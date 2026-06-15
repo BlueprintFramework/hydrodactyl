@@ -1,19 +1,13 @@
 {
-    "name": "pyrodactyl-oss/pyrodactyl",
-    "description": "Pyrodactyl is the Pterodactyl-based game server panel that's faster, smaller, safer, and more accessible.",
+    "name": "BlueprintFramework/hydrodactyl",
+    "description": "Hydrodactyl is the Pterodactyl-based game server panel that's faster, smaller, safer, and more accessible.",
     "license": "Apache-2.0",
     "authors": [
         {
-            "name": "Pyrodactyl-Oss",
-            "email": "me@pyrodactyl.dev",
-            "homepage": "https://pyrodactyl.dev",
+            "name": "Naterfute",
+            "email": "naterfute@hydrodactyl.dev",
+            "homepage": "https://naterfute.dev",
             "role": "Maintainer"
-        },
-        {
-            "name": "Pyro,  Inc.",
-            "email": "team@pyro.host",
-            "homepage": "https://pyro.host",
-            "role": "Former Maintainer"
         }
     ],
     "require": {
