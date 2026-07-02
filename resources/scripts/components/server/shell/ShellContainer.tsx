@@ -11,7 +11,7 @@ import previewEggChange, { type EggPreview } from '@/api/server/previewEggChange
 import type { ServerOperation } from '@/api/server/serverOperations';
 import getServerBackups from '@/api/swr/getServerBackups';
 import getServerStartup from '@/api/swr/getServerStartup';
-import ActionButton from '@/components/elements/ActionButton';
+import { Button } from '@/components/ui/button';
 import ConfirmationModal from '@/components/elements/ConfirmationModal';
 import {
     DropdownMenu,
@@ -29,6 +29,7 @@ import OperationProgressModal from '@/components/server/operations/OperationProg
 import WingsOperationProgressModal from '@/components/server/operations/WingsOperationProgressModal';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 import { ServerContext } from '@/state/server';
+import ServerHeader from '@/components/server/header/ServerHeader';
 
 interface Egg {
     object: string;
@@ -251,8 +252,8 @@ const SoftwareContainer = () => {
     const uuid = serverData?.uuid;
     const [nests, setNests] = useState<Nest[]>();
     //const eggs = nests?.reduce(
-    //    (eggArray, nest) => [...eggArray, ...nest.attributes.relationships.eggs.data],
-    //    [] as Egg[],
+    //  (eggArray, nest) => [...eggArray, ...nest.attributes.relationships.eggs.data],
+    //  [] as Egg[],
     //);
     const currentEgg = serverData?.egg;
     //const originalEgg = currentEgg;
@@ -510,8 +511,8 @@ const SoftwareContainer = () => {
                 selectedDockerImage && eggPreview.docker_images
                     ? eggPreview.docker_images[selectedDockerImage]
                     : eggPreview.default_docker_image && eggPreview.docker_images
-                      ? eggPreview.docker_images[eggPreview.default_docker_image]
-                      : '';
+                        ? eggPreview.docker_images[eggPreview.default_docker_image]
+                        : '';
 
             // Filter out empty environment variables to prevent validation issues
             const filteredEnvironment: Record<string, string> = {};
@@ -657,8 +658,8 @@ const SoftwareContainer = () => {
                     </div>
                 </div>
                 <div className='flex-shrink-0 w-full sm:w-auto'>
-                    <ActionButton
-                        variant='primary'
+                    <Button
+
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -673,7 +674,7 @@ const SoftwareContainer = () => {
                     >
                         {isLoading && <Spinner size='small' />}
                         Change Software
-                    </ActionButton>
+                    </Button>
                 </div>
             </div>
         </TitledGreyBox>
@@ -705,13 +706,13 @@ const SoftwareContainer = () => {
                 </div>
 
                 <div className='flex justify-center pt-4'>
-                    <ActionButton
+                    <Button
                         variant='secondary'
                         onClick={() => setCurrentStep('overview')}
                         className='w-full sm:w-auto'
                     >
                         Back to Overview
-                    </ActionButton>
+                    </Button>
                 </div>
             </div>
         </TitledGreyBox>
@@ -753,20 +754,20 @@ const SoftwareContainer = () => {
                 )}
 
                 <div className='flex flex-col sm:flex-row justify-center gap-3 pt-4'>
-                    <ActionButton
+                    <Button
                         variant='secondary'
                         onClick={() => setCurrentStep('select-game')}
                         className='w-full sm:w-auto'
                     >
                         Back to Games
-                    </ActionButton>
-                    <ActionButton
+                    </Button>
+                    <Button
                         variant='secondary'
                         onClick={() => setCurrentStep('overview')}
                         className='w-full sm:w-auto'
                     >
                         Cancel
-                    </ActionButton>
+                    </Button>
                 </div>
             </div>
         </TitledGreyBox>
@@ -901,11 +902,10 @@ const SoftwareContainer = () => {
                                                             handleVariableChange(variable.env_variable, e.target.value)
                                                         }
                                                         placeholder={variable.default_value || 'Enter value...'}
-                                                        className={`w-full px-3 py-2 bg-[#ffffff08] border rounded-lg text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none transition-colors ${
-                                                            variableErrors[variable.env_variable]
-                                                                ? 'border-red-500 focus:border-red-500'
-                                                                : 'border-[#ffffff12] focus:border-brand'
-                                                        }`}
+                                                        className={`w-full px-3 py-2 bg-[#ffffff08] border rounded-lg text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none transition-colors ${variableErrors[variable.env_variable]
+                                                            ? 'border-red-500 focus:border-red-500'
+                                                            : 'border-[#ffffff12] focus:border-brand'
+                                                            }`}
                                                     />
                                                     {variableErrors[variable.env_variable] && (
                                                         <p className='text-xs text-red-400 mt-1'>
@@ -946,11 +946,11 @@ const SoftwareContainer = () => {
                                         </label>
                                         <p className='text-xs text-neutral-400 leading-relaxed'>
                                             {backupLimit !== 0 &&
-                                            (backupLimit === null || (backups?.backupCount || 0) < backupLimit)
+                                                (backupLimit === null || (backups?.backupCount || 0) < backupLimit)
                                                 ? 'Automatically create a backup before applying changes'
                                                 : backupLimit === 0
-                                                  ? 'Backups are disabled for this server'
-                                                  : 'Backup limit reached'}
+                                                    ? 'Backups are disabled for this server'
+                                                    : 'Backup limit reached'}
                                         </p>
                                     </div>
                                     <div className='flex-shrink-0'>
@@ -984,22 +984,22 @@ const SoftwareContainer = () => {
                 )}
 
                 <div className='flex flex-col sm:flex-row justify-center gap-3 pt-4'>
-                    <ActionButton
+                    <Button
                         variant='secondary'
                         onClick={() => setCurrentStep('select-software')}
                         className='w-full sm:w-auto'
                     >
                         Back to Software
-                    </ActionButton>
-                    <ActionButton
-                        variant='primary'
+                    </Button>
+                    <Button
+
                         onClick={proceedToReview}
                         disabled={!eggPreview || isLoading}
                         className='w-full sm:w-auto'
                     >
                         {isLoading && <Spinner size='small' />}
                         Review Changes
-                    </ActionButton>
+                    </Button>
                 </div>
             </TitledGreyBox>
         </div>
@@ -1108,26 +1108,23 @@ const SoftwareContainer = () => {
                                 {eggPreview.warnings.map((warning, index) => (
                                     <div
                                         key={index}
-                                        className={`p-4 border rounded-lg ${
-                                            warning.severity === 'error'
-                                                ? 'bg-red-500/10 border-red-500/20'
-                                                : 'bg-amber-500/10 border-amber-500/20'
-                                        }`}
+                                        className={`p-4 border rounded-lg ${warning.severity === 'error'
+                                            ? 'bg-red-500/10 border-red-500/20'
+                                            : 'bg-amber-500/10 border-amber-500/20'
+                                            }`}
                                     >
                                         <div className='flex items-start gap-3'>
                                             <TriangleExclamation
                                                 width={22}
                                                 height={22}
                                                 fill='currentColor'
-                                                className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
-                                                    warning.severity === 'error' ? 'text-red-400' : 'text-amber-400'
-                                                }`}
+                                                className={`w-5 h-5 flex-shrink-0 mt-0.5 ${warning.severity === 'error' ? 'text-red-400' : 'text-amber-400'
+                                                    }`}
                                             />
                                             <div>
                                                 <h4
-                                                    className={`font-semibold mb-2 ${
-                                                        warning.severity === 'error' ? 'text-red-400' : 'text-amber-400'
-                                                    }`}
+                                                    className={`font-semibold mb-2 ${warning.severity === 'error' ? 'text-red-400' : 'text-amber-400'
+                                                        }`}
                                                 >
                                                     {warning.type === 'subdomain_incompatible'
                                                         ? 'Subdomain Will Be Deleted'
@@ -1167,22 +1164,22 @@ const SoftwareContainer = () => {
                 )}
 
                 <div className='flex flex-col sm:flex-row justify-center gap-3 pt-4'>
-                    <ActionButton
+                    <Button
                         variant='secondary'
                         onClick={() => setCurrentStep('configure')}
                         className='w-full sm:w-auto'
                     >
                         Back to Configure
-                    </ActionButton>
-                    <ActionButton
-                        variant='primary'
+                    </Button>
+                    <Button
+
                         onClick={applyChanges}
                         disabled={isLoading}
                         className='w-full sm:w-auto'
                     >
                         {isLoading && <Spinner size='small' />}
                         Apply Changes
-                    </ActionButton>
+                    </Button>
                 </div>
             </TitledGreyBox>
         </div>
@@ -1230,6 +1227,7 @@ const SoftwareContainer = () => {
     }
     return (
         <ServerContentBlock title='Software Management'>
+            <ServerHeader />
             <div className='space-y-6'>
                 <MainPageHeader direction='column' title='Software Management'>
                     <p className='text-neutral-400 leading-relaxed'>
