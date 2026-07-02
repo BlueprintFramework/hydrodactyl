@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { httpErrorToHuman } from '@/api/http';
 import deleteScheduleTask from '@/api/server/schedules/deleteScheduleTask';
 import type { Schedule, Task } from '@/api/server/schedules/getServerSchedules';
-import ActionButton from '@/components/elements/ActionButton';
+import { Button } from '@/components/ui/button';
 import Can from '@/components/elements/Can';
 import ConfirmationModal from '@/components/elements/ConfirmationModal';
 import ItemContainer from '@/components/elements/ItemContainer';
@@ -114,7 +114,7 @@ const ScheduleTaskRow = ({ schedule, task }: Props) => {
                     )}
                 </div>
                 <Can action={'schedule.update'}>
-                    <ActionButton
+                    <Button
                         variant='secondary'
                         size='sm'
                         className='flex flex-row items-center gap-2 ml-auto sm:ml-0'
@@ -123,11 +123,11 @@ const ScheduleTaskRow = ({ schedule, task }: Props) => {
                     >
                         <PencilToLine width={22} height={22} fill='currentColor' />
                         Edit
-                    </ActionButton>
+                    </Button>
                 </Can>
                 <Can action={'schedule.update'}>
-                    <ActionButton
-                        variant='danger'
+                    <Button
+                        variant='attention'
                         size='sm'
                         onClick={() => setVisible(true)}
                         className='flex items-center gap-2'
@@ -135,7 +135,7 @@ const ScheduleTaskRow = ({ schedule, task }: Props) => {
                     >
                         <TrashBin width={22} height={22} fill='currentColor' className='w-4 h-4' />
                         <span className='hidden sm:inline'>Delete</span>
-                    </ActionButton>
+                    </Button>
                 </Can>
             </div>
         </ItemContainer>

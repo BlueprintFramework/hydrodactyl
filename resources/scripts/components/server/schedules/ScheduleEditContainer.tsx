@@ -17,6 +17,7 @@ import ScheduleTaskRow from '@/components/server/schedules/ScheduleTaskRow';
 import TaskDetailsModal from '@/components/server/schedules/TaskDetailsModal';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
+import ServerHeader from '@/components/server/header/ServerHeader';
 
 const CronBox = ({ title, value }: { title: string; value: string }) => (
     <ItemContainer title={title} description={value} />
@@ -86,6 +87,7 @@ const ScheduleEditContainer = () => {
 
     return (
         <PageContentBlock title={'Schedules'}>
+            <ServerHeader />
             <FlashMessageRender byKey={'schedules'} />
             {!schedule || isLoading ? (
                 <Spinner size={'large'} centered />

@@ -5,7 +5,6 @@ import { boolean, number, object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
 import createOrUpdateScheduleTask from '@/api/server/schedules/createOrUpdateScheduleTask';
 import type { Schedule, Task } from '@/api/server/schedules/getServerSchedules';
-import ActionButton from '@/components/elements/ActionButton';
 import Field from '@/components/elements/Field';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import FormikSwitchV2 from '@/components/elements/FormikSwitchV2';
@@ -13,6 +12,7 @@ import { Textarea } from '@/components/elements/Input';
 import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import Select from '@/components/elements/Select';
 import FlashMessageRender from '@/components/FlashMessageRender';
+import { Button } from '@/components/ui/button';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -226,9 +226,9 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
                             label={'Continue on Failure'}
                         />
                         <div className={`flex justify-end my-6`}>
-                            <ActionButton variant='primary' type={'submit'} disabled={isSubmitting}>
+                            <Button variant='attention' type={'submit'} disabled={isSubmitting}>
                                 {task ? 'Save Changes' : 'Create Task'}
-                            </ActionButton>
+                            </Button>
                         </div>
                     </Form>
                 </Modal>
