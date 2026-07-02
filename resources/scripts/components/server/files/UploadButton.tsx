@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import getFileUploadUrl from '@/api/server/files/getFileUploadUrl';
-import { Button } from '@/components/ui/button';
 import { ModalMask } from '@/components/elements/Modal';
 import FadeTransition from '@/components/elements/transitions/FadeTransition';
+import { Button } from '@/components/ui/button';
 import useEventListener from '@/plugins/useEventListener';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { useFlashKey } from '@/plugins/useFlash';
@@ -163,10 +163,7 @@ const UploadButton = () => {
                 }}
                 multiple
             />
-            <Button
-                variant='secondary'
-                onClick={() => fileUploadInput.current && fileUploadInput.current.click()}
-            >
+            <Button variant='secondary' onClick={() => fileUploadInput.current && fileUploadInput.current.click()}>
                 Upload
             </Button>
         </>

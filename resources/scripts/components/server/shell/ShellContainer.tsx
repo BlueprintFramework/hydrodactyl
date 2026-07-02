@@ -901,10 +901,11 @@ const SoftwareContainer = () => {
                                                             handleVariableChange(variable.env_variable, e.target.value)
                                                         }
                                                         placeholder={variable.default_value || 'Enter value...'}
-                                                        className={`w-full px-3 py-2 bg-[#ffffff08] border rounded-lg text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none transition-colors ${variableErrors[variable.env_variable]
+                                                        className={`w-full px-3 py-2 bg-[#ffffff08] border rounded-lg text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none transition-colors ${
+                                                            variableErrors[variable.env_variable]
                                                                 ? 'border-red-500 focus:border-red-500'
                                                                 : 'border-[#ffffff12] focus:border-brand'
-                                                            }`}
+                                                        }`}
                                                     />
                                                     {variableErrors[variable.env_variable] && (
                                                         <p className='text-xs text-red-400 mt-1'>
@@ -1107,10 +1108,11 @@ const SoftwareContainer = () => {
                                 {eggPreview.warnings.map((warning, index) => (
                                     <div
                                         key={index}
-                                        className={`p-4 border rounded-lg ${warning.severity === 'error'
+                                        className={`p-4 border rounded-lg ${
+                                            warning.severity === 'error'
                                                 ? 'bg-red-500/10 border-red-500/20'
                                                 : 'bg-amber-500/10 border-amber-500/20'
-                                            }`}
+                                        }`}
                                     >
                                         <div className='flex items-start gap-3'>
                                             <TriangleExclamation

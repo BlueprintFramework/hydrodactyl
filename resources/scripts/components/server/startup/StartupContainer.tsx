@@ -24,6 +24,7 @@ import { ServerError } from '@/components/elements/ScreenBlock';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import TitledGreyBox from '@/components/elements/TitledGreyBox';
+import ServerHeader from '@/components/server/header/ServerHeader';
 import VariableBox from '@/components/server/startup/VariableBox';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 import useFlash from '@/plugins/useFlash';
@@ -193,6 +194,7 @@ const StartupContainer = () => {
         )
     ) : (
         <ServerContentBlock title={'Startup Settings'} showFlashKey={'startup:image'}>
+            <ServerHeader />
             <Dialog.Confirm
                 open={revertModalVisible}
                 title={'Revert Docker Image'}

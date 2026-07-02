@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import md5 from "md5";
+import md5 from 'md5';
+import { useEffect, useState } from 'react';
 
 interface AvatarProps {
     email: string;
@@ -8,8 +8,8 @@ interface AvatarProps {
     rounded?: number;
 }
 
-export function Avatar({ email, text = "", size = 32, rounded = 32 }: AvatarProps) {
-    const [src, setSrc] = useState<string>("");
+export function Avatar({ email, text = '', size = 32, rounded = 32 }: AvatarProps) {
+    const [src, setSrc] = useState<string>('');
 
     useEffect(() => {
         const hash = md5(email.trim().toLowerCase());
@@ -30,13 +30,5 @@ export function Avatar({ email, text = "", size = 32, rounded = 32 }: AvatarProp
             .catch(console.error);
     }, [email, text, size, rounded]);
 
-    return (
-        <img
-            src={src}
-            alt={`Avatar for ${email}`}
-            width={size}
-            height={size}
-            style={{ borderRadius: rounded }}
-        />
-    );
+    return <img src={src} alt={`Avatar for ${email}`} width={size} height={size} style={{ borderRadius: rounded }} />;
 }

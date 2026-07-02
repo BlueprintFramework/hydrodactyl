@@ -2,23 +2,22 @@ import { Eye, EyeSlash, Key, Plus, TrashBin } from '@gravity-ui/icons';
 import { format } from 'date-fns';
 import { type Actions, useStoreActions } from 'easy-peasy';
 import { Field, Form, Formik, type FormikHelpers } from 'formik';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { object, string } from 'yup';
 import { createSSHKey, deleteSSHKey, useSSHKeys } from '@/api/account/ssh-keys';
 import { httpErrorToHuman } from '@/api/http';
-import { Button } from '@/components/ui/button';
 import Code from '@/components/elements/Code';
+import CopyOnClick from '@/components/elements/CopyOnClick';
 import { Dialog } from '@/components/elements/dialog';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import Input from '@/components/elements/Input';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import FlashMessageRender from '@/components/FlashMessageRender';
+import ServerHeader from '@/components/HeaderManger';
+import { Button } from '@/components/ui/button';
 import { useFlashKey } from '@/plugins/useFlash';
 import type { ApplicationStore } from '@/state';
-
-import ServerHeader from '@/components/HeaderManger';
-import CopyOnClick from '@/components/elements/CopyOnClick';
 
 interface CreateValues {
     name: string;

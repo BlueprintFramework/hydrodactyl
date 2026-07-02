@@ -1,5 +1,4 @@
-import { Plus } from '@gravity-ui/icons';
-import { Database } from '@gravity-ui/icons';
+import { Database, Plus } from '@gravity-ui/icons';
 import { Form, Formik, type FormikHelpers } from 'formik';
 import { For } from 'million/react';
 import { useEffect, useState } from 'react';
@@ -7,7 +6,6 @@ import { object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
 import createServerDatabase from '@/api/server/databases/createServerDatabase';
 import getServerDatabases from '@/api/server/databases/getServerDatabases';
-import { Button } from '@/components/ui/button';
 import Can from '@/components/elements/Can';
 import Field from '@/components/elements/Field';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
@@ -16,10 +14,11 @@ import { PageListContainer, PageListItem } from '@/components/elements/pages/Pag
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import DatabaseRow from '@/components/server/databases/DatabaseRow';
+import ServerHeader from '@/components/server/header/ServerHeader';
+import { Button } from '@/components/ui/button';
 import { useDeepMemoize } from '@/plugins/useDeepMemoize';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
-import ServerHeader from '@/components/server/header/ServerHeader';
 
 interface DatabaseValues {
     databaseName: string;
@@ -87,7 +86,10 @@ const DatabasesContainer = () => {
             <div className='px-2 pt-2 sm:px-14 sm:pt-14 flex flex-col sm:flex-row items-center gap-4'>
                 {(databaseLimit === null || (databaseLimit > 0 && databaseLimit !== databases.length)) && (
                     <Can action={'database.create'}>
-                        <Button variant='secondary' onClick={() => setCreateModalVisible(true)} className='flex items-center gap-2'
+                        <Button
+                            variant='secondary'
+                            onClick={() => setCreateModalVisible(true)}
+                            className='flex items-center gap-2'
                         >
                             <Plus width={22} height={22} className='w-4 h-4' fill='currentColor' />
                             New Database
@@ -156,36 +158,34 @@ const DatabasesContainer = () => {
                 )}
             </Formik>
 
-            {
-                !databases.length && loading ? (
-                    <div className='flex items-center justify-center py-12'>
-                        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-brand'></div>
-                    </div>
-                ) : databases.length > 0 ? (
-                    <PageListContainer data-pyro-databases>
-                        <For each={databases} memo>
-                            {(database, index) => <DatabaseRow key={database.id} database={database} />}
-                        </For>
-                    </PageListContainer>
-                ) : (
-                    <div className='flex flex-col items-center justify-center min-h-[60vh] py-12 px-4'>
-                        <div className='text-center'>
-                            <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-[#ffffff11] flex items-center justify-center'>
-                                <Database className='w-8 h-8 text-zinc-400' fill='currentColor' />
-                            </div>
-                            <h3 className='text-lg font-medium text-zinc-200 mb-2'>
-                                {databaseLimit === 0 ? 'Databases unavailable' : 'No databases found'}
-                            </h3>
-                            <p className='text-sm text-zinc-400 max-w-sm'>
-                                {databaseLimit === 0
-                                    ? 'Databases cannot be created for this server.'
-                                    : 'Your server does not have any databases. Create one to get started.'}
-                            </p>
+            {!databases.length && loading ? (
+                <div className='flex items-center justify-center py-12'>
+                    <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-brand'></div>
+                </div>
+            ) : databases.length > 0 ? (
+                <PageListContainer data-pyro-databases>
+                    <For each={databases} memo>
+                        {(database, index) => <DatabaseRow key={database.id} database={database} />}
+                    </For>
+                </PageListContainer>
+            ) : (
+                <div className='flex flex-col items-center justify-center min-h-[60vh] py-12 px-4'>
+                    <div className='text-center'>
+                        <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-[#ffffff11] flex items-center justify-center'>
+                            <Database className='w-8 h-8 text-zinc-400' fill='currentColor' />
                         </div>
+                        <h3 className='text-lg font-medium text-zinc-200 mb-2'>
+                            {databaseLimit === 0 ? 'Databases unavailable' : 'No databases found'}
+                        </h3>
+                        <p className='text-sm text-zinc-400 max-w-sm'>
+                            {databaseLimit === 0
+                                ? 'Databases cannot be created for this server.'
+                                : 'Your server does not have any databases. Create one to get started.'}
+                        </p>
                     </div>
-                )
-            }
-        </ServerContentBlock >
+                </div>
+            )}
+        </ServerContentBlock>
     );
 };
 

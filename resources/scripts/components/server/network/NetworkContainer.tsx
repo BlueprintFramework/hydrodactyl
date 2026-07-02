@@ -8,6 +8,7 @@ import { Dialog } from '@/components/elements/dialog';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import VirtualizedList from '@/components/elements/VirtualizedList';
 import FlashMessageRender from '@/components/FlashMessageRender';
+import ServerHeader from '@/components/server/header/ServerHeader';
 import AllocationRow from '@/components/server/network/AllocationRow';
 import SubdomainManagement from '@/components/server/network/SubdomainManagement';
 import { Button } from '@/components/ui/button';
@@ -58,6 +59,7 @@ const NetworkContainer = () => {
 
     return (
         <ServerContentBlock title={'Network'} className='p-0!'>
+            <ServerHeader />
             <FlashMessageRender byKey={'server:network'} />
 
             <div className=''>

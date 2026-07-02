@@ -4,9 +4,9 @@ import type { ActivityLogFilters } from '@/api/account/activity';
 import { useActivityLogs } from '@/api/server/activity';
 import ActionButton from '@/components/elements/ActionButton';
 import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
+import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import { Input } from '@/components/elements/inputs';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
-import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import Select from '@/components/elements/Select';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
@@ -191,7 +191,12 @@ const ServerActivityLogContainer = () => {
                                         className='flex items-center gap-2'
                                         title='Export CSV (Ctrl+E)'
                                     >
-                                        <ArrowDownToLine width={22} height={22} className='w-4 h-4' fill='currentColor' />
+                                        <ArrowDownToLine
+                                            width={22}
+                                            height={22}
+                                            className='w-4 h-4'
+                                            fill='currentColor'
+                                        />
                                         Export
                                     </ActionButton>
                                 </div>
@@ -249,7 +254,9 @@ const ServerActivityLogContainer = () => {
                                     </div>
 
                                     <div>
-                                        <label className='block text-sm font-medium text-zinc-300 mb-2'>Event Type</label>
+                                        <label className='block text-sm font-medium text-zinc-300 mb-2'>
+                                            Event Type
+                                        </label>
                                         <Select
                                             value={selectedEventType}
                                             onChange={(e) => setSelectedEventType(e.target.value)}
@@ -271,25 +278,36 @@ const ServerActivityLogContainer = () => {
                                     </div>
 
                                     <div>
-                                        <label className='block text-sm font-medium text-zinc-300 mb-2'>Time Range</label>
+                                        <label className='block text-sm font-medium text-zinc-300 mb-2'>
+                                            Time Range
+                                        </label>
                                         <Select
                                             value={dateRange}
                                             onChange={(e) => setDateRange(e.target.value)}
                                             className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-brand focus:ring-1 focus:ring-brand hover:border-zinc-500 transition-colors duration-150'
                                         >
-                                            <option value='all' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
+                                            <option
+                                                value='all'
+                                                style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
+                                            >
                                                 All Time
                                             </option>
                                             <option value='1h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
                                                 Last Hour
                                             </option>
-                                            <option value='24h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
+                                            <option
+                                                value='24h'
+                                                style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
+                                            >
                                                 Last 24 Hours
                                             </option>
                                             <option value='7d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
                                                 Last 7 Days
                                             </option>
-                                            <option value='30d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
+                                            <option
+                                                value='30d'
+                                                style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
+                                            >
                                                 Last 30 Days
                                             </option>
                                         </Select>
@@ -333,7 +351,8 @@ const ServerActivityLogContainer = () => {
                                 <h3 className='text-base font-semibold text-zinc-100'>Events</h3>
                                 {filteredData?.items && (
                                     <span className='text-sm text-zinc-400'>
-                                        ({filteredData.items.length} {filteredData.items.length === 1 ? 'event' : 'events'})
+                                        ({filteredData.items.length}{' '}
+                                        {filteredData.items.length === 1 ? 'event' : 'events'})
                                     </span>
                                 )}
                             </div>
@@ -384,7 +403,6 @@ const ServerActivityLogContainer = () => {
                 </ErrorBoundary>
             </div>
         </ServerContentBlock>
-
     );
 };
 

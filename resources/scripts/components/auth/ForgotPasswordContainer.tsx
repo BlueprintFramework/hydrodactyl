@@ -11,10 +11,8 @@ import Captcha, { getCaptchaResponse } from '@/components/elements/Captcha';
 import ContentBox from '@/components/elements/ContentBox';
 import Field from '@/components/elements/Field';
 import CaptchaManager from '@/lib/captcha';
-
-import SecondaryLink from '../ui/secondary-link';
 import useFlash from '@/plugins/useFlash';
-
+import SecondaryLink from '../ui/secondary-link';
 
 interface Values {
     email: string;
@@ -70,9 +68,7 @@ const ForgotPasswordContainer = () => {
             {({ isSubmitting }) => (
                 <LoginFormContainer className={`w-full flex flex-col`}>
                     <TitleSection title='Forgot Password' />
-                    <div className='text-sm mb-6'>
-                        We&apos;ll send you an email with a link to reset your password.
-                    </div>
+                    <div className='text-sm mb-6'>We&apos;ll send you an email with a link to reset your password.</div>
                     <Field id='email' label={'Email'} name={'email'} type={'email'} />
 
                     <div className='flex w-full justify-between items-center'>
@@ -100,7 +96,6 @@ const ForgotPasswordContainer = () => {
                             });
                         }}
                     />
-
                 </LoginFormContainer>
             )}
         </Formik>

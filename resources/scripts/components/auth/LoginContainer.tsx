@@ -27,7 +27,6 @@ interface ErrorResponse {
     code: string;
 }
 
-
 function LoginContainer() {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const navigate = useNavigate();
@@ -56,7 +55,8 @@ function LoginContainer() {
                     return;
                 }
             }
-        } else { }
+        } else {
+        }
 
         login(loginData)
             .then((response) => {

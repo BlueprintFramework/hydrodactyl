@@ -1,12 +1,5 @@
-import {
-    Chart as ChartJS,
-    LineController,
-    LineElement,
-    PointElement,
-    LinearScale,
-    Filler,
-} from 'chart.js';
 import type { ChartData, ChartDataset, ChartOptions } from 'chart.js';
+import { Chart as ChartJS, Filler, LinearScale, LineController, LineElement, PointElement } from 'chart.js';
 
 import { deepmerge, deepmergeCustom } from 'deepmerge-ts';
 import { useState } from 'react';

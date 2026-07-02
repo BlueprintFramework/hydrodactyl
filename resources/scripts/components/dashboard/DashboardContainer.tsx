@@ -189,12 +189,13 @@ const DashboardContainer = () => {
                                 {items.map((server, index) => (
                                     <div
                                         key={`${server.uuid}-${dashboardDisplayOption}`}
-                                        className={`transform-gpu skeleton-anim-2 ${dashboardDisplayOption === 'grid'
+                                        className={`transform-gpu skeleton-anim-2 ${
+                                            dashboardDisplayOption === 'grid'
                                                 ? items.length === 1
                                                     ? 'w-[calc(50%-0.5rem)] max-lg:w-full'
                                                     : 'w-[calc(50%-0.5rem)] max-lg:w-full'
                                                 : 'mb-4'
-                                            } max-lg:mb-4`}
+                                        } max-lg:mb-4`}
                                         style={{
                                             animationDelay: `${index * 50 + 50}ms`,
                                             animationTimingFunction:
@@ -221,8 +222,8 @@ const DashboardContainer = () => {
                                     {serverViewMode === 'admin-all'
                                         ? 'There are no other servers to display.'
                                         : serverViewMode === 'all'
-                                            ? 'No Server Shared With your Account'
-                                            : 'There are no servers associated with your account.'}
+                                          ? 'No Server Shared With your Account'
+                                          : 'There are no servers associated with your account.'}
                                 </p>
                                 <h3 className='text-lg font-medium text-zinc-200 mb-2'>
                                     {serverViewMode === 'admin-all' ? 'No other servers found' : 'No servers found'}

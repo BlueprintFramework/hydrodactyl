@@ -1,6 +1,6 @@
 import { Search01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { memo, useState, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 import { Input } from '@/components/ui/input';
 import { KeyboardShortcut } from '@/components/ui/keyboard-shortcut';

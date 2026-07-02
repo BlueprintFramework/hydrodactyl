@@ -47,7 +47,7 @@ const ServerConsoleContainer = () => {
                     <Features enabled={eggFeatures} />
                 </ErrorBoundary>
             </div>
-        </PageContentBlock >
+        </PageContentBlock>
     );
 };
 

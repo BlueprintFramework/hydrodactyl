@@ -163,8 +163,9 @@ const AllocationRow = ({ allocation }: Props) => {
                             onClick={setPrimaryAllocation}
                             disabled={allocation.isDefault}
                             variant={'secondary'}
-                            className={`p-2  transition-colors ${allocation.isDefault ? ' text-zinc-600 cursor-not-allowed' : ' text-zinc-400'
-                                }`}
+                            className={`p-2  transition-colors ${
+                                allocation.isDefault ? ' text-zinc-600 cursor-not-allowed' : ' text-zinc-400'
+                            }`}
                             title={
                                 allocation.isDefault
                                     ? 'This is already the primary allocation'

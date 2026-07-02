@@ -2,8 +2,8 @@ import { TrashBin } from '@gravity-ui/icons';
 import { useState } from 'react';
 import deleteServerAllocation from '@/api/server/network/deleteServerAllocation';
 import getServerAllocations from '@/api/swr/getServerAllocations';
-import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/elements/dialog';
+import { Button } from '@/components/ui/button';
 import { useFlashKey } from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -48,12 +48,7 @@ const DeleteAllocationButton = ({ allocation }: Props) => {
             >
                 This allocation will be immediately removed from your server.
             </Dialog.Confirm>
-            <Button
-                variant='attention'
-                size='sm'
-                onClick={() => setConfirm(true)}
-                className='flex items-center gap-2'
-            >
+            <Button variant='attention' size='sm' onClick={() => setConfirm(true)} className='flex items-center gap-2'>
                 <TrashBin width={22} height={22} fill='currentColor' />
                 <span className='hidden sm:inline'>Delete</span>
             </Button>

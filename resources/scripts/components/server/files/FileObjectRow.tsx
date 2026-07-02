@@ -1,4 +1,4 @@
-import { File, FolderOpenFill, FileZipper } from '@gravity-ui/icons';
+import { File, FileZipper, FolderOpenFill } from '@gravity-ui/icons';
 import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
 import { join } from 'pathe';
 import { memo, type ReactNode } from 'react';
