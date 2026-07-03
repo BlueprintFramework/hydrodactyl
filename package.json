@@ -69,6 +69,7 @@
         "react-dom": "^19.1.1",
         "react-fast-compare": "^3.2.2",
         "react-router-dom": "^7.7.1",
+        "recharts": "^3.9.1",
         "sockette": "^2.0.6",
         "sonner": "^2.0.7",
         "styled-components": "^6.1.19",
@@ -114,6 +115,11 @@
         "build:turbo": "turbo build",
         "ship": "turbo build"
     },
-    "browserslist": ["> 0.5%", "last 2 versions", "firefox esr", "not dead"],
+    "browserslist": [
+        "> 0.5%",
+        "last 2 versions",
+        "firefox esr",
+        "not dead"
+    ],
     "packageManager": "pnpm@11.3.0"
 }

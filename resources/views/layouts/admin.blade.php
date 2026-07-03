@@ -21,6 +21,7 @@
   @include('layouts.scripts')
 
   @section('scripts')
+  @vite('resources/scripts/admin/index.tsx')
   {!! Theme::css('vendor/select2/select2.min.css?t={cache-version}') !!}
   {!! Theme::css('vendor/bootstrap/bootstrap.min.css?t={cache-version}') !!}
   {!! Theme::css('vendor/adminlte/admin.min.css?t={cache-version}') !!}
@@ -202,6 +203,7 @@
     </footer>
   </div>
   @section('footer-scripts')
+  @viteReactRefresh
   <script src="/js/keyboard.polyfill.js" type="application/javascript"></script>
   <script>keyboardeventKeyPolyfill.polyfill();</script>
 
