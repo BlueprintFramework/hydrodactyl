@@ -224,7 +224,7 @@ const SetupContainer = () => {
 
     return (
         <Formik initialValues={INITIAL} validationSchema={schema} onSubmit={onSubmit} validateOnBlur validateOnChange={false}>
-            {({ values, validateForm, setTouched, isSubmitting }) => {
+            {({ values, validateForm, setTouched, isSubmitting, handleSubmit }) => {
                 // validateForm() runs the full schema and is what populates the
                 // Formik `errors` the touched <Field>s render against — keep it.
                 const advance = async () => {
@@ -244,6 +244,9 @@ const SetupContainer = () => {
                 };
 
                 const back = () => setStep((s) => Math.max(0, s - 1));
+
+                // Light up the primary CTA once the current step is ready to proceed.
+                const ready = step === 0 ? true : schema.isValidSync(values);
 
                 return (
                     <Form className='w-full max-w-md mx-auto flex flex-col gap-8'>
@@ -342,19 +345,32 @@ const SetupContainer = () => {
                                 )}
                                 {step < STEP_LABELS.length - 1 ? (
                                     <Button
+                                        key='advance'
                                         type='button'
                                         onClick={advance}
                                         disabled={isSubmitting}
-                                        className='bg-mocha-100 hover:bg-mocha-200 text-black rounded-lg px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50'
+                                        className={cn(
+                                            'rounded-lg px-5 py-2.5 text-sm font-medium transition-all duration-200 disabled:opacity-50',
+                                            ready
+                                                ? 'bg-brand hover:bg-brand-600 text-white shadow-[0_0_24px_-4px_rgba(250,78,73,0.55)] hover:shadow-[0_0_30px_-2px_rgba(250,78,73,0.7)]'
+                                                : 'bg-mocha-100 hover:bg-mocha-200 text-black',
+                                        )}
                                     >
                                         {step === 0 ? 'Get started' : 'Continue'}
                                     </Button>
                                 ) : (
                                     <Button
-                                        type='submit'
+                                        key='submit'
+                                        type='button'
+                                        onClick={handleSubmit}
                                         isLoading={isSubmitting}
                                         disabled={isSubmitting}
-                                        className='bg-brand hover:bg-brand-600 text-white rounded-lg px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50'
+                                        className={cn(
+                                            'rounded-lg px-5 py-2.5 text-sm font-medium transition-all duration-200 disabled:opacity-50',
+                                            ready
+                                                ? 'bg-brand hover:bg-brand-600 text-white shadow-[0_0_24px_-4px_rgba(250,78,73,0.55)] hover:shadow-[0_0_30px_-2px_rgba(250,78,73,0.7)]'
+                                                : 'bg-mocha-100 hover:bg-mocha-200 text-black',
+                                        )}
                                     >
                                         Create admin account
                                     </Button>
