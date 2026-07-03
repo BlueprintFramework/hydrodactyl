@@ -1,63 +1,76 @@
 <p align="center">
-<a aria-label="Read the Hydrodactyl introduction blog post" href="https://blueprint.zip/blog/introducing-hydrodactyl?utm_source=githubreadme&utm_medium=readme&utm_campaign=HYDRODACTYL&utm_id=HYDRODACTYL"><img alt="" src=".github/banner_v6.jpg"></a>
+  <img alt="header" src="https://shieldcn.dev/header/gradient.svg?title=Hydrodactyl&amp;subtitle=The+world%27s+best+Pterodactyl+panel.+Unmatched+performance+and+features.&amp;mode=dark&amp;image=https%3A%2F%2Fhydrodactyl.dev%2Fpanelscreenshots%2Fhydrodactyl-server.png&amp;overlay=0.85" />
 </p>
-<p align="right"><a href="https://discord.gg/sK686yHdaK">Join Hydrodactyl's Discord community 🡕</a> • <a href="https://blueprint.zip/blog/introducing-hydrodactyl">Read the blog post 🡕</a></p>
 
-<br/>
-<h1 align="center">Hydrodactyl (formerly Pyrodactyl-oss)</h1>
 <p align="center">
-    <a href="https://github.com/BlueprintFramework/hydrodactyl/actions/workflows/dev-build.yaml"><img src="https://github.com/BlueprintFramework/hydrodactyl/actions/workflows/dev-build.yaml/badge.svg" alt="Docker"></a>
-    <a href="https://biomejs.dev"><img alt="Formatted with Biome" src="https://img.shields.io/badge/Formatted_with-Biome-60a5fa?style=flat&logo=biome"></a>
-    <a href="https://biomejs.dev"><img alt="Linted with Biome" src="https://img.shields.io/badge/Linted_with-Biome-60a5fa?style=flat&logo=biome"></a>
+  <img alt="online" src="https://shieldcn.dev/discord/1515499709685436588.svg?variant=secondary" />
+  <img alt="Custom badge" src="https://shieldcn.dev/badge/Pterodactyl.svg?variant=branded&amp;label=Fork+of&amp;color=blue" />
+  <img alt="badge" src="https://shieldcn.dev/badge/Pyrodactyl.svg?variant=branded&amp;label=Formerly&amp;color=red" />
 </p>
 
-<br/>
+> [!NOTE]
+> All Issues and PRs should be made in the [Hydrodactyl Repository](https://github.com/BlueprintFramework/hydrodactyl).
 
-Hydrodactyl is the Pterodactyl-based game server management panel that focuses on performance enhancements, a reimagined, accessible interface, and top-tier developer experience. Builds faster, compiles smaller: Hydrodactyl is the world's best Pterodactyl.
+> [!NOTE]
+> Hydrodactyl is formerly known as Pyrodactyl.
 
-- Hydrodactyl is not compatible with Blueprint extensions. This project is intended to be an AIO solution.
-- Hydrodactyl is under development and pre-release. Some UI elements may appear broken, and there might be some bugs.
-- Please read our documentation at [https://hydrodactyl.dev](https://hydrodactyl.dev/docs/hydrodactyl) before installing.
-- For Hydrodactyl-specific issues, please use the [Hydrodactyl Discord](https://discord.gg/mnTJVSSaKp?utm_source=githubreadme&utm_medium=readme&utm_campaign=OSSLAUNCH&utm_id=OSSLAUNCH) instead of Pterodactyl or Blueprint support channels.
+> [!WARNING]
+> Hydrodactyl is under development and pre-release. Some UI elements may appear broken, and there might be some bugs.
 
+> [!NOTE]
+> Please read our documentation at [hydrodactyl.dev](https://hydrodactyl.dev/docs/hydrodactyl) before installing.
 
-![Dashboard Image](./.github/server_menu.jpeg)
+> [!IMPORTANT]
+> For Hydrodactyl-specific issues, please use the [Hydrodactyl Discord](https://discord.gg/mnTJVSSaKp?utm_source=githubreadme&utm_medium=readme&utm_campaign=OSSLAUNCH&utm_id=OSSLAUNCH) instead of Pterodactyl or Pelican support channels.
 
-Hydrodactyl is Pterodactyl, but built using modern technologies and for everyone. Expect smaller bundle sizes, faster build times, faster loading times, better accessibility and more approachable.
+## Changes from vanilla Pterodactyl
 
-Built by the same maintainer behind the original Pyrodactyl project, funded by Blueprint for years to come.
+- **Smaller bundle sizes**: Hydrodactyl is built using Vite, and significant design changes mean Hydrodactyl's initial download size is over 170 times smaller than leading Pterodactyl forks, including Pelican.
+- **Faster build times**: Hydrodactyl completes builds in milliseconds with the power of Turbo. Cold builds with zero cache finish in under 7 seconds.
+- **Faster loading times**: Hydrodactyl's load times are, on average, over 16 times faster than other closed-source Pterodactyl forks and Pelican. Smarter code splitting and chunking means that pages you visit in the panel only load necessary resources on demand. Better caching means that everything is simply snappy.
+- **More secure**: Hydrodactyl's modern architecture means most severe and easily exploitable CVEs simply do not exist. We have also implemented SRI and integrity checks for production builds.
+- **More accessible**: Hydrodactyl's Maintainers believes that gaming should be easily available for everyone. Hydrodactyl builds with the latest Web accessibility guidelines in mind. Hydrodactyl is entirely keyboard-navigable, even context menus, and screen-readers are easily compatible.
+- **More approachable**: Hydrodactyl's friendly, approachable interface means that anyone can confidently run a game server with it.
 
-## Install/development
+## Easy Script Installation
+**Officially licensed third-party script**
 
-**See our [Installation](https://hydrodactyl.dev/docs/hydrodactyl/installation) docs page on how to get started.**
+A community member has built an automated installer to get **Pyrodactyl** up and running quickly, a modified version for Hydrodactyl is expected soon™! You can find the original script at their GitHub repository: [Muspelheim-Hosting/pyrodactyl-installer](https://github.com/Muspelheim-Hosting/pyrodactyl-installer)
 
-For local development, see our [Local Development](https://hydrodactyl.dev/docs/pyrodactyl/local-development) guide. You'll find instructions on how to get a development environment up and running for Linux, MacOS and Windows.
+## Quickstart
+### System requirements
+#### Minimum Requirements
 
-Windows is only supported for local-development purposes.
+| Component | Specification |
+|-----------|--------------|
+| **CPU** | 2 cores (x86_64 or ARM64) |
+| **RAM** | 2 GB |
+| **Storage** | 20 GB SSD |
+| **Network** | Public IPv4 or IPv6 |
+| **OS** | Ubuntu 22.04/24.04, Debian 11/12, Rocky Linux 8/9, AlmaLinux 8/9 |
 
-![Dashboard Image](./.github/dashboard.jpeg)
+#### Recommended Requirements
 
-## Support the project
+| Component | Specification |
+|-----------|--------------|
+| **CPU** | 4+ cores |
+| **RAM** | 4+ GB |
+| **Storage** | 50+ GB SSD |
+| **Network** | Both IPv4 and IPv6 |
+| **OS** | Ubuntu 24.04 |
 
-There are multiple ways to support Hydrodactyl:
-- [Support Hydrodactyl's maintainer by donating to Naterfute on Ko-Fi.](https://ko-fi.com/naterfute)
-- [Support the Blueprint organization with a donation](https://bpfw.io/donate), the nonprofit funding Hydrodactyl.
-- **Star the project on GitHub** and share it with someone who might be interested in using this! :D
-- Joining the [Hydrodactyl Discord community](https://discord.gg/sK686yHdaK).
+## License & Legal
 
-<a href="https://star-history.com/#BlueprintFramework/hydrodactyl&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=BlueprintFramework/hydrodactyl&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=BlueprintFramework/hydrodactyl&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=BlueprintFramework/hydrodactyl&type=Date" />
-  </picture>
-</a>
+Hydrodactyl is licensed under the **Apache License 2.0**, ensuring that the software remains free and open source.
 
-## License
+### Project History & Copyright
 
-- Pterodactyl® Copyright © 2015 - 2022 Dane Everitt and contributors.
-- Pyrodactyl™ Copyright © 2023-2025 Pyro Inc. and contributors.
-- Pyrodactyl™ Copyright © 2025-2026 Pyrodactyl-oss and contributors.
-- Hydrodactyl Copyright © 2026-present Naterfute, Blueprint Framework and contributors.
+* **Pterodactyl®** © 2015–2022 Dane Everitt and contributors.
+* **Pyrodactyl™** © 2023–2026 Pyrodactyl-OSS and contributors.
+* **Hydrodactyl™** © 2026 BlueprintFramework, Hydrodactyl, and contributors.
 
-Apache-2.0
+Hydrodactyl is the continuation of the Pyrodactyl project, now funded by Blueprint.
+
+You are free to use, modify, and distribute this project under the terms of the **Apache License 2.0**.
+
+For the full license text, see [LICENSE](./LICENSE).
