@@ -38,7 +38,7 @@
     </div>
     <div class="clearfix visible-xs-block">&nbsp;</div>
     <div class="col-xs-6 col-sm-3 text-center">
-    <a href="https://github.com/hydrodactyl-oss/hydrodactyl"><button class="btn btn-primary" style="width:100%;"><i
+    <a href="https://github.com/BlueprintFramework/hydrodactyl"><button class="btn btn-primary" style="width:100%;"><i
         class="fa fa-fw fa-support"></i> Github</button></a>
     </div>
     <div class="col-xs-6 col-sm-3 text-center">
