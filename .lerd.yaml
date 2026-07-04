@@ -1,7 +1,7 @@
 domains:
     - hydrodactyl
 php_version: "8.5"
-js_runtime: bun
+js_runtime: pnpm
 framework: laravel
 framework_version: "13"
 services:
