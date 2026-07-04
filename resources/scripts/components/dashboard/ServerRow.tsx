@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import getServerResourceUsage, { type ServerPowerState, type ServerStats } from '@/api/server/getServerResourceUsage';
+import type { Server } from '@/api/server/getServer';
 import { bytesToString, ip } from '@/lib/formatters';
 
 // Determines if the current value is in an alarm threshold so we can show it in red rather
@@ -54,7 +55,8 @@ position: relative;
         } else {
             return 'linear-gradient(180deg, #c7aa43 0%, #c7aa43 100%)';
         }
-    }}
+    }};
+    }
 `;
 
 type Timer = ReturnType<typeof setInterval>;
@@ -103,18 +105,18 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
         <StatusIndicatorBox
             as={Link}
             to={`/server/${server.id}`}
-            className={`{className} bg-mocha-500 hover:bg-mocha-400 border border-[1px] border-mocha-400 hover:border-mocha-400`}
+            className={`${className} bg-mocha-500 hover:bg-mocha-400 border border-[1px] border-mocha-400 hover:border-mocha-400`}
             $status={stats?.status || 'offline'}
         >
-            <div className={`flex items - center`}>
+            <div className={`flex items-center`}>
                 <div className='flex flex-col'>
                     <div className='flex items-center gap-2'>
-                        <p className={`text - xl tracking - tight font - bold truncate max - w - [20vw]`}>
+                        <p className={`text-xl tracking-tight font-bold truncate max-w-[20vw]`}>
                             {server.name}
                         </p>{' '}
                         <div className={'status-bar'} />
                     </div>
-                    <p className={`text - sm text - [#ffffff66]`}>
+                    <p className={`text-sm text-[#ffffff66]`}>
                         {server.allocations
                             .filter((alloc) => alloc.isDefault)
                             .map((allocation) => (
@@ -130,21 +132,21 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
             >
                 {!stats || isSuspended || isInstalling ? (
                     isSuspended ? (
-                        <div className={`flex - 1 text - center`}>
-                            <span className={`text - red - 100 text - xs`}>
+                        <div className={`flex-1 text-center`}>
+                            <span className={`text-red-100 text-xs`}>
                                 {server.status === 'suspended' ? 'Suspended' : 'Connection Error'}
                             </span>
                         </div>
                     ) : server.isTransferring || server.status ? (
-                        <div className={`flex - 1 text - center`}>
-                            <span className={`text - zinc - 100 text - xs`}>
+                        <div className={`flex-1 text-center`}>
+                            <span className={`text-zinc-100 text-xs`}>
                                 {server.isTransferring
                                     ? 'Transferring'
                                     : server.status === 'installing'
-                                      ? 'Installing'
-                                      : server.status === 'restoring_backup'
-                                        ? 'Restoring Backup'
-                                        : 'Unavailable'}
+                                        ? 'Installing'
+                                        : server.status === 'restoring_backup'
+                                            ? 'Restoring Backup'
+                                            : 'Unavailable'}
                             </span>
                         </div>
                     ) : (
@@ -153,13 +155,13 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                 ) : (
                     <Fragment>
                         <div className={`sm:flex hidden`}>
-                            <div className={`flex justify - center gap - 2 w - fit`}>
+                            <div className={`flex justify-center gap-2 w-fit`}>
                                 <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>CPU:</p>
                                 <p className='font-bold w-fit whitespace-nowrap'>{stats.cpuUsagePercent.toFixed(2)}%</p>
                             </div>
                         </div>
                         <div className={`sm:flex hidden`}>
-                            <div className={`flex justify - center gap - 2 w - fit`}>
+                            <div className={`flex justify-center gap-2 w-fit`}>
                                 <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>RAM:</p>
                                 <p className='font-bold w-fit whitespace-nowrap'>
                                     {bytesToString(stats.memoryUsageInBytes, 0)}
@@ -167,7 +169,7 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                             </div>
                         </div>
                         <div className={`sm:flex hidden`}>
-                            <div className={`flex justify - center gap - 2 w - fit`}>
+                            <div className={`flex justify-center gap-2 w-fit`}>
                                 <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>Storage:</p>
                                 <p className='font-bold w-fit whitespace-nowrap'>
                                     {bytesToString(stats.diskUsageInBytes, 0)}

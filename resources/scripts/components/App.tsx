@@ -24,9 +24,11 @@ import HydrodactylProvider from './HydrodactylProvider';
 // const ServerRouter = lazy(() => import('@/routers/ServerRouter'));
 const UnifiedRouter = lazy(() => import('@/routers/UnifiedRouter'));
 const AuthenticationRouter = lazy(() => import('@/routers/AuthenticationRouter'));
+const SetupRouter = lazy(() => import('@/routers/SetupRouter'));
 
 interface ExtendedWindow extends Window {
     SiteConfiguration?: SiteSettings;
+    SetupRequired?: boolean;
     PyrodactylUser?: {
         uuid: string;
         username: string;
@@ -79,6 +81,14 @@ const App = () => {
                         />
                         <BrowserRouter>
                             <Routes>
+                                <Route
+                                    path='/setup/*'
+                                    element={
+                                        <Spinner.Suspense>
+                                            <SetupRouter />
+                                        </Spinner.Suspense>
+                                    }
+                                />
                                 <Route
                                     path='/auth/*'
                                     element={

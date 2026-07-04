@@ -125,7 +125,7 @@ function LoginContainer() {
 
                     <div className='flex w-full justify-between items-center'>
                         <Button
-                            className={`bg-mocha-100 rounded-full p-2 px-4 text-black hover:cursor-pointer hover:bg-mocha-200 hover:scale-102 ease-in-out`}
+                            className={`bg-mocha-100 rounded-lg p-2 px-4 text-black hover:cursor-pointer hover:bg-mocha-200 ease-in-out`}
                             type={'submit'}
                             size={'xlarge'}
                             isLoading={isSubmitting}
