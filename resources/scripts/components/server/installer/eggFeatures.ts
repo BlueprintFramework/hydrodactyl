@@ -1,15 +1,5 @@
 import type { MarketplaceType } from '@/api/server/marketplace';
 
-/**
- * The Minecraft loaders the installer knows about, split by whether they load
- * mods (into `mods/`) or plugins (into `plugins/`). Egg features such as
- * "mod/fabric" or "plugin/paper" are matched against these lists.
- */
-export const MOD_LOADERS = ['fabric', 'forge', 'quilt', 'neoforge'] as const;
-export const PLUGIN_LOADERS = ['paper', 'purpur', 'spigot', 'bukkit', 'pufferfish', 'folia'] as const;
-
-export type LoaderName = (typeof MOD_LOADERS)[number] | (typeof PLUGIN_LOADERS)[number];
-
 const normalize = (value: string): string =>
     value
         .toLowerCase()
@@ -28,12 +18,17 @@ const normalizeLoader = (raw: string): string => {
 
 /**
  * Extract the loaders a server supports for the given content type from its egg
- * features.
+ * features. When `knownLoaders` (the live Modrinth tag list) is supplied, each
+ * extracted loader is validated against it so the installer only offers loaders
+ * the marketplace actually recognizes; when it is absent (fetch pending/failed)
+ * the egg feature is trusted as-is.
  *
- * @param features e.g. ["eula", "java_version", "mod/fabric", "mclogs"]
+ * @param features     e.g. ["eula", "java_version", "mod/fabric", "mclogs"]
+ * @param type         "mod" | "plugin"
+ * @param knownLoaders live Modrinth loader-tag names (optional)
  */
-export const loadersFor = (features: string[], type: MarketplaceType): string[] => {
-    const known = type === 'mod' ? MOD_LOADERS : PLUGIN_LOADERS;
+export const loadersFor = (features: string[], type: MarketplaceType, knownLoaders?: string[]): string[] => {
+    const known = knownLoaders && knownLoaders.length > 0 ? new Set(knownLoaders.map(normalize)) : null;
     const found: string[] = [];
 
     for (const feature of features) {
@@ -42,7 +37,8 @@ export const loadersFor = (features: string[], type: MarketplaceType): string[] 
         if (!normalized.startsWith(prefix)) continue;
 
         const loader = normalizeLoader(normalized.slice(prefix.length));
-        if (known.includes(loader as never) && !found.includes(loader)) {
+        if (known && !known.has(loader)) continue;
+        if (!found.includes(loader)) {
             found.push(loader);
         }
     }

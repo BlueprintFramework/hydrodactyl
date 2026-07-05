@@ -9,6 +9,7 @@ use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\DestroyInstallRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\GetProjectRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\ListInstallsRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\LoadersRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\ResolveInstallRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\SearchMarketplaceRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\StoreInstallRequest;
@@ -247,6 +248,18 @@ class MarketplaceController extends ClientApiController
             'filename' => $i->filename,
             'installed_at' => $i->installed_at?->toIso8601String(),
         ];
+    }
+
+    /**
+     * The cached Modrinth loader-tag list, so the frontend can validate the
+     * loader extracted from a server's egg features against the live set rather
+     * than a hard-coded list (auto-supports loaders Modrinth adds later).
+     */
+    public function loaders(LoadersRequest $request): JsonResponse
+    {
+        $loaders = $this->sources->get('modrinth')?->loaders() ?? [];
+
+        return response()->json(['loaders' => $loaders]);
     }
 
     /**

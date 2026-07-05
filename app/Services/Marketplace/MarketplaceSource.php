@@ -47,4 +47,13 @@ interface MarketplaceSource
      * @return array{url: string, filename: string, size: ?int}
      */
     public function resolve(string $type, string $projectId, string $versionId): array;
+
+    /**
+     * Loader tags this source recognizes, used to validate the loader extracted
+     * from a server's egg features (e.g. "mod/fabric"). The authoritative list
+     * is Modrinth's GET /tag/loader; other sources return an empty array.
+     *
+     * @return string[]
+     */
+    public function loaders(): array;
 }

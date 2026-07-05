@@ -285,6 +285,18 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
     }
 
     /**
+     * Loader tags this source recognizes for egg-feature validation. Only the
+     * Modrinth source provides these (from GET /tag/loader); the default empty
+     * array means "no validation" — the frontend then trusts the egg as-is.
+     *
+     * @return string[]
+     */
+    public function loaders(): array
+    {
+        return [];
+    }
+
+    /**
      * Normalize a loader identifier against the canonical marketplace names.
      */
     protected function normalizeLoader(?string $loader): ?string

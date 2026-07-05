@@ -2,7 +2,10 @@
 
 namespace Pterodactyl\Services\Marketplace\Sources;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Pterodactyl\Services\Marketplace\AbstractMarketplaceSource;
 use Pterodactyl\Services\Marketplace\MarketplaceException;
 use Pterodactyl\Services\Marketplace\MarketplaceProject;
@@ -28,6 +31,51 @@ class ModrinthSource extends AbstractMarketplaceSource
     public function supports(string $type): bool
     {
         return $type === 'mod' || $type === 'plugin';
+    }
+
+    /**
+     * The authoritative loader tag list (GET /tag/loader), cached for a day.
+     * Used to validate the loader extracted from a server's egg features so the
+     * installer picks up new loaders Modrinth adds without a code change. Only a
+     * non-empty result is cached, so a transient failure retries on the next
+     * request instead of being pinned for 24h.
+     *
+     * @return string[]
+     */
+    public function loaders(): array
+    {
+        $cacheKey = 'marketplace:modrinth:loader-tags';
+
+        $cached = Cache::get($cacheKey);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        try {
+            $response = Http::withHeaders(['User-Agent' => $this->userAgent(), 'Accept' => 'application/json'])
+                ->timeout($this->timeout())
+                ->get($this->url('/tag/loader'));
+        } catch (ConnectionException) {
+            return [];
+        }
+
+        if ($response->failed()) {
+            return [];
+        }
+
+        $names = [];
+        foreach (($response->json() ?? []) as $tag) {
+            if (is_array($tag) && is_string($tag['name'] ?? null) && $tag['name'] !== '') {
+                $names[] = $tag['name'];
+            }
+        }
+
+        $names = array_values(array_unique($names));
+        if ($names !== []) {
+            Cache::put($cacheKey, $names, 86400);
+        }
+
+        return $names;
     }
 
     public function search(string $type, array $filters): array

@@ -137,3 +137,14 @@ export const resolveMarketplaceInstall = async (
 
     return data as MarketplaceResolvedInstall;
 };
+
+/**
+ * The cached Modrinth loader-tag list — the authoritative set of loader names,
+ * used to validate the loader extracted from a server's egg features so the
+ * installer picks up new loaders Modrinth adds without a code change.
+ */
+export const getMarketplaceLoaders = async (uuid: string): Promise<string[]> => {
+    const { data } = await http.get(`/api/client/servers/${uuid}/marketplace/loaders`);
+
+    return Array.isArray((data as { loaders?: string[] })?.loaders) ? data.loaders : [];
+};

@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { httpErrorToHuman } from '@/api/http';
 import deleteFiles from '@/api/server/files/deleteFiles';
 import type { MarketplaceProject, MarketplaceSourceMeta, MarketplaceType } from '@/api/server/marketplace';
-import { searchMarketplace } from '@/api/server/marketplace';
+import { getMarketplaceLoaders, searchMarketplace } from '@/api/server/marketplace';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
@@ -82,6 +82,12 @@ const InstallerContainer = () => {
     const [picker, setPicker] = useState<PickerCtx | null>(null);
     const [installedItems, setInstalledItems] = useState<InstalledItem[]>([]);
     const [removingKey, setRemovingKey] = useState<string | null>(null);
+    // Live Modrinth loader-tag list, used to validate the loader extracted from
+    // the server's egg features (so new loaders Modrinth adds are supported
+    // without a code change). Empty until the fetch resolves.
+    const [knownLoaders, setKnownLoaders] = useState<string[]>([]);
+    const knownLoadersRef = useRef(knownLoaders);
+    knownLoadersRef.current = knownLoaders;
 
     const directory = destinationFolder(tab);
 
@@ -104,6 +110,16 @@ const InstallerContainer = () => {
         }
     }, [view, refreshInstalled]);
 
+    // Fetch the authoritative Modrinth loader list once so egg-feature loaders
+    // are validated against it. A failure leaves the list empty, which makes
+    // loadersFor trust the egg feature as-is (no validation).
+    useEffect(() => {
+        if (!uuid) return;
+        getMarketplaceLoaders(uuid)
+            .then(setKnownLoaders)
+            .catch(() => setKnownLoaders([]));
+    }, [uuid]);
+
     const installedEntryFor = useCallback(
         (project: MarketplaceProject): InstalledEntry | undefined =>
             installedItems.find((i) => i.source === project.source && i.projectId === project.id)?.entry,
@@ -113,7 +129,7 @@ const InstallerContainer = () => {
     // Reset browse selections when switching tabs. Source defaults to "all"
     // (combined providers) each time.
     useEffect(() => {
-        setLoader(loadersFor(eggFeatures, tab)[0] ?? null);
+        setLoader(loadersFor(eggFeatures, tab, knownLoadersRef.current)[0] ?? null);
         setQuery('');
         setSource(ALL_PROVIDERS);
         setSources([]);
@@ -175,7 +191,7 @@ const InstallerContainer = () => {
             .finally(() => setLoadingMore(false));
     }, [uuid, loadingMore, hasMore, results, tab, source, query, loader]);
 
-    const tabLoaders = useMemo(() => loadersFor(eggFeatures, tab), [eggFeatures, tab]);
+    const tabLoaders = useMemo(() => loadersFor(eggFeatures, tab, knownLoaders), [eggFeatures, tab, knownLoaders]);
 
     const openPicker = useCallback(
         (project: MarketplaceProject, type: MarketplaceType, src: string, dir: string, ld: string | null) =>

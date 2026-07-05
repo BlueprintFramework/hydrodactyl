@@ -102,6 +102,11 @@ Route::group([
             ->name('api.client.servers.marketplace.installed');
         Route::post('/installed', [MarketplaceController::class, 'store']);
         Route::delete('/installed', [MarketplaceController::class, 'destroy']);
+
+        // Cached Modrinth loader-tag list, so egg-feature loaders are validated
+        // against the live set instead of a hard-coded list.
+        Route::get('/loaders', [MarketplaceController::class, 'loaders'])
+            ->name('api.client.servers.marketplace.loaders');
     });
 });
 

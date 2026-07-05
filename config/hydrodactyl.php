@@ -66,10 +66,5 @@ return [
             'mod' => 'mods',
             'plugin' => 'plugins',
         ],
-
-        // Minecraft loaders the installer understands, used to map egg features
-        // (e.g. "mod/fabric") onto marketplace loader facets.
-        'mod_loaders' => ['fabric', 'forge', 'quilt', 'neoforge', 'neo-forge'],
-        'plugin_loaders' => ['paper', 'purpur', 'spigot', 'bukkit', 'pufferfish', 'folia', 'bungeecord', 'waterfall', 'velocity'],
     ],
 ];
