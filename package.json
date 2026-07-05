@@ -37,7 +37,7 @@
         "@tailwindcss/postcss": "^4.1.11",
         "@tanstack/react-virtual": "^3.13.12",
         "@xterm/addon-fit": "^0.10.0",
-        "@xterm/addon-search": "^0.15.0",
+        "@xterm/addon-search": "^0.16.0",
         "@xterm/addon-web-links": "^0.11.0",
         "@xterm/xterm": "^5.5.0",
         "axios": "1.11.0",
