@@ -65,7 +65,7 @@ const FilterDropdown = ({ filterOptions, activeField, activeValue, onFilterChang
                 >
                     <div className='flex flex-row items-center gap-1.5'>
                         <HugeiconsIcon size={16} strokeWidth={2} icon={FilterIcon} className='size-4' />
-                        <span className='hidden sm:inline'>{activeLabel || 'Filter'}</span>
+                        <span className='hidden sm:inline max-w-[140px] truncate'>{activeLabel || 'Filter'}</span>
                     </div>
                 </Button>
             </DropdownMenuTrigger>

@@ -11,8 +11,11 @@ class ServerNodeNameSort implements Sort
     {
         $direction = $descending ? 'DESC' : 'ASC';
 
-        $query->leftJoin('nodes', 'servers.node_id', '=', 'nodes.id')
-            ->orderBy('nodes.name', $direction)
+        // Correlated subquery instead of a LEFT JOIN: ordering by a joined
+        // column conflicts with MultiFieldServerFilter's GROUP BY servers.id on
+        // PostgreSQL (SQLSTATE 42803 -> HTTP 500) when an IP/port search filter
+        // is also applied. $direction is a hardcoded literal -> injection-safe.
+        $query->orderByRaw("(SELECT nodes.name FROM nodes WHERE nodes.id = servers.node_id) {$direction}")
             ->select('servers.*');
     }
 }

@@ -55,15 +55,21 @@ const StatGraphs = () => {
         },
     });
 
+    // When the server goes offline, clear the charts once. Do NOT list the
+    // per-chart `clear` functions in the deps — useChart() recreates them every
+    // render, so doing so makes this effect re-fire every render -> clear()
+    // calls setData -> re-render -> re-fire, i.e. a "Maximum update depth
+    // exceeded" infinite loop. They only close over stable setData/merge, so a
+    // status-only dependency is both correct and safe.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — clear fns are unstable, see above.
     useEffect(() => {
-        if (status === 'offline') {
-            cpu.clear();
-            memory.clear();
-            network.clear();
-            setUptime(0);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [status, network.clear, memory.clear, cpu.clear]);
+        if (status !== 'offline') return;
+
+        cpu.clear();
+        memory.clear();
+        network.clear();
+        setUptime(0);
+    }, [status]);
 
     useWebsocketEvent(SocketEvent.STATS, (data: string) => {
         let values: StatsData;

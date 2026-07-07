@@ -11,8 +11,11 @@ class ServerEggNameSort implements Sort
     {
         $direction = $descending ? 'DESC' : 'ASC';
 
-        $query->leftJoin('eggs', 'servers.egg_id', '=', 'eggs.id')
-            ->orderBy('eggs.name', $direction)
+        // Correlated subquery instead of a LEFT JOIN: ordering by a joined
+        // column conflicts with MultiFieldServerFilter's GROUP BY servers.id on
+        // PostgreSQL (SQLSTATE 42803 -> HTTP 500) when an IP/port search filter
+        // is also applied. $direction is a hardcoded literal -> injection-safe.
+        $query->orderByRaw("(SELECT eggs.name FROM eggs WHERE eggs.id = servers.egg_id) {$direction}")
             ->select('servers.*');
     }
 }

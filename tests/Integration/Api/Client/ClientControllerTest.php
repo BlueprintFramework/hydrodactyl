@@ -494,6 +494,30 @@ class ClientControllerTest extends ClientApiIntegrationTestCase
         $response->assertJsonPath('object', 'server_filter_options');
     }
 
+    public function testCustomNameSortCombinedWithAllocationSearchFilter(): void
+    {
+        // Regression for a Postgres-only bug: the custom name sorts used to ORDER BY
+        // a LEFT JOINed column, which conflicts with MultiFieldServerFilter's
+        // GROUP BY servers.id (added by the IP/port search branch) on PostgreSQL,
+        // raising SQLSTATE 42803 -> HTTP 500. MySQL/MariaDB are lenient
+        // (ONLY_FULL_GROUP_BY off), so this only fails on the pgsql CI leg.
+        /** @var User $user */
+        $user = User::factory()->create();
+
+        $server1 = $this->createServerModel(['user_id' => $user->id, 'name' => 'OnPortA']);
+        $this->createServerModel(['user_id' => $user->id, 'name' => 'OnPortB']);
+
+        // sort=owner_name (custom sort) + filter[*]=:PORT (allocation search ->
+        // allocations join + GROUP BY servers.id). Must not 500, must narrow to 1.
+        $response = $this->actingAs($user)->getJson(
+            '/api/client?sort=owner_name&filter[*]=:' . $server1->allocation->port
+        );
+
+        $response->assertOk();
+        $response->assertJsonCount(1, 'data');
+        $response->assertJsonPath('data.0.attributes.name', 'OnPortA');
+    }
+
     public static function filterTypeDataProvider(): array
     {
         return [['admin'], ['admin-all']];
