@@ -1,0 +1,57 @@
+{
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2024-05-07T12:55:54+00:00",
+  "name": "Sponge (SpongeNeo)",
+  "author": "support@phosphor.host",
+  "description": "SpongeNeo is the SpongeAPI implementation for Neoforge Loader.",
+  "features": ["eula", "java_version", "pid_limit", "plugin/sponge", "mod/neoforge", "mclogs", "subdomain_minecraft"],
+  "docker_images": {
+      "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
+      "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",
+      "Java 17": "ghcr.io\/pterodactyl\/yolks:java_17",
+      "Java 16": "ghcr.io\/pterodactyl\/yolks:java_16",
+      "Java 11": "ghcr.io\/pterodactyl\/yolks:java_11",
+      "Java 8": "ghcr.io\/pterodactyl\/yolks:java_8"
+  },
+  "file_denylist": [],
+  "startup": "java -Xms128M -XX:MaxRAMPercentage=95.0 -Dterminal.jline=false -Dterminal.ansi=true $( [[  ! -f unix_args.txt ]] && printf %s \"-jar {{SERVER_JARFILE}}\" || printf %s \"@unix_args.txt\" )",
+  "config": {
+    "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"server-port\": \"{{server.build.default.port}}\",\r\n            \"query.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+    "startup": "{\r\n    \"done\": \")! For help, type \"\r\n}",
+    "logs": "{}",
+    "stop": "stop"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/bash\n# SpongeNeo Installation Script\n#\n# SpongeNeo is a NeoForge mod, not a standalone server, so a matching NeoForge\n# server is installed and the SpongeNeo jar is dropped into the mods folder.\n# Everything else mirrors the SpongeVanilla egg: same install image\n# (ghcr.io/ptero-eggs/installers:debian), same variables, same v2 download API.\n#\n# Server Files: /mnt/server\napt update\n# jq/curl ship with the image; openjdk is only needed to run the NeoForge\n# installer (installer + processors are Java 8 bytecode, so any JRE works).\napt install -y jq curl openjdk-17-jdk-headless\n\nmkdir -p /mnt/server\ncd /mnt/server\n\nAPI=\"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongeneo\"\n\n# Resolve the SpongeNeo version to install\nif [ -z \"${SPONGE_VERSION}\" ] || [ \"${SPONGE_VERSION}\" == \"latest\" ] || [ \"${SPONGE_VERSION}\" == \"recommended\" ]; then\n  echo -e \"Getting recommended SpongeNeo version\"\n  SPONGE_VERSION=$(curl -s \"${API}/versions?recommended=true&limit=1&offset=0\" | jq -r '.artifacts | keys[0]')\n  if [ -z \"${SPONGE_VERSION}\" ] || [ \"${SPONGE_VERSION}\" == \"null\" ]; then\n    echo -e \"No recommended build available, falling back to the newest version\"\n    SPONGE_VERSION=$(curl -s \"${API}/versions?limit=1&offset=0\" | jq -r '.artifacts | keys[0]')\n  fi\nfi\n\necho -e \"Using SpongeNeo version ${SPONGE_VERSION}\"\n\n# Pull the version metadata: Minecraft version, required NeoForge version and the\n# download URL of the runnable mod jar (the \"universal\" classifier).\nVERSION_DATA=$(curl -s \"${API}/versions/${SPONGE_VERSION}\")\nMC_VERSION=$(echo \"${VERSION_DATA}\" | jq -r '.tags.minecraft')\nNEO_VERSION=$(echo \"${VERSION_DATA}\" | jq -r '.tags.neoforge')\nSV_DL_LINK=$(echo \"${VERSION_DATA}\" | jq -r '.assets[]? | select(.classifier == \"universal\" and .extension == \"jar\") | .downloadUrl')\n\nif [ -z \"${SV_DL_LINK}\" ] || [ \"${SV_DL_LINK}\" == \"null\" ] || [ -z \"${NEO_VERSION}\" ] || [ \"${NEO_VERSION}\" == \"null\" ]; then\n  echo -e \"ERROR: could not resolve SpongeNeo version '${SPONGE_VERSION}'.\"\n  echo -e \"Check the version string against https://spongepowered.org/downloads/spongeneo\"\n  exit 1\nfi\n\necho -e \"Minecraft ${MC_VERSION}, NeoForge ${NEO_VERSION}\"\n\n# --- Install the matching NeoForge server ---\nDOWNLOAD_LINK=\"https://maven.neoforged.net/releases/net/neoforged/neoforge/${NEO_VERSION}/neoforge-${NEO_VERSION}-installer.jar\"\n\necho -e \"Downloading NeoForge installer from ${DOWNLOAD_LINK}\"\nif ! curl --output /dev/null --silent --head --fail \"${DOWNLOAD_LINK}\"; then\n  echo -e \"ERROR: NeoForge installer for ${NEO_VERSION} is not available.\"\n  exit 2\nfi\ncurl -s -o installer.jar -sS \"${DOWNLOAD_LINK}\"\n\n# Clean any previous NeoForge args/libraries so up/downgrades work\nrm -rf libraries/net/neoforged/neoforge\nrm -f unix_args.txt\n\necho -e \"Installing NeoForge server\"\njava -jar installer.jar --installServer || { echo -e \"\\nNeoForge install failed for ${NEO_VERSION}. If memory is set to 0/unlimited, give the install some real memory.\"; exit 4; }\nrm -f installer.jar\n\n# NeoForge launches through generated JPMS args; symlink them for the egg startup\nif ls libraries/net/neoforged/neoforge/*/unix_args.txt >/dev/null 2>&1; then\n  ln -sf libraries/net/neoforged/neoforge/*/unix_args.txt unix_args.txt\nelse\n  echo -e \"ERROR: NeoForge unix_args.txt was not produced.\"\n  exit 5\nfi\n\n# --- Drop SpongeNeo into the mods folder ---\nmkdir -p mods\necho -e \"Downloading SpongeNeo ${SPONGE_VERSION} into mods/\"\ncurl -s -o \"mods/spongeneo-${SPONGE_VERSION}.jar\" \"${SV_DL_LINK}\"\n\nif [ ! -f server.properties ]; then\n  echo -e \"Downloading default server.properties\"\n  curl -s -o server.properties https://raw.githubusercontent.com/ptero-eggs/game-eggs/main/minecraft/java/server.properties\nfi\n\necho -e \"Install for SpongeNeo is complete\"\n",
+      "container": "ghcr.io/ptero-eggs/installers:debian",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Sponge Version",
+      "description": "SpongeNeo version to install (e.g. 1.21.10-21.10.64-17.0.0), or \"latest\"/\"recommended\". Also determines which NeoForge version is installed.",
+      "env_variable": "SPONGE_VERSION",
+      "default_value": "latest",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|regex:/^([a-zA-Z0-9.\\-_]+)$/",
+      "field_type": "text"
+    },
+    {
+      "name": "Server Jar File",
+      "description": "The name of the Jarfile to use when running SpongeVanilla.",
+      "env_variable": "SERVER_JARFILE",
+      "default_value": "server.jar",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|regex:/^([\\w\\d._-]+)(\\.jar)$/",
+      "field_type": "text"
+    }
+  ]
+}

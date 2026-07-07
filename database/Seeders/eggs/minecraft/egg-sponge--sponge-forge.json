@@ -1,0 +1,57 @@
+{
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2024-05-07T12:55:54+00:00",
+  "name": "Sponge (SpongeForge)",
+  "author": "support@phosphor.host",
+  "description": "SpongeForge is the SpongeAPI implementation for Forge Loader.",
+  "features": ["eula", "java_version", "pid_limit", "plugin/sponge", "mod/forge", "mclogs", "subdomain_minecraft"],
+  "docker_images": {
+      "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
+      "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",
+      "Java 17": "ghcr.io\/pterodactyl\/yolks:java_17",
+      "Java 16": "ghcr.io\/pterodactyl\/yolks:java_16",
+      "Java 11": "ghcr.io\/pterodactyl\/yolks:java_11",
+      "Java 8": "ghcr.io\/pterodactyl\/yolks:java_8"
+  },
+  "file_denylist": [],
+  "startup": "java -Xms128M -XX:MaxRAMPercentage=95.0 -Dterminal.jline=false -Dterminal.ansi=true $( [[  ! -f unix_args.txt ]] && printf %s \"-jar {{SERVER_JARFILE}}\" || printf %s \"@unix_args.txt\" )",
+  "config": {
+    "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"server-port\": \"{{server.build.default.port}}\",\r\n            \"query.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+    "startup": "{\r\n    \"done\": \")! For help, type \"\r\n}",
+    "logs": "{}",
+    "stop": "stop"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/bash\n# SpongeForge Installation Script\n#\n# SpongeForge is a Forge mod, not a standalone server, so a matching Forge\n# server is installed and the SpongeForge jar is dropped into the mods folder.\n# Everything else mirrors the SpongeVanilla egg: same install image\n# (ghcr.io/ptero-eggs/installers:debian), same variables, same v2 download API.\n#\n# Server Files: /mnt/server\napt update\n# jq/curl ship with the image; openjdk is only needed to run the Forge installer\n# (the installer and its processors are Java 8 bytecode, so any JRE works).\napt install -y jq curl openjdk-17-jdk-headless\n\nmkdir -p /mnt/server\ncd /mnt/server\n\nAPI=\"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongeforge\"\n\n# Resolve the SpongeForge version to install\nif [ -z \"${SPONGE_VERSION}\" ] || [ \"${SPONGE_VERSION}\" == \"latest\" ] || [ \"${SPONGE_VERSION}\" == \"recommended\" ]; then\n  echo -e \"Getting recommended SpongeForge version\"\n  SPONGE_VERSION=$(curl -s \"${API}/versions?recommended=true&limit=1&offset=0\" | jq -r '.artifacts | keys[0]')\n  if [ -z \"${SPONGE_VERSION}\" ] || [ \"${SPONGE_VERSION}\" == \"null\" ]; then\n    echo -e \"No recommended build available, falling back to the newest version\"\n    SPONGE_VERSION=$(curl -s \"${API}/versions?limit=1&offset=0\" | jq -r '.artifacts | keys[0]')\n  fi\nfi\n\necho -e \"Using SpongeForge version ${SPONGE_VERSION}\"\n\n# Pull the version metadata: Minecraft version, required Forge version and the\n# download URL of the runnable mod jar (the \"universal\" classifier).\nVERSION_DATA=$(curl -s \"${API}/versions/${SPONGE_VERSION}\")\nMC_VERSION=$(echo \"${VERSION_DATA}\" | jq -r '.tags.minecraft')\nFORGE_VERSION=$(echo \"${VERSION_DATA}\" | jq -r '.tags.forge')\nSV_DL_LINK=$(echo \"${VERSION_DATA}\" | jq -r '.assets[]? | select(.classifier == \"universal\" and .extension == \"jar\") | .downloadUrl')\n\nif [ -z \"${SV_DL_LINK}\" ] || [ \"${SV_DL_LINK}\" == \"null\" ] || [ -z \"${FORGE_VERSION}\" ] || [ \"${FORGE_VERSION}\" == \"null\" ]; then\n  echo -e \"ERROR: could not resolve SpongeForge version '${SPONGE_VERSION}'.\"\n  echo -e \"Check the version string against https://spongepowered.org/downloads/spongeforge\"\n  exit 1\nfi\n\necho -e \"Minecraft ${MC_VERSION}, Forge ${FORGE_VERSION}\"\n\n# --- Install the matching Forge server ---\nFORGE_FULL=\"${MC_VERSION}-${FORGE_VERSION}\"\nDOWNLOAD_LINK=\"https://maven.minecraftforge.net/net/minecraftforge/forge/${FORGE_FULL}/forge-${FORGE_FULL}-installer.jar\"\n\necho -e \"Downloading Forge installer from ${DOWNLOAD_LINK}\"\nif ! curl --output /dev/null --silent --head --fail \"${DOWNLOAD_LINK}\"; then\n  echo -e \"ERROR: Forge installer for ${FORGE_FULL} is not available.\"\n  exit 2\nfi\ncurl -s -o installer.jar -sS \"${DOWNLOAD_LINK}\"\n\n# Clean any previous Forge args/libraries so up/downgrades work\nrm -rf libraries/net/minecraftforge/forge\nrm -f unix_args.txt\n\necho -e \"Installing Forge server\"\njava -jar installer.jar --installServer || { echo -e \"\\nForge install failed for ${FORGE_FULL}. If memory is set to 0/unlimited, give the install some real memory.\"; exit 4; }\nrm -f installer.jar\n\n# Forge 1.17+ launches through generated JPMS args; symlink them for the egg startup\nif ls libraries/net/minecraftforge/forge/*/unix_args.txt >/dev/null 2>&1; then\n  ln -sf libraries/net/minecraftforge/forge/*/unix_args.txt unix_args.txt\nelse\n  echo -e \"ERROR: Forge unix_args.txt was not produced; SpongeForge requires Forge 1.17+.\"\n  exit 5\nfi\n\n# --- Drop SpongeForge into the mods folder ---\nmkdir -p mods\necho -e \"Downloading SpongeForge ${SPONGE_VERSION} into mods/\"\ncurl -s -o \"mods/spongeforge-${SPONGE_VERSION}.jar\" \"${SV_DL_LINK}\"\n\nif [ ! -f server.properties ]; then\n  echo -e \"Downloading default server.properties\"\n  curl -s -o server.properties https://raw.githubusercontent.com/ptero-eggs/game-eggs/main/minecraft/java/server.properties\nfi\n\necho -e \"Install for SpongeForge is complete\"\n",
+      "container": "ghcr.io/ptero-eggs/installers:debian",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Sponge Version",
+      "description": "SpongeForge version to install (e.g. 1.21.10-60.0.1-17.0.0), or \"latest\"/\"recommended\". Also determines which Forge version is installed.",
+      "env_variable": "SPONGE_VERSION",
+      "default_value": "latest",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|regex:/^([a-zA-Z0-9.\\-_]+)$/",
+      "field_type": "text"
+    },
+    {
+      "name": "Server Jar File",
+      "description": "The name of the Jarfile to use when running SpongeVanilla.",
+      "env_variable": "SERVER_JARFILE",
+      "default_value": "server.jar",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|regex:/^([\\w\\d._-]+)(\\.jar)$/",
+      "field_type": "text"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2025-01-07T23:17:29+00:00",
+    "name": "Quilt",
+    "author": "support@phosphor.host",
+    "description": "Quilt Server. Quilt is a lightweight mod loader for Minecraft based on Fabric Loader, with support for snapshots and fast updates to new versions.",
+    "features": ["eula", "java_version", "pid_limit", "mod/quilt", "mclogs", "subdomain_minecraft"],
+    "docker_images": {
+        "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
+        "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",
+        "Java 17": "ghcr.io\/pterodactyl\/yolks:java_17",
+        "Java 16": "ghcr.io\/pterodactyl\/yolks:java_16",
+        "Java 11": "ghcr.io\/pterodactyl\/yolks:java_11",
+        "Java 8": "ghcr.io\/pterodactyl\/yolks:java_8"
+    },
+    "file_denylist": [],
+    "startup": "java -Xms128M -XX:MaxRAMPercentage=95.0 -jar {{SERVER_JARFILE}}",
+    "config": {
+        "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"server-port\": \"{{server.build.default.port}}\",\r\n            \"query.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \")! For help, type \"\r\n}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\r\n# Quilt Installation Script\r\n#\r\n# Server Files: /mnt/server\r\napt update\r\napt install -y curl jq\r\n\r\nmkdir -p /mnt/server\r\ncd /mnt/server\r\n\r\n# The Quilt game endpoint DOES expose a \"stable\" flag, so we can filter on it.\r\nLATEST_MC_VERSION=$(curl -sSL https://meta.quiltmc.org/v3/versions/game | jq -r 'map(select(.stable == true)) | first.version')\r\nLATEST_MC_SNAPSHOT_VERSION=$(curl -sSL https://meta.quiltmc.org/v3/versions/game | jq -r '.[0].version')\r\n\r\n# NOTE: Quilt's loader/installer entries do NOT carry a \"stable\" field\r\n# (every loader is published as a \"-beta.N\" build), so filtering on\r\n# `.stable == true` returns null. Take the newest entry (index 0) instead.\r\nLATEST_LOADER_VERSION=$(curl -sSL https://meta.quiltmc.org/v3/versions/loader | jq -r '.[0].version')\r\nLATEST_INSTALLER=$(curl -sSL https://meta.quiltmc.org/v3/versions/installer | jq -r '.[0]')\r\nLATEST_INSTALLER_VERSION=$(echo \"$LATEST_INSTALLER\" | jq -r '.version')\r\nLATEST_INSTALLER_URL=$(echo \"$LATEST_INSTALLER\" | jq -r '.url')\r\n\r\necho -e \"Latest MC version is $LATEST_MC_VERSION\"\r\necho -e \"Latest MC snapshot is $LATEST_MC_SNAPSHOT_VERSION\"\r\necho -e \"Latest loader version is $LATEST_LOADER_VERSION\"\r\necho -e \"Latest installer version is $LATEST_INSTALLER_VERSION\"\r\n\r\nif [ -z \"$MINECRAFT_VERSION\" ] || [ \"$MINECRAFT_VERSION\" == \"latest\" ]; then\r\n  MC_VERSION=$LATEST_MC_VERSION\r\nelif [ \"$MINECRAFT_VERSION\" == \"snapshot\" ]; then\r\n  MC_VERSION=$LATEST_MC_SNAPSHOT_VERSION\r\nelse\r\n  MC_VERSION=$MINECRAFT_VERSION\r\nfi\r\n\r\nif [ -z \"$QUILT_VERSION\" ] || [ \"$QUILT_VERSION\" == \"latest\" ]; then\r\n  LOADER_VERSION=$LATEST_LOADER_VERSION\r\nelse\r\n  LOADER_VERSION=$QUILT_VERSION\r\nfi\r\n\r\nif [ -z \"$QUILT_INSTALLER_VERSION\" ] || [ \"$QUILT_INSTALLER_VERSION\" == \"latest\" ]; then\r\n  INSTALLER_VERSION=$LATEST_INSTALLER_VERSION\r\n  INSTALLER_URL=$LATEST_INSTALLER_URL\r\nelse\r\n  INSTALLER_VERSION=$QUILT_INSTALLER_VERSION\r\n  INSTALLER_URL=\"https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-installer/${INSTALLER_VERSION}/quilt-installer-${INSTALLER_VERSION}.jar\"\r\nfi\r\n\r\necho -e \"Installing Minecraft $MC_VERSION with Quilt loader $LOADER_VERSION (installer $INSTALLER_VERSION)\"\r\n\r\n# Unlike Fabric, the Quilt meta server does NOT provide a prebuilt\r\n# /server/jar. We download the Quilt installer and run it to generate\r\n# quilt-server-launch.jar plus the vanilla server.jar in /mnt/server.\r\necho -e \"Downloading Quilt installer from $INSTALLER_URL\"\r\ncurl -sSL -o quilt-installer.jar \"$INSTALLER_URL\"\r\n\r\n# The installer's --install-dir value must be wrapped in literal quotes.\r\necho -e \"running: java -jar quilt-installer.jar install server $MC_VERSION $LOADER_VERSION --install-dir=$(pwd) --download-server\"\r\njava -jar quilt-installer.jar install server \"$MC_VERSION\" \"$LOADER_VERSION\" --install-dir=\"\\\"$(pwd)\\\"\" --download-server\r\n\r\nrm -f quilt-installer.jar\r\n\r\nif [ ! -f quilt-server-launch.jar ]; then\r\n  echo -e \"ERROR: quilt-server-launch.jar was not created. Check that Minecraft version '$MC_VERSION' and loader '$LOADER_VERSION' are valid.\"\r\n  exit 1\r\nfi\r\n\r\necho -e \"Install Complete\"\r",
+            "container": "eclipse-temurin:21-jdk",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Minecraft Version",
+            "description": "The version of Minecraft to download. \r\n\r\nLeave at latest to always get the latest version. Invalid versions will default to latest.",
+            "env_variable": "MINECRAFT_VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Server Jar File",
+            "description": "The name of the .jar used to launch the Quilt server. The installer always produces quilt-server-launch.jar; the vanilla server it downloads is named server.jar.",
+            "env_variable": "SERVER_JARFILE",
+            "default_value": "quilt-server-launch.jar",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|regex:/^([\\w\\d._-]+)(\\.jar)$/",
+            "field_type": "text"
+        },
+        {
+            "name": "Quilt Version",
+            "description": "The version of Quilt to use",
+            "env_variable": "QUILT_VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Quilt Installer Version",
+            "description": "The version of the Quilt Installer to use. Leave at latest to always use the newest installer.",
+            "env_variable": "QUILT_INSTALLER_VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        }
+    ]
+}

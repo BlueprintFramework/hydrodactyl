@@ -1,0 +1,77 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2024-05-07T12:55:56+00:00",
+    "name": "Neoforge",
+    "author": "support@phosphor.host",
+    "description": "Minecraft Neoforge Server. Minecraft Neoforge is a modding API (Application Programming Interface), which makes it easier to create mods, and also make sure mods are compatible with each other.",
+    "features": ["eula", "java_version", "pid_limit", "mod/neoforge", "mclogs", "subdomain_minecraft"],
+    "docker_images": {
+        "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
+        "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",
+        "Java 17": "ghcr.io\/pterodactyl\/yolks:java_17",
+        "Java 16": "ghcr.io\/pterodactyl\/yolks:java_16",
+        "Java 11": "ghcr.io\/pterodactyl\/yolks:java_11",
+        "Java 8": "ghcr.io\/pterodactyl\/yolks:java_8"
+    },
+    "file_denylist": [],
+    "startup": "java -Xms128M -XX:MaxRAMPercentage=95.0 -Dterminal.jline=false -Dterminal.ansi=true $( [[  ! -f unix_args.txt ]] && printf %s \"-jar {{SERVER_JARFILE}}\" || printf %s \"@unix_args.txt\" )",
+    "config": {
+        "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"server-port\": \"{{server.build.default.port}}\",\r\n            \"query.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \")! For help, type \"\r\n}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\r\n# NeoForge Installation Script\r\n#\r\n# Server Files: /mnt/server\r\napt update\r\napt install -y curl jq\r\n\r\nif [[ ! -d /mnt/server ]]; then\r\n  mkdir /mnt/server\r\nfi\r\n\r\ncd /mnt/server\r\n\r\n# Remove spaces from the version numbers to avoid issues with curl\r\nNEOFORGE_VERSION=\"$(echo \"$NEOFORGE_VERSION\" | tr -d ' ')\"\r\nMC_VERSION=\"$(echo \"$MC_VERSION\" | tr -d ' ')\"\r\n\r\nAPI_SITE=\"https://maven.neoforged.net/api/maven/versions/releases/net/neoforged/neoforge\"\r\nFILE_SITE=\"https://maven.neoforged.net/releases/net/neoforged/neoforge\"\r\n\r\nif [[ ! -z \"${NEOFORGE_VERSION}\" ]]; then\r\n  echo -e \"Using explicit NeoForge version ${NEOFORGE_VERSION}\"\r\nelse\r\n  ## Grab the full list of published NeoForge versions\r\n  VERSIONS=$(curl -sSL \"${API_SITE}\" | jq -r '.versions[]')\r\n\r\n  ## Build a version prefix from the requested Minecraft version.\r\n  ## NeoForge versions are <minor>.<patch>.<build> and map to Minecraft 1.<minor>.<patch>\r\n  ## e.g. MC 1.21.10 -> 21.10.* , MC 1.21 -> 21.0.*\r\n  if [[ \"${MC_VERSION}\" == \"latest\" ]] || [[ \"${MC_VERSION}\" == \"\" ]]; then\r\n    echo -e \"getting latest version of neoforge.\"\r\n    FILTER=\"\"\r\n  else\r\n    MC_TRIM=\"${MC_VERSION#1.}\"\r\n    if [[ \"${MC_TRIM}\" == *.* ]]; then\r\n      FILTER=\"${MC_TRIM}.\"\r\n    else\r\n      FILTER=\"${MC_TRIM}.0.\"\r\n    fi\r\n  fi\r\n\r\n  if [[ \"${BUILD_TYPE}\" != \"recommended\" ]] && [[ \"${BUILD_TYPE}\" != \"latest\" ]]; then\r\n    BUILD_TYPE=recommended\r\n  fi\r\n\r\n  echo -e \"minecraft version: ${MC_VERSION}\"\r\n  echo -e \"build type: ${BUILD_TYPE}\"\r\n\r\n  ## recommended = newest stable build, latest = newest build including betas\r\n  if [[ \"${BUILD_TYPE}\" == \"latest\" ]]; then\r\n    NEOFORGE_VERSION=$(echo \"${VERSIONS}\" | grep -E \"^${FILTER}\" | tail -1)\r\n  else\r\n    NEOFORGE_VERSION=$(echo \"${VERSIONS}\" | grep -E \"^${FILTER}\" | grep -v -- '-beta' | tail -1)\r\n    ## drop back to including betas if there is no stable build yet\r\n    if [[ \"${NEOFORGE_VERSION}\" == \"\" ]]; then\r\n      echo -e \"dropping back to latest from recommended due to there not being a stable version of neoforge for the mc version requested.\"\r\n      NEOFORGE_VERSION=$(echo \"${VERSIONS}\" | grep -E \"^${FILTER}\" | tail -1)\r\n    fi\r\n  fi\r\nfi\r\n\r\n## Error if no valid version was found.\r\nif [ \"${NEOFORGE_VERSION}\" == \"\" ] || [ \"${NEOFORGE_VERSION}\" == \"null\" ]; then\r\n  echo -e \"The install failed because there is no valid version of neoforge for the version of minecraft selected.\"\r\n  exit 1\r\nfi\r\n\r\n#Adding .jar when not eding by SERVER_JARFILE\r\nif [[ ! $SERVER_JARFILE = *\\.jar ]]; then\r\n  SERVER_JARFILE=\"$SERVER_JARFILE.jar\"\r\nfi\r\n\r\nDOWNLOAD_LINK=${FILE_SITE}/${NEOFORGE_VERSION}/neoforge-${NEOFORGE_VERSION}\r\n\r\n#Downloading jars\r\necho -e \"Downloading neoforge version ${NEOFORGE_VERSION}\"\r\necho -e \"Download link is ${DOWNLOAD_LINK}-installer.jar\"\r\n\r\nif curl --output /dev/null --silent --head --fail ${DOWNLOAD_LINK}-installer.jar; then\r\n  echo -e \"installer jar download link is valid.\"\r\nelse\r\n  echo -e \"link is invalid. Exiting now\"\r\n  exit 2\r\nfi\r\n\r\ncurl -s -o installer.jar -sS ${DOWNLOAD_LINK}-installer.jar\r\n\r\n#Checking if downloaded jars exist\r\nif [[ ! -f ./installer.jar ]]; then\r\n  echo \"!!! Error downloading neoforge version ${NEOFORGE_VERSION} !!!\"\r\n  exit 3\r\nfi\r\n\r\nfunction unix_args {\r\n  echo -e \"Setting up neoforge unix args.\"\r\n  ln -sf libraries/net/neoforged/neoforge/*/unix_args.txt unix_args.txt\r\n}\r\n\r\n# Delete args to support downgrading/upgrading\r\nrm -rf libraries/net/neoforged/neoforge\r\nrm -f unix_args.txt\r\n\r\n#Installing server\r\necho -e \"Installing neoforge server.\\n\"\r\njava -jar installer.jar --installServer || { echo -e \"\\nInstall failed using NeoForge version ${NEOFORGE_VERSION} and Minecraft version ${MC_VERSION}.\\nShould you be using unlimited memory value of 0, make sure to increase the default install resource limits in the Wings config or specify exact allocated memory in the server Build Configuration instead of 0! \\nOtherwise, the NeoForge installer will not have enough memory.\"; exit 4; }\r\n\r\n# NeoForge always launches through generated JPMS args\r\nif ls libraries/net/neoforged/neoforge/*/unix_args.txt >/dev/null 2>&1; then\r\n  unix_args\r\nelse\r\n  echo -e \"ERROR: neoforge unix_args.txt was not produced; the install may have failed.\"\r\n  exit 5\r\nfi\r\n\r\necho -e \"Deleting installer.jar file.\\n\"\r\nrm -rf installer.jar\r\necho -e \"Installation process is completed\"\r",
+            "container": "openjdk:8-jdk-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Server Jar File",
+            "description": "The name of the Jarfile to use when running NeoForge. NeoForge 1.20.2+ launches via @unix_args.txt, so this is only a fallback.",
+            "env_variable": "SERVER_JARFILE",
+            "default_value": "server.jar",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|regex:/^([\\w\\d._-]+)(\\.jar)$/",
+            "field_type": "text"
+        },
+        {
+            "name": "Minecraft Version",
+            "description": "The version of minecraft you want to install for.\r\n\r\nLeaving latest will install the latest recommended version.",
+            "env_variable": "MC_VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:9",
+            "field_type": "text"
+        },
+        {
+            "name": "Build Type",
+            "description": "The type of NeoForge build to install.\r\n\r\nValid types are \"recommended\" (newest stable) and \"latest\" (newest, may include betas).",
+            "env_variable": "BUILD_TYPE",
+            "default_value": "recommended",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:recommended,latest",
+            "field_type": "text"
+        },
+        {
+            "name": "NeoForge Version",
+            "description": "The full exact NeoForge version.\r\n\r\nEx. 21.10.64\r\n\r\nOverrides MC_VERSION and BUILD_TYPE. If it fails to download the server files it will fail to install.",
+            "env_variable": "NEOFORGE_VERSION",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|regex:/^[0-9a-zA-Z.\\-]+$/",
+            "field_type": "text"
+        }
+    ]
+}
