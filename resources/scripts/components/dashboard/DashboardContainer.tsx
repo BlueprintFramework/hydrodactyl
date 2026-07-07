@@ -157,7 +157,13 @@ const DashboardContainer = () => {
     );
 
     const ownerFilterDropdown = useMemo(
-        () => <OwnerFilterDropdown value={ownerFilter ?? 'owner'} rootAdmin={rootAdmin ?? false} onChange={handleOwnerFilterChange} />,
+        () => (
+            <OwnerFilterDropdown
+                value={ownerFilter ?? 'owner'}
+                rootAdmin={rootAdmin ?? false}
+                onChange={handleOwnerFilterChange}
+            />
+        ),
         [ownerFilter, rootAdmin, handleOwnerFilterChange],
     );
 
