@@ -57,6 +57,7 @@
         "events": "^3.3.0",
         "formik": "^2.4.6",
         "globals": "^16.3.0",
+        "i18next": "^26.3.4",
         "install": "^0.13.0",
         "laravel-vite-plugin": "^2.0.0",
         "million": "^3.1.11",
@@ -68,6 +69,7 @@
         "react-chartjs-2": "^5.3.0",
         "react-dom": "^19.1.1",
         "react-fast-compare": "^3.2.2",
+        "react-i18next": "^17.0.8",
         "react-router-dom": "^7.7.1",
         "recharts": "^3.9.1",
         "sockette": "^2.0.6",
@@ -118,6 +120,11 @@
         "test:unit": "php vendor/bin/phpunit --testsuite=Unit",
         "test:integration": "php vendor/bin/phpunit --testsuite=Integration"
     },
-    "browserslist": ["> 0.5%", "last 2 versions", "firefox esr", "not dead"],
+    "browserslist": [
+        "> 0.5%",
+        "last 2 versions",
+        "firefox esr",
+        "not dead"
+    ],
     "packageManager": "pnpm@11.3.0"
 }

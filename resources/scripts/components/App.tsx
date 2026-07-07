@@ -6,13 +6,17 @@ import GlobalStylesheet from '@/assets/css/GlobalStylesheet';
 import '@/assets/tailwind.css';
 import '@preact/signals-react';
 import { StoreProvider } from 'easy-peasy';
-import { lazy } from 'react';
+import { lazy, useEffect, useState } from 'react';
+import { I18nextProvider } from 'react-i18next';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
 import AuthenticatedRoute from '@/components/elements/AuthenticatedRoute';
 import { NotFound } from '@/components/elements/ScreenBlock';
 import Spinner from '@/components/elements/Spinner';
+
+import i18n, { fetchSupportedLanguages, loadTranslations } from '@/lib/i18n';
+import { loadLocaleForLanguage } from '@/lib/localeMap';
 
 import { store } from '@/state';
 import { ServerContext } from '@/state/server';
@@ -44,6 +48,8 @@ interface ExtendedWindow extends Window {
 
 const App = () => {
     const { HydrodactylUser, SiteConfiguration } = window as ExtendedWindow;
+    const [i18nReady, setI18nReady] = useState(false);
+
     if (HydrodactylUser && !store.getState().user.data) {
         store.getActions().user.setUserData({
             uuid: HydrodactylUser.uuid,
@@ -63,8 +69,27 @@ const App = () => {
         }
     }
 
+    useEffect(() => {
+        const userLang = HydrodactylUser?.language || SiteConfiguration?.locale || 'en';
+        fetchSupportedLanguages().then(() => {
+            loadTranslations(userLang).then(() => {
+                i18n.changeLanguage(userLang);
+                loadLocaleForLanguage(userLang);
+                setI18nReady(true);
+            });
+        });
+    }, []);
+
+    if (!i18nReady) {
+        return (
+            <div className='flex items-center justify-center w-screen h-screen bg-neutral-900'>
+                <Spinner />
+            </div>
+        );
+    }
+
     return (
-        <>
+        <I18nextProvider i18n={i18n}>
             <GlobalStylesheet />
             <StoreProvider store={store}>
                 <HydrodactylProvider>
@@ -130,7 +155,7 @@ const App = () => {
                     </div>
                 </HydrodactylProvider>
             </StoreProvider>
-        </>
+        </I18nextProvider>
     );
 };
 
