@@ -20,7 +20,7 @@ export default function Captcha({
     size = 'flexible',
 }: CaptchaProps) {
     const containerRef = useRef<HTMLDivElement>(null);
-    const [widgetId, setWidgetId] = useState<string | null>(null);
+    const widgetIdRef = useRef<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -62,9 +62,9 @@ export default function Captcha({
             if (!containerRef.current) return;
 
             // Clean up any existing widget first
-            if (widgetId) {
+            if (widgetIdRef.current) {
                 CaptchaManager.removeWidget();
-                setWidgetId(null);
+                widgetIdRef.current = null;
             }
 
             // Clear the container
@@ -91,7 +91,7 @@ export default function Captcha({
                 });
 
                 if (mounted) {
-                    setWidgetId(id);
+                    widgetIdRef.current = id;
                 }
             } catch (_err) {
                 if (mounted) {
@@ -108,12 +108,13 @@ export default function Captcha({
 
         return () => {
             mounted = false;
-            if (widgetId) {
+            if (widgetIdRef.current) {
                 CaptchaManager.removeWidget();
+                widgetIdRef.current = null;
             }
         };
-        // biome-ignore lint/correctness/useExhaustiveDependencies: callbacks use refs so they are stable
-    }, [theme, size, widgetId, handleSuccess, handleExpired, handleError]);
+        // biome-ignore lint/correctness/useExhaustiveDependencies: handlers delegate through refs so they are stable
+    }, [theme, size]);
 
     // Set up event listeners for captcha events
     useEffect(() => {
