@@ -136,6 +136,12 @@ function LoginContainer() {
                         </Button>
                         <SecondaryLink to='/auth/password'>Forgot your password?</SecondaryLink>
                     </div>
+                    <div className='flex w-full justify-center items-center mt-4'>
+                        <span className='text-secondary text-sm'>
+                            Don&apos;t have an account?{' '}
+                            <SecondaryLink to='/auth/register'>Sign up</SecondaryLink>
+                        </span>
+                    </div>
                 </LoginFormContainer>
             )}
         </Formik>

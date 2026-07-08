@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import ForgotPasswordContainer from '@/components/auth/ForgotPasswordContainer';
 import LoginCheckpointContainer from '@/components/auth/LoginCheckpointContainer';
 import LoginContainer from '@/components/auth/LoginContainer';
+import RegisterContainer from '@/components/auth/RegisterContainer';
 import ResetPasswordContainer from '@/components/auth/ResetPasswordContainer';
 import Logo from '@/components/elements/HydroLogo';
 import { NotFound } from '@/components/elements/ScreenBlock';
@@ -27,6 +28,7 @@ const AuthenticationRouter = () => {
                 <div className='w-full max-w-4xl z-2 flex items-center bg-bg-lowered align-middle px-[calc(var(--page-padding)*3)]'>
                     <Routes>
                         <Route path='login' element={<LoginContainer />} />
+                        <Route path='register' element={<RegisterContainer />} />
                         <Route path='login/checkpoint/*' element={<LoginCheckpointContainer />} />
                         <Route path='password' element={<ForgotPasswordContainer />} />
                         <Route path='password/reset/:token' element={<ResetPasswordContainer />} />
