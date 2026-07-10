@@ -53,7 +53,7 @@ class ServerTransferController extends Controller
         if (!$node->isViable($server->memory, $server->disk)) {
             $this->alert->danger(trans('admin/server.alerts.transfer_not_viable'))->flash();
 
-            return redirect()->route('admin.servers.view.manage', $server->id);
+            return redirect()->route('admin.depr.servers.view.manage', $server->id);
         }
 
         $server->validateTransferState();
@@ -90,7 +90,7 @@ class ServerTransferController extends Controller
 
         $this->alert->success(trans('admin/server.alerts.transfer_started'))->flash();
 
-        return redirect()->route('admin.servers.view.manage', $server->id);
+        return redirect()->route('admin.depr.servers.view.manage', $server->id);
     }
 
     /**

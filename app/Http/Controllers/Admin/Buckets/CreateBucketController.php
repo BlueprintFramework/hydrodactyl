@@ -29,6 +29,6 @@ class CreateBucketController extends Controller
 
         $this->alert->success('S3 configuration created')->flash();
 
-        return redirect()->route('admin.buckets.view', $s3->id);
+        return redirect()->route('admin.depr.buckets.view', $s3->id);
     }
 }

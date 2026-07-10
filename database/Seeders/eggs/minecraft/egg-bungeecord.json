@@ -1,56 +1,87 @@
 {
-    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY HYDRODACTYL PANEL",
     "meta": {
         "version": "PTDL_v2",
         "update_url": null
     },
-    "exported_at": "2024-05-07T12:55:57+00:00",
+    "exported_at": "2026-07-09T00:00:00+00:00",
     "name": "Bungeecord",
-    "author": "support@pterodactyl.io",
-    "description": "For a long time, Minecraft server owners have had a dream that encompasses a free, easy, and reliable way to connect multiple Minecraft servers together. BungeeCord is the answer to said dream. Whether you are a small server wishing to string multiple game-modes together, or the owner of the ShotBow Network, BungeeCord is the ideal solution for you. With the help of BungeeCord, you will be able to unlock your community's full potential.",
-    "features": ["eula", "java_version", "pid_limit", "plugin/bungeecord", "mclogs", "subdomain_minecraft"],
+    "author": "support@hydrodactyl.com",
+    "description": "For a long time, Minecraft server owners have had a dream that encompasses a free, easy, and reliable way to connect multiple Minecraft servers together. Uses the itzg/mc-proxy Docker image.",
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit",
+        "mclogs",
+        "subdomain_minecraft"
+    ],
     "docker_images": {
-        "Java 25": "ghcr.io/pyrodactyl-oss/images:java_25",
-        "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",
-        "Java 17": "ghcr.io\/pterodactyl\/yolks:java_17",
-        "Java 16": "ghcr.io\/pterodactyl\/yolks:java_16",
-        "Java 11": "ghcr.io\/pterodactyl\/yolks:java_11",
-        "Java 8": "ghcr.io\/pterodactyl\/yolks:java_8"
+        "itzg MC Proxy": "itzg/mc-proxy:latest"
     },
     "file_denylist": [],
-    "startup": "java -Xms128M -XX:MaxRAMPercentage=95.0 -jar {{SERVER_JARFILE}}",
+    "startup": "/start",
     "config": {
-        "files": "{\r\n    \"config.yml\": {\r\n        \"parser\": \"yaml\",\r\n        \"find\": {\r\n            \"listeners[0].query_port\": \"{{server.build.default.port}}\",\r\n            \"listeners[0].host\": \"0.0.0.0:{{server.build.default.port}}\",\r\n            \"servers.*.address\": {\r\n                \"regex:^(127\\\\.0\\\\.0\\\\.1|localhost)(:\\\\d{1,5})?$\": \"{{config.docker.interface}}$2\"\r\n            }\r\n        }\r\n    }\r\n}",
-        "startup": "{\r\n    \"done\": \"Listening on \"\r\n}",
+        "files": "{}",
+        "startup": "{\"done\": \"Listening on \"}",
         "logs": "{}",
         "stop": "end"
     },
     "scripts": {
         "installation": {
-            "script": "#!\/bin\/ash\r\n# Bungeecord Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\n\r\ncd \/mnt\/server\r\n\r\nif [ -z \"${BUNGEE_VERSION}\" ] || [ \"${BUNGEE_VERSION}\" == \"latest\" ]; then\r\n    BUNGEE_VERSION=\"lastStableBuild\"\r\nfi\r\n\r\ncurl -o ${SERVER_JARFILE} https:\/\/ci.md-5.net\/job\/BungeeCord\/${BUNGEE_VERSION}\/artifact\/bootstrap\/target\/BungeeCord.jar",
-            "container": "ghcr.io\/pterodactyl\/installers:alpine",
+            "script": "#!/bin/ash\n# Bungeecord installation script\n# itzg/mc-proxy handles server jar download at container start\nmkdir -p /mnt/server\n",
+            "container": "ghcr.io/pterodactyl/installers:alpine",
             "entrypoint": "ash"
         }
     },
     "variables": [
         {
-            "name": "Bungeecord Version",
-            "description": "The version of Bungeecord to download and use.",
-            "env_variable": "BUNGEE_VERSION",
-            "default_value": "latest",
-            "user_viewable": true,
-            "user_editable": true,
-            "rules": "required|alpha_num|between:1,6",
+            "name": "Server Type",
+            "description": "The type of proxy to run. Fixed for this egg.",
+            "env_variable": "TYPE",
+            "default_value": "BUNGEECORD",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|string|max:20",
             "field_type": "text"
         },
         {
-            "name": "Bungeecord Jar File",
-            "description": "The name of the Jarfile to use when running Bungeecord.",
-            "env_variable": "SERVER_JARFILE",
-            "default_value": "bungeecord.jar",
+            "name": "Proxy Version",
+            "description": "The version of the proxy to run. Set to LATEST for the latest release.",
+            "env_variable": "VERSION",
+            "default_value": "LATEST",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|regex:\/^([\\w\\d._-]+)(\\.jar)$\/",
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Max Memory",
+            "description": "Maximum memory allocated to the Java heap (e.g., 1G, 512M).",
+            "env_variable": "MEMORY",
+            "default_value": "1G",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:10",
+            "field_type": "text"
+        },
+        {
+            "name": "Online Mode",
+            "description": "Whether to authenticate players with Mojang servers. Set FALSE for offline/cracked servers.",
+            "env_variable": "ONLINE_MODE",
+            "default_value": "TRUE",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:TRUE,FALSE",
+            "field_type": "text"
+        },
+        {
+            "name": "Max Players",
+            "description": "Maximum number of players that can connect through the proxy.",
+            "env_variable": "MAX_PLAYERS",
+            "default_value": "100",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|min:1|max:10000",
             "field_type": "text"
         }
     ]

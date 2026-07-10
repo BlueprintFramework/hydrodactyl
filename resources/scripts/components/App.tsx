@@ -22,6 +22,7 @@ import HydrodactylProvider from './HydrodactylProvider';
 
 // const DashboardRouter = lazy(() => import('@/routers/DashboardRouter'));
 // const ServerRouter = lazy(() => import('@/routers/ServerRouter'));
+const AdminRouter = lazy(() => import('@/routers/AdminRouter'));
 const UnifiedRouter = lazy(() => import('@/routers/UnifiedRouter'));
 const AuthenticationRouter = lazy(() => import('@/routers/AuthenticationRouter'));
 const SetupRouter = lazy(() => import('@/routers/SetupRouter'));
@@ -101,6 +102,17 @@ const App = () => {
                                 />
 
                                 <Route
+                                    path='/admin/*'
+                                    element={
+                                        <AuthenticatedRoute>
+                                            <Spinner.Suspense>
+                                                <AdminRouter />
+                                            </Spinner.Suspense>
+                                        </AuthenticatedRoute>
+                                    }
+                                />
+
+                                <Route
                                     path='/*'
                                     element={
                                         <AuthenticatedRoute>
@@ -112,17 +124,6 @@ const App = () => {
                                         </AuthenticatedRoute>
                                     }
                                 />
-
-                                {/* <Route */}
-                                {/*     path='/*' */}
-                                {/*     element={ */}
-                                {/*         <AuthenticatedRoute> */}
-                                {/*             <Spinner.Suspense> */}
-                                {/*                 <DashboardRouter /> */}
-                                {/*             </Spinner.Suspense> */}
-                                {/*         </AuthenticatedRoute> */}
-                                {/*     } */}
-                                {/* /> */}
 
                                 <Route path='*' element={<NotFound />} />
                             </Routes>

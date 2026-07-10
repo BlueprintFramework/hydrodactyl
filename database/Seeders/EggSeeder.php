@@ -59,6 +59,8 @@ class EggSeeder extends Seeder
         $files = new \DirectoryIterator(database_path('Seeders/eggs/' . kebab_case($nest->name)));
 
         $this->command->alert('Updating Eggs for Nest: ' . $nest->name);
+
+        $managedIds = [];
         /** @var \DirectoryIterator $file */
         foreach ($files as $file) {
             if (!$file->isFile() || !$file->isReadable()) {
@@ -66,7 +68,7 @@ class EggSeeder extends Seeder
             }
 
             $decoded = json_decode(file_get_contents($file->getRealPath()), true, 512, JSON_THROW_ON_ERROR);
-            $file = new UploadedFile($file->getPathname(), $file->getFilename(), 'application/json');
+            $eggFile = new UploadedFile($file->getPathname(), $file->getFilename(), 'application/json');
 
             $egg = $nest->eggs()
                 ->where('author', $decoded['author'])
@@ -74,12 +76,19 @@ class EggSeeder extends Seeder
                 ->first();
 
             if ($egg instanceof Egg) {
-                $this->updateImporterService->handle($egg, $file);
+                $this->updateImporterService->handle($egg, $eggFile);
                 $this->command->info('Updated ' . $decoded['name']);
             } else {
-                $this->importerService->handle($file, $nest->id);
+                $egg = $this->importerService->handle($eggFile, $nest->id);
                 $this->command->comment('Created ' . $decoded['name']);
             }
+
+            $managedIds[] = $egg->id;
+        }
+
+        $removed = $nest->eggs()->whereNotIn('id', $managedIds)->delete();
+        if ($removed > 0) {
+            $this->command->warn("Removed {$removed} stale egg(s) from nest '{$nest->name}'");
         }
 
         $this->command->line('');

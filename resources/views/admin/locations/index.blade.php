@@ -43,7 +43,7 @@
                             @endphp
                             <tr>
                                 <td><code>{{ $location->id }}</code></td>
-                                <td><a href="{{ route('admin.locations.view', $location->id) }}">{{ $location->short }}</a></td>
+                                <td><a href="{{ route('admin.depr.locations.view', $location->id) }}">{{ $location->short }}</a></td>
                                 <td>{{ $location->long }}</td>
                                 <td class="text-center" style="color: {{ $memoryColor }}" title="Allocated: {{ humanizeSize($location->allocated_memory * 1024 * 1024) }} / Total: {{ humanizeSize($location->total_memory * 1024 * 1024) }}">
                                     {{ round($location->memory_percent) }}%
@@ -64,7 +64,7 @@
 <div class="modal fade" id="newLocationModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="{{ route('admin.locations') }}" method="POST">
+            <form action="{{ route('admin.depr.locations') }}" method="POST">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Create Location</h4>

@@ -9,7 +9,7 @@
   <h1>Domain Management<small>Configure DNS domains for subdomain management.</small></h1>
   <ol class="breadcrumb">
     <li><a href="{{ route('admin.index') }}">Admin</a></li>
-    <li><a href="{{ route('admin.settings') }}">Settings</a></li>
+    <li><a href="{{ route('admin.depr.settings') }}">Settings</a></li>
     <li class="active">Domains</li>
   </ol>
 @endsection
@@ -22,7 +22,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">Configured Domains</h3>
           <div class="box-tools">
-            <a href="{{ route('admin.settings.domains.create') }}" class="btn btn-sm btn-primary">Create New Domain</a>
+            <a href="{{ route('admin.depr.settings.domains.create') }}" class="btn btn-sm btn-primary">Create New Domain</a>
           </div>
         </div>
         <div class="box-body table-responsive no-padding">
@@ -63,9 +63,9 @@
                     </td>
                     <td>{{ $domain->created_at->diffForHumans() }}</td>
                     <td class="text-center">
-                      <a href="{{ route('admin.settings.domains.edit', $domain) }}" class="btn btn-xs btn-primary">Edit</a>
+                      <a href="{{ route('admin.depr.settings.domains.edit', $domain) }}" class="btn btn-xs btn-primary">Edit</a>
                       @if($domain->server_subdomains_count == 0)
-                        <form action="{{ route('admin.settings.domains.destroy', $domain) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this domain?')">
+                        <form action="{{ route('admin.depr.settings.domains.destroy', $domain) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this domain?')">
                           @csrf
                           @method('DELETE')
                           <button type="submit" class="btn btn-xs btn-danger">Delete</button>
@@ -81,7 +81,7 @@
               <h4 class="text-muted">No domains configured</h4>
               <p class="text-muted">
                 Configure DNS domains to enable subdomain management for servers.<br>
-                <a href="{{ route('admin.settings.domains.create') }}" class="btn btn-primary btn-sm" style="margin-top: 10px;">Create Your First Domain</a>
+                <a href="{{ route('admin.depr.settings.domains.create') }}" class="btn btn-primary btn-sm" style="margin-top: 10px;">Create Your First Domain</a>
               </p>
             </div>
           @endif

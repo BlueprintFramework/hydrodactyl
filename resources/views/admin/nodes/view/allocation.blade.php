@@ -8,8 +8,8 @@
     <h1>{{ $node->name }}<small>Control allocations available for servers on this node.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.nodes') }}">Nodes</a></li>
-        <li><a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a></li>
+        <li><a href="{{ route('admin.depr.nodes') }}">Nodes</a></li>
+        <li><a href="{{ route('admin.depr.nodes.view', $node->id) }}">{{ $node->name }}</a></li>
         <li class="active">Allocations</li>
     </ol>
 @endsection
@@ -19,11 +19,11 @@
     <div class="col-xs-12">
         <div class="nav-tabs-custom nav-tabs-floating">
             <ul class="nav nav-tabs">
-                <li><a href="{{ route('admin.nodes.view', $node->id) }}">About</a></li>
-                <li><a href="{{ route('admin.nodes.view.settings', $node->id) }}">Settings</a></li>
-                <li><a href="{{ route('admin.nodes.view.configuration', $node->id) }}">Configuration</a></li>
-                <li class="active"><a href="{{ route('admin.nodes.view.allocation', $node->id) }}">Allocation</a></li>
-                <li><a href="{{ route('admin.nodes.view.servers', $node->id) }}">Servers</a></li>
+                <li><a href="{{ route('admin.depr.nodes.view', $node->id) }}">About</a></li>
+                <li><a href="{{ route('admin.depr.nodes.view.settings', $node->id) }}">Settings</a></li>
+                <li><a href="{{ route('admin.depr.nodes.view.configuration', $node->id) }}">Configuration</a></li>
+                <li class="active"><a href="{{ route('admin.depr.nodes.view.allocation', $node->id) }}">Allocation</a></li>
+                <li><a href="{{ route('admin.depr.nodes.view.servers', $node->id) }}">Servers</a></li>
             </ul>
         </div>
     </div>
@@ -72,7 +72,7 @@
                             <td class="col-sm-2 middle" data-identifier="port">{{ $allocation->port }}</td>
                             <td class="col-sm-3 middle">
                                 @if(! is_null($allocation->server))
-                                    <a href="{{ route('admin.servers.view', $allocation->server_id) }}">{{ $allocation->server->name }}</a>
+                                    <a href="{{ route('admin.depr.servers.view', $allocation->server_id) }}">{{ $allocation->server->name }}</a>
                                 @endif
                             </td>
                             <td class="col-sm-1 middle">
@@ -92,7 +92,7 @@
         </div>
     </div>
     <div class="col-sm-4">
-        <form action="{{ route('admin.nodes.view.allocation', $node->id) }}" method="POST">
+        <form action="{{ route('admin.depr.nodes.view.allocation', $node->id) }}" method="POST">
             <div class="box box-success">
                 <div class="box-header with-border">
                     <h3 class="box-title">Assign New Allocations</h3>
@@ -139,7 +139,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Delete Allocations for IP Block</h4>
             </div>
-            <form action="{{ route('admin.nodes.view.allocation.removeBlock', $node->id) }}" method="POST">
+            <form action="{{ route('admin.depr.nodes.view.allocation.removeBlock', $node->id) }}" method="POST">
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-12">

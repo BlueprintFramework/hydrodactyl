@@ -19,7 +19,7 @@
                 <div class="box-header with-border">
                     <h3 class="box-title">Credentials List</h3>
                     <div class="box-tools">
-                        <a href="{{ route('admin.api.new') }}" class="btn btn-sm btn-primary">Create New</a>
+                        <a href="{{ route('admin.depr.api.new') }}" class="btn btn-sm btn-primary">Create New</a>
                     </div>
                 </div>
                 <div class="box-body table-responsive no-padding">

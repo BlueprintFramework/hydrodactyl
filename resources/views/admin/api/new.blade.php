@@ -8,14 +8,14 @@
     <h1>Application API<small>Create a new application API key.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.api.index') }}">Application API</a></li>
+        <li><a href="{{ route('admin.depr.api.index') }}">Application API</a></li>
         <li class="active">New Credentials</li>
     </ol>
 @endsection
 
 @section('content')
     <div class="row">
-        <form method="POST" action="{{ route('admin.api.new') }}">
+        <form method="POST" action="{{ route('admin.depr.api.new') }}">
             <div class="col-sm-8 col-xs-12">
                 <div class="box box-primary">
                     <div class="box-header with-border">

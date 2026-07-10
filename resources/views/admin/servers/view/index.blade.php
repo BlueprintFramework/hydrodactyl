@@ -5,175 +5,116 @@
 @endsection
 
 @section('content-header')
-    <h1>{{ $server->name }}<small>{{ str_limit($server->description) }}</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
-        <li class="active">{{ $server->name }}</li>
-    </ol>
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-100">{{ $server->name }}
+                <small class="text-gray-500 ml-2">{{ str_limit($server->description) }}</small>
+            </h1>
+        </div>
+        <ol class="flex items-center space-x-2 text-sm text-gray-500">
+            <li><a href="{{ route('admin.index') }}" class="text-blue-400 hover:text-blue-300">Admin</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li><a href="{{ route('admin.depr.servers') }}" class="text-blue-400 hover:text-blue-300">Servers</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li class="text-gray-400">{{ $server->name }}</li>
+        </ol>
+    </div>
 @endsection
 
 @section('content')
 @include('admin.servers.partials.navigation')
-<div class="row">
-    <div class="col-sm-8">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="box box-primary">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">Information</h3>
-                    </div>
-                    <div class="box-body table-responsive no-padding">
-                        <table class="table table-hover">
-                            <tr>
-                                <td>Internal Identifier</td>
-                                <td><code>{{ $server->id }}</code></td>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+    <div class="lg:col-span-2">
+        <div class="bg-[#1a1a1a] rounded-lg border border-gray-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-800">
+                <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider">Information</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <tbody>
+                        @foreach([
+                            ['Internal Identifier', '<code class="text-blue-400">'.$server->id.'</code>'],
+                            ['External Identifier', is_null($server->external_id)
+                                ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-gray-400">Not Set</span>'
+                                : '<code class="text-blue-400">'.$server->external_id.'</code>'],
+                            ['UUID / Docker Container ID', '<code class="text-blue-400 break-all">'.$server->uuid.'</code>'],
+                            ['Current Egg', '<a href="'.route('admin.depr.nests.view', $server->nest_id).'" class="text-blue-400 hover:text-blue-300">'.$server->nest->name.'</a> :: <a href="'.route('admin.depr.nests.egg.view', $server->egg_id).'" class="text-blue-400 hover:text-blue-300">'.$server->egg->name.'</a>'],
+                            ['Server Name', $server->name],
+                            ['CPU Limit', $server->cpu === 0
+                                ? '<code class="text-green-400">Unlimited</code>'
+                                : '<code class="text-yellow-400">'.$server->cpu.'%</code>'],
+                            ['CPU Pinning', $server->threads != null
+                                ? '<code class="text-blue-400">'.$server->threads.'</code>'
+                                : '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-gray-400">Not Set</span>'],
+                            ['Memory', ($server->memory === 0 ? '<code class="text-green-400">Unlimited</code>' : '<code class="text-yellow-400">'.$server->memory.'MiB</code>').' / '.($server->swap === 0 ? '<code class="text-gray-400" title="Swap Space">Not Set</code>' : ($server->swap === -1 ? '<code class="text-green-400" title="Swap Space">Unlimited</code>' : '<code class="text-yellow-400" title="Swap Space">'.$server->swap.'MiB</code>'))],
+                            ['Disk Space', $server->disk === 0
+                                ? '<code class="text-green-400">Unlimited</code>'
+                                : '<code class="text-yellow-400">'.$server->disk.'MiB</code>'],
+                            ['Block IO Weight', '<code class="text-blue-400">'.$server->io.'</code>'],
+                            ['Default Connection', '<code class="text-blue-400">'.$server->allocation->ip.':'.$server->allocation->port.'</code>'],
+                            ['Connection Alias', $server->allocation->alias !== $server->allocation->ip
+                                ? '<code class="text-blue-400">'.$server->allocation->alias.':'.$server->allocation->port.'</code>'
+                                : '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-gray-400">No Alias Assigned</span>'],
+                        ] as $row)
+                            <tr class="border-b border-gray-800 last:border-0 hover:bg-white/5">
+                                <td class="px-5 py-3 text-gray-400 font-medium w-56">{{ $row[0] }}</td>
+                                <td class="px-5 py-3 text-gray-200">{!! $row[1] !!}</td>
                             </tr>
-                            <tr>
-                                <td>External Identifier</td>
-                                @if(is_null($server->external_id))
-                                    <td><span class="label label-default">Not Set</span></td>
-                                @else
-                                    <td><code>{{ $server->external_id }}</code></td>
-                                @endif
-                            </tr>
-                            <tr>
-                                <td>UUID / Docker Container ID</td>
-                                <td><code>{{ $server->uuid }}</code></td>
-                            </tr>
-                            <tr>
-                                <td>Current Egg</td>
-                                <td>
-                                    <a href="{{ route('admin.nests.view', $server->nest_id) }}">{{ $server->nest->name }}</a> ::
-                                    <a href="{{ route('admin.nests.egg.view', $server->egg_id) }}">{{ $server->egg->name }}</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Server Name</td>
-                                <td>{{ $server->name }}</td>
-                            </tr>
-                            <tr>
-                                <td>CPU Limit</td>
-                                <td>
-                                    @if($server->cpu === 0)
-                                        <code>Unlimited</code>
-                                    @else
-                                        <code>{{ $server->cpu }}%</code>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>CPU Pinning</td>
-                                <td>
-                                    @if($server->threads != null)
-                                        <code>{{ $server->threads }}</code>
-                                    @else
-                                        <span class="label label-default">Not Set</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Memory</td>
-                                <td>
-                                    @if($server->memory === 0)
-                                        <code>Unlimited</code>
-                                    @else
-                                        <code>{{ $server->memory }}MiB</code>
-                                    @endif
-                                    /
-                                    @if($server->swap === 0)
-                                        <code data-toggle="tooltip" data-placement="top" title="Swap Space">Not Set</code>
-                                    @elseif($server->swap === -1)
-                                        <code data-toggle="tooltip" data-placement="top" title="Swap Space">Unlimited</code>
-                                    @else
-                                        <code data-toggle="tooltip" data-placement="top" title="Swap Space"> {{ $server->swap }}MiB</code>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Disk Space</td>
-                                <td>
-                                    @if($server->disk === 0)
-                                        <code>Unlimited</code>
-                                    @else
-                                        <code>{{ $server->disk }}MiB</code>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Block IO Weight</td>
-                                <td><code>{{ $server->io }}</code></td>
-                            </tr>
-                            <tr>
-                                <td>Default Connection</td>
-                                <td><code>{{ $server->allocation->ip }}:{{ $server->allocation->port }}</code></td>
-                            </tr>
-                            <tr>
-                                <td>Connection Alias</td>
-                                <td>
-                                    @if($server->allocation->alias !== $server->allocation->ip)
-                                        <code>{{ $server->allocation->alias }}:{{ $server->allocation->port }}</code>
-                                    @else
-                                        <span class="label label-default">No Alias Assigned</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    <div class="col-sm-4">
-        <div class="box box-primary">
-            <div class="box-body" style="padding-bottom: 0px;">
-                <div class="row">
-                    @if($server->isSuspended())
-                        <div class="col-sm-12">
-                            <div class="small-box bg-yellow">
-                                <div class="inner">
-                                    <h3 class="no-margin">Suspended</h3>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                    @if(!$server->isInstalled())
-                        <div class="col-sm-12">
-                            <div class="small-box {{ (! $server->isInstalled()) ? 'bg-blue' : 'bg-maroon' }}">
-                                <div class="inner">
-                                    <h3 class="no-margin">{{ (! $server->isInstalled()) ? 'Installing' : 'Install Failed' }}</h3>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                    <div class="col-sm-12">
-                        <div class="small-box bg-zinc">
-                            <div class="inner">
-                                <h3>{{ str_limit($server->user->username, 16) }}</h3>
-                                <p>{{ $server->user->email }}</p>
-                                <p>Server Owner</p>
-                            </div>
-                            <div class="icon"><i class="fa fa-user"></i></div>
-                            <a href="{{ route('admin.users.view', $server->user->id) }}" class="small-box-footer">
-                                More info <i class="fa fa-arrow-circle-right"></i>
-                            </a>
-                        </div>
+
+    <div class="space-y-4">
+        @if($server->isSuspended())
+            <div class="bg-yellow-600/20 border border-yellow-600/30 rounded-lg p-4 text-center">
+                <h3 class="text-lg font-bold text-yellow-400">Suspended</h3>
+            </div>
+        @endif
+
+        @if(!$server->isInstalled())
+            <div class="bg-blue-600/20 border border-blue-600/30 rounded-lg p-4 text-center">
+                <h3 class="text-lg font-bold text-blue-400">{{ $server->isInstalled() ? 'Install Failed' : 'Installing' }}</h3>
+            </div>
+        @endif
+
+        <a href="{{ route('admin.depr.users.view', $server->user->id) }}" class="block bg-[#1a1a1a] rounded-lg border border-gray-800 hover:border-gray-700 transition-colors overflow-hidden group">
+            <div class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-100">{{ str_limit($server->user->username, 16) }}</h3>
+                        <p class="text-sm text-gray-500">{{ $server->user->email }}</p>
                     </div>
-                    <div class="col-sm-12">
-                        <div class="small-box bg-zinc">
-                            <div class="inner">
-                                <h3>{{ str_limit($server->node->name, 16) }}</h3>
-                                <p>Server Node</p>
-                            </div>
-                            <div class="icon"><i class="fa fa-codepen"></i></div>
-                            <a href="{{ route('admin.nodes.view', $server->node->id) }}" class="small-box-footer">
-                                More info <i class="fa fa-arrow-circle-right"></i>
-                            </a>
-                        </div>
+                    <div class="text-gray-600 group-hover:text-gray-400 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     </div>
                 </div>
+                <p class="text-xs text-gray-600 mt-2 font-medium uppercase tracking-wider">Server Owner</p>
             </div>
-        </div>
+            <div class="bg-blue-500/10 px-5 py-2 text-xs text-blue-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                View User Profile &rarr;
+            </div>
+        </a>
+
+        <a href="{{ route('admin.depr.nodes.view', $server->node->id) }}" class="block bg-[#1a1a1a] rounded-lg border border-gray-800 hover:border-gray-700 transition-colors overflow-hidden group">
+            <div class="p-5">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-100">{{ str_limit($server->node->name, 16) }}</h3>
+                    </div>
+                    <div class="text-gray-600 group-hover:text-gray-400 transition-colors">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/></svg>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 mt-2 font-medium uppercase tracking-wider">Server Node</p>
+            </div>
+            <div class="bg-blue-500/10 px-5 py-2 text-xs text-blue-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                View Node Details &rarr;
+            </div>
+        </a>
     </div>
 </div>
 @endsection

@@ -58,7 +58,7 @@ class NestController extends Controller
         $nest = $this->nestCreationService->handle($request->normalize());
         $this->alert->success(trans('admin/nests.notices.created', ['name' => htmlspecialchars($nest->name)]))->flash();
 
-        return redirect()->route('admin.nests.view', $nest->id);
+        return redirect()->route('admin.depr.nests.view', $nest->id);
     }
 
     /**
@@ -84,7 +84,7 @@ class NestController extends Controller
         $this->nestUpdateService->handle($nest, $request->normalize());
         $this->alert->success(trans('admin/nests.notices.updated'))->flash();
 
-        return redirect()->route('admin.nests.view', $nest);
+        return redirect()->route('admin.depr.nests.view', $nest);
     }
 
     /**
@@ -97,6 +97,6 @@ class NestController extends Controller
         $this->nestDeletionService->handle($nest);
         $this->alert->success(trans('admin/nests.notices.deleted'))->flash();
 
-        return redirect()->route('admin.nests');
+        return redirect()->route('admin.depr.nests');
     }
 }

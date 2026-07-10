@@ -79,7 +79,7 @@ class DatabaseController extends Controller
                     sprintf('There was an error while trying to connect to the host or while executing a query: "%s"', $exception->getMessage())
                 )->flash();
 
-                return redirect()->route('admin.databases')->withInput($request->validated());
+                return redirect()->route('admin.depr.databases')->withInput($request->validated());
             } else {
                 throw $exception;
             }
@@ -87,7 +87,7 @@ class DatabaseController extends Controller
 
         $this->alert->success('Successfully created a new database host on the system.')->flash();
 
-        return redirect()->route('admin.databases.view', $host->id);
+        return redirect()->route('admin.depr.databases.view', $host->id);
     }
 
     /**
@@ -97,7 +97,7 @@ class DatabaseController extends Controller
      */
     public function update(DatabaseHostFormRequest $request, DatabaseHost $host): RedirectResponse
     {
-        $redirect = redirect()->route('admin.databases.view', $host->id);
+        $redirect = redirect()->route('admin.depr.databases.view', $host->id);
 
         try {
             $this->updateService->handle($host->id, $request->normalize());
@@ -129,7 +129,7 @@ class DatabaseController extends Controller
         $this->deletionService->handle($host);
         $this->alert->success('The requested database host has been deleted from the system.')->flash();
 
-        return redirect()->route('admin.databases');
+        return redirect()->route('admin.depr.databases');
     }
 
     /**

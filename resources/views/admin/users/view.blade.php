@@ -8,14 +8,14 @@
     <h1>{{ $user->name_first }} {{ $user->name_last}}<small>{{ $user->username }}</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.users') }}">Users</a></li>
+        <li><a href="{{ route('admin.depr.users') }}">Users</a></li>
         <li class="active">{{ $user->username }}</li>
     </ol>
 @endsection
 
 @section('content')
 <div class="row">
-    <form action="{{ route('admin.users.view', $user->id) }}" method="post">
+    <form action="{{ route('admin.depr.users.view', $user->id) }}" method="post">
         <div class="col-md-6">
             <div class="box box-primary">
                 <div class="box-header with-border">
@@ -111,7 +111,7 @@
                 <p class="no-margin">There must be no servers associated with this account in order for it to be deleted.</p>
             </div>
             <div class="box-footer">
-                <form action="{{ route('admin.users.view', $user->id) }}" method="POST">
+                <form action="{{ route('admin.depr.users.view', $user->id) }}" method="POST">
                     {!! csrf_field() !!}
                     {!! method_field('DELETE') !!}
                     <input id="delete" type="submit" class="btn btn-sm btn-danger pull-right" {{ $user->servers->count() < 1 ?: 'disabled' }} value="Delete User" />

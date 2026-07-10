@@ -19,12 +19,12 @@
             <div class="box-header with-border">
                 <h3 class="box-title">Server List</h3>
                 <div class="box-tools search01">
-                    <form action="{{ route('admin.servers') }}" method="GET">
+                    <form action="{{ route('admin.depr.servers') }}" method="GET">
                         <div class="input-group input-group-sm">
                             <input type="text" name="filter[*]" class="form-control pull-right" value="{{ request()->input()['filter']['*'] ?? '' }}" placeholder="Search Servers">
                             <div class="input-group-btn">
                                 <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                                <a href="{{ route('admin.servers.new') }}"><button type="button" class="btn btn-sm btn-primary" style="border-radius: 0 3px 3px 0;margin-left:-1px;">Create New</button></a>
+                                <a href="{{ route('admin.depr.servers.new') }}"><button type="button" class="btn btn-sm btn-primary" style="border-radius: 0 3px 3px 0;margin-left:-1px;">Create New</button></a>
                             </div>
                         </div>
                     </form>
@@ -45,10 +45,10 @@
                         </tr>
                         @foreach ($servers as $server)
                             <tr data-server="{{ $server->uuidShort }}">
-                                <td><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></td>
+                                <td><a href="{{ route('admin.depr.servers.view', $server->id) }}">{{ $server->name }}</a></td>
                                 <td><code title="{{ $server->uuid }}">{{ $server->uuid }}</code></td>
-                                <td><a href="{{ route('admin.users.view', $server->user->id) }}">{{ $server->user->username }} ({{ $server->user->email }})</a></td>
-                                <td><a href="{{ route('admin.nodes.view', $server->node->id) }}">{{ $server->node->name }}</a></td>
+                                <td><a href="{{ route('admin.depr.users.view', $server->user->id) }}">{{ $server->user->username }} ({{ $server->user->email }})</a></td>
+                                <td><a href="{{ route('admin.depr.nodes.view', $server->node->id) }}">{{ $server->node->name }}</a></td>
                                 <td>
                                     <code>{{ $server->allocation->alias }}:{{ $server->allocation->port }}</code>
                                 </td>

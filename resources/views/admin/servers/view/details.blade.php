@@ -8,8 +8,8 @@
     <h1>{{ $server->name }}<small>Edit details for this server including owner and container.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
-        <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
+        <li><a href="{{ route('admin.depr.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.depr.servers.view', $server->id) }}">{{ $server->name }}</a></li>
         <li class="active">Details</li>
     </ol>
 @endsection
@@ -22,7 +22,7 @@
             <div class="box-header with-border">
                 <h3 class="box-title">Base Information</h3>
             </div>
-            <form action="{{ route('admin.servers.view.details', $server->id) }}" method="POST">
+            <form action="{{ route('admin.depr.servers.view.details', $server->id) }}" method="POST">
                 <div class="box-body">
                     <div class="form-group">
                         <label for="name" class="control-label">Server Name <span class="field-required"></span></label>

@@ -108,7 +108,7 @@ public function index(Request $request): View
 
         $this->deletionService->handle($user);
 
-        return redirect()->route('admin.users');
+        return redirect()->route('admin.depr.users');
     }
 
     /**
@@ -122,7 +122,7 @@ public function index(Request $request): View
         $user = $this->creationService->handle($request->normalize());
         $this->alert->success($this->translator->get('admin/user.notices.account_created'))->flash();
 
-        return redirect()->route('admin.users.view', $user->id);
+        return redirect()->route('admin.depr.users.view', $user->id);
     }
 
     /**
@@ -139,7 +139,7 @@ public function index(Request $request): View
 
         $this->alert->success(trans('admin/user.notices.account_updated'))->flash();
 
-        return redirect()->route('admin.users.view', $user->id);
+        return redirect()->route('admin.depr.users.view', $user->id);
     }
 
     /**

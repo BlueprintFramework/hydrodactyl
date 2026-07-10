@@ -8,8 +8,8 @@
     <h1>{{ $server->name }}<small>Manage server mounts.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
-        <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
+        <li><a href="{{ route('admin.depr.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.depr.servers.view', $server->id) }}">{{ $server->name }}</a></li>
         <li class="active">Mounts</li>
     </ol>
 @endsection
@@ -38,7 +38,7 @@
                         @foreach ($mounts as $mount)
                             <tr>
                                 <td class="col-sm-1 middle"><code>{{ $mount->id }}</code></td>
-                                <td class="middle"><a href="{{ route('admin.mounts.view', $mount->id) }}">{{ $mount->name }}</a></td>
+                                <td class="middle"><a href="{{ route('admin.depr.mounts.view', $mount->id) }}">{{ $mount->name }}</a></td>
                                 <td class="middle"><code>{{ $mount->source }}</code></td>
                                 <td class="col-sm-2 middle"><code>{{ $mount->target }}</code></td>
 
@@ -48,7 +48,7 @@
                                     </td>
 
                                     <td class="col-sm-1 middle">
-                                        <form action="{{ route('admin.servers.view.mounts.store', [ 'server' => $server->id ]) }}" method="POST">
+                                        <form action="{{ route('admin.depr.servers.view.mounts.store', [ 'server' => $server->id ]) }}" method="POST">
                                             {!! csrf_field() !!}
                                             <input type="hidden" value="{{ $mount->id }}" name="mount_id" />
                                             <button type="submit" class="btn btn-xs btn-success"><i class="fa fa-plus"></i></button>
@@ -60,7 +60,7 @@
                                     </td>
 
                                     <td class="col-sm-1 middle">
-                                        <form action="{{ route('admin.servers.view.mounts.delete', [ 'server' => $server->id, 'mount' => $mount->id ]) }}" method="POST">
+                                        <form action="{{ route('admin.depr.servers.view.mounts.delete', [ 'server' => $server->id, 'mount' => $mount->id ]) }}" method="POST">
                                             @method('DELETE')
                                             {!! csrf_field() !!}
 

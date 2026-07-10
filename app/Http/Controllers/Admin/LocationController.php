@@ -62,7 +62,7 @@ class LocationController extends Controller
         $location = $this->creationService->handle($request->normalize());
         $this->alert->success('Location was created successfully.')->flash();
 
-        return redirect()->route('admin.locations.view', $location->id);
+        return redirect()->route('admin.depr.locations.view', $location->id);
     }
 
     /**
@@ -79,7 +79,7 @@ class LocationController extends Controller
         $this->updateService->handle($location->id, $request->normalize());
         $this->alert->success('Location was updated successfully.')->flash();
 
-        return redirect()->route('admin.locations.view', $location->id);
+        return redirect()->route('admin.depr.locations.view', $location->id);
     }
 
     /**
@@ -93,11 +93,11 @@ class LocationController extends Controller
         try {
             $this->deletionService->handle($location->id);
 
-            return redirect()->route('admin.locations');
+            return redirect()->route('admin.depr.locations');
         } catch (DisplayException $ex) {
             $this->alert->danger($ex->getMessage())->flash();
         }
 
-        return redirect()->route('admin.locations.view', $location->id);
+        return redirect()->route('admin.depr.locations.view', $location->id);
     }
 }

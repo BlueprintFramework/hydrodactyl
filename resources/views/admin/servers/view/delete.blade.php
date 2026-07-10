@@ -8,8 +8,8 @@
     <h1>{{ $server->name }}<small>Delete this server from the panel.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
-        <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
+        <li><a href="{{ route('admin.depr.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.depr.servers.view', $server->id) }}">{{ $server->name }}</a></li>
         <li class="active">Delete</li>
     </ol>
 @endsection
@@ -27,7 +27,7 @@
                 <p class="text-danger small">Deleting a server is an irreversible action. <strong>All server data</strong> (including files and users) will be removed from the system.</p>
             </div>
             <div class="box-footer">
-                <form id="deleteform" action="{{ route('admin.servers.view.delete', $server->id) }}" method="POST">
+                <form id="deleteform" action="{{ route('admin.depr.servers.view.delete', $server->id) }}" method="POST">
                     {!! csrf_field() !!}
                     <button id="deletebtn" class="btn btn-danger">Safely Delete This Server</button>
                 </form>
@@ -44,7 +44,7 @@
                 <p class="text-danger small">Deleting a server is an irreversible action. <strong>All server data</strong> (including files and users) will be removed from the system. This method may leave dangling files on your daemon if it reports an error.</p>
             </div>
             <div class="box-footer">
-                <form id="forcedeleteform" action="{{ route('admin.servers.view.delete', $server->id) }}" method="POST">
+                <form id="forcedeleteform" action="{{ route('admin.depr.servers.view.delete', $server->id) }}" method="POST">
                     {!! csrf_field() !!}
                     <input type="hidden" name="force_delete" value="1" />
                     <button id="forcedeletebtn"" class="btn btn-danger">Forcibly Delete This Server</button>

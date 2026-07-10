@@ -17,7 +17,7 @@
   @yield('settings::nav')
   <div class="row">
     <div class="col-xs-12">
-      <form action="{{ route('admin.settings.captcha') }}" method="POST">
+      <form action="{{ route('admin.depr.settings.captcha') }}" method="POST">
         <div class="box">
           <div class="box-header with-border">
             <h3 class="box-title">Captcha Provider</h3>

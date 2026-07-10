@@ -58,7 +58,7 @@ class EggController extends Controller
         $egg = $this->creationService->handle($data);
         $this->alert->success(trans('admin/nests.eggs.notices.egg_created'))->flash();
 
-        return redirect()->route('admin.nests.egg.view', $egg->id);
+        return redirect()->route('admin.depr.nests.egg.view', $egg->id);
     }
 
     /**
@@ -91,7 +91,7 @@ class EggController extends Controller
         $this->updateService->handle($egg, $data);
         $this->alert->success(trans('admin/nests.eggs.notices.updated'))->flash();
 
-        return redirect()->route('admin.nests.egg.view', $egg->id);
+        return redirect()->route('admin.depr.nests.egg.view', $egg->id);
     }
 
     /**
@@ -105,7 +105,7 @@ class EggController extends Controller
         $this->deletionService->handle($egg->id);
         $this->alert->success(trans('admin/nests.eggs.notices.deleted'))->flash();
 
-        return redirect()->route('admin.nests.view', $egg->nest_id);
+        return redirect()->route('admin.depr.nests.view', $egg->nest_id);
     }
 
     /**

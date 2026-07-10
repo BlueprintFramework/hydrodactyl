@@ -9,7 +9,7 @@
     <h1>{{ $mount->name }}<small>{{ str_limit($mount->description, 75) }}</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.mounts') }}">Mounts</a></li>
+        <li><a href="{{ route('admin.depr.mounts') }}">Mounts</a></li>
         <li class="active">{{ $mount->name }}</li>
     </ol>
 @endsection
@@ -22,7 +22,7 @@
                     <h3 class="box-title">Mount Details</h3>
                 </div>
 
-                <form action="{{ route('admin.mounts.view', $mount->id) }}" method="POST">
+                <form action="{{ route('admin.depr.mounts.view', $mount->id) }}" method="POST">
                     <div class="box-body">
                         <div class="form-group">
                             <label for="PUniqueID" class="form-label">Unique ID</label>
@@ -118,7 +118,7 @@
                         @foreach ($mount->eggs as $egg)
                             <tr>
                                 <td class="col-sm-2 middle"><code>{{ $egg->id }}</code></td>
-                                <td class="middle"><a href="{{ route('admin.nests.egg.view', $egg->id) }}">{{ $egg->name }}</a></td>
+                                <td class="middle"><a href="{{ route('admin.depr.nests.egg.view', $egg->id) }}">{{ $egg->name }}</a></td>
                                 <td class="col-sm-1 middle">
                                     <button data-action="detach-egg" data-id="{{ $egg->id }}" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
                                 </td>
@@ -149,7 +149,7 @@
                         @foreach ($mount->nodes as $node)
                             <tr>
                                 <td class="col-sm-2 middle"><code>{{ $node->id }}</code></td>
-                                <td class="middle"><a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a></td>
+                                <td class="middle"><a href="{{ route('admin.depr.nodes.view', $node->id) }}">{{ $node->name }}</a></td>
                                 <td class="middle"><code>{{ $node->fqdn }}</code></td>
                                 <td class="col-sm-1 middle">
                                     <button data-action="detach-node" data-id="{{ $node->id }}" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i></button>
@@ -165,7 +165,7 @@
     <div class="modal fade" id="addEggsModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="{{ route('admin.mounts.eggs', $mount->id) }}" method="POST">
+                <form action="{{ route('admin.depr.mounts.eggs', $mount->id) }}" method="POST">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true" style="color: #FFFFFF">&times;</span>
@@ -209,7 +209,7 @@
     <div class="modal fade" id="addNodesModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="{{ route('admin.mounts.nodes', $mount->id) }}" method="POST">
+                <form action="{{ route('admin.depr.mounts.nodes', $mount->id) }}" method="POST">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true" style="color: #FFFFFF">&times;</span>

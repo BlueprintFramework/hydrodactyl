@@ -54,7 +54,7 @@ class EggVariableController extends Controller
         $this->creationService->handle($egg->id, $request->normalize());
         $this->alert->success(trans('admin/nests.variables.notices.variable_created'))->flash();
 
-        return redirect()->route('admin.nests.egg.variables', $egg->id);
+        return redirect()->route('admin.depr.nests.egg.variables', $egg->id);
     }
 
     /**
@@ -72,7 +72,7 @@ class EggVariableController extends Controller
             'variable' => htmlspecialchars($variable->name),
         ]))->flash();
 
-        return redirect()->route('admin.nests.egg.variables', $egg->id);
+        return redirect()->route('admin.depr.nests.egg.variables', $egg->id);
     }
 
     /**
@@ -85,6 +85,6 @@ class EggVariableController extends Controller
             'variable' => htmlspecialchars($variable->name),
         ]))->flash();
 
-        return redirect()->route('admin.nests.egg.variables', $egg);
+        return redirect()->route('admin.depr.nests.egg.variables', $egg);
     }
 }

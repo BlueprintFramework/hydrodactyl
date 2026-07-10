@@ -8,13 +8,13 @@
     <h1>New Node<small>Create a new local or remote node for servers to be installed to.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.nodes') }}">Nodes</a></li>
+        <li><a href="{{ route('admin.depr.nodes') }}">Nodes</a></li>
         <li class="active">New</li>
     </ol>
 @endsection
 
 @section('content')
-<form action="{{ route('admin.nodes.new') }}" method="POST">
+<form action="{{ route('admin.depr.nodes.new') }}" method="POST">
     <div class="row">
         <div class="col-sm-6">
             <div class="box box-primary">

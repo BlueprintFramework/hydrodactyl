@@ -8,13 +8,13 @@
     <h1>{{ $host->name }}<small>Viewing associated databases and details for this database host.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.databases') }}">Database Hosts</a></li>
+        <li><a href="{{ route('admin.depr.databases') }}">Database Hosts</a></li>
         <li class="active">{{ $host->name }}</li>
     </ol>
 @endsection
 
 @section('content')
-<form action="{{ route('admin.databases.view', $host->id) }}" method="POST">
+<form action="{{ route('admin.depr.databases.view', $host->id) }}" method="POST">
     <div class="row">
         <div class="col-sm-6">
             <div class="box box-primary">
@@ -99,7 +99,7 @@
                     </tr>
                     @foreach($databases as $database)
                         <tr>
-                            <td class="middle"><a href="{{ route('admin.servers.view', $database->getRelation('server')->id) }}">{{ $database->getRelation('server')->name }}</a></td>
+                            <td class="middle"><a href="{{ route('admin.depr.servers.view', $database->getRelation('server')->id) }}">{{ $database->getRelation('server')->name }}</a></td>
                             <td class="middle">{{ $database->database }}</td>
                             <td class="middle">{{ $database->username }}</td>
                             <td class="middle">{{ $database->remote }}</td>
@@ -109,7 +109,7 @@
                                 <td class="middle">Unlimited</td>
                             @endif
                             <td class="text-center">
-                                <a href="{{ route('admin.servers.view.database', $database->getRelation('server')->id) }}">
+                                <a href="{{ route('admin.depr.servers.view.database', $database->getRelation('server')->id) }}">
                                     <button class="btn btn-xs btn-primary">Manage</button>
                                 </a>
                             </td>
