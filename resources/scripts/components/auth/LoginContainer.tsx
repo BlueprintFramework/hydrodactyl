@@ -124,9 +124,9 @@ function LoginContainer() {
                         }}
                     />
 
-                    <div className='flex w-full justify-between items-center'>
+                    <div className='flex w-full flex-col gap-4 sm:flex-row sm:justify-between sm:items-center'>
                         <Button
-                            className={`bg-mocha-100 rounded-lg p-2 px-4 text-black hover:cursor-pointer hover:bg-mocha-200 ease-in-out`}
+                            className={`bg-mocha-100 rounded-lg p-2 px-4 text-black hover:cursor-pointer hover:bg-mocha-200 ease-in-out w-full sm:w-auto`}
                             type={'submit'}
                             size={'xlarge'}
                             isLoading={isSubmitting}
@@ -134,7 +134,9 @@ function LoginContainer() {
                         >
                             Sign in
                         </Button>
-                        <SecondaryLink to='/auth/password'>Forgot your password?</SecondaryLink>
+                        <SecondaryLink to='/auth/password' className='text-center sm:text-right'>
+                            Forgot your password?
+                        </SecondaryLink>
                     </div>
                 </LoginFormContainer>
             )}

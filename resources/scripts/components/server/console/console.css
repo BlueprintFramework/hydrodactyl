@@ -1,0 +1,42 @@
+/*
+ * Separate the xterm terminal's scroll from the page scroll — SMOOTHLY.
+ *
+ * The problem this solves:
+ *   xterm renders its canvas (.xterm-screen) ON TOP of the scrollable
+ *   .xterm-viewport. So a touch on the terminal lands on the canvas, and the
+ *   only way the buffer scrolls is via xterm's OWN touchmove handler, which
+ *   runs on the MAIN THREAD (Viewport.handleTouchMove does scrollTop += delta).
+ *   Main-thread-driven scroll stutters/hangs on real phones even when CPU
+ *   profiling shows zero long tasks, because the compositor can't drive it.
+ *
+ *   `touch-action: none` (a previous attempt) makes this WORSE: it tells the
+ *   browser to do no native touch handling, forcing 100% of terminal drags
+ *   through that main-thread handler.
+ *
+ * The fix:
+ *   On touch devices only, set `pointer-events: none` on the canvas/screen so
+ *   the touch falls THROUGH to the .xterm-viewport behind it. The browser's
+ *   COMPOSITOR then scrolls the viewport natively (GPU-smooth — this is what
+ *   xterm listens to via the viewport's scroll event to render the buffer).
+ *   `overscroll-behavior-y: contain` on the viewport keeps that scroll from
+ *   chaining to the page, so the terminal and page stay decoupled — the
+ *   "separate the xterm console from the console page" behaviour.
+ *
+ *   Scoped to `@media (pointer: coarse)` (touch devices) so DESKTOP is
+ *   completely unaffected: there the canvas keeps pointer events and xterm's
+ *   wheel handler + text selection work as normal.
+ *
+ *   Desktop mouse users are unaffected; mobile terminal text-selection via
+ *   long-press is the only trade-off (rarely needed on a game-server console,
+ *   which is disableStdin + live output).
+ */
+@media (pointer: coarse) {
+    .console-terminal-host .xterm-screen,
+    .console-terminal-host .xterm canvas {
+        pointer-events: none;
+    }
+    .console-terminal-host .xterm-viewport {
+        overscroll-behavior-y: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+}

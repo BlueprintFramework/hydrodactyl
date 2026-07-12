@@ -121,7 +121,7 @@ const Modal: React.FC<ModalProps> = ({
                                 }}
                                 className={'fixed inset-0 backdrop-blur-xs z-9997'}
                             />
-                            <div className={'fixed inset-0 overflow-y-auto z-9998'}>
+                            <div className={'fixed inset-0 overflow-y-auto z-9998 pb-[env(safe-area-inset-bottom)]'}>
                                 <div
                                     ref={container}
                                     className={styles.dialogContainer}

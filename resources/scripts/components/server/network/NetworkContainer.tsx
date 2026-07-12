@@ -63,7 +63,7 @@ const NetworkContainer = () => {
             <FlashMessageRender byKey={'server:network'} />
 
             <div className=''>
-                <div className='rounded-xl shadow-sm px-14 py-14'>
+                <div className='rounded-xl shadow-sm px-4 py-8 sm:px-14 sm:py-14'>
                     <div className='flex items-center justify-between mb-2'>
                         {data && (
                             <Can action={'allocation.create'}>

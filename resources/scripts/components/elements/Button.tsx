@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Spinner from '@/components/elements/Spinner';
 
@@ -10,7 +10,33 @@ interface Props {
     isSecondary?: boolean;
 }
 
-const ButtonStyle = styled.button<Omit<Props, 'isLoading'>>``;
+// Only min-height + font-size here. Padding is intentionally owned by each
+// call site's className — emitting padding here would fight it on equal
+// specificity (single-class selectors), making the winner injection-order
+// dependent.
+const SIZES = {
+    xsmall: css`
+        min-height: 1.5rem;
+        font-size: 0.75rem;
+    `,
+    small: css`
+        min-height: 2rem;
+        font-size: 0.875rem;
+    `,
+    large: css`
+        min-height: 2.75rem;
+        font-size: 0.95rem;
+    `,
+    xlarge: css`
+        min-height: 3rem;
+        font-size: 1rem;
+    `,
+} as const;
+
+const ButtonStyle = styled.button<Omit<Props, 'isLoading'>>`
+    position: relative;
+    ${({ size }) => size && SIZES[size]}
+`;
 
 type ComponentProps = Omit<JSX.IntrinsicElements['button'], 'ref' | keyof Props> & Props;
 

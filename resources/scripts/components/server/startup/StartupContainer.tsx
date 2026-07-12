@@ -266,7 +266,7 @@ const StartupContainer = () => {
                                         </span>
                                         <CopyOnClick text={liveProcessedCommand}>
                                             <div className='cursor-pointer group'>
-                                                <div className='w-full h-32 sm:h-36 md:h-40 px-3 py-3 sm:px-4 sm:py-4 font-mono bg-linear-to-b from-[#ffffff06] to-[#ffffff03] border-2 border-green-500/20 rounded-xl text-sm sm:text-base overflow-auto group-hover:border-green-500/40 transition-all'>
+                                                <div className='w-full min-h-[8rem] sm:min-h-[9rem] md:min-h-[10rem] px-3 py-3 sm:px-4 sm:py-4 font-mono bg-linear-to-b from-[#ffffff06] to-[#ffffff03] border-2 border-green-500/20 rounded-xl text-sm sm:text-base overflow-auto group-hover:border-green-500/40 transition-all'>
                                                     <span
                                                         className='break-all text-green-200'
                                                         style={{

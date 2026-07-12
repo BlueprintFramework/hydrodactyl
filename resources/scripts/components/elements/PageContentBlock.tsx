@@ -25,7 +25,7 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({
 
     return (
         <div
-            className={`${className || ''} max-w-[120rem] overflow-y-auto w-full mx-auto flex flex-col flex-1 h-full relative rounded-2xl ${background ? 'bg-bg-raised border border-mocha-400 p-7' : ''}`}
+            className={`${className || ''} max-w-[120rem] overflow-y-auto overscroll-y-contain w-full mx-auto flex flex-col flex-1 h-full relative rounded-2xl ${background ? 'bg-bg-raised border border-mocha-400 p-7' : ''}`}
         >
             {showFlashKey && <FlashMessageRender byKey={showFlashKey} />}
             {children}

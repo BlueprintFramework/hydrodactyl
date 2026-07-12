@@ -4,6 +4,7 @@ import { WebLinksAddon } from '@xterm/addon-web-links';
 import { type ITerminalOptions, Terminal } from '@xterm/xterm';
 import { useSidebar } from '@/contexts/SidebarContext';
 import '@xterm/xterm/css/xterm.css';
+import './console.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -14,6 +15,7 @@ import KeyboardShortcut from '@/components/ui/keyboard-shortcut';
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/plugins/usePermissions';
 import { usePersistedState } from '@/plugins/usePersistedState';
+import { ScrollDownHelperAddon } from '@/plugins/XtermScrollDownHelperAddon';
 import { ServerContext } from '@/state/server';
 
 const theme = {
@@ -57,12 +59,16 @@ const Console = () => {
     const fitAddon = useMemo(() => new FitAddon(), []);
     const searchAddon = useMemo(() => new SearchAddon(), []);
     const webLinksAddon = useMemo(() => new WebLinksAddon(), []);
+    const scrollDownHelperAddon = useMemo(() => new ScrollDownHelperAddon(), []);
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
     const [canSendCommands] = usePermissions(['control.console']);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.id);
     const isTransferring = ServerContext.useStoreState((state) => state.server.data?.isTransferring);
     const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
     const [historyIndex, setHistoryIndex] = useState(-1);
+    // Bumped when the tab becomes visible again so the listeners effect re-runs
+    // (clear + SEND_LOGS) and refills a terminal left blank after backgrounding.
+    const [visibilityTick, setVisibilityTick] = useState(0);
     const { isMinimized: _isMinimized } = useSidebar();
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -202,9 +208,23 @@ const Console = () => {
                 terminal.loadAddon(fitAddon);
                 terminal.loadAddon(searchAddon);
                 terminal.loadAddon(webLinksAddon);
+                terminal.loadAddon(scrollDownHelperAddon);
 
                 terminal.open(ref.current);
                 fitAddon.fit();
+
+                // Lock the terminal canvas. The hidden `.xterm-helper-textarea` is
+                // xterm's only keyboard entry point — disabling it (and dropping it
+                // from the tab order) means the canvas can never gain focus and no
+                // keystrokes reach xterm's input pipeline, so nothing (scroll-on-key,
+                // the copy handler below, IME, etc.) ever fires. This is on top of
+                // `disableStdin`, which only suppresses emitted data. Output rendering,
+                // mouse text-selection, and native viewport scrolling are unaffected;
+                // command input still flows through the dedicated box below.
+                if (terminal.textarea) {
+                    terminal.textarea.tabIndex = -1;
+                    terminal.textarea.disabled = true;
+                }
 
                 // Add support for capturing keys
                 terminal.attachCustomKeyEventHandler((e: KeyboardEvent) => {
@@ -242,7 +262,7 @@ const Console = () => {
                 resizeObserverRef.current = null;
             }
         };
-    }, [terminal, connected, fitAddon, searchAddon, webLinksAddon, debouncedFit]);
+    }, [terminal, connected, fitAddon, searchAddon, webLinksAddon, scrollDownHelperAddon, debouncedFit]);
 
     // useEventListener(
     //     'resize',
@@ -257,6 +277,10 @@ const Console = () => {
         debouncedFit();
     }, [debouncedFit]);
 
+    // visibilityTick is an intentional trigger dep: it isn't read in the body, it
+    // only forces this effect to re-run (clear + SEND_LOGS) when the tab becomes
+    // visible again, so a terminal left blank after backgrounding refills.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: visibilityTick is a deliberate re-run trigger
     useEffect(() => {
         const listeners: Record<string, (s: string) => void> = {
             [SocketEvent.STATUS]: handlePowerChangeEvent,
@@ -306,7 +330,23 @@ const Console = () => {
         handleDaemonErrorOutput,
         handlePowerChangeEvent,
         handleTransferStatus,
+        visibilityTick,
     ]);
+
+    // On phones, backgrounding the app (home screen) freezes this component, so
+    // when the user returns the socket is often still/again connected (stats keep
+    // flowing) but the terminal can be left blank — its effects never re-ran while
+    // frozen. Bumping visibilityTick on return re-runs the listeners effect above
+    // (clear + SEND_LOGS), repopulating the console instead of leaving it empty.
+    useEffect(() => {
+        const onVisibility = () => {
+            if (document.visibilityState === 'visible') {
+                setVisibilityTick((tick) => tick + 1);
+            }
+        };
+        document.addEventListener('visibilitychange', onVisibility);
+        return () => document.removeEventListener('visibilitychange', onVisibility);
+    }, []);
 
     return (
         <div className='flex w-full h-full'>
@@ -314,31 +354,36 @@ const Console = () => {
                 <SpinnerOverlay visible={!connected} size={'large'} />
                 <div
                     className={cn(
-                        'bg-bg-raised border-mocha-400 p-4 flex flex-1 flex-col overflow-hidden rounded-2xl border text-sm',
-                        {
-                            'rounded-b': !canSendCommands,
-                        },
+                        // `console-terminal-host` decouples the terminal's scroll from the
+                        // page (see console.css): on touch devices the canvas lets touches
+                        // fall through to .xterm-viewport so the COMPOSITOR scrolls the
+                        // buffer natively (GPU-smooth, not xterm's main-thread handler that
+                        // stutters on phones), and overscroll-behavior:contain keeps it from
+                        // chaining to the page. Desktop (mouse) is untouched. This is the
+                        // "separate the xterm console from the console page" behaviour.
+                        'console-terminal-host bg-bg-raised border-mocha-400 p-4 flex min-h-[260px] lg:flex-1 lg:min-h-0 flex-col overflow-hidden rounded-t-2xl border text-sm',
+                        canSendCommands ? 'rounded-b-none border-b-0' : 'rounded-b-2xl',
                     )}
                 >
-                    <div className='size-full' ref={ref} />
-
-                    {canSendCommands && (
-                        <div className='w-full rounded-2xl border border-mocha-300 bg-mocha-400 p-2 text-zinc-100 flex px-(--padding-x) relative [--padding-x:--spacing(4)] text-sm'>
-                            <input
-                                ref={inputRef}
-                                className='w-full'
-                                type={'text'}
-                                placeholder={'Enter a command'}
-                                aria-label={'Console command input.'}
-                                disabled={!instance || !connected}
-                                onKeyDown={handleCommandKeyDown}
-                                autoCorrect={'off'}
-                                autoCapitalize={'none'}
-                            />
-                            <KeyboardShortcut keys={['/']} variant='faded' className='pl-(--padding-x)' />
-                        </div>
-                    )}
+                    <div className='h-full' ref={ref} />
                 </div>
+
+                {canSendCommands && (
+                    <div className='w-full shrink-0 rounded-b-2xl rounded-t-none border border-t-0 border-mocha-300 bg-mocha-400 p-2 text-zinc-100 flex px-(--padding-x) relative [--padding-x:--spacing(4)] text-sm'>
+                        <input
+                            ref={inputRef}
+                            className='w-full'
+                            type={'text'}
+                            placeholder={'Enter a command'}
+                            aria-label={'Console command input.'}
+                            disabled={!instance || !connected}
+                            onKeyDown={handleCommandKeyDown}
+                            autoCorrect={'off'}
+                            autoCapitalize={'none'}
+                        />
+                        <KeyboardShortcut keys={['/']} variant='faded' className='pl-(--padding-x)' />
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -60,7 +60,7 @@ const MassActionsBar = () => {
     };
 
     return (
-        <div className={`pointer-events-none fixed bottom-0 z-20 left-0 right-0 flex justify-center`}>
+        <div className={`pointer-events-none fixed bottom-0 z-[9997] left-0 right-0 flex justify-center`}>
             <SpinnerOverlay visible={loading} size={'large'} fixed>
                 {loadingMessage}
             </SpinnerOverlay>
@@ -93,7 +93,9 @@ const MassActionsBar = () => {
             )}
             <FadeTransition duration='duration-75' show={selectedFiles.length > 0} appear unmount>
                 <div
-                    className={'pointer-events-none fixed bottom-0 left-0 right-0 mb-6 flex justify-center w-full z-50'}
+                    className={
+                        'pointer-events-none fixed bottom-0 left-0 right-0 mb-[calc(4rem+env(safe-area-inset-bottom))] lg:mb-6 flex justify-center w-full z-50'
+                    }
                 >
                     <div className={`flex items-center space-x-4 pointer-events-auto rounded-sm p-4 bg-black/50`}>
                         <Button onClick={() => setShowMove(true)} disabled={loading}>

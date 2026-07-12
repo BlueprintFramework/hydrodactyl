@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import getWebsocketToken from '@/api/server/getWebsocketToken';
 import Spinner from '@/components/elements/Spinner';
 import FadeTransition from '@/components/elements/transitions/FadeTransition';
@@ -14,6 +14,13 @@ function WebsocketHandler() {
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const setServerStatus = ServerContext.useStoreActions((actions) => actions.status.setServerStatus);
     const { setInstance, setConnectionState } = ServerContext.useStoreActions((actions) => actions.socket);
+
+    // Mirror the live connection state into refs so the one-shot visibility
+    // listener below can read the latest values without re-registering.
+    const connectedRef = useRef(connected);
+    const instanceRef = useRef(instance);
+    connectedRef.current = connected;
+    instanceRef.current = instance;
 
     const updateToken = (uuid: string, socket: Websocket) => {
         if (updatingToken) {
@@ -104,6 +111,39 @@ function WebsocketHandler() {
         connect(uuid);
         // biome-ignore lint/correctness/useExhaustiveDependencies: connect is intentionally recreated
     }, [uuid, instance, connect]);
+
+    useEffect(() => {
+        // Mobile browsers suspend/kill the websocket when the tab is backgrounded
+        // (e.g. the user returns to the home screen). Sockette's auto-reconnect
+        // doesn't reliably resume in that case — its timers were frozen and a
+        // clean close event may never fire — so the console is left empty until a
+        // manual page reload. When the tab becomes visible again (or the network
+        // comes back online), give pending close events a moment to settle, then
+        // force a reconnect if we're no longer connected. On reconnect the socket
+        // re-authenticates and the Console component re-requests SEND_LOGS, so the
+        // buffer refills automatically.
+        let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
+        const attemptReconnect = () => {
+            if (reconnectTimer) clearTimeout(reconnectTimer);
+            reconnectTimer = window.setTimeout(() => {
+                const socket = instanceRef.current;
+                if (socket && !connectedRef.current) {
+                    socket.reconnect();
+                }
+            }, 300);
+        };
+        const onVisibility = () => {
+            if (document.visibilityState === 'visible') attemptReconnect();
+        };
+
+        document.addEventListener('visibilitychange', onVisibility);
+        window.addEventListener('online', attemptReconnect);
+        return () => {
+            document.removeEventListener('visibilitychange', onVisibility);
+            window.removeEventListener('online', attemptReconnect);
+            if (reconnectTimer) clearTimeout(reconnectTimer);
+        };
+    }, []);
 
     return error ? (
         <FadeTransition duration='duration-150' show>

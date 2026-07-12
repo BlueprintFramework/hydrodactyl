@@ -23,8 +23,8 @@ const AuthenticationRouter = () => {
                 }}
                 className='pointer-events-none fixed inset-0 z-1 opacity-[0.4]'
             ></div>
-            <div className='flex size-full'>
-                <div className='w-full max-w-4xl z-2 flex items-center bg-bg-lowered align-middle px-[calc(var(--page-padding)*3)]'>
+            <div className='flex size-full flex-col lg:flex-row'>
+                <div className='w-full max-w-4xl z-2 flex items-start sm:items-center bg-bg-lowered min-h-dvh lg:min-h-0 px-6 py-8 sm:px-[calc(var(--page-padding)*3)] overflow-y-auto'>
                     <Routes>
                         <Route path='login' element={<LoginContainer />} />
                         <Route path='login/checkpoint/*' element={<LoginCheckpointContainer />} />
@@ -33,7 +33,7 @@ const AuthenticationRouter = () => {
                         <Route path='*' element={<NotFound />} />
                     </Routes>
                 </div>
-                <div className='w-full relative'>
+                <div className='hidden lg:block w-full relative'>
                     <div className='flex items-center gap-4 h-6 absolute right-(--page-padding) top-(--page-padding) text-lg'>
                         <Logo className='h-full w-full flex inset-0' />
                         <div className='border-l border-gray-200 h-full' />

@@ -105,11 +105,11 @@ export default memo(function Sidebar({ navItems, className, onNavClick }: Sideba
     return (
         <div
             className={cn(
-                'sidebar-container flex-col shrink-0 rounded-lg px-8 select-none overflow-y-auto relative',
+                'sidebar-container flex-col shrink-0 rounded-lg px-5 select-none overflow-y-auto relative',
                 className,
             )}
         >
-            <div className='sidebar-indicator absolute bg-mocha-400 border border-mocha-300 left-[2rem] rounded-xl pointer-events-none' />
+            <div className='sidebar-indicator absolute bg-mocha-400 border border-mocha-300 left-[1.25rem] rounded-xl pointer-events-none' />
             <ul className='flex flex-col text-sm'>
                 {navItems.map((item, index) => {
                     const isActive = currentActiveTab === item.tabName;

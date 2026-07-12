@@ -21,9 +21,9 @@ const ServerConsoleContainer = () => {
     const isNodeUnderMaintenance = ServerContext.useStoreState((state) => state.server.data?.isNodeUnderMaintenance);
 
     return (
-        <PageContentBlock title={'Console'} background={false} className='overflow-y-visible'>
-            <div className='w-full h-full flex flex-col lg:flex-row gap-4'>
-                <div className='flex flex-col flex-1 gap-4'>
+        <PageContentBlock title={'Console'} background={false}>
+            <div className='w-full flex flex-col gap-4 lg:h-full lg:flex-row'>
+                <div className='flex flex-col gap-4 lg:flex-1 lg:min-h-0'>
                     <ServerHeader powerButtons={true} />
                     <PowerButtons className='flex lg:hidden gap-2 items-center justify-center' />
                     {(isNodeUnderMaintenance || isInstalling || isTransferring) && (
@@ -35,9 +35,11 @@ const ServerConsoleContainer = () => {
                                   : 'This server is currently being transferred to another node and all actions are unavailable.'}
                         </Alert>
                     )}
-                    <Console />
+                    <div className='lg:h-full lg:flex-1 lg:min-h-0'>
+                        <Console />
+                    </div>
                 </div>
-                <div className='relative w-full lg:w-(--sidebar-full-width) overflow-y-auto overflow-x-visible lg:flex-none lg:-mb-(--main-wrapper-spacing) lg:pb-(--main-wrapper-spacing)'>
+                <div className='relative w-full overflow-x-visible lg:w-(--sidebar-full-width) lg:overflow-y-auto lg:flex-none lg:-mb-(--main-wrapper-spacing) lg:pb-(--main-wrapper-spacing)'>
                     <div className='flex flex-col gap-4'>
                         <Spinner.Suspense>
                             <StatGraphs />

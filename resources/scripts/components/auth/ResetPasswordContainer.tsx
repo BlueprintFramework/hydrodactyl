@@ -154,11 +154,11 @@ function ResetPasswordContainer() {
                         <div aria-hidden className='my-8 bg-[#ffffff33] min-h-[1px]'></div>
 
                         <div
-                            className={`text-center w-full rounded-lg bg-[#ffffff33] border-0 ring-0 outline-hidden capitalize font-bold text-sm py-2 `}
+                            className={`text-center w-full rounded-lg bg-[#ffffff33] border-0 ring-0 outline-hidden capitalize font-bold text-sm py-3`}
                         >
                             <Link
                                 to={'/auth/login'}
-                                className={`text-xs text-white tracking-wide uppercase no-underline hover:text-neutral-700 border-color-[#ffffff33] pt-4`}
+                                className={`text-sm text-white tracking-wide uppercase no-underline hover:text-neutral-700 border-color-[#ffffff33]`}
                             >
                                 Return to Login
                             </Link>

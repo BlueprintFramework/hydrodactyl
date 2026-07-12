@@ -65,7 +65,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[] }>(({ navItems }) => {
                 )}
                 data-sidebar-minimized='false'
             >
-                <div className='sidebar-logo-container h-[64px] items-center mx-8 flex flex-none'>
+                <div className='sidebar-logo-container h-[64px] items-center mx-5 flex flex-none'>
                     <NavLink
                         to={'/'}
                         className='flex items-center shrink-0 h-8 w-fit hydrodactyl-logo'

@@ -6,7 +6,7 @@
     --sidebar-transition-sidebar: 0.4s cubic-bezier(0.23, 1.2, 0.32, 1);
     --sidebar-text-scale-small: 0.86; /* 12px (text-xs) / 14px (text-sm) */
     --sidebar-margin-base: 0.75rem;
-    --sidebar-padding: 2rem; /* 32px, mx-8 */
+    --sidebar-padding: 1.25rem; /* 20px, px-5 */
     --sidebar-full-width: 300px;
     --sidebar-minimized-width: 128px;
 }
@@ -41,9 +41,9 @@ body[data-sidebar-minimized="true"] .sidebar-logo-container {
     width: calc(var(--sidebar-width));
 }
 body[data-sidebar-minimized="false"] .sidebar-logo-container {
-    /* -64px because the padding is 32px (mx-8)
+    /* -40px because the padding is 20px (px-5)
        this puts the toggle button in line with the items */
-    width: calc(var(--sidebar-width) - 64px);
+    width: calc(var(--sidebar-width) - 2.5rem);
 }
 
 .sidebar-indicator {
@@ -67,7 +67,7 @@ body[data-sidebar-minimized="true"] .nav-item {
 }
 body[data-sidebar-minimized="false"] .nav-item {
     /* 32px height, 8px used for padding */
-    @apply h-10 flex-row items-center gap-2 pl-3;
+    @apply h-10 w-full flex-row items-center gap-2 pl-3;
 }
 
 body[data-sidebar-minimized="true"] .nav-item .nav-icon {
@@ -102,4 +102,27 @@ body[data-sidebar-minimized="false"] .nav-item .nav-text {
 /* active tab highlighting - applies to the active tab when only when nothing's hovered */
 .sidebar-container:not(:has(li:hover)) li[data-active="true"] a {
     @apply !text-cream-400 !fill-cream-400 opacity-100;
+}
+
+/* ---- Mobile drawer ----
+   On mobile the <body> stays in the "minimized" state (the desktop rail is hidden),
+   so the drawer's items would otherwise inherit the minimized "icon-chip" styles and
+   render as tiny icon-only chips with a huge empty right gap. These rules force
+   full-width, left-aligned rows, scoped to the drawer panel (the only .sidebar-container
+   carrying data-sidebar-minimized="false") so the desktop rail is untouched.
+   No `!important` is needed: this selector (.sidebar-container[...] .nav-item,
+   specificity (0,3,0)) already outranks the body[data-sidebar-minimized="true"] .nav-item
+   rules (0,2,1). */
+.sidebar-container[data-sidebar-minimized="false"] .nav-item {
+    width: 100%;
+    height: 2.75rem;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.75rem;
+    padding-left: 0.75rem;
+    text-align: left;
+}
+.sidebar-container[data-sidebar-minimized="false"] .nav-item .nav-text {
+    transform: none;
 }

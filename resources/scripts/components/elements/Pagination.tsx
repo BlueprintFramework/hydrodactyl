@@ -39,9 +39,9 @@ function Pagination<T>({ data: { items, pagination }, onPageSelect, children }: 
         <>
             {children({ items, isFirstPage, isLastPage })}
             {pages.length > 1 && (
-                <div className={`flex justify-center mt-4`}>
+                <div className={`flex justify-start mt-4 max-w-full overflow-x-auto`}>
                     <div
-                        className={`flex justify-center gap-3 p-[4px] w-fit bg-linear-to-b from-[#ffffff10] to-[#ffffff09] border border-[#00000017] rounded-md`}
+                        className={`flex justify-center gap-1.5 sm:gap-3 p-[4px] w-fit bg-linear-to-b from-[#ffffff10] to-[#ffffff09] border border-[#00000017] rounded-md shrink-0`}
                     >
                         <Block
                             isSecondary

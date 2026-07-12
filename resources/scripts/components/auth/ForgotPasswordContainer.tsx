@@ -67,20 +67,6 @@ const ForgotPasswordContainer = () => {
                     <div className='text-sm mb-6'>We&apos;ll send you an email with a link to reset your password.</div>
                     <Field id='email' label={'Email'} name={'email'} type={'email'} />
 
-                    <div className='flex w-full justify-between items-center'>
-                        <Button
-                            className={`bg-mocha-100 text-black p-2 px-4 mt-4 rounded-full border-0 ring-0 outline-hidden capitalize`}
-                            type='submit'
-                            size='xlarge'
-                            isLoading={isSubmitting}
-                            disabled={isSubmitting}
-                        >
-                            Send Email
-                        </Button>
-
-                        <SecondaryLink to='/auth/login'>Return to Login?</SecondaryLink>
-                    </div>
-
                     <Captcha
                         className='mt-6'
                         onError={(error) => {
@@ -92,6 +78,22 @@ const ForgotPasswordContainer = () => {
                             });
                         }}
                     />
+
+                    <div className='flex w-full flex-col gap-3 mt-6 sm:flex-row sm:justify-between sm:items-center'>
+                        <Button
+                            className={`bg-mocha-100 text-black p-2 px-4 rounded-full border-0 ring-0 outline-hidden capitalize w-full sm:w-auto`}
+                            type='submit'
+                            size='xlarge'
+                            isLoading={isSubmitting}
+                            disabled={isSubmitting}
+                        >
+                            Send Email
+                        </Button>
+
+                        <SecondaryLink to='/auth/login' className='text-center sm:text-right'>
+                            Return to Login?
+                        </SecondaryLink>
+                    </div>
                 </LoginFormContainer>
             )}
         </Formik>

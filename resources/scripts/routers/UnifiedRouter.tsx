@@ -27,6 +27,7 @@ import Logo from '@/components/elements/HydroLogo';
 import MainWrapper from '@/components/elements/MainWrapper';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import { NotFound, ServerError } from '@/components/elements/ScreenBlock';
+import BottomNav from '@/components/layout/BottomNav';
 import AppHeader from '@/components/layout/header/AppHeader';
 import MobileSidebar from '@/components/layout/sidebar/MobileSidebar';
 import Sidebar from '@/components/layout/sidebar/Sidebar';
@@ -332,6 +333,7 @@ const UnifiedRouter = () => {
                         <div className='flex flex-col lg:flex-row h-full w-full overflow-hidden relative'>
                             <Sidebar navItems={navItems} className='hidden lg:flex' />
                             <MobileSidebar navItems={navItems} />
+                            <BottomNav items={navItems} />
 
                             {/* server-specific components - only render when we have server data */}
                             {isServerRoute && uuid && id && (

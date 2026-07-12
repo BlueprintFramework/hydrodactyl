@@ -67,7 +67,10 @@ const inputStyle = css<Props>`
     border-radius: 0.5rem;
     outline: none;
     background-color: rgba(255, 255, 255, 0.09); /* Converted the hex color with alpha to rgba */
-    font-size: 0.875rem; /* 14px */
+    font-size: 1rem; /* 16px on mobile to prevent iOS Safari focus auto-zoom */
+    @media (min-width: 640px) {
+        font-size: 0.875rem;
+    }
 `;
 
 const Input = styled.input<Props>`
