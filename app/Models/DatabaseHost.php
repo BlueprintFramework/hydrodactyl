@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $port
  * @property string $username
  * @property string $password
+ * @property string $type
  * @property int|null $max_databases
  * @property int|null $node_id
  * @property \Carbon\CarbonImmutable $created_at
@@ -20,6 +21,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class DatabaseHost extends Model
 {
+    public const TYPE_MYSQL = 'mysql';
+    public const TYPE_POSTGRESQL = 'postgresql';
+    public const TYPE_REDIS = 'redis';
+    public const TYPE_MONGODB = 'mongodb';
+
     /** @use HasFactory<\Database\Factories\DatabaseHostFactory> */
     use HasFactory;
 
@@ -50,6 +56,7 @@ class DatabaseHost extends Model
         'port',
         'username',
         'password',
+        'type',
         'max_databases',
         'node_id',
     ];
@@ -72,8 +79,19 @@ class DatabaseHost extends Model
         'port' => 'required|numeric|between:1,65535',
         'username' => 'required|string|max:32',
         'password' => 'nullable|string',
+        'type' => 'required|string|in:mysql,postgresql,redis,mongodb',
         'node_id' => 'sometimes|nullable|integer|exists:nodes,id',
     ];
+
+    public static function typeLabels(): array
+    {
+        return [
+            self::TYPE_MYSQL => 'MariaDB/MySQL',
+            self::TYPE_POSTGRESQL => 'PostgreSQL',
+            self::TYPE_REDIS => 'Redis',
+            self::TYPE_MONGODB => 'MongoDB',
+        ];
+    }
 
     /**
      * Gets the node associated with a database host.

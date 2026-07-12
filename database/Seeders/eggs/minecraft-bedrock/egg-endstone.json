@@ -1,0 +1,48 @@
+{
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2026-06-27T00:00:00+00:00",
+  "name": "Endstone",
+  "author": "support@phosphor.host",
+  "description": "Endstone offers a high-performance, easy-to-use plugin API for Minecraft: Bedrock Edition servers, supporting both Python and C++ plugins. It launches the official Bedrock Dedicated Server (BDS) with the Endstone runtime injected via LD_PRELOAD. The BDS version is pinned to the installed Endstone version. Runtime image must stay on Python 3.12 to match the install venv.",
+  "features": [
+    "pid_limit"
+  ],
+  "docker_images": {
+    "Python 3.14": "ghcr.io/parkervcp/yolks:python_3.14",
+    "Python 3.13": "ghcr.io/parkervcp/yolks:python_3.13",
+    "Python 3.12": "ghcr.io/parkervcp/yolks:python_3.12",
+    "Python 3.11": "ghcr.io/parkervcp/yolks:python_3.11",
+    "Python 3.10": "ghcr.io/parkervcp/yolks:python_3.10"
+  },
+  "file_denylist": [],
+  "startup": "python -m pip install -U pip && pip install -U \\\"{{ENDSTONE_VERSION}}\\\" && python -m endstone -s . -y",
+  "config": {
+    "files": "{\"server.properties\":{\"parser\":\"properties\",\"find\":{\"server-port\":\"{{server.build.default.port}}\",\"server-portv6\":\"{{server.build.default.port}}\",\"server-name\":\"{{server.build.env.SERVERNAME}}\",\"gamemode\":\"{{server.build.env.GAMEMODE}}\",\"difficulty\":\"{{server.build.env.DIFFICULTY}}\",\"allow-cheats\":\"{{server.build.env.CHEATS}}\",\"max-players\":\"{{server.build.env.MAXPLAYERS}}\",\"level-name\":\"{{server.build.env.LEVELNAME}}\"}}}",
+    "startup": "{\"done\":\"Server started.\"}",
+    "logs": "{}",
+    "stop": "stop"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!\\/bin\\/bash\\n# Endstone Installation Script\\n#\\n# Server Files: \\/mnt\\/server\\napt update\\napt install -y curl\\n\\nmkdir -p \\/mnt\\/server\\ncd \\/mnt\\/server\\n\\nif [ ! -f server.properties ]; then\\n    echo -e \\\"Downloading server.properties\\\"\\n    curl -o server.properties https:\\/\\/raw.githubusercontent.com\\/EndstoneMC\\/pterodactyl\\/main\\/server.properties\\nfi\\n\\nexport HOME=\\/mnt\\/server\\n\\necho -e \\\"Installation complete\\\"\\nexit 0",
+      "container": "python:3.12-slim-bookworm",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Endstone Version",
+      "description": "The version of the Endstone pip package to install (e.g. 0.11.4). Leave as \"endstone\" for the newest release. This also determines which Bedrock Dedicated Server version is used.",
+      "env_variable": "ENDSTONE_VERSION",
+      "default_value": "endstone",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:20",
+      "field_type": "text"
+    }
+  ]
+}

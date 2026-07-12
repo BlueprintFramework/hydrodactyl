@@ -3,30 +3,20 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Pterodactyl\Models\Nest;
 use Pterodactyl\Services\Nests\NestCreationService;
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
 
 class NestSeeder extends Seeder
 {
-    /**
-     * @var NestCreationService
-     */
-    private $creationService;
-
-    /**
-     * @var NestRepositoryInterface
-     */
-    private $repository;
+    private const PTERODACTYL_AUTHOR = 'support@pterodactyl.io';
+    private const PHOSPHOR_AUTHOR = 'support@phosphor.host';
 
     /**
      * NestSeeder constructor.
      */
     public function __construct(
-        NestCreationService $creationService,
-        NestRepositoryInterface $repository,
+        private NestCreationService $creationService,
     ) {
-        $this->creationService = $creationService;
-        $this->repository = $repository;
     }
 
     /**
@@ -36,16 +26,35 @@ class NestSeeder extends Seeder
      */
     public function run()
     {
-        $items = $this->repository->findWhere([
-            'author' => 'support@pterodactyl.io',
-        ])->keyBy('name')->toArray();
+        $items = Nest::query()->get()->keyBy('name');
 
-        $this->createMinecraftNest(array_get($items, 'Minecraft'));
-        $this->createHytaleNest(array_get($items, 'Hytale'));
-        $this->createSourceEngineNest(array_get($items, 'Source Engine'));
-        $this->createVoiceServersNest(array_get($items, 'Voice Servers'));
-        $this->createRustNest(array_get($items, 'Rust'));
-        $this->createVintageStoryNest(array_get($items, 'Vintage Story'));
+        $this->createMinecraftNest($items->get('Minecraft'));
+        $this->createMinecraftBedrockNest($items->get('Minecraft Bedrock'));
+        $this->createHytaleNest($items->get('Hytale'));
+        $this->createSourceEngineNest($items->get('Source Engine'));
+        $this->createVoiceServersNest($items->get('Voice Servers'));
+        $this->createRustNest($items->get('Rust'));
+        $this->createVintageStoryNest($items->get('Vintage Story'));
+    }
+
+    private function resolveNestAuthor(string $nestName): string
+    {
+        $files = new \DirectoryIterator(database_path('Seeders/eggs/' . kebab_case($nestName)));
+
+        foreach ($files as $file) {
+            if (!$file->isFile() || !$file->isReadable()) {
+                continue;
+            }
+
+            $decoded = json_decode(file_get_contents($file->getRealPath()), true, 512, JSON_THROW_ON_ERROR);
+            $author = $decoded['author'] ?? null;
+
+            if (is_string($author) && $author !== '') {
+                return $author;
+            }
+        }
+
+        return self::PTERODACTYL_AUTHOR;
     }
 
     /**
@@ -53,13 +62,28 @@ class NestSeeder extends Seeder
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    private function createMinecraftNest(?array $nest = null)
+    private function createMinecraftNest(?Nest $nest = null)
     {
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Minecraft',
                 'description' => 'Minecraft - the classic game from Mojang. With support for Vanilla MC, Spigot, and many others!',
-            ], 'support@pterodactyl.io');
+            ], self::PTERODACTYL_AUTHOR);
+        }
+    }
+
+    /**
+     * Create the Minecraft Bedrock nest to be used later on.
+     *
+     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     */
+    private function createMinecraftBedrockNest(?Nest $nest = null)
+    {
+        if (is_null($nest)) {
+            $this->creationService->handle([
+                'name' => 'Minecraft Bedrock',
+                'description' => 'The Bedrock edition of Minecraft. Comes with support for Vanilla, Endstone, Waterdog, and many others!',
+            ], self::PHOSPHOR_AUTHOR);
         }
     }
 
@@ -68,13 +92,13 @@ class NestSeeder extends Seeder
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    private function createHytaleNest(?array $nest = null)
+    private function createHytaleNest(?Nest $nest = null)
     {
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Hytale',
                 'description' => 'Hytale - A new sandbox game from Hypixel Studios.',
-            ], 'support@pterodactyl.io');
+            ], self::PTERODACTYL_AUTHOR);
         }
     }
 
@@ -83,13 +107,13 @@ class NestSeeder extends Seeder
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    private function createSourceEngineNest(?array $nest = null)
+    private function createSourceEngineNest(?Nest $nest = null)
     {
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Source Engine',
                 'description' => 'Includes support for most Source Dedicated Server games.',
-            ], 'support@pterodactyl.io');
+            ], self::PTERODACTYL_AUTHOR);
         }
     }
 
@@ -98,13 +122,13 @@ class NestSeeder extends Seeder
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    private function createVoiceServersNest(?array $nest = null)
+    private function createVoiceServersNest(?Nest $nest = null)
     {
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Voice Servers',
                 'description' => 'Voice servers such as Mumble and Teamspeak 3.',
-            ], 'support@pterodactyl.io');
+            ], self::PTERODACTYL_AUTHOR);
         }
     }
 
@@ -113,13 +137,13 @@ class NestSeeder extends Seeder
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    private function createRustNest(?array $nest = null)
+    private function createRustNest(?Nest $nest = null)
     {
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Rust',
                 'description' => 'Rust - A game where you must fight to survive.',
-            ], 'support@pterodactyl.io');
+            ], self::PTERODACTYL_AUTHOR);
         }
     }
 
@@ -128,14 +152,13 @@ class NestSeeder extends Seeder
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    private function createVintageStoryNest(?array $nest = null)
+    private function createVintageStoryNest(?Nest $nest = null)
     {
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Vintage Story',
                 'description' => 'Vintage Story - An uncompromising wilderness survival sandbox game.',
-            ], 'support@pterodactyl.io');
+            ], self::PTERODACTYL_AUTHOR);
         }
     }
-
 }

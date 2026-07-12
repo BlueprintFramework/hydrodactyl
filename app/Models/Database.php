@@ -15,7 +15,9 @@ use Pterodactyl\Contracts\Extensions\HashidsInterface;
  * @property string $username
  * @property string $remote
  * @property string $password
+ * @property string $type
  * @property int $max_connections
+ * @property array|null $connection_details
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property Server $server
@@ -52,7 +54,9 @@ class Database extends Model
     'username',
     'password',
     'remote',
+    'type',
     'max_connections',
+    'connection_details',
   ];
 
   /**
@@ -62,6 +66,7 @@ class Database extends Model
     'server_id' => 'integer',
     'database_host_id' => 'integer',
     'max_connections' => 'integer',
+    'connection_details' => 'array',
   ];
 
   public static array $validationRules = [
@@ -71,7 +76,9 @@ class Database extends Model
     'username' => 'string|alpha_dash|between:3,100',
     'max_connections' => 'nullable|integer',
     'remote' => 'required|string|regex:/^[\w\-\/.%:]+$/',
+    'type' => 'required|string|in:mysql,postgresql,redis,mongodb',
     'password' => 'string',
+    'connection_details' => 'nullable|array',
   ];
 
   public function getRouteKeyName(): string

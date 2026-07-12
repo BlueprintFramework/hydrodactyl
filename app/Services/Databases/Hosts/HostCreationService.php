@@ -6,7 +6,7 @@ use Pterodactyl\Models\DatabaseHost;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Pterodactyl\Extensions\DynamicDatabaseConnection;
+use Pterodactyl\Services\Databases\Drivers\DatabaseDriverManager;
 use Pterodactyl\Contracts\Repository\DatabaseHostRepositoryInterface;
 
 class HostCreationService
@@ -16,9 +16,8 @@ class HostCreationService
      */
     public function __construct(
         private ConnectionInterface $connection,
-        private DatabaseManager $databaseManager,
-        private DynamicDatabaseConnection $dynamic,
         private Encrypter $encrypter,
+        private DatabaseDriverManager $drivers,
         private DatabaseHostRepositoryInterface $repository,
     ) {
     }
@@ -37,13 +36,13 @@ class HostCreationService
                 'host' => array_get($data, 'host'),
                 'port' => array_get($data, 'port'),
                 'username' => array_get($data, 'username'),
+                'type' => array_get($data, 'type', DatabaseHost::TYPE_MYSQL),
                 'max_databases' => null,
                 'node_id' => array_get($data, 'node_id'),
             ]);
 
             // Confirm access using the provided credentials before saving data.
-            $this->dynamic->set('dynamic', $host);
-            $this->databaseManager->connection('dynamic')->select('SELECT 1 FROM dual');
+            $this->drivers->driverFor($host)->testConnection($host);
 
             return $host;
         });

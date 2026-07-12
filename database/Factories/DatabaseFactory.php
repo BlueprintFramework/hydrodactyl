@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\Database;
+use Pterodactyl\Models\DatabaseHost;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DatabaseFactory extends Factory
@@ -28,6 +29,8 @@ class DatabaseFactory extends Factory
       'username' => Str::random(10),
       'remote' => '%',
       'password' => $password ?: encrypt('test123'),
+      'type' => DatabaseHost::TYPE_MYSQL,
+      'connection_details' => null,
       'created_at' => Carbon::now(),
       'updated_at' => Carbon::now(),
     ];
