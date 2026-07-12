@@ -21,7 +21,7 @@ export default function Captcha({
 }: CaptchaProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const widgetIdRef = useRef<string | null>(null);
-    const [widgetId, setWidgetId] = useState<string | null>(null);
+    const [, setWidgetId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -101,7 +101,6 @@ export default function Captcha({
                 widgetIdRef.current = null;
             }
         };
-        // biome-ignore lint/correctness/useExhaustiveDependencies: callbacks use refs so they are stable
     }, [theme, size, handleSuccess, handleExpired, handleError]);
 
     // Set up event listeners for captcha events
