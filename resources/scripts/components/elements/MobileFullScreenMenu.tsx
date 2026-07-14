@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { getSubdomainInfo } from '@/api/server/network/subdomain';
 import Can from '@/components/elements/Can';
-import type { FeatureLimitKey, ServerRouteDefinition } from '@/routers/routes';
+import { isFeatureLimitEnabled, isNetworkFeatureEnabled } from '@/lib/featureLimits';
+import type { ServerRouteDefinition } from '@/routers/routes';
 import { getServerNavRoutes } from '@/routers/routes';
 
 import { ServerContext } from '@/state/server';
@@ -134,12 +135,10 @@ const ServerMobileNavItem = ({ route, serverId, onClose }: ServerMobileNavItemPr
         if (!featureLimit) return true;
 
         if (featureLimit === 'network') {
-            const allocationLimit = featureLimits?.allocations ?? 0;
-            return allocationLimit > 0 || subdomainSupported;
+            return isNetworkFeatureEnabled(featureLimits?.allocations, subdomainSupported);
         }
 
-        const limitValue = featureLimits?.[featureLimit as FeatureLimitKey] ?? 0;
-        return limitValue !== 0;
+        return isFeatureLimitEnabled(featureLimits?.[featureLimit]);
     };
 
     if (!isVisible() || !Icon || !name) return null;

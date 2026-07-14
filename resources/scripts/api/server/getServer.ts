@@ -40,9 +40,9 @@ export interface Server {
     };
     eggFeatures: string[];
     featureLimits: {
-        databases: number;
-        allocations: number;
-        backups: number;
+        databases: number | null;
+        allocations: number | null;
+        backups: number | null;
         backupStorageMb: number | null;
     };
     isTransferring: boolean;
