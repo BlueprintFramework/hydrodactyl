@@ -2,6 +2,7 @@ import { Plus } from '@gravity-ui/icons';
 import { useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import createServerAllocation from '@/api/server/network/createServerAllocation';
+import { getSubdomainInfo } from '@/api/server/network/subdomain';
 import getServerAllocations from '@/api/swr/getServerAllocations';
 import Can from '@/components/elements/Can';
 import { Dialog } from '@/components/elements/dialog';
@@ -19,6 +20,7 @@ import { ServerContext } from '@/state/server';
 const NetworkContainer = () => {
     const [_, setLoading] = useState(false);
     const [showSubdomainModal, setShowSubdomainModal] = useState(false);
+    const [subdomainSupported, setSubdomainSupported] = useState(false);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const allocationLimit = ServerContext.useStoreState((state) => state.server.data?.featureLimits.allocations);
     const allocations = ServerContext.useStoreState((state) => state.server.data?.allocations, isEqual);
@@ -34,6 +36,24 @@ const NetworkContainer = () => {
     useEffect(() => {
         clearAndAddHttpError(error);
     }, [error, clearAndAddHttpError]);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        setSubdomainSupported(false);
+
+        getSubdomainInfo(uuid)
+            .then(({ supported }) => {
+                if (!cancelled) setSubdomainSupported(supported);
+            })
+            .catch(() => {
+                if (!cancelled) setSubdomainSupported(false);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [uuid]);
 
     useDeepCompareEffect(() => {
         if (!data) return;
@@ -74,13 +94,15 @@ const NetworkContainer = () => {
                                             New Allocation
                                         </Button>
                                     )}
-                                    <Button
-                                        variant='outline'
-                                        className='gap-2'
-                                        onClick={() => setShowSubdomainModal(true)}
-                                    >
-                                        Subdomains
-                                    </Button>
+                                    {subdomainSupported && (
+                                        <Button
+                                            variant='outline'
+                                            className='gap-2'
+                                            onClick={() => setShowSubdomainModal(true)}
+                                        >
+                                            Subdomains
+                                        </Button>
+                                    )}
                                     <span
                                         className={`text-sm ${allocationLimit === 0 ? 'text-red-400' : 'text-zinc-300'} gap-0.5`}
                                     >
@@ -139,9 +161,15 @@ const NetworkContainer = () => {
                     )}
                 </div>
             </div>
-            <Dialog open={showSubdomainModal} onClose={() => setShowSubdomainModal(false)} title='Subdomain Management'>
-                <SubdomainManagement onClose={() => setShowSubdomainModal(false)} />
-            </Dialog>
+            {subdomainSupported && (
+                <Dialog
+                    open={showSubdomainModal}
+                    onClose={() => setShowSubdomainModal(false)}
+                    title='Subdomain Management'
+                >
+                    <SubdomainManagement onClose={() => setShowSubdomainModal(false)} />
+                </Dialog>
+            )}
         </ServerContentBlock>
     );
 };
