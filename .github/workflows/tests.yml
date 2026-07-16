@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         php: [8.4, 8.5]
-        db: [mysql, mariadb-10_5, mariadb-11, pgsql]
+        db: [mysql, mariadb, pgsql]
 
     runs-on:  blacksmith-2vcpu-ubuntu-2404
 
@@ -27,25 +27,13 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-      mariadb-10_5:
+      mariadb:
         image: mariadb:10.5
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: testing
         ports:
           - 3307:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-      mariadb-11:
-        image: mariadb:11
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: testing
-        ports:
-          - 3308:3306
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
