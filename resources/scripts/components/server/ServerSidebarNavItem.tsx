@@ -3,7 +3,8 @@ import { NavLink } from 'react-router-dom';
 import { getSubdomainInfo } from '@/api/server/network/subdomain';
 
 import Can from '@/components/elements/Can';
-import type { FeatureLimitKey, ServerRouteDefinition } from '@/routers/routes';
+import { isFeatureLimitEnabled, isNetworkFeatureEnabled } from '@/lib/featureLimits';
+import type { ServerRouteDefinition } from '@/routers/routes';
 
 import { ServerContext } from '@/state/server';
 
@@ -50,18 +51,12 @@ const ServerSidebarNavItem = forwardRef<HTMLAnchorElement, ServerSidebarNavItemP
         // Check if the item should be visible based on feature limits
         const isVisible = (): boolean => {
             if (!featureLimit) return true;
-            if (featureLimits?.[featureLimit] === null) return true;
-            if (featureLimit === 'network') {
-                // Network is visible if allocations > 0 OR subdomain is supported
-                if (featureLimits?.allocations === null) return true;
 
-                const allocationLimit = featureLimits?.allocations ?? 0;
-                return allocationLimit > 0 || subdomainSupported;
+            if (featureLimit === 'network') {
+                return isNetworkFeatureEnabled(featureLimits?.allocations, subdomainSupported);
             }
 
-            // For other feature limits (databases, backups, allocations)
-            const limitValue = featureLimits?.[featureLimit as FeatureLimitKey] ?? 0;
-            return limitValue !== 0;
+            return isFeatureLimitEnabled(featureLimits?.[featureLimit]);
         };
 
         // Don't render if feature limit hides this item

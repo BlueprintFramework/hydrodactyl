@@ -12,8 +12,10 @@ use Pterodactyl\Models\Schedule;
 use Illuminate\Support\Facades\Bus;
 use Pterodactyl\Jobs\Schedule\RunTaskJob;
 use GuzzleHttp\Exception\BadResponseException;
+use Pterodactyl\Services\Elytra\ElytraJobService;
 use Pterodactyl\Tests\Integration\IntegrationTestCase;
 use Pterodactyl\Repositories\Wings\DaemonPowerRepository;
+use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 class RunTaskJobTest extends IntegrationTestCase
@@ -169,6 +171,73 @@ class RunTaskJobTest extends IntegrationTestCase
         $this->assertFalse($task->is_queued);
         $this->assertFalse($schedule->is_processing);
         $this->assertTrue(Carbon::now()->isSameAs(\DateTimeInterface::ATOM, $schedule->last_run_at));
+    }
+
+    public function testScheduledBackupUsesWingsBackupServiceForWingsNode(): void
+    {
+        $server = $this->createServerModel(['backup_limit' => 5]);
+        $server->node->update(['daemonType' => 'wings']);
+
+        $schedule = Schedule::factory()->for($server)->create(['is_processing' => true]);
+        $task = Task::factory()->for($schedule)->create([
+            'action' => Task::ACTION_BACKUP,
+            'payload' => "cache\ntemp",
+            'is_queued' => true,
+        ]);
+
+        $backupService = \Mockery::mock(InitiateBackupService::class);
+        $this->instance(InitiateBackupService::class, $backupService);
+        $backupService->expects('setIgnoredFiles')->with(['cache', 'temp'])->andReturnSelf();
+        $backupService->expects('handle')
+            ->with(\Mockery::on(fn (Server $value) => $value->is($server)), null, true)
+            ->once();
+
+        $elytraJobService = \Mockery::mock(ElytraJobService::class);
+        $this->instance(ElytraJobService::class, $elytraJobService);
+        $elytraJobService->shouldNotReceive('submitJob');
+
+        Bus::dispatchSync(new RunTaskJob($task));
+
+        $this->assertFalse($task->fresh()->is_queued);
+        $this->assertFalse($task->fresh()->is_processing);
+        $this->assertFalse($schedule->fresh()->is_processing);
+    }
+
+    public function testScheduledBackupUsesElytraJobServiceForElytraNode(): void
+    {
+        $server = $this->createServerModel(['backup_limit' => 5]);
+        $server->node->update(['daemonType' => 'elytra']);
+
+        $schedule = Schedule::factory()->for($server)->create(['is_processing' => true]);
+        $task = Task::factory()->for($schedule)->create([
+            'action' => Task::ACTION_BACKUP,
+            'payload' => '',
+            'is_queued' => true,
+        ]);
+
+        $backupService = \Mockery::mock(InitiateBackupService::class);
+        $this->instance(InitiateBackupService::class, $backupService);
+        $backupService->shouldNotReceive('setIgnoredFiles');
+
+        $elytraJobService = \Mockery::mock(ElytraJobService::class);
+        $this->instance(ElytraJobService::class, $elytraJobService);
+        $elytraJobService->expects('submitJob')
+            ->with(
+                \Mockery::on(fn (Server $value) => $value->is($server)),
+                'backup_create',
+                \Mockery::on(fn (array $data) => $data['operation'] === 'create'
+                    && $data['ignored'] === ''
+                    && $data['is_automatic'] === true),
+                \Mockery::on(fn ($user) => $user->is($server->user))
+            )
+            ->once()
+            ->andReturn([]);
+
+        Bus::dispatchSync(new RunTaskJob($task));
+
+        $this->assertFalse($task->fresh()->is_queued);
+        $this->assertFalse($task->fresh()->is_processing);
+        $this->assertFalse($schedule->fresh()->is_processing);
     }
 
     public static function isManualRunDataProvider(): array

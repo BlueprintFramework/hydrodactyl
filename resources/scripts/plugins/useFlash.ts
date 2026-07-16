@@ -1,4 +1,5 @@
 import { type Actions, useStoreActions } from 'easy-peasy';
+import { useCallback, useMemo } from 'react';
 
 import type { ApplicationStore } from '@/state';
 import type { FlashStore } from '@/state/flashes';
@@ -16,11 +17,24 @@ const useFlash = (): Actions<FlashStore> => {
 const useFlashKey = (key: string): KeyedFlashStore => {
     const { addFlash, clearFlashes, clearAndAddHttpError } = useFlash();
 
-    return {
-        addError: (message, title) => addFlash({ key, message, title, type: 'error' }),
-        clearFlashes: () => clearFlashes(key),
-        clearAndAddHttpError: (error) => clearAndAddHttpError({ key, error }),
-    };
+    const addError = useCallback(
+        (message: string, title?: string) => addFlash({ key, message, title, type: 'error' }),
+        [addFlash, key],
+    );
+    const clearKeyedFlashes = useCallback(() => clearFlashes(key), [clearFlashes, key]);
+    const clearAndAddKeyedHttpError = useCallback(
+        (error?: Error | string | null) => clearAndAddHttpError({ key, error }),
+        [clearAndAddHttpError, key],
+    );
+
+    return useMemo(
+        () => ({
+            addError,
+            clearFlashes: clearKeyedFlashes,
+            clearAndAddHttpError: clearAndAddKeyedHttpError,
+        }),
+        [addError, clearKeyedFlashes, clearAndAddKeyedHttpError],
+    );
 };
 
 export { useFlashKey };

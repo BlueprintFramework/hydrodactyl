@@ -3,7 +3,6 @@
 namespace Pterodactyl\Jobs\Schedule;
 
 use Exception;
-use Pterodactyl\Exceptions\Service\Backup\BackupFailedException;
 use Pterodactyl\Jobs\Job;
 use Carbon\CarbonImmutable;
 use Pterodactyl\Models\Task;
@@ -15,6 +14,8 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Pterodactyl\Services\Elytra\ElytraJobService;
 use Pterodactyl\Repositories\Wings\DaemonPowerRepository;
 use Pterodactyl\Repositories\Wings\DaemonCommandRepository;
+use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
+use Pterodactyl\Exceptions\Service\Backup\BackupFailedException;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 class RunTaskJob extends Job implements ShouldQueue
@@ -36,6 +37,7 @@ class RunTaskJob extends Job implements ShouldQueue
     public function handle(
         DaemonCommandRepository $commandRepository,
         ElytraJobService $elytraJobService,
+        InitiateBackupService $backupService,
         DaemonPowerRepository $powerRepository,
     ) {
         // Do not process a task that is not set to active, unless it's been manually triggered.
@@ -73,14 +75,12 @@ class RunTaskJob extends Job implements ShouldQueue
                         Log::warning('Scheduled backup blocked due to backup limit', [
                             'task_id' => $this->task->id,
                             'schedule_id' => $this->task->schedule_id,
-                            'server_id' => $server->id
+                            'server_id' => $server->id,
                         ]);
 
                         // TooManyBackupsException is currently scoped to daemon-level backup services,
                         // therefore BackupFailedException is used here to properly fail the scheduled task.
-                        throw new BackupFailedException(
-                            'The permitted backup limit has been exceeded.'
-                        );
+                        throw new BackupFailedException('The permitted backup limit has been exceeded.');
                     }
 
                     $affectedRows = Task::where('id', $this->task->id)
@@ -99,20 +99,26 @@ class RunTaskJob extends Job implements ShouldQueue
                     try {
                         $ignoredFiles = !empty($this->task->payload) ? explode(PHP_EOL, $this->task->payload) : [];
 
-                        $elytraJobService->submitJob(
-                            $server,
-                            'backup_create',
-                            [
-                                'operation' => 'create',
-                                'adapter' => config('backups.default', 'elytra'),
-                                'ignored' => implode("\n", $ignoredFiles),
-                                'name' => 'Scheduled Backup - ' . now()->format('Y-m-d H:i'),
-                                'is_automatic' => true,
-                            ],
-                            auth()->user() ?? $server->user
-                        );
+                        if (strtolower($server->node->daemonType) === 'wings') {
+                            $backupService
+                                ->setIgnoredFiles($ignoredFiles)
+                                ->handle($server, null, true);
+                        } else {
+                            $elytraJobService->submitJob(
+                                $server,
+                                'backup_create',
+                                [
+                                    'operation' => 'create',
+                                    'adapter' => config('backups.default', 'elytra'),
+                                    'ignored' => implode("\n", $ignoredFiles),
+                                    'name' => 'Scheduled Backup - ' . now()->format('Y-m-d H:i'),
+                                    'is_automatic' => true,
+                                ],
+                                auth()->user() ?? $server->user
+                            );
+                        }
                     } finally {
-                        $this->task->update(['is_processing' => false]);
+                        $this->markBackupTaskNotProcessing();
                         $this->task->schedule->touch();
                     }
                     break;
@@ -138,7 +144,7 @@ class RunTaskJob extends Job implements ShouldQueue
     public function failed(?\Exception $exception = null)
     {
         if ($this->task->action === Task::ACTION_BACKUP) {
-            $this->task->update(['is_processing' => false]);
+            $this->markBackupTaskNotProcessing();
         }
 
         $this->markTaskNotQueued();
@@ -185,5 +191,15 @@ class RunTaskJob extends Job implements ShouldQueue
     private function markTaskNotQueued()
     {
         $this->task->update(['is_queued' => false]);
+    }
+
+    /**
+     * Clear the backup processing claim in the database and on the job's model instance.
+     */
+    private function markBackupTaskNotProcessing(): void
+    {
+        Task::query()->whereKey($this->task->id)->update(['is_processing' => false]);
+        $this->task->setAttribute('is_processing', false);
+        $this->task->syncOriginalAttribute('is_processing');
     }
 }

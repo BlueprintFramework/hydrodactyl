@@ -1,3 +1,5 @@
+import { formatBackupStorage } from './backupStorageFormat';
+
 interface BackupStorageInfo {
     used_mb: number;
     legacy_usage_mb: number;
@@ -20,16 +22,6 @@ interface BackupStatsProps {
     backupStorageLimit?: number | null;
 }
 
-const formatStorage = (mb: number | undefined | null): string => {
-    if (mb === null || mb === undefined) {
-        return '0MB';
-    }
-    if (mb >= 1024) {
-        return `${(mb / 1024).toFixed(1)}GB`;
-    }
-    return `${mb.toFixed(1)}MB`;
-};
-
 const StorageBreakdown = ({ storage }: { storage: BackupStorageInfo }) => {
     const hasBothUsages = storage.repository_usage_mb > 0 && storage.legacy_usage_mb > 0;
 
@@ -37,9 +29,9 @@ const StorageBreakdown = ({ storage }: { storage: BackupStorageInfo }) => {
 
     return (
         <p className='text-xs text-zinc-400'>
-            {storage.repository_usage_mb > 0 ? `${formatStorage(storage.repository_usage_mb)} deduplicated` : ''}
+            {storage.repository_usage_mb > 0 ? `${formatBackupStorage(storage.repository_usage_mb)} deduplicated` : ''}
             {hasBothUsages && ' + '}
-            {storage.legacy_usage_mb > 0 ? `${formatStorage(storage.legacy_usage_mb)} legacy` : ''}
+            {storage.legacy_usage_mb > 0 ? `${formatBackupStorage(storage.legacy_usage_mb)} legacy` : ''}
         </p>
     );
 };
@@ -51,15 +43,15 @@ const StorageTooltip = ({
     storage: BackupStorageInfo;
     backupStorageLimit: number | null;
 }) => {
-    const used = storage.used_mb?.toFixed(2) || 0;
-    const repo = storage.repository_usage_mb?.toFixed(2) || 0;
-    const legacy = storage.legacy_usage_mb?.toFixed(2) || 0;
-    const available = storage.available_mb?.toFixed(2) || 0;
+    const used = formatBackupStorage(storage.used_mb, 2);
+    const repo = formatBackupStorage(storage.repository_usage_mb, 2);
+    const legacy = formatBackupStorage(storage.legacy_usage_mb, 2);
+    const available = formatBackupStorage(storage.available_mb, 2);
 
     if (backupStorageLimit === null) {
-        return `${used}MB total (Repository: ${repo}MB, Legacy: ${legacy}MB)`;
+        return `${used} total (Repository: ${repo}, Legacy: ${legacy})`;
     }
-    return `${used}MB used of ${backupStorageLimit}MB (Repository: ${repo}MB, Legacy: ${legacy}MB, ${available}MB Available)`;
+    return `${used} used of ${formatBackupStorage(backupStorageLimit, 2)} (Repository: ${repo}, Legacy: ${legacy}, ${available} available)`;
 };
 
 const BackupStats = ({ backupCount, backupLimit, storage, backupStorageLimit = null }: BackupStatsProps) => {
@@ -79,11 +71,11 @@ const BackupStats = ({ backupCount, backupLimit, storage, backupStorageLimit = n
                         className='text-sm text-zinc-300 cursor-help'
                         title={StorageTooltip({ storage, backupStorageLimit })}
                     >
-                        <span className='font-medium'>{formatStorage(storage.used_mb)}</span>{' '}
+                        <span className='font-medium'>{formatBackupStorage(storage.used_mb)}</span>{' '}
                         {backupStorageLimit === null ? (
                             'storage used'
                         ) : (
-                            <span className='font-medium'>of {formatStorage(backupStorageLimit)} used</span>
+                            <span className='font-medium'>of {formatBackupStorage(backupStorageLimit)} used</span>
                         )}
                     </p>
                     <StorageBreakdown storage={storage} />

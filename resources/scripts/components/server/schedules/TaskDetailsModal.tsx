@@ -74,6 +74,23 @@ const ActionListener = () => {
     return null;
 };
 
+export const completeTaskSubmission = (
+    schedule: Schedule,
+    savedTask: Task,
+    setSubmitting: FormikHelpers<Values>['setSubmitting'],
+    appendSchedule: (schedule: Schedule) => void,
+    onDismissed: () => void,
+) => {
+    let tasks = schedule.tasks.map((task) => (task.id === savedTask.id ? savedTask : task));
+    if (!schedule.tasks.some((task) => task.id === savedTask.id)) {
+        tasks = [...tasks, savedTask];
+    }
+
+    setSubmitting(false);
+    appendSchedule({ ...schedule, tasks });
+    onDismissed();
+};
+
 const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Props) => {
     const { clearFlashes, addError } = useFlash();
 
@@ -95,15 +112,9 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
             });
         } else {
             createOrUpdateScheduleTask(uuid, schedule.id, task?.id, values)
-                .then((task) => {
-                    let tasks = schedule.tasks.map((t) => (t.id === task.id ? task : t));
-                    if (!schedule.tasks.find((t) => t.id === task.id)) {
-                        tasks = [...tasks, task];
-                    }
-
-                    appendSchedule({ ...schedule, tasks });
-                    onDismissed();
-                })
+                .then((savedTask) =>
+                    completeTaskSubmission(schedule, savedTask, setSubmitting, appendSchedule, onDismissed),
+                )
                 .catch((error) => {
                     console.error(error);
                     setSubmitting(false);
