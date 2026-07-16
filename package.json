@@ -85,6 +85,8 @@
         "@swc/plugin-styled-components": "^12.14.1",
         "@types/debounce": "^1.2.4",
         "@types/events": "^3.0.3",
+        "@types/jest": "^30.0.0",
+        "@types/mocha": "^10.0.10",
         "@types/node": "^24.2.0",
         "@types/react": "^19.1.9",
         "@types/react-copy-to-clipboard": "^5.0.7",
@@ -115,6 +117,11 @@
         "test:unit": "php vendor/bin/phpunit --testsuite=Unit",
         "test:integration": "php vendor/bin/phpunit --testsuite=Integration"
     },
-    "browserslist": ["> 0.5%", "last 2 versions", "firefox esr", "not dead"],
+    "browserslist": [
+        "> 0.5%",
+        "last 2 versions",
+        "firefox esr",
+        "not dead"
+    ],
     "packageManager": "pnpm@11.3.0"
 }
