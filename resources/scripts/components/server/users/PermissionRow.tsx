@@ -1,3 +1,4 @@
+import { useField } from 'formik';
 import { useStoreState } from 'easy-peasy';
 
 import { Checkbox } from '@/components/elements/CheckboxNew';
@@ -10,6 +11,9 @@ interface Props {
 const PermissionRow = ({ permission, disabled }: Props) => {
     const [key = '', pkey = ''] = permission.split('.', 2);
     const permissions = useStoreState((state) => state.permissions.data);
+    const [{ value }, , { setValue }] = useField<string[]>('permissions');
+
+    const checked = value?.includes(permission) ?? false;
 
     return (
         <label
@@ -22,6 +26,14 @@ const PermissionRow = ({ permission, disabled }: Props) => {
                 id={`permission_${permission}`}
                 name='permissions'
                 value={permission}
+                checked={checked}
+                onCheckedChange={() => {
+                    if (checked) {
+                        setValue(value.filter((p) => p !== permission));
+                    } else {
+                        setValue([...value, permission]);
+                    }
+                }}
                 disabled={disabled}
                 className='mt-0.5'
             />
