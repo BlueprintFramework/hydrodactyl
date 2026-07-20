@@ -94,7 +94,6 @@ Route::group([
         // Resolve yields a daemon-pulled download URL, so it gets a tighter
         // limiter than browse (caps upstream amplification per user).
         Route::get('/resolve', [MarketplaceController::class, 'resolve'])
-            ->middleware('throttle:10,1')
             ->name('api.client.servers.marketplace.resolve');
 
         // Install history. Stored in the panel database (not on the daemon) so
