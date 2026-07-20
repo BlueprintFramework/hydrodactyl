@@ -6,7 +6,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Spinner from '@/components/elements/Spinner';
 import Pagination from '@/components/elements/Pagination';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import { getNests, createNest, type AdminNest, type CreateNestData } from '@/api/admin/nests';
 import { httpErrorToHuman } from '@/api/http';
 import AdminNestViewContainer from '@/components/admin/nests/AdminNestViewContainer';
@@ -40,7 +40,7 @@ const AdminNestsContainer = () => {
         return (
             <div>
                 <MainPageHeader title='Create Nest'>
-                    <ButtonV2 onClick={() => setShowCreate(false)}>Back</ButtonV2>
+                    <Button variant='secondary' onClick={() => setShowCreate(false)}>Back</Button>
                 </MainPageHeader>
                 {createError && <div className='text-red-400 mb-4 text-sm'>{createError}</div>}
                 <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6 max-w-lg'>
@@ -60,9 +60,9 @@ const AdminNestsContainer = () => {
                             className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400'
                         />
                     </div>
-                    <ButtonV2 onClick={handleCreate} disabled={saving || !createName}>
+                    <Button variant='default' onClick={handleCreate} disabled={saving || !createName}>
                         {saving ? 'Creating...' : 'Create Nest'}
-                    </ButtonV2>
+                    </Button>
                 </div>
             </div>
         );
@@ -77,30 +77,10 @@ const AdminNestsContainer = () => {
                         <MainPageHeader title='Nests'>
                             <div className='flex items-center gap-2'>
                                 <div className='flex items-center bg-mocha-600 rounded-lg p-1'>
-                                    <button
-                                        onClick={() => setViewMode('cards')}
-                                        className={`p-1.5 rounded transition-colors text-xs font-bold ${
-                                            viewMode === 'cards'
-                                                ? 'bg-mocha-400 text-cream-400'
-                                                : 'text-mocha-200 hover:text-mocha-100'
-                                        }`}
-                                        title='Card view'
-                                    >
-                                        ▦
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('table')}
-                                        className={`p-1.5 rounded transition-colors text-xs font-bold ${
-                                            viewMode === 'table'
-                                                ? 'bg-mocha-400 text-cream-400'
-                                                : 'text-mocha-200 hover:text-mocha-100'
-                                        }`}
-                                        title='Table view'
-                                    >
-                                        ☰
-                                    </button>
+                                    <Button variant={viewMode === 'cards' ? 'default' : 'secondary'} size='sm' onClick={() => setViewMode('cards')} title='Card view'>▦</Button>
+                                    <Button variant={viewMode === 'table' ? 'default' : 'secondary'} size='sm' onClick={() => setViewMode('table')} title='Table view'>☰</Button>
                                 </div>
-                                <ButtonV2 onClick={() => setShowCreate(true)}>New Nest</ButtonV2>
+                                <Button variant='default' onClick={() => setShowCreate(true)}>New Nest</Button>
                             </div>
                         </MainPageHeader>
 

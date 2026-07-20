@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { type AdminMount, type CreateMountData, createMount, deleteMount, getMounts } from '@/api/admin/mounts';
 import { httpErrorToHuman } from '@/api/http';
 import AdminMountViewContainer from '@/components/admin/mounts/AdminMountViewContainer';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
@@ -45,7 +45,7 @@ const AdminMountsContainer = () => {
         return (
             <div>
                 <MainPageHeader title='Create Mount'>
-                    <ButtonV2 onClick={() => setShowCreate(false)}>Back</ButtonV2>
+                    <Button variant='secondary' onClick={() => setShowCreate(false)}>Back</Button>
                 </MainPageHeader>
                 {createError && <div className='text-red-400 mb-4 text-sm'>{createError}</div>}
                 <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6 max-w-lg'>
@@ -95,9 +95,7 @@ const AdminMountsContainer = () => {
                             User Mountable
                         </label>
                     </div>
-                    <ButtonV2 onClick={handleCreate} disabled={saving || !form.name || !form.source || !form.target}>
-                        {saving ? 'Creating...' : 'Create Mount'}
-                    </ButtonV2>
+                    <Button variant='default' onClick={handleCreate} disabled={saving || !form.name || !form.source || !form.target}>{saving ? 'Creating...' : 'Create Mount'}</Button>
                 </div>
             </div>
         );
@@ -110,7 +108,7 @@ const AdminMountsContainer = () => {
                 element={
                     <div>
                         <MainPageHeader title='Mounts'>
-                            <ButtonV2 onClick={() => setShowCreate(true)}>New Mount</ButtonV2>
+                            <Button variant='default' onClick={() => setShowCreate(true)}>New Mount</Button>
                         </MainPageHeader>
 
                         {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
@@ -197,12 +195,7 @@ const AdminMountsContainer = () => {
                                                                     >
                                                                         View
                                                                     </Link>
-                                                                    <button
-                                                                        onClick={() => handleDelete(mount.id)}
-                                                                        className='text-xs text-red-400 hover:text-red-300'
-                                                                    >
-                                                                        Delete
-                                                                    </button>
+                                                                    <Button variant='attention' onClick={() => handleDelete(mount.id)}>Delete</Button>
                                                                 </div>
                                                             </td>
                                                         </tr>

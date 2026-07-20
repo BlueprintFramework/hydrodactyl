@@ -12,7 +12,7 @@ import {
     updateBucket,
 } from '@/api/admin/buckets';
 import { httpErrorToHuman } from '@/api/http';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
@@ -118,9 +118,9 @@ const AdminBucketView = () => {
                     </Link>
                 }
             >
-                <ButtonV2 onClick={handleSave} disabled={saving || deleting}>
+                <Button variant='default' onClick={handleSave} disabled={saving || deleting}>
                     {saving ? 'Saving...' : 'Save'}
-                </ButtonV2>
+                </Button>
             </MainPageHeader>
 
             {(error || bucketError) && (
@@ -288,13 +288,9 @@ const AdminBucketView = () => {
                         <p className='text-sm text-mocha-200 mb-4'>
                             Permanently delete this bucket and all associated data. This action cannot be undone.
                         </p>
-                        <ButtonV2
-                            onClick={handleDelete}
-                            disabled={deleting}
-                            className='!bg-red-600 hover:!bg-red-500'
-                        >
+                        <Button variant='attention' onClick={handleDelete} disabled={deleting}>
                             {deleting ? 'Deleting...' : 'Delete Bucket'}
-                        </ButtonV2>
+                        </Button>
                     </div>
                 </>
             )}
@@ -455,19 +451,8 @@ const CreateBucketModal = ({ open, onClose, onCreated }: { open: boolean; onClos
             </div>
             <Dialog.Footer>
                 <div className='flex items-center gap-3 p-6'>
-                    <button
-                        onClick={handleCreate}
-                        disabled={saving || !createName || !createAccessKey || !createSecretKey || !createBucketName}
-                        className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
-                        {saving ? 'Creating...' : 'Create Bucket'}
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className='px-4 py-2 bg-mocha-500 hover:bg-mocha-400 border border-mocha-400 text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
-                        Cancel
-                    </button>
+                    <Button variant='default' onClick={handleCreate} disabled={saving || !createName || !createAccessKey || !createSecretKey || !createBucketName}>{saving ? 'Creating...' : 'Create Bucket'}</Button>
+                    <Button variant='secondary' onClick={onClose}>Cancel</Button>
                 </div>
             </Dialog.Footer>
         </Dialog>
@@ -497,7 +482,7 @@ const AdminBucketsContainer = () => {
                 element={
                     <div>
                         <MainPageHeader title='S3 Buckets'>
-                            <ButtonV2 onClick={() => setShowCreateModal(true)}>Add Bucket</ButtonV2>
+                            <Button variant='default' onClick={() => setShowCreateModal(true)}>Add Bucket</Button>
                         </MainPageHeader>
 
                         {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
@@ -582,12 +567,7 @@ const AdminBucketsContainer = () => {
                                                                     >
                                                                         View
                                                                     </Link>
-                                                                    <button
-                                                                        onClick={() => handleDelete(bucket.id)}
-                                                                        className='text-xs text-red-400 hover:text-red-300'
-                                                                    >
-                                                                        Delete
-                                                                    </button>
+                                                                    <Button variant='attention' onClick={() => handleDelete(bucket.id)}>Delete</Button>
                                                                 </div>
                                                             </td>
                                                         </tr>

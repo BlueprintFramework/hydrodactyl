@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { type AdminApiKey, type CreateApiKeyData, createApiKey, deleteApiKey, getApiKeys } from '@/api/admin/apiKeys';
 import { httpErrorToHuman } from '@/api/http';
+import { Button } from '@/components/ui/button';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
@@ -60,15 +61,7 @@ const AdminApiContainer = () => {
     return (
         <div>
             <MainPageHeader title='API Keys'>
-                <button
-                    onClick={() => {
-                        setShowCreate(!showCreate);
-                        setCreatedToken(null);
-                    }}
-                    className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 text-cream-400 text-sm rounded transition-colors'
-                >
-                    Create API Key
-                </button>
+                <Button variant='default' onClick={() => { setShowCreate(!showCreate); setCreatedToken(null); }}>Create API Key</Button>
             </MainPageHeader>
 
             {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
@@ -87,12 +80,7 @@ const AdminApiContainer = () => {
                                 {createdToken}
                             </code>
                         </div>
-                        <button
-                            onClick={handleCopyToken}
-                            className='ml-4 px-3 py-2 bg-mocha-400 hover:bg-mocha-300 text-mocha-100 text-sm rounded transition-colors whitespace-nowrap'
-                        >
-                            Copy
-                        </button>
+                        <Button variant='secondary' onClick={handleCopyToken}>Copy</Button>
                     </div>
                 </div>
             )}
@@ -122,23 +110,8 @@ const AdminApiContainer = () => {
                             />
                         </div>
                         <div className='flex gap-2'>
-                            <button
-                                onClick={handleCreate}
-                                disabled={!memo.trim() || creating}
-                                className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm rounded transition-colors'
-                            >
-                                {creating ? 'Creating...' : 'Create Key'}
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setShowCreate(false);
-                                    setMemo('');
-                                    setAllowedIps('');
-                                }}
-                                className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 text-mocha-100 text-sm rounded transition-colors'
-                            >
-                                Cancel
-                            </button>
+                            <Button variant='default' onClick={handleCreate} disabled={!memo.trim() || creating}>{creating ? 'Creating...' : 'Create Key'}</Button>
+                            <Button variant='secondary' onClick={() => { setShowCreate(false); setMemo(''); setAllowedIps(''); }}>Cancel</Button>
                         </div>
                     </div>
                 </div>
@@ -196,12 +169,7 @@ const AdminApiContainer = () => {
                                                     {new Date(apiKey.createdAt).toLocaleDateString()}
                                                 </td>
                                                 <td className='px-4 py-3 text-right'>
-                                                    <button
-                                                        onClick={() => handleDelete(apiKey.id)}
-                                                        className='text-xs text-red-400 hover:text-red-300'
-                                                    >
-                                                        Delete
-                                                    </button>
+                                                    <Button variant='attention' onClick={() => handleDelete(apiKey.id)}>Delete</Button>
                                                 </td>
                                             </tr>
                                         ))

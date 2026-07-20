@@ -3,6 +3,7 @@ import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import useSWR, { mutate } from 'swr';
 import { type AdminUser, createUser, deleteUser, getUser, getUsers, updateUser } from '@/api/admin/users';
 import { httpErrorToHuman } from '@/api/http';
+import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/elements/dialog';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
@@ -101,12 +102,12 @@ const AdminUserList = () => {
                                                         >
                                                             View
                                                         </Link>
-                                                        <button
+                                                        <Button
+                                                            variant='attention'
                                                             onClick={() => setConfirmDelete(user.id)}
-                                                            className='text-xs text-red-400 hover:text-red-300 cursor-pointer'
                                                         >
                                                             Delete
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -235,18 +236,12 @@ const CreateUserModal = ({ open, onClose, onCreated }: { open: boolean; onClose:
             </form>
             <Dialog.Footer>
                 <div className='flex items-center gap-3 p-6'>
-                    <button
-                        onClick={handleSubmit}
-                        className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
+                    <Button variant='default' onClick={handleSubmit}>
                         Create User
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className='px-4 py-2 bg-mocha-500 hover:bg-mocha-400 border border-mocha-400 text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
+                    </Button>
+                    <Button variant='secondary' onClick={onClose}>
                         Cancel
-                    </button>
+                    </Button>
                 </div>
             </Dialog.Footer>
         </Dialog>
@@ -328,17 +323,18 @@ const AdminUserView = () => {
 
             <div className='flex items-center space-x-1 border-b border-mocha-400 overflow-x-auto'>
                 {tabs.map((tab) => (
-                    <button
+                    <Button
                         key={tab}
+                        variant='ghost'
                         onClick={() => setActiveTab(tab)}
-                        className={`whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                        className={`border-b-2 -mb-px rounded-none ${
                             activeTab === tab
                                 ? 'border-brand text-cream-400'
                                 : 'border-transparent text-mocha-200 hover:text-cream-400 hover:border-mocha-300'
                         }`}
                     >
                         {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                    </button>
+                    </Button>
                 ))}
             </div>
 
@@ -459,13 +455,9 @@ const AdminUserView = () => {
                                 </div>
 
                                 <div className='flex justify-end'>
-                                    <button
-                                        type='submit'
-                                        disabled={saving}
-                                        className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                                    >
+                                    <Button type='submit' variant='default' disabled={saving}>
                                         {saving ? 'Saving...' : 'Save Changes'}
-                                    </button>
+                                    </Button>
                                 </div>
                             </form>
                         </div>
@@ -480,12 +472,9 @@ const AdminUserView = () => {
                             <p className='text-sm text-mocha-200 mb-4'>
                                 Permanently delete this user and all associated data. This action cannot be undone.
                             </p>
-                            <button
-                                onClick={() => setShowDeleteConfirm(true)}
-                                className='px-4 py-2 bg-red-600 hover:bg-red-500 text-cream-400 text-sm rounded transition-colors'
-                            >
+                            <Button variant='attention' onClick={() => setShowDeleteConfirm(true)}>
                                 Delete User
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -510,12 +499,9 @@ const AdminUsersContainer = () => {
     return (
         <div>
             <MainPageHeader title='Users'>
-                <button
-                    onClick={() => setShowCreate(true)}
-                    className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 text-cream-400 text-sm font-medium rounded-xl transition-colors cursor-pointer'
-                >
+                <Button variant='default' onClick={() => setShowCreate(true)}>
                     Create User
-                </button>
+                </Button>
             </MainPageHeader>
 
             <Routes>

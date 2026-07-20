@@ -28,6 +28,7 @@ import { Dialog } from '@/components/elements/dialog';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
 
 const inputClass =
     'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors';
@@ -333,13 +334,7 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                         <div>
                             <div className='flex items-center justify-between mb-2'>
                                 <label className='text-mocha-200 font-medium'>Environment Variables</label>
-                                <button
-                                    type='button'
-                                    onClick={addEnvVar}
-                                    className='text-xs text-cream-400 hover:text-cream-500'
-                                >
-                                    + Add Variable
-                                </button>
+                                <Button variant='ghost' size='sm' type='button' onClick={addEnvVar}>+ Add Variable</Button>
                             </div>
                             {envVars.map((v, i) => (
                                 <div key={i} className='flex gap-2 mb-2'>
@@ -357,13 +352,7 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                                         className={inputClass}
                                         placeholder='value'
                                     />
-                                    <button
-                                        type='button'
-                                        onClick={() => removeEnvVar(i)}
-                                        className='text-red-400 hover:text-red-300 px-2'
-                                    >
-                                        ×
-                                    </button>
+                                    <Button variant='ghost' size='sm' type='button' onClick={() => removeEnvVar(i)}>×</Button>
                                 </div>
                             ))}
                         </div>
@@ -406,19 +395,8 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
 
             <Dialog.Footer>
                 <div className='flex items-center gap-3 p-6'>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={saving || !name || !userId || !eggId || !nodeId}
-                        className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
-                        {saving ? 'Creating...' : 'Create Server'}
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className='px-4 py-2 bg-mocha-500 hover:bg-mocha-400 border border-mocha-400 text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
-                        Cancel
-                    </button>
+                    <Button variant='default' onClick={handleSubmit} disabled={saving || !name || !userId || !eggId || !nodeId}>{saving ? 'Creating...' : 'Create Server'}</Button>
+                    <Button variant='secondary' onClick={onClose}>Cancel</Button>
                 </div>
             </Dialog.Footer>
         </Dialog>
@@ -711,17 +689,18 @@ const AdminServerViewContainer = () => {
 
             <div className='flex items-center space-x-1 border-b border-mocha-400 overflow-x-auto'>
                 {tabs.map((tab) => (
-                    <button
+                    <Button
                         key={tab}
+                        variant='ghost'
                         onClick={() => setActiveTab(tab)}
-                        className={`whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                        className={`border-b-2 -mb-px rounded-none ${
                             activeTab === tab
                                 ? 'border-brand text-cream-400'
                                 : 'border-transparent text-mocha-200 hover:text-cream-400 hover:border-mocha-300'
                         }`}
                     >
                         {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                    </button>
+                    </Button>
                 ))}
             </div>
 
@@ -816,13 +795,7 @@ const AdminServerViewContainer = () => {
                                 <div>
                                     <div className='flex items-center justify-between mb-2'>
                                         <label className='text-mocha-200 font-medium'>Environment Variables</label>
-                                        <button
-                                            type='button'
-                                            onClick={addDetailsEnvVar}
-                                            className='text-xs text-cream-400 hover:text-cream-500'
-                                        >
-                                            + Add Variable
-                                        </button>
+                                        <Button variant='ghost' size='sm' type='button' onClick={addDetailsEnvVar}>+ Add Variable</Button>
                                     </div>
                                     {dEnvVars.map((v, i) => (
                                         <div key={i} className='flex gap-2 mb-2'>
@@ -840,25 +813,13 @@ const AdminServerViewContainer = () => {
                                                 className={inputClass}
                                                 placeholder='value'
                                             />
-                                            <button
-                                                type='button'
-                                                onClick={() => removeDetailsEnvVar(i)}
-                                                className='text-red-400 hover:text-red-300 px-2'
-                                            >
-                                                ×
-                                            </button>
+                                            <Button variant='ghost' size='sm' type='button' onClick={() => removeDetailsEnvVar(i)}>×</Button>
                                         </div>
                                     ))}
                                 </div>
 
                                 <div className='flex justify-end'>
-                                    <button
-                                        onClick={handleDetailsSave}
-                                        disabled={detailsSaving}
-                                        className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                                    >
-                                        {detailsSaving ? 'Saving...' : 'Save Details'}
-                                    </button>
+                                <Button variant='default' onClick={handleDetailsSave} disabled={detailsSaving}>{detailsSaving ? 'Saving...' : 'Save Details'}</Button>
                                 </div>
                             </div>
                         </div>
@@ -945,13 +906,7 @@ const AdminServerViewContainer = () => {
                             </div>
 
                             <div className='flex justify-end'>
-                                <button
-                                    onClick={handleBuildSave}
-                                    disabled={buildSaving}
-                                    className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                                >
-                                    {buildSaving ? 'Saving...' : 'Save Build'}
-                                </button>
+                                <Button variant='default' onClick={handleBuildSave} disabled={buildSaving}>{buildSaving ? 'Saving...' : 'Save Build'}</Button>
                             </div>
                         </div>
                     </div>
@@ -1007,13 +962,7 @@ const AdminServerViewContainer = () => {
                                 <div>
                                     <div className='flex items-center justify-between mb-2'>
                                         <label className='text-mocha-200 font-medium'>Environment Variables</label>
-                                        <button
-                                            type='button'
-                                            onClick={addStartupEnvVar}
-                                            className='text-xs text-cream-400 hover:text-cream-500'
-                                        >
-                                            + Add Variable
-                                        </button>
+                                        <Button variant='ghost' size='sm' type='button' onClick={addStartupEnvVar}>+ Add Variable</Button>
                                     </div>
                                     {sEnvVars.map((v, i) => (
                                         <div key={i} className='flex gap-2 mb-2'>
@@ -1031,25 +980,13 @@ const AdminServerViewContainer = () => {
                                                 className={inputClass}
                                                 placeholder='value'
                                             />
-                                            <button
-                                                type='button'
-                                                onClick={() => removeStartupEnvVar(i)}
-                                                className='text-red-400 hover:text-red-300 px-2'
-                                            >
-                                                ×
-                                            </button>
+                                            <Button variant='ghost' size='sm' type='button' onClick={() => removeStartupEnvVar(i)}>×</Button>
                                         </div>
                                     ))}
                                 </div>
 
                                 <div className='flex justify-end'>
-                                    <button
-                                        onClick={handleStartupSave}
-                                        disabled={startupSaving}
-                                        className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                                    >
-                                        {startupSaving ? 'Saving...' : 'Save Startup'}
-                                    </button>
+                                <Button variant='default' onClick={handleStartupSave} disabled={startupSaving}>{startupSaving ? 'Saving...' : 'Save Startup'}</Button>
                                 </div>
                             </div>
                         </div>
@@ -1095,12 +1032,7 @@ const AdminServerViewContainer = () => {
                                                 <td className='px-6 py-3 text-mocha-100'>{db.username}</td>
                                                 <td className='px-6 py-3 text-mocha-100'>#{db.hostId}</td>
                                                 <td className='px-6 py-3 text-right'>
-                                                    <button
-                                                        onClick={() => setConfirmDeleteDb(db.id)}
-                                                        className='text-xs text-red-400 hover:text-red-300'
-                                                    >
-                                                        Delete
-                                                    </button>
+                                                    <Button variant='attention' size='sm' onClick={() => setConfirmDeleteDb(db.id)}>Delete</Button>
                                                 </td>
                                             </tr>
                                         ))
@@ -1148,13 +1080,7 @@ const AdminServerViewContainer = () => {
                                 </div>
 
                                 <div className='flex justify-end'>
-                                    <button
-                                        onClick={handleCreateDatabase}
-                                        disabled={dbSaving || !dbHostId}
-                                        className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                                    >
-                                        {dbSaving ? 'Creating...' : 'Create Database'}
-                                    </button>
+                                <Button variant='default' onClick={handleCreateDatabase} disabled={dbSaving || !dbHostId}>{dbSaving ? 'Creating...' : 'Create Database'}</Button>
                                 </div>
                             </div>
                         </div>
@@ -1167,27 +1093,12 @@ const AdminServerViewContainer = () => {
                         <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6'>
                             <h3 className='text-cream-400 font-medium mb-4'>Server Actions</h3>
                             <div className='flex flex-wrap gap-3'>
-                                <button
-                                    onClick={() => setConfirmReinstall(true)}
-                                    className='px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-cream-400 text-sm rounded transition-colors'
-                                >
-                                    Reinstall Server
-                                </button>
+                                <Button variant='secondary' onClick={() => setConfirmReinstall(true)}>Reinstall Server</Button>
 
                                 {server.suspended ? (
-                                    <button
-                                        onClick={() => setConfirmUnsuspend(true)}
-                                        className='px-4 py-2 bg-green-600 hover:bg-green-500 text-cream-400 text-sm rounded transition-colors'
-                                    >
-                                        Unsuspend Server
-                                    </button>
+                                    <Button variant='secondary' onClick={() => setConfirmUnsuspend(true)}>Unsuspend Server</Button>
                                 ) : (
-                                    <button
-                                        onClick={() => setConfirmSuspend(true)}
-                                        className='px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-cream-400 text-sm rounded transition-colors'
-                                    >
-                                        Suspend Server
-                                    </button>
+                                    <Button variant='secondary' onClick={() => setConfirmSuspend(true)}>Suspend Server</Button>
                                 )}
                             </div>
                         </div>
@@ -1197,12 +1108,7 @@ const AdminServerViewContainer = () => {
                             <p className='text-sm text-mocha-200 mb-4'>
                                 Deleting this server will permanently remove all data. This action cannot be undone.
                             </p>
-                            <button
-                                onClick={() => setConfirmDelete(true)}
-                                className='px-4 py-2 bg-red-600 hover:bg-red-500 text-cream-400 text-sm rounded transition-colors'
-                            >
-                                Delete Server
-                            </button>
+                            <Button variant='attention' onClick={() => setConfirmDelete(true)}>Delete Server</Button>
                         </div>
                     </div>
                 )}
@@ -1305,12 +1211,7 @@ const AdminServersContainer = () => {
                 element={
                     <div>
                         <MainPageHeader title='Servers'>
-                            <button
-                                onClick={() => setShowCreate(true)}
-                                className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 text-cream-400 text-sm font-medium rounded-xl transition-colors cursor-pointer'
-                            >
-                                Create Server
-                            </button>
+                            <Button variant='default' onClick={() => setShowCreate(true)}>Create Server</Button>
                         </MainPageHeader>
 
                         {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
@@ -1413,29 +1314,11 @@ const AdminServersContainer = () => {
                                                                         View
                                                                     </Link>
                                                                     {server.suspended ? (
-                                                                        <button
-                                                                            onClick={() => handleUnsuspend(server.id)}
-                                                                            className='text-xs text-green-400 hover:text-green-300 cursor-pointer p-1'
-                                                                            title='Unsuspend server'
-                                                                        >
-                                                                            Unsuspend
-                                                                        </button>
+                                                                        <Button variant='ghost' size='sm' onClick={() => handleUnsuspend(server.id)} title='Unsuspend server'>Unsuspend</Button>
                                                                     ) : (
-                                                                        <button
-                                                                            onClick={() => handleSuspend(server.id)}
-                                                                            className='text-xs text-yellow-400 hover:text-yellow-300 cursor-pointer p-1'
-                                                                            title='Suspend server'
-                                                                        >
-                                                                            Suspend
-                                                                        </button>
+                                                                        <Button variant='ghost' size='sm' onClick={() => handleSuspend(server.id)} title='Suspend server'>Suspend</Button>
                                                                     )}
-                                                                    <button
-                                                                        onClick={() => setConfirmDelete(server.id)}
-                                                                        className='text-xs text-red-400 hover:text-red-300 cursor-pointer p-1'
-                                                                        title='Delete server'
-                                                                    >
-                                                                        Delete
-                                                                    </button>
+                                                                    <Button variant='attention' size='sm' onClick={() => setConfirmDelete(server.id)} title='Delete server'>Delete</Button>
                                                                 </div>
                                                             </td>
                                                         </tr>

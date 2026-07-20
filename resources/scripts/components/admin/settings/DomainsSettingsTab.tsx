@@ -65,11 +65,10 @@ const DomainsList = () => {
                     <div className='text-center py-12'>
                         <h4 className='text-mocha-200 text-sm font-medium'>No domains configured</h4>
                         <p className='text-mocha-200/60 text-xs mt-1'>Configure DNS domains to enable subdomain management for servers.</p>
-                        <Link
-                            to='/admin/settings/domains/create'
-                            className='inline-block mt-4 px-4 py-2 bg-mocha-400 hover:bg-mocha-300 text-cream-400 text-sm rounded font-medium transition-colors'
-                        >
-                            Create Your First Domain
+                        <Link to='/admin/settings/domains/create'>
+                            <Button variant='default'>
+                                Create Your First Domain
+                            </Button>
                         </Link>
                     </div>
                 ) : (
@@ -353,12 +352,7 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                 <div className='flex items-center justify-between gap-3'>
                     <div className='flex gap-2'>
                         {form.dns_provider && (
-                            <button
-                                type='button'
-                                onClick={handleTestConnection}
-                                disabled={testing}
-                                className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 disabled:opacity-50 text-mocha-100 text-sm rounded font-medium transition-colors flex items-center gap-1.5'
-                            >
+                            <Button type='button' variant='secondary' onClick={handleTestConnection} disabled={testing}>
                                 {testing ? (
                                     <svg className='w-4 h-4 animate-spin' fill='none' viewBox='0 0 24 24'>
                                         <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
@@ -370,21 +364,14 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                                     </svg>
                                 )}
                                 Test Connection
-                            </button>
+                            </Button>
                         )}
                     </div>
                     <div className='flex items-center gap-2'>
-                        <Link
-                            to='/admin/settings/domains'
-                            className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 text-mocha-100 text-sm rounded font-medium transition-colors'
-                        >
-                            Cancel
+                        <Link to='/admin/settings/domains'>
+                            <Button variant='secondary'>Cancel</Button>
                         </Link>
-                        <button
-                            type='submit'
-                            disabled={saving}
-                            className='px-5 py-2 bg-mocha-400 hover:bg-mocha-300 disabled:opacity-50 text-cream-400 text-sm rounded font-medium transition-colors flex items-center gap-1.5'
-                        >
+                        <Button type='submit' variant='default' disabled={saving}>
                             {saving && (
                                 <svg className='w-4 h-4 animate-spin' fill='none' viewBox='0 0 24 24'>
                                     <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
@@ -395,7 +382,7 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4' />
                             </svg>
                             {domain ? 'Update Domain' : 'Create Domain'}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </form>

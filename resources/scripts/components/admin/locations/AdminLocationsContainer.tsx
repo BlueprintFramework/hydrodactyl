@@ -10,7 +10,7 @@ import {
     updateLocation,
 } from '@/api/admin/locations';
 import { httpErrorToHuman } from '@/api/http';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/elements/dialog';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
@@ -80,9 +80,9 @@ const AdminLocationView = () => {
                     </Link>
                 }
             >
-                <ButtonV2 onClick={handleSave} disabled={saving}>
+                <Button variant='default' onClick={handleSave} disabled={saving}>
                     {saving ? 'Saving...' : 'Save'}
-                </ButtonV2>
+                </Button>
             </MainPageHeader>
 
             {(error || locationError) && (
@@ -95,22 +95,18 @@ const AdminLocationView = () => {
             ) : (
                 <>
                     <div className='flex gap-2 mb-6'>
-                        <button
+                        <Button
+                            variant={tab === 'details' ? 'default' : 'ghost'}
                             onClick={() => setTab('details')}
-                            className={`px-4 py-2 text-sm rounded transition-colors ${
-                                tab === 'details' ? 'bg-mocha-400/30 text-cream-400' : 'text-mocha-200 hover:text-mocha-100'
-                            }`}
                         >
                             Details
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                            variant={tab === 'danger' ? 'attention' : 'ghost'}
                             onClick={() => setTab('danger')}
-                            className={`px-4 py-2 text-sm rounded transition-colors ${
-                                tab === 'danger' ? 'bg-red-500/10 text-red-400' : 'text-mocha-200 hover:text-mocha-100'
-                            }`}
                         >
                             Danger Zone
-                        </button>
+                        </Button>
                     </div>
 
                     {tab === 'details' && (
@@ -150,12 +146,9 @@ const AdminLocationView = () => {
                             <p className='text-mocha-200 text-sm mb-4'>
                                 Permanently remove this location. This action cannot be undone.
                             </p>
-                            <ButtonV2
-                                onClick={() => setShowDeleteConfirm(true)}
-                                className='!bg-red-600 hover:!bg-red-500'
-                            >
+                            <Button variant='attention' onClick={() => setShowDeleteConfirm(true)}>
                                 Delete Location
-                            </ButtonV2>
+                            </Button>
                         </div>
                     )}
                 </>
@@ -200,12 +193,9 @@ const AdminLocationsContainer = () => {
                 element={
                     <div>
                         <MainPageHeader title='Locations'>
-                            <button
-                                onClick={() => setShowCreate(true)}
-                                className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 text-cream-400 text-sm font-medium rounded-xl transition-colors cursor-pointer'
-                            >
+                            <Button variant='default' onClick={() => setShowCreate(true)}>
                                 Create Location
-                            </button>
+                            </Button>
                         </MainPageHeader>
 
                         {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
@@ -264,12 +254,9 @@ const AdminLocationsContainer = () => {
                                                             </td>
                                                             <td className='px-4 py-3 text-right'>
                                                                 <div className='flex items-center justify-end gap-2'>
-                                                                    <button
-                                                                        onClick={() => setConfirmDelete(location.id)}
-                                                                        className='text-xs text-red-400 hover:text-red-300 cursor-pointer'
-                                                                    >
+                                                                    <Button variant='attention' onClick={() => setConfirmDelete(location.id)}>
                                                                         Delete
-                                                                    </button>
+                                                                    </Button>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -349,19 +336,12 @@ const CreateLocationModal = ({ open, onClose, onCreated }: { open: boolean; onCl
             </div>
             <Dialog.Footer>
                 <div className='flex items-center gap-3 p-6'>
-                    <button
-                        onClick={handleCreate}
-                        disabled={saving || !short || !long}
-                        className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
+                    <Button variant='default' onClick={handleCreate} disabled={saving || !short || !long}>
                         {saving ? 'Creating...' : 'Create Location'}
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className='px-4 py-2 bg-mocha-500 hover:bg-mocha-400 border border-mocha-400 text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
+                    </Button>
+                    <Button variant='secondary' onClick={onClose}>
                         Cancel
-                    </button>
+                    </Button>
                 </div>
             </Dialog.Footer>
         </Dialog>

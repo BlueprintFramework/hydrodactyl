@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { deleteMount, getMount, updateMount } from '@/api/admin/mounts';
 import { httpErrorToHuman } from '@/api/http';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Spinner from '@/components/elements/Spinner';
 
@@ -87,9 +87,9 @@ const AdminMountViewContainer = () => {
     return (
         <div>
             <MainPageHeader title={mount.name}>
-                <ButtonV2 onClick={handleSave} disabled={saving || deleting}>
+                <Button variant='default' onClick={handleSave} disabled={saving || deleting}>
                     {saving ? 'Saving...' : 'Save'}
-                </ButtonV2>
+                </Button>
             </MainPageHeader>
 
             {(error || mountError) && (
@@ -158,13 +158,9 @@ const AdminMountViewContainer = () => {
             <div className='bg-mocha-500 border border-red-800 rounded-lg p-6 max-w-lg'>
                 <h4 className='text-red-400 font-medium mb-2'>Danger Zone</h4>
                 <p className='text-sm text-mocha-200 mb-4'>Permanently delete this mount. This cannot be undone.</p>
-                <ButtonV2
-                    onClick={handleDelete}
-                    disabled={saving || deleting}
-                    className='!bg-red-900/50 !border-red-700 !text-red-400 hover:!bg-red-900/80'
-                >
+                <Button variant='attention' onClick={handleDelete} disabled={saving || deleting}>
                     {deleting ? 'Deleting...' : 'Delete Mount'}
-                </ButtonV2>
+                </Button>
             </div>
         </div>
     );

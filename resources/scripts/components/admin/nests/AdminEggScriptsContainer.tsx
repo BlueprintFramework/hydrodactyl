@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import Spinner from '@/components/elements/Spinner';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import { getEgg, updateEgg, getNestEggs, type AdminEgg } from '@/api/admin/nests';
 import { httpErrorToHuman } from '@/api/http';
 
@@ -141,9 +141,9 @@ const AdminEggScriptsContainer = ({ nestId, eggId }: Props) => {
                 </div>
             </div>
 
-            <ButtonV2 onClick={handleSave} disabled={saving}>
+            <Button variant='default' onClick={handleSave} disabled={saving}>
                 {saving ? 'Saving...' : 'Save Script'}
-            </ButtonV2>
+            </Button>
         </div>
     );
 };

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface AdminErrorStateProps {
     message: string;
@@ -38,13 +39,9 @@ export function AdminErrorState({
             <h3 className='text-lg font-semibold text-cream-400 mb-1'>{title}</h3>
             <p className='text-sm text-mocha-200/80 mb-4 max-w-md mx-auto'>{message}</p>
             {onRetry && (
-                <button
-                    type='button'
-                    onClick={onRetry}
-                    className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 text-cream-400 text-sm rounded-lg font-medium transition-colors'
-                >
+                <Button variant='secondary' onClick={onRetry}>
                     Try Again
-                </button>
+                </Button>
             )}
         </div>
     );

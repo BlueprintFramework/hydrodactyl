@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import Spinner from '@/components/elements/Spinner';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import {
     getEggVariables,
     createEggVariable,
@@ -157,17 +157,17 @@ const AdminEggVariablesContainer = ({ nestId, eggId }: Props) => {
                         </div>
                     </div>
                     <div className='flex gap-2 mt-4'>
-                        <ButtonV2 onClick={handleSave} disabled={saving || !form.name}>
+                        <Button variant='default' onClick={handleSave} disabled={saving || !form.name}>
                             {saving ? 'Saving...' : 'Save'}
-                        </ButtonV2>
-                        <ButtonV2 onClick={resetForm}>Cancel</ButtonV2>
+                        </Button>
+                        <Button variant='secondary' onClick={resetForm}>Cancel</Button>
                     </div>
                 </div>
             )}
 
             <div className='flex items-center justify-between mb-4'>
                 <h4 className='text-cream-400 font-medium'>Variables ({variables.length})</h4>
-                {!showCreate && <ButtonV2 onClick={() => setShowCreate(true)}>Create Variable</ButtonV2>}
+                {!showCreate && <Button variant='default' onClick={() => setShowCreate(true)}>Create Variable</Button>}
             </div>
 
             {variables.length === 0 ? (
@@ -182,8 +182,8 @@ const AdminEggVariablesContainer = ({ nestId, eggId }: Props) => {
                                     <span className='text-mocha-200 text-xs ml-2 font-mono'>{v.envVariable}</span>
                                 </div>
                                 <div className='flex gap-2'>
-                                    <button onClick={() => handleEdit(v)} className='text-xs text-mocha-200 hover:text-mocha-100'>Edit</button>
-                                    <button onClick={() => handleDelete(v)} className='text-xs text-red-400 hover:text-red-300'>Delete</button>
+                                    <Button variant='ghost' size='sm' onClick={() => handleEdit(v)}>Edit</Button>
+                                    <Button variant='attention' size='sm' onClick={() => handleDelete(v)}>Delete</Button>
                                 </div>
                             </div>
                             {v.description && <p className='text-mocha-200 text-xs mb-2'>{v.description}</p>}

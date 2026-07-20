@@ -13,7 +13,7 @@ import {
 } from '@/api/admin/databaseHosts';
 import { type AdminNode, getNodes } from '@/api/admin/nodes';
 import { httpErrorToHuman } from '@/api/http';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
@@ -109,12 +109,12 @@ const AdminDatabaseHostView = () => {
                     </Link>
                 }
             >
-                <ButtonV2 onClick={handleSave} disabled={saving || deleting}>
+                <Button variant='default' onClick={handleSave} disabled={saving || deleting}>
                     {saving ? 'Saving...' : 'Save'}
-                </ButtonV2>
-                <ButtonV2 onClick={handleDelete} disabled={saving || deleting} className='!text-red-400 cursor-pointer'>
+                </Button>
+                <Button variant='attention' onClick={handleDelete} disabled={saving || deleting}>
                     {deleting ? 'Deleting...' : 'Delete'}
-                </ButtonV2>
+                </Button>
             </MainPageHeader>
 
             {(error || hostError) && (
@@ -313,7 +313,7 @@ const AdminDatabasesContainer = () => {
         return (
             <div>
                 <MainPageHeader title='Add Database Host'>
-                    <ButtonV2 onClick={() => setShowCreate(false)}>Back</ButtonV2>
+                    <Button variant='secondary' onClick={() => setShowCreate(false)}>Back</Button>
                 </MainPageHeader>
                 {createError && <div className='text-red-400 mb-4 text-sm'>{createError}</div>}
                 <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6 max-w-2xl'>
@@ -404,12 +404,13 @@ const AdminDatabasesContainer = () => {
                                 ))}
                             </select>
                         </div>
-                        <ButtonV2
+                        <Button
+                            variant='default'
                             onClick={handleCreate}
                             disabled={saving || !createName || !createHost || !createUsername || !createPassword || !createContainerImage}
                         >
                             {saving ? 'Creating...' : 'Add Database Host'}
-                        </ButtonV2>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -423,7 +424,7 @@ const AdminDatabasesContainer = () => {
                 element={
                     <div>
                         <MainPageHeader title='Database Hosts'>
-                            <ButtonV2 onClick={() => setShowCreate(true)}>Add Database Host</ButtonV2>
+                            <Button variant='default' onClick={() => setShowCreate(true)}>Add Database Host</Button>
                         </MainPageHeader>
 
                         {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
@@ -494,15 +495,14 @@ const AdminDatabasesContainer = () => {
                                                                     >
                                                                         View
                                                                     </Link>
-                                                                    <button
+                                                                    <Button
+                                                                        variant='attention'
                                                                         onClick={() =>
                                                                             handleDelete(dbHost.id, dbHost.name)
                                                                         }
-                                                                        className='text-xs text-red-400 hover:text-red-300 cursor-pointer p-1'
-                                                                        title='Delete database host'
                                                                     >
                                                                         Delete
-                                                                    </button>
+                                                                    </Button>
                                                                 </div>
                                                             </td>
                                                         </tr>

@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { TrashBin } from '@gravity-ui/icons';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Spinner from '@/components/elements/Spinner';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import { getNest, updateNest, deleteNest, getNestEggs, deleteEgg, type AdminEgg } from '@/api/admin/nests';
 import { httpErrorToHuman } from '@/api/http';
 import AdminEggViewContainer from '@/components/admin/nests/AdminEggViewContainer';
@@ -81,12 +81,12 @@ const AdminNestViewContainer = () => {
                         <MainPageHeader title={nest?.name || 'Nest'} headChildren={
                             <Link to='/admin/nests' className='text-sm text-mocha-200 hover:text-mocha-100 cursor-pointer'>&larr; Back to Nests</Link>
                         }>
-                            <ButtonV2 onClick={handleSave} disabled={saving || deleting}>
+                            <Button variant='default' onClick={handleSave} disabled={saving || deleting}>
                                 {saving ? 'Saving...' : 'Save'}
-                            </ButtonV2>
-                            <ButtonV2 onClick={handleDelete} disabled={saving || deleting} className='!text-red-400 cursor-pointer'>
+                            </Button>
+                            <Button variant='attention' onClick={handleDelete} disabled={saving || deleting}>
                                 {deleting ? 'Deleting...' : 'Delete'}
-                            </ButtonV2>
+                            </Button>
                         </MainPageHeader>
 
                         {(error || nestError) && <div className='text-red-400 mb-4 text-sm'>{error || httpErrorToHuman(nestError)}</div>}
@@ -155,13 +155,7 @@ const AdminNestViewContainer = () => {
                                                              </td>
                                                              <td className='py-2 pr-4 text-mocha-200 hidden md:table-cell cursor-default'>{egg.description || '-'}</td>
                                                              <td className='py-2 text-right'>
-                                                                 <button
-                                                                     onClick={() => handleDeleteEgg(egg)}
-                                                                     className='text-red-400 hover:text-red-300 cursor-pointer p-1'
-                                                                     title='Delete egg'
-                                                                 >
-                                                                     <TrashBin fill='currentColor' className='w-4 h-4' />
-                                                                 </button>
+                                                                  <Button variant='attention' size='sm' onClick={() => handleDeleteEgg(egg)} title='Delete egg'><TrashBin fill='currentColor' className='w-4 h-4' /></Button>
                                                              </td>
                                                         </tr>
                                                     ))}

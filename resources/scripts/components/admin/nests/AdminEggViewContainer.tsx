@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { toast } from 'sonner';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Spinner from '@/components/elements/Spinner';
-import ButtonV2 from '@/components/elements/ButtonV2';
+import { Button } from '@/components/ui/button';
 import { getEgg, updateEgg, deleteEgg, type AdminEgg } from '@/api/admin/nests';
 import { httpErrorToHuman } from '@/api/http';
 import AdminEggVariablesContainer from '@/components/admin/nests/AdminEggVariablesContainer';
@@ -148,13 +148,13 @@ const AdminEggViewContainer = () => {
                                 <h1 className='text-2xl font-semibold text-cream-400'>{egg.name}</h1>
                             </div>
                             <div className='flex items-center gap-2'>
-                                <ButtonV2 onClick={handleExport}>Export</ButtonV2>
-                                <ButtonV2 onClick={handleSave} disabled={saving || deleting}>
+                                <Button variant='secondary' onClick={handleExport}>Export</Button>
+                                <Button variant='default' onClick={handleSave} disabled={saving || deleting}>
                                     {saving ? 'Saving...' : 'Save'}
-                                </ButtonV2>
-                                <ButtonV2 onClick={handleDelete} disabled={saving || deleting} className='!text-red-400'>
+                                </Button>
+                                <Button variant='attention' onClick={handleDelete} disabled={saving || deleting}>
                                     {deleting ? 'Deleting...' : 'Delete'}
-                                </ButtonV2>
+                                </Button>
                             </div>
                         </div>
 

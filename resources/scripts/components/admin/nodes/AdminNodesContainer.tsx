@@ -21,6 +21,7 @@ import { Dialog } from '@/components/elements/dialog';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
 
 const inputClass =
     'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors';
@@ -164,19 +165,8 @@ const CreateNodeModal = ({ open, onClose, onCreated }: { open: boolean; onClose:
             </div>
             <Dialog.Footer>
                 <div className='flex items-center gap-3 p-6'>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting || !name || !fqdn || !locationId}
-                        className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
-                        {isSubmitting ? 'Creating...' : 'Create Node'}
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className='px-4 py-2 bg-mocha-500 hover:bg-mocha-400 border border-mocha-400 text-cream-400 text-sm font-medium rounded-xl transition-colors'
-                    >
-                        Cancel
-                    </button>
+                    <Button variant='default' onClick={handleSubmit} disabled={isSubmitting || !name || !fqdn || !locationId}>{isSubmitting ? 'Creating...' : 'Create Node'}</Button>
+                    <Button variant='secondary' onClick={onClose}>Cancel</Button>
                 </div>
             </Dialog.Footer>
         </Dialog>
@@ -210,17 +200,18 @@ const AdminNodeViewContainer = () => {
 
             <div className='flex items-center space-x-1 border-b border-mocha-400 overflow-x-auto'>
                 {(['overview', 'allocations', 'settings'] as const).map((tab) => (
-                    <button
+                    <Button
                         key={tab}
+                        variant='ghost'
                         onClick={() => setActiveTab(tab)}
-                        className={`whitespace-nowrap px-4 py-3 text-sm font-medium transition-all ${
+                        className={`border-b-2 rounded-none ${
                             activeTab === tab
-                                ? 'text-cream-400 border-b-2 border-cream-400'
-                                : 'text-mocha-200 hover:text-mocha-100'
+                                ? 'text-cream-400 border-cream-400'
+                                : 'text-mocha-200 hover:text-mocha-100 border-transparent'
                         }`}
                     >
                         {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                    </button>
+                    </Button>
                 ))}
             </div>
 
@@ -319,12 +310,7 @@ const OverviewTab = ({ node, onUpdate, locations }: { node: AdminNode; onUpdate:
                         <p className='text-mocha-200 text-sm mt-1'>Basic node configuration and identification</p>
                     </div>
                     {!editing && (
-                        <button
-                            onClick={() => setEditing(true)}
-                            className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 text-cream-400 text-sm font-medium rounded-lg transition-colors'
-                        >
-                            Edit Settings
-                        </button>
+                        <Button variant='secondary' onClick={() => setEditing(true)}>Edit Settings</Button>
                     )}
                 </div>
 
@@ -380,22 +366,8 @@ const OverviewTab = ({ node, onUpdate, locations }: { node: AdminNode; onUpdate:
                         </div>
 
                         <div className='flex items-center gap-3 pt-2'>
-                            <button
-                                onClick={handleSave}
-                                disabled={saving || !name || !fqdn}
-                                className='px-5 py-2.5 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm font-medium rounded-lg transition-colors'
-                            >
-                                {saving ? 'Saving...' : 'Save Changes'}
-                            </button>
-                            <button
-                                onClick={() => {
-                                    syncFromNode();
-                                    setEditing(false);
-                                }}
-                                className='px-5 py-2.5 bg-mocha-600 hover:bg-mocha-500 border border-mocha-400 text-cream-400 text-sm font-medium rounded-lg transition-colors'
-                            >
-                                Cancel
-                            </button>
+                            <Button variant='default' onClick={handleSave} disabled={saving || !name || !fqdn}>{saving ? 'Saving...' : 'Save Changes'}</Button>
+                            <Button variant='secondary' onClick={() => { syncFromNode(); setEditing(false); }}>Cancel</Button>
                         </div>
                     </div>
                 ) : (
@@ -543,13 +515,7 @@ const AllocationsTab = ({
                         <input type='text' value={alias} onChange={(e) => setAlias(e.target.value)} className={inputClass} placeholder='Optional' />
                     </div>
                 </div>
-                <button
-                    onClick={handleAdd}
-                    disabled={adding || !ip || !port}
-                    className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm rounded transition-colors'
-                >
-                    {adding ? 'Adding...' : 'Add Allocation'}
-                </button>
+                <Button variant='default' onClick={handleAdd} disabled={adding || !ip || !port}>{adding ? 'Adding...' : 'Add Allocation'}</Button>
             </div>
 
             <div className='bg-mocha-500 border border-mocha-400 rounded-lg overflow-hidden'>
@@ -583,13 +549,7 @@ const AllocationsTab = ({
                                     </td>
                                     <td className='px-4 py-3 text-right'>
                                         {!alloc.serverId && (
-                                            <button
-                                                onClick={() => setConfirmDeleteAlloc(alloc.id)}
-                                                className='text-xs text-red-400 hover:text-red-300 cursor-pointer p-1'
-                                                title='Delete allocation'
-                                            >
-                                                <TrashBin fill='currentColor' className='w-4 h-4' />
-                                            </button>
+                                            <Button variant='attention' size='sm' onClick={() => setConfirmDeleteAlloc(alloc.id)} title='Delete allocation'><TrashBin fill='currentColor' className='w-4 h-4' /></Button>
                                         )}
                                     </td>
                                 </tr>
@@ -813,13 +773,7 @@ const SettingsTab = ({
 
             {/* Action Buttons */}
             <div className='flex items-center gap-3'>
-                <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className='px-6 py-2.5 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 disabled:opacity-50 disabled:cursor-not-allowed text-cream-400 text-sm font-medium rounded-lg transition-colors'
-                >
-                    {saving ? 'Saving...' : 'Save Changes'}
-                </button>
+                <Button variant='default' onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</Button>
             </div>
 
             {/* Danger Zone */}
@@ -839,13 +793,7 @@ const SettingsTab = ({
                 <p className='text-sm text-mocha-200 mb-4'>
                     Permanently delete this node and all associated data including allocations. This action cannot be undone.
                 </p>
-                <button
-                    onClick={() => setShowDeleteConfirm(true)}
-                    disabled={deleting}
-                    className='px-4 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-cream-400 text-sm font-medium rounded-lg transition-colors'
-                >
-                    {deleting ? 'Deleting...' : 'Delete Node'}
-                </button>
+                <Button variant='attention' onClick={() => setShowDeleteConfirm(true)} disabled={deleting}>{deleting ? 'Deleting...' : 'Delete Node'}</Button>
             </div>
 
             <Dialog.Confirm
@@ -886,12 +834,7 @@ const AdminNodesContainer = () => {
                 element={
                     <div>
                         <MainPageHeader title='Nodes'>
-                            <button
-                                onClick={() => setShowCreate(true)}
-                                className='px-4 py-2 bg-mocha-400 hover:bg-mocha-300 border border-mocha-300 text-cream-400 text-sm font-medium rounded-xl transition-colors cursor-pointer'
-                            >
-                                Create Node
-                            </button>
+                            <Button variant='default' onClick={() => setShowCreate(true)}>Create Node</Button>
                         </MainPageHeader>
 
                         {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
@@ -951,13 +894,7 @@ const AdminNodesContainer = () => {
                                                                     <Link to={String(node.id)} className='text-xs text-cream-400 hover:text-cream-500 cursor-pointer'>
                                                                         View
                                                                     </Link>
-                                                                    <button
-                                                                        onClick={() => setConfirmDelete(node.id)}
-                                                                        className='text-xs text-red-400 hover:text-red-300 cursor-pointer p-1'
-                                                                        title='Delete node'
-                                                                    >
-                                                                        <TrashBin fill='currentColor' className='w-4 h-4' />
-                                                                    </button>
+                                                                    <Button variant='attention' size='sm' onClick={() => setConfirmDelete(node.id)} title='Delete node'><TrashBin fill='currentColor' className='w-4 h-4' /></Button>
                                                                 </div>
                                                             </td>
                                                         </tr>
