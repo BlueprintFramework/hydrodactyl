@@ -139,7 +139,7 @@ const AdminRouter = () => {
                             <Sidebar navItems={navItems} className='hidden lg:flex' />
                             <MobileSidebar navItems={navItems} />
 
-                            <PageContentBlock title={'Admin'} className='!bg-[#11100E] !border-0 !rounded-none'>
+                            <PageContentBlock title={'Admin'} >
                                 <Suspense
                                     fallback={
                                         <div className='flex items-center justify-center h-full'>

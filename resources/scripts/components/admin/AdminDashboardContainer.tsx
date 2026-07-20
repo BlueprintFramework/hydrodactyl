@@ -7,7 +7,6 @@ import { getNodes } from '@/api/admin/nodes';
 import { getServers } from '@/api/admin/servers';
 import { getUsers } from '@/api/admin/users';
 
-import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Spinner from '@/components/elements/Spinner';
 
 function formatBytes(bytes: number): string {
