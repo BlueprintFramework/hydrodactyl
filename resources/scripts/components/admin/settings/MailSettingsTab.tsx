@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import Spinner from '@/components/elements/Spinner';
 import { getMailSettings, updateMailSettings, testMailSettings } from '@/api/admin/settings';
 import { httpErrorToHuman } from '@/api/http';
+import { Button } from '@/components/ui/button';
 
 const MailSettingsTab = () => {
     const { data: settings, isLoading, error: fetchError, mutate } = useSWR('admin:settings:mail', getMailSettings);
@@ -207,32 +208,15 @@ const MailSettingsTab = () => {
                 <div className='px-5 py-4 border-t border-mocha-400 flex items-center justify-end gap-3'>
                     {error && <span className='text-red-400 text-sm'>{error}</span>}
                     {success && <span className='text-green-400 text-sm'>Operation completed successfully.</span>}
-                    <button
+                    <Button
                         onClick={() => { handleSave(); handleTest(); }}
                         disabled={saving || testing}
-                        className='px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-cream-400 text-sm rounded font-medium transition-colors flex items-center gap-1.5'
                     >
                         <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M12 19l9 2-9-18-9 18 9-2zm0 0v-8' />
                         </svg>
                         Save & Test
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={saving}
-                        className='px-5 py-2 bg-mocha-400 hover:bg-mocha-300 disabled:opacity-50 text-cream-400 text-sm rounded font-medium transition-colors flex items-center gap-1.5'
-                    >
-                        {saving && (
-                            <svg className='w-4 h-4 animate-spin' fill='none' viewBox='0 0 24 24'>
-                                <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
-                                <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z' />
-                            </svg>
-                        )}
-                        <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4' />
-                        </svg>
-                        Save
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

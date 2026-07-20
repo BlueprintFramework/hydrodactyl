@@ -4,6 +4,7 @@ import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import Spinner from '@/components/elements/Spinner';
 import { getDomains, type DomainData, type DomainsResponse, createDomain, updateDomain, deleteDomain, testDnsConnection, getProviderSchema } from '@/api/admin/settings';
 import { httpErrorToHuman } from '@/api/http';
+import { Button } from '@/components/ui/button';
 
 const DomainsList = () => {
     const navigate = useNavigate();
@@ -51,12 +52,13 @@ const DomainsList = () => {
             <div className='bg-mocha-500 rounded-lg border border-mocha-400 overflow-hidden'>
                 <div className='px-5 py-4 border-b border-mocha-400 flex items-center justify-between'>
                     <h3 className='text-sm font-semibold text-mocha-100 uppercase tracking-wider'>Configured Domains</h3>
-                    <Link
-                        to='/admin/settings/domains/create'
-                        className='px-3 py-1.5 bg-mocha-400 hover:bg-mocha-300 text-cream-400 text-xs rounded font-medium transition-colors'
-                    >
-                        Create New Domain
-                    </Link>
+                    <Button variant='secondary'>
+                        <Link
+                            to='/admin/settings/domains/create'
+                        >
+                            Create New Domain
+                        </Link>
+                    </Button>
                 </div>
 
                 {domains.length === 0 ? (
@@ -117,19 +119,20 @@ const DomainsList = () => {
                                         </td>
                                         <td className='px-4 py-3 text-right'>
                                             <div className='flex items-center justify-end gap-2'>
-                                                <button
+                                                <Button
+                                                    variant='secondary'
+
                                                     onClick={() => navigate(`/admin/settings/domains/${domain.id}/edit`)}
-                                                    className='px-2 py-1 bg-mocha-400 hover:bg-mocha-300 text-mocha-100 text-xs rounded transition-colors'
                                                 >
                                                     Edit
-                                                </button>
+                                                </Button>
                                                 {(domain.server_subdomains_count || 0) === 0 && (
-                                                    <button
+                                                    <Button
+                                                        variant='attention'
                                                         onClick={() => handleDelete(domain)}
-                                                        className='px-2 py-1 bg-red-800 hover:bg-red-700 text-red-200 text-xs rounded transition-colors'
                                                     >
                                                         Delete
-                                                    </button>
+                                                    </Button>
                                                 )}
                                             </div>
                                         </td>

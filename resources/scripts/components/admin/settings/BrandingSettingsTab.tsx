@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Spinner from '@/components/elements/Spinner';
 import { getBrandingSettings, type BrandingSettings, updateBrandingSettings } from '@/api/admin/settings';
 import { httpErrorToHuman } from '@/api/http';
+import { Button } from '@/components/ui/button';
 
 const BrandingSettingsTab = () => {
     const [loading, setLoading] = useState(true);
@@ -112,9 +113,9 @@ const BrandingSettingsTab = () => {
                 </div>
                 <div className='p-5'>
                     <div className='flex items-center justify-center'>
-                        <div className='flex items-center justify-center min-h-[120px]'>
+                        <div className='flex items-center justify-center min-h-30'>
                             {currentLogoUrl ? (
-                                <img src={currentLogoUrl} alt='Current Logo' className='max-w-full max-h-[200px] rounded' />
+                                <img src={currentLogoUrl} alt='Current Logo' className='max-w-full max-h-50 rounded' />
                             ) : (
                                 <svg width='80' height='80' viewBox='0 0 100 92' fill='none' xmlns='http://www.w3.org/2000/svg'>
                                     <path d='M35.1293 92L39.2242 59.3897L44.8276 60.4695L14.2241 81.2019L0 57.0141L32.7586 45.3521V47.7277L0 33.4742L14.2241 8.85446L45.6896 33.2582L39.2242 34.1221L34.4828 0H65.5172L61.4225 33.9061L56.681 32.8263L85.7759 8.85446L100 33.4742L66.1638 47.7277V45.5681L99.569 57.0141L85.3448 81.2019L57.5431 59.3897H61.638L66.1638 92H35.1293Z' fill='#52A9FF' />
@@ -155,7 +156,7 @@ const BrandingSettingsTab = () => {
                             </div>
                             {filePreview && (
                                 <div className='mt-3 text-center'>
-                                    <img src={filePreview} alt='Preview' className='max-w-full max-h-[150px] rounded mx-auto border border-mocha-400 p-1' />
+                                    <img src={filePreview} alt='Preview' className='max-w-full max-h-37.5 rounded mx-auto border border-mocha-400 p-1' />
                                     <p className='text-mocha-200 text-xs mt-1'>Preview</p>
                                 </div>
                             )}
@@ -184,7 +185,7 @@ const BrandingSettingsTab = () => {
                             <p className='text-xs text-mocha-200/60 mt-1'>Enter a direct link to an image hosted elsewhere.</p>
                             {urlPreview && (
                                 <div className='mt-3 text-center'>
-                                    <img src={urlPreview} alt='URL Preview' className='max-w-full max-h-[150px] rounded mx-auto border border-mocha-400 p-1' />
+                                    <img src={urlPreview} alt='URL Preview' className='max-w-full maxh-[150px] rounded mx-auto border border-mocha-400 p-1' />
                                 </div>
                             )}
                         </div>
@@ -192,21 +193,19 @@ const BrandingSettingsTab = () => {
                 </div>
                 <div className='px-5 py-4 border-t border-mocha-400 flex items-center justify-end gap-2'>
                     {currentLogoUrl && (
-                        <button
+                        <Button
                             onClick={() => handleSave(true)}
                             disabled={saving}
-                            className='px-4 py-2 bg-red-800 hover:bg-red-700 disabled:opacity-50 text-red-200 text-sm rounded font-medium transition-colors flex items-center gap-1.5'
                         >
                             <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16' />
                             </svg>
                             Remove Logo
-                        </button>
+                        </Button>
                     )}
-                    <button
+                    <Button
                         onClick={() => handleSave()}
                         disabled={saving || (!selectedFile && !logoUrl.trim())}
-                        className='px-5 py-2 bg-mocha-400 hover:bg-mocha-300 disabled:opacity-50 text-cream-400 text-sm rounded font-medium transition-colors flex items-center gap-1.5'
                     >
                         {saving && (
                             <svg className='w-4 h-4 animate-spin' fill='none' viewBox='0 0 24 24'>
@@ -218,7 +217,7 @@ const BrandingSettingsTab = () => {
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4' />
                         </svg>
                         Save Logo
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -238,7 +237,7 @@ const BrandingSettingsTab = () => {
                                         className={`border-2 rounded-lg p-3 cursor-pointer transition-all text-center ${isCurrent ? 'border-mocha-300 shadow-[0_0_8px_rgba(59,130,246,0.3)]' : 'border-mocha-400 hover:border-mocha-400'}`}
                                         onClick={() => { if (!isCurrent && confirm('Switch to this logo version?')) handleSave(false, index); }}
                                     >
-                                        <img src={imgSrc} alt={`Logo ${index + 1}`} className='max-w-full max-h-[80px] mx-auto rounded' onError={(e) => { (e.target as HTMLElement).closest('[class*="border"]')?.classList.add('hidden'); }} />
+                                        <img src={imgSrc} alt={`Logo ${index + 1}`} className='max-w-full max-h-20 mx-auto rounded' onError={(e) => { (e.target as HTMLElement).closest('[class*="border"]')?.classList.add('hidden'); }} />
                                         <p className={`text-xs mt-1 font-medium ${isCurrent ? 'text-cream-400' : 'text-mocha-200'}`}>
                                             {isCurrent ? 'Current' : `#${index + 1}`}
                                         </p>

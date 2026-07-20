@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Spinner from '@/components/elements/Spinner';
 import { getCaptchaSettings, type CaptchaSettings, updateCaptchaSettings } from '@/api/admin/settings';
 import { httpErrorToHuman } from '@/api/http';
+import { Button } from '@/components/ui/button';
 
 const providerConfigs: Record<string, { title: string; fields: { key: string; label: string; sensitive: boolean }[]; instructions: { text: string; url: string; urlLabel: string }[] }> = {
     turnstile: {
@@ -165,14 +166,14 @@ const CaptchaSettingsTab = () => {
                     </div>
                 </div>
             )}
-
             <div className='bg-mocha-500 rounded-lg border border-mocha-400 px-5 py-4 flex items-center justify-end gap-3'>
+
                 {error && <span className='text-red-400 text-sm'>{error}</span>}
                 {success && <span className='text-green-400 text-sm'>Captcha settings saved successfully.</span>}
-                <button
+                <Button
+                    variant="default"
                     onClick={handleSave}
                     disabled={saving}
-                    className='px-5 py-2 bg-mocha-400 hover:bg-mocha-300 disabled:opacity-50 text-cream-400 text-sm rounded font-medium transition-colors flex items-center gap-1.5'
                 >
                     {saving && (
                         <svg className='w-4 h-4 animate-spin' fill='none' viewBox='0 0 24 24'>
@@ -184,10 +185,10 @@ const CaptchaSettingsTab = () => {
                         <path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4' />
                     </svg>
                     Save
-                </button>
+                </Button>
             </div>
         </div>
     );
 };
-
+// TODO:  the button placement is fucked
 export default CaptchaSettingsTab;
