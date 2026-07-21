@@ -62,4 +62,56 @@ class NestCreationServiceTest extends TestCase
 
         $this->service->handle($data, 'custom@author.com');
     }
+
+    /**
+     * Property 1: Icon path inclusion when icon is supplied
+     * Validates: Requirements 2.1
+     */
+    public function testIconIsIncludedInPayloadWhenProvided()
+    {
+        $data = [
+            'name' => 'Minecraft',
+            'description' => 'A Minecraft nest',
+            'icon' => 'nests/minecraft.png',
+        ];
+
+        $this->config->shouldReceive('get')
+            ->with('pterodactyl.service.author')
+            ->andReturn('test@example.com');
+
+        $this->repository->shouldReceive('create')
+            ->once()
+            ->with(\Mockery::on(function ($payload) {
+                return array_key_exists('icon', $payload)
+                    && $payload['icon'] === 'nests/minecraft.png';
+            }), true, true)
+            ->andReturn(new Nest());
+
+        $this->service->handle($data);
+    }
+
+    /**
+     * Property 2: Icon key omission when icon is absent
+     * Validates: Requirements 2.2
+     */
+    public function testIconIsOmittedFromPayloadWhenNotProvided()
+    {
+        $data = [
+            'name' => 'Minecraft',
+            'description' => 'A Minecraft nest',
+        ];
+
+        $this->config->shouldReceive('get')
+            ->with('pterodactyl.service.author')
+            ->andReturn('test@example.com');
+
+        $this->repository->shouldReceive('create')
+            ->once()
+            ->with(\Mockery::on(function ($payload) {
+                return !array_key_exists('icon', $payload);
+            }), true, true)
+            ->andReturn(new Nest());
+
+        $this->service->handle($data);
+    }
 }

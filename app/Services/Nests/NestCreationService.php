@@ -23,11 +23,18 @@ class NestCreationService
      */
     public function handle(array $data, ?string $author = null): Nest
     {
-        return $this->repository->create([
+        $payload = [
             'uuid' => Uuid::uuid4()->toString(),
             'author' => $author ?? $this->config->get('pterodactyl.service.author'),
             'name' => array_get($data, 'name'),
             'description' => array_get($data, 'description'),
-        ], true, true);
+        ];
+
+        $icon = array_get($data, 'icon');
+        if ($icon !== null) {
+            $payload['icon'] = $icon;
+        }
+
+        return $this->repository->create($payload, true, true);
     }
 }
