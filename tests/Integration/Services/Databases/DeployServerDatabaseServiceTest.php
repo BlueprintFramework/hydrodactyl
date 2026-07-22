@@ -113,6 +113,52 @@ class DeployServerDatabaseServiceTest extends IntegrationTestCase
         $this->assertInstanceOf(Database::class, $response);
     }
 
+    public function testDatabaseHostWithMatchingTypeIsSelected()
+    {
+        $server = $this->createServerModel();
+
+        DatabaseHost::factory()->create([
+            'node_id' => $server->node_id,
+            'type' => DatabaseHost::TYPE_MYSQL,
+        ]);
+        $host = DatabaseHost::factory()->create([
+            'node_id' => $server->node_id,
+            'type' => DatabaseHost::TYPE_REDIS,
+        ]);
+
+        $this->managementService->expects('create')->with($server, [
+            'database_host_id' => $host->id,
+            'database' => "s{$server->id}_something",
+            'remote' => '%',
+        ])->andReturns(new Database());
+
+        $response = $this->getService()->handle($server, [
+            'database' => 'something',
+            'remote' => '%',
+            'database_type' => DatabaseHost::TYPE_REDIS,
+        ]);
+
+        $this->assertInstanceOf(Database::class, $response);
+    }
+
+    public function testErrorIsThrownIfNoDatabaseHostsExistForRequestedType()
+    {
+        $server = $this->createServerModel();
+
+        DatabaseHost::factory()->create([
+            'node_id' => $server->node_id,
+            'type' => DatabaseHost::TYPE_MYSQL,
+        ]);
+
+        $this->expectException(NoSuitableDatabaseHostException::class);
+
+        $this->getService()->handle($server, [
+            'database' => 'something',
+            'remote' => '%',
+            'database_type' => DatabaseHost::TYPE_MONGODB,
+        ]);
+    }
+
     /**
      * Test that a database host not assigned to the same node as the server is used if
      * there are no same-node hosts and the allow_random configuration value is set to

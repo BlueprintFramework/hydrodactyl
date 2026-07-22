@@ -12,13 +12,11 @@ use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-
-use PDO;
-use PDOException;
 use Pterodactyl\Services\Databases\Hosts\HostUpdateService;
 use Pterodactyl\Http\Requests\Admin\DatabaseHostFormRequest;
 use Pterodactyl\Services\Databases\Hosts\HostCreationService;
 use Pterodactyl\Services\Databases\Hosts\HostDeletionService;
+use Pterodactyl\Services\Databases\Drivers\DatabaseDriverManager;
 use Pterodactyl\Contracts\Repository\DatabaseRepositoryInterface;
 use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
 use Pterodactyl\Contracts\Repository\DatabaseHostRepositoryInterface;
@@ -35,6 +33,7 @@ class DatabaseController extends Controller
         private HostCreationService $creationService,
         private HostDeletionService $deletionService,
         private HostUpdateService $updateService,
+        private DatabaseDriverManager $drivers,
         private LocationRepositoryInterface $locationRepository,
         private ViewFactory $view,
     ) {}
@@ -74,15 +73,11 @@ class DatabaseController extends Controller
         try {
             $host = $this->creationService->handle($request->normalize());
         } catch (\Exception $exception) {
-            if ($exception instanceof \PDOException || $exception->getPrevious() instanceof \PDOException) {
-                $this->alert->danger(
-                    sprintf('There was an error while trying to connect to the host or while executing a query: "%s"', $exception->getMessage())
-                )->flash();
+            $this->alert->danger(
+                sprintf('There was an error while trying to connect to the host or while executing a query: "%s"', $exception->getMessage())
+            )->flash();
 
-                return redirect()->route('admin.databases')->withInput($request->validated());
-            } else {
-                throw $exception;
-            }
+            return redirect()->route('admin.databases')->withInput($request->validated());
         }
 
         $this->alert->success('Successfully created a new database host on the system.')->flash();
@@ -103,17 +98,11 @@ class DatabaseController extends Controller
             $this->updateService->handle($host->id, $request->normalize());
             $this->alert->success('Database host was updated successfully.')->flash();
         } catch (\Exception $exception) {
-            // Catch any SQL related exceptions and display them back to the user, otherwise just
-            // throw the exception like normal and move on with it.
-            if ($exception instanceof \PDOException || $exception->getPrevious() instanceof \PDOException) {
-                $this->alert->danger(
-                    sprintf('There was an error while trying to connect to the host or while executing a query: "%s"', $exception->getMessage())
-                )->flash();
+            $this->alert->danger(
+                sprintf('There was an error while trying to connect to the host or while executing a query: "%s"', $exception->getMessage())
+            )->flash();
 
-                return $redirect->withInput($request->normalize());
-            } else {
-                throw $exception;
-            }
+            return $redirect->withInput($request->normalize());
         }
 
         return $redirect;
@@ -144,53 +133,35 @@ class DatabaseController extends Controller
             'port' => 'required|integer|min:1|max:65535',
             'username' => 'required|string',
             'password' => 'required|string',
-        ]);
-        Log::error("TestConnection", [
-            "\nhost" => $request->host,
-            "\nport" => $request->port,
-            "\nusername" => $request->username,
-            "\npassword" => $request->password
+            'type' => 'required|string|in:mysql,postgresql,redis,mongodb',
         ]);
 
         try {
-            $dsn = "mysql:host={$request->input('host')};port={$request->input('port')};charset=utf8";
+            $host = new DatabaseHost();
+            $host->forceFill([
+                'host' => $request->input('host'),
+                'port' => $request->input('port'),
+                'username' => $request->input('username'),
+                'password' => app(\Illuminate\Contracts\Encryption\Encrypter::class)->encrypt($request->input('password')),
+                'type' => $request->input('type'),
+            ])->skipValidation();
 
-            $pdo = new PDO($dsn, $request->input('username'), $request->input('password'), [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_TIMEOUT => 5, // 5 second timeout
-            ]);
-
-            // Test basic query
-            $version = $pdo->query('SELECT VERSION() as version')->fetchColumn();
-
-            // Test GRANT permissions (this is what Pterodactyl needs)
-            $grants = $pdo->query('SHOW GRANTS FOR CURRENT_USER()')->fetchAll(PDO::FETCH_COLUMN);
-
-            $hasGrantOption = false;
-            foreach ($grants as $grant) {
-                if (stripos($grant, 'GRANT OPTION') !== false) {
-                    $hasGrantOption = true;
-                    break;
-                }
-            }
-
-            $message = "Successfully connected to MySQL server (Version: {$version}).";
-            if (!$hasGrantOption) {
-                $message .= " Warning: The user appears to lack GRANT OPTION permission which is required for creating databases and users.";
-            }
+            $details = $this->drivers->driverFor($host)->testConnection($host);
 
             return response()->json([
                 'success' => true,
-                'message' => $message,
-                'version' => $version,
-                'has_grant_option' => $hasGrantOption
+                'message' => $details['message'] ?? 'Successfully connected.',
+                'version' => $details['version'] ?? null,
+                'has_grant_option' => $details['has_grant_option'] ?? null,
             ]);
-        } catch (PDOException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Connection failed: ' . $e->getMessage()
-            ], 422);
         } catch (\Exception $e) {
+            Log::warning('Database host connection test failed.', [
+                'type' => $request->input('type'),
+                'host' => $request->input('host'),
+                'port' => $request->input('port'),
+                'error' => $e->getMessage(),
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Error: ' . $e->getMessage()

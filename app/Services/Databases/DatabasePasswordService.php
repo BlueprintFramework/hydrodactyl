@@ -6,8 +6,7 @@ use Pterodactyl\Models\Database;
 use Pterodactyl\Helpers\Utilities;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Pterodactyl\Extensions\DynamicDatabaseConnection;
-use Pterodactyl\Contracts\Repository\DatabaseRepositoryInterface;
+use Pterodactyl\Services\Databases\Drivers\DatabaseDriverManager;
 
 class DatabasePasswordService
 {
@@ -16,9 +15,8 @@ class DatabasePasswordService
      */
     public function __construct(
         private ConnectionInterface $connection,
-        private DynamicDatabaseConnection $dynamic,
         private Encrypter $encrypter,
-        private DatabaseRepositoryInterface $repository,
+        private DatabaseDriverManager $drivers,
     ) {
     }
 
@@ -29,19 +27,25 @@ class DatabasePasswordService
      */
     public function handle(Database|int $database): string
     {
+        if (is_int($database)) {
+            $database = Database::query()->findOrFail($database);
+        }
+
         $password = Utilities::randomStringWithSpecialCharacters(24);
+        $database->loadMissing('host');
+        $driver = $this->drivers->driverFor($database->host);
 
-        $this->connection->transaction(function () use ($database, $password) {
-            $this->dynamic->set('dynamic', $database->database_host_id);
-
-            $this->repository->withoutFreshModel()->update($database->id, [
+        $this->connection->transaction(function () use ($database, $password, $driver) {
+            $updates = [
                 'password' => $this->encrypter->encrypt($password),
-            ]);
+            ];
 
-            $this->repository->dropUser($database->username, $database->remote);
-            $this->repository->createUser($database->username, $database->remote, $password, $database->max_connections);
-            $this->repository->assignUserToDatabase($database->database, $database->username, $database->remote);
-            $this->repository->flush();
+            $connectionDetails = $driver->rotatePassword($database->host, $database, $password);
+            if ($connectionDetails !== []) {
+                $updates['connection_details'] = $connectionDetails;
+            }
+
+            $database->forceFill($updates)->saveOrFail();
         });
 
         return $password;

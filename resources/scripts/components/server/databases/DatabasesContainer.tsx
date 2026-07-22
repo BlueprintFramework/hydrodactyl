@@ -1,13 +1,14 @@
 import { Database, Plus } from '@gravity-ui/icons';
-import { Form, Formik, type FormikHelpers } from 'formik';
+import { Field as FormikField, Form, Formik, type FormikHelpers } from 'formik';
 import { For } from 'million/react';
 import { useEffect, useState } from 'react';
 import { object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
 import createServerDatabase from '@/api/server/databases/createServerDatabase';
-import getServerDatabases from '@/api/server/databases/getServerDatabases';
+import getServerDatabases, { type AvailableDatabaseType } from '@/api/server/databases/getServerDatabases';
 import Can from '@/components/elements/Can';
 import Field from '@/components/elements/Field';
+import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import Modal from '@/components/elements/Modal';
 import { PageListContainer } from '@/components/elements/pages/PageList';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
@@ -22,6 +23,7 @@ import { ServerContext } from '@/state/server';
 interface DatabaseValues {
     databaseName: string;
     connectionsFrom: string;
+    databaseType: string;
 }
 
 const databaseSchema = object().shape({
@@ -33,7 +35,8 @@ const databaseSchema = object().shape({
             /^[\w\-.]{3,48}$/,
             'Database name should only contain alphanumeric characters, underscores, dashes, and/or periods.',
         ),
-    connectionsFrom: string().matches(/^[\w\-/.%:]+$/, 'A valid host address must be provided.'),
+    connectionsFrom: string().matches(/^[\w\-/.%:*]+$/, 'A valid host address must be provided.'),
+    databaseType: string().required('A database type must be selected.'),
 });
 
 const DatabasesContainer = () => {
@@ -43,16 +46,21 @@ const DatabasesContainer = () => {
     const { addError, clearFlashes } = useFlash();
     const [loading, setLoading] = useState(true);
     const [createModalVisible, setCreateModalVisible] = useState(false);
+    const [availableTypes, setAvailableTypes] = useState<AvailableDatabaseType[]>([]);
 
     const databases = useDeepMemoize(ServerContext.useStoreState((state) => state.databases.data));
     const setDatabases = ServerContext.useStoreActions((state) => state.databases.setDatabases);
     const appendDatabase = ServerContext.useStoreActions((actions) => actions.databases.appendDatabase);
+    const canCreateDatabase = availableTypes.length > 0;
 
     const submitDatabase = (values: DatabaseValues, { setSubmitting, resetForm }: FormikHelpers<DatabaseValues>) => {
         clearFlashes('database:create');
+        const normalizedConnectionsFrom = values.connectionsFrom.trim() === '*' ? '%' : values.connectionsFrom.trim();
+
         createServerDatabase(uuid, {
             databaseName: values.databaseName,
-            connectionsFrom: values.connectionsFrom || '%',
+            connectionsFrom: normalizedConnectionsFrom || '%',
+            databaseType: values.databaseType,
         })
             .then((database) => {
                 resetForm();
@@ -71,7 +79,10 @@ const DatabasesContainer = () => {
         clearFlashes('databases');
 
         getServerDatabases(uuid)
-            .then((databases) => setDatabases(databases))
+            .then(({ databases, availableTypes }) => {
+                setDatabases(databases);
+                setAvailableTypes(availableTypes);
+            })
             .catch((error) => {
                 console.error(error);
                 addError({ key: 'databases', message: httpErrorToHuman(error) });
@@ -83,7 +94,7 @@ const DatabasesContainer = () => {
         <ServerContentBlock className='p-0!' title={'Databases'} showFlashKey={'databases'}>
             <ServerHeader />
             <div className='px-2 pt-2 sm:px-14 sm:pt-14 flex flex-col sm:flex-row items-center gap-4'>
-                {(databaseLimit === null || (databaseLimit > 0 && databaseLimit !== databases.length)) && (
+                {canCreateDatabase && (databaseLimit === null || (databaseLimit > 0 && databaseLimit !== databases.length)) && (
                     <Can action={'database.create'}>
                         <Button
                             variant='secondary'
@@ -111,50 +122,78 @@ const DatabasesContainer = () => {
             </div>
             <Formik
                 onSubmit={submitDatabase}
-                initialValues={{ databaseName: '', connectionsFrom: '' }}
+                initialValues={{
+                    databaseName: '',
+                    connectionsFrom: '*',
+                    databaseType: availableTypes[0]?.value || 'mysql',
+                }}
                 validationSchema={databaseSchema}
+                enableReinitialize
             >
-                {({ isSubmitting, resetForm }) => (
-                    <Modal
-                        visible={createModalVisible}
-                        dismissable={!isSubmitting}
-                        showSpinnerOverlay={isSubmitting}
-                        onDismissed={() => {
-                            resetForm();
-                            setCreateModalVisible(false);
-                        }}
-                        title='Create new database'
-                    >
-                        <div className='flex flex-col'>
-                            <FlashMessageRender byKey={'database:create'} />
-                            <Form>
-                                <Field
-                                    type={'string'}
-                                    id={'database_name'}
-                                    name={'databaseName'}
-                                    label={'Database Name'}
-                                    description={'A descriptive name for your database instance.'}
-                                />
-                                <div className={`mt-6`}>
+                {({ isSubmitting, resetForm, values }) => {
+                    const selectedDatabaseType = availableTypes.find((type) => type.value === values.databaseType);
+
+                    return (
+                        <Modal
+                            visible={createModalVisible}
+                            dismissable={!isSubmitting}
+                            showSpinnerOverlay={isSubmitting}
+                            onDismissed={() => {
+                                resetForm();
+                                setCreateModalVisible(false);
+                            }}
+                            title='Create new database'
+                        >
+                            <div className='w-full max-w-lg mx-auto'>
+                                <FlashMessageRender byKey={'database:create'} />
+                                <Form>
                                     <Field
                                         type={'string'}
-                                        id={'connections_from'}
-                                        name={'connectionsFrom'}
-                                        label={'Connections From'}
-                                        description={
-                                            'Where connections should be allowed from. Leave blank to allow connections from anywhere.'
-                                        }
+                                        id={'database_name'}
+                                        name={'databaseName'}
+                                        label={'Database Name'}
+                                        description={'A descriptive name for your database instance.'}
                                     />
-                                </div>
-                                <div className={`flex gap-3 justify-end my-6`}>
-                                    <Button variant='attention' type={'submit'}>
-                                        Create Database
-                                    </Button>
-                                </div>
-                            </Form>
-                        </div>
-                    </Modal>
-                )}
+                                    <FormikFieldWrapper
+                                        name={'databaseType'}
+                                        id={'database_type'}
+                                        label={'Database Type'}
+                                        className={'mt-6'}
+                                    >
+                                        <FormikField
+                                            as={'select'}
+                                            id={'database_type'}
+                                            name={'databaseType'}
+                                            className='px-4 py-2 rounded-lg outline-hidden bg-[#ffffff17] text-base sm:text-sm w-full'
+                                        >
+                                            {availableTypes.map((type) => (
+                                                <option key={type.value} value={type.value}>
+                                                    {type.label}
+                                                </option>
+                                            ))}
+                                        </FormikField>
+                                    </FormikFieldWrapper>
+                                    {selectedDatabaseType?.supportsRemoteConnections && (
+                                        <div className='mt-6'>
+                                            <Field
+                                                type={'string'}
+                                                id={'connections_from'}
+                                                name={'connectionsFrom'}
+                                                label={'Allow Connections From (Default *)'}
+                                                description={'Use * to allow connections from anywhere.'}
+                                            />
+                                        </div>
+                                    )}
+                                    <div className='mt-6'>
+                                        <Button variant='attention' type={'submit'} className='w-full'>
+                                            Create Database
+                                        </Button>
+                                    </div>
+                                </Form>
+                            </div>
+                        </Modal>
+                    );
+                }}
             </Formik>
 
             {!databases.length && loading ? (
@@ -179,6 +218,8 @@ const DatabasesContainer = () => {
                         <p className='text-sm text-zinc-400 max-w-sm'>
                             {databaseLimit === 0
                                 ? 'Databases cannot be created for this server.'
+                                : !canCreateDatabase
+                                  ? 'No compatible database hosts are available for this server node.'
                                 : 'Your server does not have any databases. Create one to get started.'}
                         </p>
                     </div>

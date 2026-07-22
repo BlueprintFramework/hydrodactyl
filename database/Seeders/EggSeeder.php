@@ -20,6 +20,7 @@ class EggSeeder extends Seeder
      */
     public static array $import = [
         'Minecraft',
+        'Minecraft Bedrock',
         'Hytale',
         'Source Engine',
         'Voice Servers',
@@ -45,9 +46,7 @@ class EggSeeder extends Seeder
     {
         foreach (static::$import as $nest) {
             /* @noinspection PhpParamsInspection */
-            $this->parseEggFiles(
-                Nest::query()->where('author', 'support@pterodactyl.io')->where('name', $nest)->firstOrFail()
-            );
+            $this->parseEggFiles(Nest::query()->where('name', $nest)->firstOrFail());
         }
     }
 

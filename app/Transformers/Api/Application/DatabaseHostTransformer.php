@@ -30,6 +30,7 @@ class DatabaseHostTransformer extends BaseTransformer
         return [
             'id' => $model->id,
             'name' => $model->name,
+            'type' => $model->type,
             'host' => $model->host,
             'port' => $model->port,
             'username' => $model->username,
