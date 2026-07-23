@@ -33,17 +33,51 @@ body[data-sidebar-minimized] {
 .sidebar-container {
     width: var(--sidebar-width);
 }
+.sidebar-logo-container {
+    box-sizing: border-box;
+    padding-left: var(--sidebar-padding);
+    width: calc(var(--sidebar-width) + 2.5rem);
+}
 .sidebar-logo-container,
 .sidebar-container {
     transition: width var(--sidebar-transition-sidebar);
 }
-body[data-sidebar-minimized="true"] .sidebar-logo-container {
-    width: calc(var(--sidebar-width));
+.sidebar-logo-link {
+    left: calc(var(--sidebar-width) / 2);
+    max-width: calc(var(--sidebar-width) - calc(var(--sidebar-padding) * 2));
+    overflow: hidden;
+    position: absolute;
+    transform: translateX(-50%);
+    transition:
+        left var(--sidebar-transition-sidebar),
+        max-width var(--sidebar-transition-sidebar),
+        transform var(--sidebar-transition-sidebar);
 }
-body[data-sidebar-minimized="false"] .sidebar-logo-container {
-    /* -40px because the padding is 20px (px-5)
-       this puts the toggle button in line with the items */
-    width: calc(var(--sidebar-width) - 2.5rem);
+
+body[data-sidebar-minimized="false"] .sidebar-logo-link {
+    left: var(--sidebar-padding);
+    max-width: calc(var(--sidebar-width) - calc(var(--sidebar-padding) * 2) - 3rem);
+    transform: none;
+}
+
+.sidebar-logo-name {
+    display: none;
+    opacity: 0;
+    transform: translateX(-0.5rem);
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    white-space: nowrap;
+}
+
+body[data-sidebar-minimized="false"] .sidebar-logo-name {
+    display: block;
+    opacity: 1;
+    transform: none;
+}
+
+.sidebar-toggle-button {
+    margin-left: auto;
 }
 
 .sidebar-indicator {
@@ -135,4 +169,11 @@ body[data-sidebar-minimized="false"] .nav-item .nav-text {
 }
 .sidebar-container[data-sidebar-minimized="false"] .nav-item .nav-text {
     transform: none;
+}
+
+.sidebar-container[data-sidebar-minimized="false"] .mobile-sidebar-logo {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0;
+    justify-content: center;
 }

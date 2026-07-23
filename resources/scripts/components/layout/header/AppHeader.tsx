@@ -32,11 +32,30 @@ const HeaderActions = memo(() => {
 
 HeaderActions.displayName = 'HeaderActions';
 
-const LogoSection = memo(() => (
-    <NavLink to={'/'} className='flex items-center shrink-0 h-8 w-fit hydrodactyl-logo' aria-label='Home page'>
-        <Logo />
-    </NavLink>
-));
+const getSiteName = () => {
+    const siteConfiguration = (window as Record<string, unknown>).SiteConfiguration as { name?: unknown } | undefined;
+
+    return typeof siteConfiguration?.name === 'string' && siteConfiguration.name.trim().length > 0
+        ? siteConfiguration.name
+        : 'Hydrodactyl';
+};
+
+const LogoSection = memo(() => {
+    const siteName = getSiteName();
+
+    return (
+        <NavLink
+            to={'/'}
+            className='sidebar-logo-link flex items-center shrink-0 h-8 min-w-0 gap-3 hydrodactyl-logo'
+            aria-label={`${siteName} home page`}
+        >
+            <Logo className='flex h-8 w-8 shrink-0 object-contain' />
+            <span className='sidebar-logo-name truncate text-sm font-semibold leading-none tracking-wide text-cream-50'>
+                {siteName}
+            </span>
+        </NavLink>
+    );
+});
 LogoSection.displayName = 'LogoSection';
 
 const ToggleButton = memo(() => {
@@ -46,7 +65,7 @@ const ToggleButton = memo(() => {
         <Button
             variant={'secondary'}
             size={'sm'}
-            className='p-1 gap-1 rounded-full size-8'
+            className='sidebar-toggle-button p-1 gap-1 rounded-full size-8'
             aria-label='Toggle sidebar'
             onClick={toggleMinimized}
         >
@@ -58,7 +77,7 @@ ToggleButton.displayName = 'ToggleButton';
 
 const SidebarLogo = memo(() => {
     return (
-        <div className='sidebar-logo-container hidden lg:flex h-12 items-center justify-between mx-8 flex-none'>
+        <div className='sidebar-logo-container hidden lg:flex h-12 items-center flex-none relative'>
             <LogoSection />
             <ToggleButton />
         </div>
