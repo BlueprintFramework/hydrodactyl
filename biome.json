@@ -70,7 +70,7 @@
             "!**/.phpstorm.meta.php",
             "!**/.yarn",
             "!public/assets/manifest.json",
-            "!**/docker-compose.yml",
+            "!**/compose.yml",
             "!**/local_docker",
             "!srv",
             "!var",
