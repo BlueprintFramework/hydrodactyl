@@ -4,10 +4,11 @@ import useSWR from 'swr';
 import { type AdminMount, type CreateMountData, createMount, deleteMount, getMounts } from '@/api/admin/mounts';
 import { httpErrorToHuman } from '@/api/http';
 import AdminMountViewContainer from '@/components/admin/mounts/AdminMountViewContainer';
-import { Button } from '@/components/ui/button';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const AdminMountsContainer = () => {
     const [page, setPage] = useState(1);
@@ -36,7 +37,7 @@ const AdminMountsContainer = () => {
         try {
             await deleteMount(id);
             mutate();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -45,21 +46,29 @@ const AdminMountsContainer = () => {
         return (
             <div>
                 <MainPageHeader title='Create Mount'>
-                    <Button variant='secondary' onClick={() => setShowCreate(false)}>Back</Button>
+                    <Button variant='secondary' onClick={() => setShowCreate(false)}>
+                        Back
+                    </Button>
                 </MainPageHeader>
                 {createError && <div className='text-red-400 mb-4 text-sm'>{createError}</div>}
                 <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6 max-w-lg'>
                     <div className='mb-4'>
-                        <label className='block text-sm text-mocha-200 mb-1'>Name</label>
+                        <label htmlFor='mount-name' className='block text-sm text-mocha-200 mb-1'>
+                            Name
+                        </label>
                         <input
+                            id='mount-name'
                             value={form.name}
                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                             className='w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400'
                         />
                     </div>
                     <div className='mb-4'>
-                        <label className='block text-sm text-mocha-200 mb-1'>Source</label>
+                        <label htmlFor='mount-source' className='block text-sm text-mocha-200 mb-1'>
+                            Source
+                        </label>
                         <input
+                            id='mount-source'
                             value={form.source}
                             onChange={(e) => setForm({ ...form, source: e.target.value })}
                             className='w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400'
@@ -67,8 +76,11 @@ const AdminMountsContainer = () => {
                         />
                     </div>
                     <div className='mb-4'>
-                        <label className='block text-sm text-mocha-200 mb-1'>Target</label>
+                        <label htmlFor='mount-target' className='block text-sm text-mocha-200 mb-1'>
+                            Target
+                        </label>
                         <input
+                            id='mount-target'
                             value={form.target}
                             onChange={(e) => setForm({ ...form, target: e.target.value })}
                             className='w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400'
@@ -76,26 +88,24 @@ const AdminMountsContainer = () => {
                         />
                     </div>
                     <div className='flex gap-4 mb-4'>
-                        <label className='flex items-center gap-2 text-sm text-mocha-200'>
-                            <input
-                                type='checkbox'
-                                checked={form.read_only ?? false}
-                                onChange={(e) => setForm({ ...form, read_only: e.target.checked })}
-                                className='rounded border-mocha-400'
-                            />
-                            Read Only
-                        </label>
-                        <label className='flex items-center gap-2 text-sm text-mocha-200'>
-                            <input
-                                type='checkbox'
-                                checked={form.user_mountable ?? false}
-                                onChange={(e) => setForm({ ...form, user_mountable: e.target.checked })}
-                                className='rounded border-mocha-400'
-                            />
-                            User Mountable
-                        </label>
+                        <Checkbox
+                            checked={form.read_only ?? false}
+                            onChange={(e) => setForm({ ...form, read_only: e.target.checked })}
+                            label='Read Only'
+                        />
+                        <Checkbox
+                            checked={form.user_mountable ?? false}
+                            onChange={(e) => setForm({ ...form, user_mountable: e.target.checked })}
+                            label='User Mountable'
+                        />
                     </div>
-                    <Button variant='default' onClick={handleCreate} disabled={saving || !form.name || !form.source || !form.target}>{saving ? 'Creating...' : 'Create Mount'}</Button>
+                    <Button
+                        variant='default'
+                        onClick={handleCreate}
+                        disabled={saving || !form.name || !form.source || !form.target}
+                    >
+                        {saving ? 'Creating...' : 'Create Mount'}
+                    </Button>
                 </div>
             </div>
         );
@@ -108,7 +118,9 @@ const AdminMountsContainer = () => {
                 element={
                     <div>
                         <MainPageHeader title='Mounts'>
-                            <Button variant='default' onClick={() => setShowCreate(true)}>New Mount</Button>
+                            <Button variant='default' onClick={() => setShowCreate(true)}>
+                                New Mount
+                            </Button>
                         </MainPageHeader>
 
                         {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
@@ -177,14 +189,18 @@ const AdminMountsContainer = () => {
                                                                 {mount.readOnly ? (
                                                                     <span className='text-yellow-400 text-xs'>Yes</span>
                                                                 ) : (
-                                                                    <span className='text-mocha-200/60 text-xs'>No</span>
+                                                                    <span className='text-mocha-200/60 text-xs'>
+                                                                        No
+                                                                    </span>
                                                                 )}
                                                             </td>
                                                             <td className='px-4 py-3'>
                                                                 {mount.userMountable ? (
                                                                     <span className='text-green-400 text-xs'>Yes</span>
                                                                 ) : (
-                                                                    <span className='text-mocha-200/60 text-xs'>No</span>
+                                                                    <span className='text-mocha-200/60 text-xs'>
+                                                                        No
+                                                                    </span>
                                                                 )}
                                                             </td>
                                                             <td className='px-4 py-3 text-right'>
@@ -195,7 +211,12 @@ const AdminMountsContainer = () => {
                                                                     >
                                                                         View
                                                                     </Link>
-                                                                    <Button variant='attention' onClick={() => handleDelete(mount.id)}>Delete</Button>
+                                                                    <Button
+                                                                        variant='attention'
+                                                                        onClick={() => handleDelete(mount.id)}
+                                                                    >
+                                                                        Delete
+                                                                    </Button>
                                                                 </div>
                                                             </td>
                                                         </tr>

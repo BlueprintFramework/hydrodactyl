@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
 import { getAdminCounts, getPanelStatus, type PanelStatus } from '@/api/admin';
-import { getServers, type AdminServer } from '@/api/admin/servers';
+import { type AdminServer, getServers } from '@/api/admin/servers';
 import { SkeletonCards } from '@/components/admin/shared/AdminSkeleton';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
@@ -45,6 +45,46 @@ function formatRelativeTime(dateStr: string): string {
     return `${Math.floor(hrs / 24)}d ago`;
 }
 
+function shortenOS(raw: string): string {
+    const windowsMatch = raw.match(/Microsoft Windows (\d+)/i);
+    if (windowsMatch) return `Windows ${windowsMatch[1]}`;
+
+    const linuxMatch = raw.match(/^Linux\s+\S+\s+[\d.]+[-\s].*$/i);
+    if (!linuxMatch) return raw.length > 40 ? `${raw.slice(0, 40)}…` : raw;
+
+    const distroPatterns: [RegExp, string][] = [
+        [/Ubuntu[\s/]+(\d+\.\d+(?:\.\d+)?)/i, 'Linux, Ubuntu $1'],
+        [/Debian[\s/]+(\d+)/i, 'Linux, Debian $1'],
+        [/CentOS[\s/]+(\d+)/i, 'Linux, CentOS $1'],
+        [/Rocky[\s/]+(\d+)/i, 'Linux, Rocky $1'],
+        [/AlmaLinux[\s/]+(\d+)/i, 'Linux, AlmaLinux $1'],
+        [/Fedora[\s/]+(\d+)/i, 'Linux, Fedora $1'],
+        [/Arch[\s_-]*Linux/i, 'Linux, Arch'],
+        [/Alpine[\s/]+(\d+\.\d+)/i, 'Linux, Alpine $1'],
+        [/RHEL[\s/]+(\d+)/i, 'Linux, RHEL $1'],
+        [/SUSE[\s/]+(\d+\.\d+)/i, 'Linux, SUSE $1'],
+        [/openSUSE[\s/]+(\d+\.\d+)/i, 'Linux, openSUSE $1'],
+        [/Gentoo/i, 'Linux, Gentoo'],
+        [/Manjaro/i, 'Linux, Manjaro'],
+        [/NixOS[\s/]+(\d+\.\d+)/i, 'Linux, NixOS $1'],
+        [/Void[\s_-]*Linux/i, 'Linux, Void'],
+    ];
+
+    for (const [re, fmt] of distroPatterns) {
+        const m = raw.match(re);
+        if (m) {
+            let result = fmt;
+            for (let i = 1; i < m.length; i++) {
+                result = result.replace(`$${i}`, m[i]);
+            }
+            return result;
+        }
+    }
+
+    const afterLinux = raw.replace(/^Linux\s+\S+\s+[\d.]+[-\s]*/i, '').trim();
+    return afterLinux ? `Linux, ${afterLinux.split(/\s/).slice(0, 3).join(' ')}` : 'Linux';
+}
+
 /* ──────────────────────── count-up hook ──────────────────────── */
 
 function useCountUp(target: number, duration = 900): number {
@@ -59,7 +99,6 @@ function useCountUp(target: number, duration = 900): number {
         const start = performance.now();
         const tick = (now: number) => {
             const progress = Math.min((now - start) / duration, 1);
-            // ease-out cubic
             const eased = 1 - (1 - progress) ** 3;
             setValue(Math.floor(eased * target));
             if (progress < 1) frameRef.current = requestAnimationFrame(tick);
@@ -71,152 +110,54 @@ function useCountUp(target: number, duration = 900): number {
     return value;
 }
 
-/* ──────────────────────── stat card ──────────────────────── */
-
-const CARD_ACCENT: Record<string, string> = {
-    servers: 'from-blue-500/20 to-blue-500/5 border-blue-500/30',
-    nodes: 'from-teal-500/20 to-teal-500/5 border-teal-500/30',
-    users: 'from-violet-500/20 to-violet-500/5 border-violet-500/30',
-    locations: 'from-amber-500/20 to-amber-500/5 border-amber-500/30',
-    nests: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30',
-    buckets: 'from-rose-500/20 to-rose-500/5 border-rose-500/30',
-};
-
-const ICON_RING: Record<string, string> = {
-    servers: 'bg-blue-500/15 text-blue-400',
-    nodes: 'bg-teal-500/15 text-teal-400',
-    users: 'bg-violet-500/15 text-violet-400',
-    locations: 'bg-amber-500/15 text-amber-400',
-    nests: 'bg-emerald-500/15 text-emerald-400',
-    buckets: 'bg-rose-500/15 text-rose-400',
-};
-
-interface StatCardProps {
-    id: string;
-    label: string;
-    value: number;
-    sub: string;
-    to: string;
-    icon: IconSvgElement;
-}
-
-function StatCard({ id, label, value, sub, to, icon: Icon }: StatCardProps) {
-    const displayed = useCountUp(value);
-    const accent = CARD_ACCENT[id] ?? 'from-mocha-400/20 to-mocha-400/5 border-mocha-400/30';
-    const ring = ICON_RING[id] ?? 'bg-mocha-400 text-cream-400';
-
-    return (
-        <Link
-            to={to}
-            id={`stat-card-${id}`}
-            className={`group relative overflow-hidden rounded-xl border bg-gradient-to-br ${accent} p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20 flex flex-col gap-3`}
-        >
-            {/* top row */}
-            <div className='flex items-center justify-between'>
-                <span className='text-xs font-semibold uppercase tracking-wider text-mocha-100/70'>{label}</span>
-                <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg ${ring} transition-transform duration-300 group-hover:scale-110`}
-                >
-                    <HugeiconsIcon icon={Icon} size={18} />
-                </div>
-            </div>
-
-            {/* value */}
-            <div className='text-4xl font-extrabold tracking-tight text-cream-400 leading-none tabular-nums'>
-                {displayed.toLocaleString()}
-            </div>
-
-            {/* sub */}
-            <p className='text-xs text-mocha-100/60 leading-relaxed'>{sub}</p>
-        </Link>
-    );
-}
-
-/* ──────────────────────── SVG arc gauge ──────────────────────── */
-
-interface ArcGaugeProps {
-    percent: number;
-    label: string;
-    sub: string;
-}
+/* ──────────────────────── svg gauge ──────────────────────── */
 
 function gaugeColor(pct: number): string {
-    if (pct >= 80) return '#f87171'; // red-400
-    if (pct >= 60) return '#fbbf24'; // amber-400
-    return '#34d399'; // emerald-400
+    if (pct >= 80) return '#f87171';
+    if (pct >= 60) return '#fbbf24';
+    return '#34d399';
 }
 
-function ArcGauge({ percent, label, sub }: ArcGaugeProps) {
-    const [animPct, setAnimPct] = useState(0);
-    const frameRef = useRef<number>(0);
-
-    useEffect(() => {
-        const duration = 1000;
-        const start = performance.now();
-        const tick = (now: number) => {
-            const progress = Math.min((now - start) / duration, 1);
-            const eased = 1 - (1 - progress) ** 3;
-            setAnimPct(eased * percent);
-            if (progress < 1) frameRef.current = requestAnimationFrame(tick);
-        };
-        frameRef.current = requestAnimationFrame(tick);
-        return () => cancelAnimationFrame(frameRef.current);
-    }, [percent]);
-
-    const size = 100;
-    const strokeW = 8;
-    const r = (size - strokeW) / 2;
-    const cx = size / 2;
-    const cy = size / 2;
-    // arc from 135° to 405° (270° sweep)
-    const sweepDeg = 270;
+function SvgGauge({ percent, label, sub }: { percent: number; label: string; sub: string }) {
     const color = gaugeColor(percent);
+    const radius = 44;
+    const stroke = 8;
+    const startAngle = -225;
+    const endAngle = 45;
+    const totalAngle = endAngle - startAngle;
+    const circumference = 2 * Math.PI * radius;
+    const arcLength = (totalAngle / 360) * circumference;
+    const fillLength = (Math.max(percent, 0.5) / 100) * arcLength;
 
-    // Convert degrees to radians for path
     const toRad = (deg: number) => (deg * Math.PI) / 180;
-    const polarToXY = (angle: number) => ({
-        x: cx + r * Math.cos(toRad(angle)),
-        y: cy + r * Math.sin(toRad(angle)),
-    });
+    const cx = 50;
+    const cy = 50;
 
-    const startA = -135; // -135° from 3 o'clock = 7:30 position
-    const endA = startA + sweepDeg; // 135°
+    const x1 = cx + radius * Math.cos(toRad(startAngle));
+    const y1 = cy + radius * Math.sin(toRad(startAngle));
+    const x2 = cx + radius * Math.cos(toRad(endAngle));
+    const y2 = cy + radius * Math.sin(toRad(endAngle));
 
-    const start = polarToXY(startA);
-    const end = polarToXY(endA);
-    const largeArc = sweepDeg > 180 ? 1 : 0;
-
-    const trackPath = `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${end.x} ${end.y}`;
-
-    // filled arc
-    const fillEndA = startA + (animPct / 100) * sweepDeg;
-    const fillEnd = polarToXY(fillEndA);
-    const fillLargeArc = (animPct / 100) * sweepDeg > 180 ? 1 : 0;
-    const fillPath =
-        animPct <= 0 ? '' : `M ${start.x} ${start.y} A ${r} ${r} 0 ${fillLargeArc} 1 ${fillEnd.x} ${fillEnd.y}`;
+    const bgD = `M ${x1} ${y1} A ${radius} ${radius} 0 1 1 ${x2} ${y2}`;
 
     return (
         <div className='flex flex-col items-center gap-2'>
-            <div className='relative' style={{ width: size, height: size }}>
-                <svg width={size} height={size} className='overflow-visible'>
-                    {/* track */}
-                    <path d={trackPath} fill='none' stroke='#4a4a4a' strokeWidth={strokeW} strokeLinecap='round' />
-                    {/* fill */}
-                    {fillPath && (
-                        <path
-                            d={fillPath}
-                            fill='none'
-                            stroke={color}
-                            strokeWidth={strokeW}
-                            strokeLinecap='round'
-                            style={{ filter: `drop-shadow(0 0 4px ${color}80)` }}
-                        />
-                    )}
+            <div className='relative' style={{ width: 120, height: 100 }}>
+                <svg viewBox='0 0 100 85' className='w-full h-full' role='presentation'>
+                    <path d={bgD} fill='none' stroke='#3f3f46' strokeWidth={stroke} strokeLinecap='round' />
+                    <path
+                        d={bgD}
+                        fill='none'
+                        stroke={color}
+                        strokeWidth={stroke}
+                        strokeLinecap='round'
+                        strokeDasharray={`${fillLength} ${arcLength}`}
+                        className='transition-all duration-1000 ease-out'
+                    />
                 </svg>
-                {/* center text */}
-                <div className='absolute inset-0 flex flex-col items-center justify-center'>
-                    <span className='text-lg font-bold text-cream-400 tabular-nums leading-none'>
-                        {Math.round(animPct)}%
+                <div className='absolute inset-0 flex items-center justify-center pb-2'>
+                    <span className='text-xl font-bold text-cream-400 tabular-nums leading-none'>
+                        {Math.round(percent)}%
                     </span>
                 </div>
             </div>
@@ -233,12 +174,12 @@ function ArcGauge({ percent, label, sub }: ArcGaugeProps) {
 function LoadSparkline({ loads }: { loads: number[] }) {
     const max = Math.max(...loads, 1);
     return (
-        <div className='flex items-end gap-1 h-10'>
+        <div className='flex items-end gap-1.5 h-12'>
             {loads.map((v, i) => {
                 const pct = (v / max) * 100;
                 const color = v > 2 ? '#f87171' : v > 1 ? '#fbbf24' : '#34d399';
                 return (
-                    <div key={i} className='flex-1 flex flex-col items-center gap-0.5'>
+                    <div key={i} className='flex-1 flex flex-col items-center gap-1'>
                         <div
                             className='w-full rounded-sm transition-all duration-700'
                             style={{ height: `${Math.max(pct, 8)}%`, backgroundColor: color }}
@@ -251,31 +192,85 @@ function LoadSparkline({ loads }: { loads: number[] }) {
     );
 }
 
-/* ──────────────────────── quick action card ──────────────────────── */
+/* ──────────────────────── live uptime ticker ──────────────────────── */
 
-interface ActionCardProps {
-    to: string;
-    icon: IconSvgElement;
-    label: string;
-    description: string;
-    id: string;
+function UptimeTicker({ uptimeSeconds }: { uptimeSeconds: number }) {
+    const [live, setLive] = useState(uptimeSeconds);
+    useEffect(() => {
+        const id = setInterval(() => setLive((s) => s + 1), 1000);
+        return () => clearInterval(id);
+    }, []);
+    return <span className='tabular-nums'>{formatUptime(live)}</span>;
 }
 
-function ActionCard({ to, icon: Icon, label, description, id }: ActionCardProps) {
+/* ──────────────────────── stat card ──────────────────────── */
+
+interface StatCardProps {
+    id: string;
+    label: string;
+    value: number;
+    sub: string;
+    to: string;
+    icon: IconSvgElement;
+}
+
+function StatCard({ id, label, value, sub, to, icon: Icon }: StatCardProps) {
+    const displayed = useCountUp(value);
+
     return (
         <Link
             to={to}
-            id={`quick-action-${id}`}
-            className='group flex flex-col gap-3 rounded-xl border border-mocha-400 bg-mocha-500 p-5 transition-all duration-300 hover:border-mocha-300 hover:bg-mocha-400/60 hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5'
+            id={`stat-card-${id}`}
+            className='group relative overflow-hidden rounded-xl border border-mocha-400 bg-mocha-500 p-5 transition-all duration-300 hover:bg-mocha-400/40 hover:shadow-lg hover:shadow-black/20 flex flex-col gap-3'
         >
-            <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-mocha-400 text-cream-400 transition-colors duration-300 group-hover:bg-mocha-300'>
-                <HugeiconsIcon icon={Icon} size={22} />
+            <div className='flex items-center justify-between'>
+                <span className='text-xs font-semibold uppercase tracking-wider text-mocha-100/70'>{label}</span>
+                <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-mocha-400 text-cream-400 transition-transform duration-300 group-hover:scale-110'>
+                    <HugeiconsIcon icon={Icon} size={18} />
+                </div>
             </div>
-            <div>
-                <p className='text-sm font-semibold text-cream-400'>{label}</p>
-                <p className='text-xs text-mocha-100/60 mt-0.5'>{description}</p>
+            <div className='text-4xl font-extrabold tracking-tight text-cream-400 leading-none tabular-nums'>
+                {displayed.toLocaleString()}
             </div>
+            <p className='text-xs text-mocha-100/60 leading-relaxed'>{sub}</p>
         </Link>
+    );
+}
+
+/* ──────────────────────── info row ──────────────────────── */
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+    return (
+        <div className='flex items-center justify-between py-3 border-b border-mocha-400 last:border-0'>
+            <span className='text-xs font-medium text-mocha-100/60 uppercase tracking-wide'>{label}</span>
+            <span className='text-sm text-cream-400 font-mono'>{value}</span>
+        </div>
+    );
+}
+
+/* ──────────────────────── section header ──────────────────────── */
+
+function SectionHeader({ title, sub, action }: { title: string; sub?: string; action?: React.ReactNode }) {
+    return (
+        <div className='flex items-end justify-between mb-5'>
+            <div>
+                <h2 className='text-base font-bold text-cream-400'>{title}</h2>
+                {sub && <p className='text-xs text-mocha-100/60 mt-1'>{sub}</p>}
+            </div>
+            {action}
+        </div>
+    );
+}
+
+/* ──────────────────────── skeleton ──────────────────────── */
+
+function GaugeSkeleton() {
+    return (
+        <div className='flex flex-col items-center gap-2 animate-pulse'>
+            <div className='h-[100px] w-[100px] rounded-full bg-mocha-400/30' />
+            <div className='h-3 w-16 rounded bg-mocha-400/30' />
+            <div className='h-2 w-20 rounded bg-mocha-400/20' />
+        </div>
     );
 }
 
@@ -303,54 +298,6 @@ function ServerStatusBadge({ server }: { server: AdminServer }) {
             <span className='h-1.5 w-1.5 rounded-full bg-emerald-400' />
             Active
         </span>
-    );
-}
-
-/* ──────────────────────── info row ──────────────────────── */
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-    return (
-        <div className='flex items-center justify-between py-2.5 border-b border-mocha-400 last:border-0'>
-            <span className='text-xs font-medium text-mocha-100/60 uppercase tracking-wide'>{label}</span>
-            <span className='text-sm text-cream-400 font-mono'>{value}</span>
-        </div>
-    );
-}
-
-/* ──────────────────────── live uptime ticker ──────────────────────── */
-
-function UptimeTicker({ uptimeSeconds }: { uptimeSeconds: number }) {
-    const [live, setLive] = useState(uptimeSeconds);
-    useEffect(() => {
-        const id = setInterval(() => setLive((s) => s + 1), 1000);
-        return () => clearInterval(id);
-    }, []);
-    return <span className='tabular-nums'>{formatUptime(live)}</span>;
-}
-
-/* ──────────────────────── section header ──────────────────────── */
-
-function SectionHeader({ title, sub, action }: { title: string; sub?: string; action?: React.ReactNode }) {
-    return (
-        <div className='flex items-end justify-between mb-4'>
-            <div>
-                <h2 className='text-base font-bold text-cream-400'>{title}</h2>
-                {sub && <p className='text-xs text-mocha-100/60 mt-0.5'>{sub}</p>}
-            </div>
-            {action}
-        </div>
-    );
-}
-
-/* ──────────────────────── skeleton for gauges ──────────────────────── */
-
-function GaugeSkeleton() {
-    return (
-        <div className='flex flex-col items-center gap-2 animate-pulse'>
-            <div className='h-[100px] w-[100px] rounded-full bg-mocha-400/30' />
-            <div className='h-3 w-16 rounded bg-mocha-400/30' />
-            <div className='h-2 w-20 rounded bg-mocha-400/20' />
-        </div>
     );
 }
 
@@ -426,48 +373,48 @@ const AdminDashboardContainer = () => {
         },
     ];
 
-    const quickActions: ActionCardProps[] = [
+    const quickActions = [
         {
-            id: 'create-server',
-            to: '/admin/servers/new',
+            to: '/admin/servers',
             icon: ServerStack02Icon,
             label: 'Create Server',
             description: 'Deploy a new game server',
+            id: 'create-server',
         },
         {
-            id: 'create-user',
-            to: '/admin/users/new',
+            to: '/admin/users',
             icon: UserMultiple02Icon,
             label: 'Create User',
             description: 'Add a new panel account',
+            id: 'create-user',
         },
         {
-            id: 'add-node',
-            to: '/admin/nodes/new',
+            to: '/admin/nodes',
             icon: Activity02Icon,
             label: 'Add Node',
             description: 'Register a Wings daemon',
+            id: 'add-node',
         },
         {
-            id: 'add-bucket',
-            to: '/admin/buckets/new',
+            to: '/admin/buckets',
             icon: Archive01Icon,
             label: 'Add S3 Bucket',
             description: 'Connect object storage',
+            id: 'add-bucket',
         },
         {
-            id: 'manage-databases',
             to: '/admin/databases',
             icon: Database02Icon,
             label: 'Databases',
             description: 'Manage database hosts',
+            id: 'manage-databases',
         },
         {
-            id: 'manage-locations',
             to: '/admin/locations',
             icon: GlobalIcon,
             label: 'Locations',
             description: 'Configure regions',
+            id: 'manage-locations',
         },
     ];
 
@@ -480,7 +427,7 @@ const AdminDashboardContainer = () => {
         status && status.metrics.disk.total > 0 ? (status.metrics.disk.used / status.metrics.disk.total) * 100 : 0;
 
     return (
-        <div className='space-y-8 pb-8'>
+        <div className='space-y-10 pb-10'>
             {/* ── page header ── */}
             <div className='flex flex-col gap-1'>
                 <h1 className='text-[42px] font-extrabold leading-[98%] tracking-[-0.1rem] text-cream-400'>Overview</h1>
@@ -491,7 +438,7 @@ const AdminDashboardContainer = () => {
             {!counts ? (
                 <SkeletonCards count={6} />
             ) : (
-                <div className='grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3'>
+                <div className='grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4'>
                     {stats.map((s) => (
                         <StatCard key={s.id} {...s} />
                     ))}
@@ -499,7 +446,7 @@ const AdminDashboardContainer = () => {
             )}
 
             {/* ── resource health + system info ── */}
-            <div className='grid grid-cols-1 lg:grid-cols-5 gap-4'>
+            <div className='grid grid-cols-1 lg:grid-cols-5 gap-6'>
                 {/* gauges — 3/5 */}
                 <div className='lg:col-span-3 rounded-xl border border-mocha-400 bg-mocha-500 p-6'>
                     <SectionHeader title='Resource Health' sub='Real-time system metrics' />
@@ -510,20 +457,20 @@ const AdminDashboardContainer = () => {
                             <GaugeSkeleton />
                         </div>
                     ) : (
-                        <div className='flex items-center justify-around py-4 gap-4 flex-wrap'>
-                            <ArcGauge
+                        <div className='flex items-center justify-around py-6 gap-6 flex-wrap'>
+                            <SvgGauge
                                 percent={parseFloat(cpuPct.toFixed(1))}
                                 label='CPU'
                                 sub={`${cpuPct.toFixed(1)}%`}
                             />
-                            <div className='h-20 w-px bg-mocha-400 hidden sm:block' />
-                            <ArcGauge
+                            <div className='h-24 w-px bg-mocha-400 hidden sm:block' />
+                            <SvgGauge
                                 percent={parseFloat(memPct.toFixed(1))}
                                 label='Memory'
                                 sub={`${formatBytes(status.metrics.memory.used)} / ${formatBytes(status.metrics.memory.total)}`}
                             />
-                            <div className='h-20 w-px bg-mocha-400 hidden sm:block' />
-                            <ArcGauge
+                            <div className='h-24 w-px bg-mocha-400 hidden sm:block' />
+                            <SvgGauge
                                 percent={parseFloat(diskPct.toFixed(1))}
                                 label='Disk'
                                 sub={`${formatBytes(status.metrics.disk.used)} / ${formatBytes(status.metrics.disk.total)}`}
@@ -548,9 +495,9 @@ const AdminDashboardContainer = () => {
                         <>
                             <div className='space-y-0'>
                                 <InfoRow label='Hostname' value={status.system.hostname} />
-                                <InfoRow label='OS' value={status.system.os} />
+                                <InfoRow label='OS' value={shortenOS(status.system.os)} />
                                 <InfoRow label='PHP' value={status.system.php_version} />
-                                <div className='flex items-center justify-between py-2.5 border-b border-mocha-400'>
+                                <div className='flex items-center justify-between py-3 border-b border-mocha-400'>
                                     <span className='text-xs font-medium text-mocha-100/60 uppercase tracking-wide'>
                                         Uptime
                                     </span>
@@ -573,9 +520,22 @@ const AdminDashboardContainer = () => {
             {/* ── quick actions ── */}
             <div>
                 <SectionHeader title='Quick Actions' sub='Common administrative tasks' />
-                <div className='grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3'>
+                <div className='grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4'>
                     {quickActions.map((a) => (
-                        <ActionCard key={a.id} {...a} />
+                        <Link
+                            key={a.id}
+                            to={a.to}
+                            id={`quick-action-${a.id}`}
+                            className='group flex flex-col gap-3 rounded-xl border border-mocha-400 bg-mocha-500 p-5 transition-all duration-300 hover:bg-mocha-400/40 hover:shadow-lg hover:shadow-black/20 hover:-translate-y-0.5'
+                        >
+                            <div className='flex h-11 w-11 items-center justify-center rounded-xl bg-mocha-400/60 text-cream-400 transition-colors duration-300 group-hover:bg-mocha-300/60'>
+                                <HugeiconsIcon icon={a.icon} size={22} />
+                            </div>
+                            <div>
+                                <p className='text-sm font-semibold text-cream-400'>{a.label}</p>
+                                <p className='text-xs text-mocha-100/60 mt-0.5'>{a.description}</p>
+                            </div>
+                        </Link>
                     ))}
                 </div>
             </div>
@@ -598,7 +558,7 @@ const AdminDashboardContainer = () => {
                     {!serversPage ? (
                         <div className='divide-y divide-mocha-400'>
                             {Array.from({ length: 5 }).map((_, i) => (
-                                <div key={i} className='flex items-center gap-4 px-5 py-3.5 animate-pulse'>
+                                <div key={i} className='flex items-center gap-4 px-5 py-4 animate-pulse'>
                                     <div className='h-3 w-32 rounded bg-mocha-400/30' />
                                     <div className='h-3 w-20 rounded bg-mocha-400/20' />
                                     <div className='ml-auto h-5 w-16 rounded bg-mocha-400/20' />
@@ -609,7 +569,7 @@ const AdminDashboardContainer = () => {
                     ) : recentServers.length === 0 ? (
                         <div className='py-12 text-center text-mocha-100/50 text-sm'>
                             No servers yet.{' '}
-                            <Link to='/admin/servers/new' className='text-cream-400 hover:underline'>
+                            <Link to='/admin/servers' className='text-cream-400 hover:underline'>
                                 Create one
                             </Link>
                         </div>
@@ -617,19 +577,19 @@ const AdminDashboardContainer = () => {
                         <table className='w-full text-sm' id='recent-servers-table'>
                             <thead>
                                 <tr className='border-b border-mocha-400 text-left'>
-                                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide text-mocha-100/50'>
+                                    <th className='px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-mocha-100/50'>
                                         Name
                                     </th>
-                                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide text-mocha-100/50 hidden sm:table-cell'>
+                                    <th className='px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-mocha-100/50 hidden sm:table-cell'>
                                         Owner
                                     </th>
-                                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide text-mocha-100/50 hidden md:table-cell'>
+                                    <th className='px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-mocha-100/50 hidden md:table-cell'>
                                         Resources
                                     </th>
-                                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide text-mocha-100/50'>
+                                    <th className='px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-mocha-100/50'>
                                         Status
                                     </th>
-                                    <th className='px-5 py-3 text-xs font-semibold uppercase tracking-wide text-mocha-100/50 hidden lg:table-cell'>
+                                    <th className='px-5 py-3.5 text-xs font-semibold uppercase tracking-wide text-mocha-100/50 hidden lg:table-cell'>
                                         Created
                                     </th>
                                 </tr>
@@ -640,7 +600,7 @@ const AdminDashboardContainer = () => {
                                         key={server.id}
                                         className='hover:bg-mocha-400/20 transition-colors duration-150'
                                     >
-                                        <td className='px-5 py-3.5'>
+                                        <td className='px-5 py-4'>
                                             <Link
                                                 to={`/admin/servers/${server.id}`}
                                                 className='font-medium text-cream-400 hover:text-cream-200 transition-colors'
@@ -651,17 +611,17 @@ const AdminDashboardContainer = () => {
                                                 {server.shortUuid}
                                             </p>
                                         </td>
-                                        <td className='px-5 py-3.5 text-mocha-100/70 hidden sm:table-cell'>
+                                        <td className='px-5 py-4 text-mocha-100/70 hidden sm:table-cell'>
                                             {server.userName ?? `UID ${server.user}`}
                                         </td>
-                                        <td className='px-5 py-3.5 text-mocha-100/60 text-xs font-mono hidden md:table-cell'>
+                                        <td className='px-5 py-4 text-mocha-100/60 text-xs font-mono hidden md:table-cell'>
                                             {server.memory === 0 ? '∞' : `${server.memory} MB`} RAM ·{' '}
                                             {server.disk === 0 ? '∞' : `${server.disk} MB`} Disk
                                         </td>
-                                        <td className='px-5 py-3.5'>
+                                        <td className='px-5 py-4'>
                                             <ServerStatusBadge server={server} />
                                         </td>
-                                        <td className='px-5 py-3.5 text-xs text-mocha-100/50 hidden lg:table-cell'>
+                                        <td className='px-5 py-4 text-xs text-mocha-100/50 hidden lg:table-cell'>
                                             {formatRelativeTime(server.createdAt)}
                                         </td>
                                     </tr>

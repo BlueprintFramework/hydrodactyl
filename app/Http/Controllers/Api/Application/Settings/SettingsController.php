@@ -39,7 +39,6 @@ class SettingsController extends Controller
     public function general(): JsonResponse
     {
         return new JsonResponse([
-            'app:name' => $this->config->get('app.name'),
             'app:locale' => $this->config->get('app.locale'),
             'pterodactyl:auth:2fa_required' => (int) $this->config->get('pterodactyl.auth.2fa_required', 0),
             'available_languages' => $this->getAvailableLanguages(true),
@@ -49,7 +48,6 @@ class SettingsController extends Controller
     public function updateGeneral(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'app:name' => 'required|string|max:191',
             'pterodactyl:auth:2fa_required' => 'required|integer|in:0,1,2',
             'app:locale' => 'required|string|max:10',
         ]);
@@ -210,6 +208,7 @@ class SettingsController extends Controller
     public function branding(): JsonResponse
     {
         return new JsonResponse([
+            'companyName' => $this->config->get('app.name', ''),
             'logoType' => $this->logoService->getCurrentType(),
             'logoUrl' => $this->logoService->getCurrentUrl(),
             'logoValue' => $this->logoService->getCurrentValue(),
@@ -220,13 +219,22 @@ class SettingsController extends Controller
     public function updateBranding(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'logo_file' => 'nullable|file|mimes:png,jpg,jpeg,gif,webp,svg|max:2048',
+            'company_name' => 'nullable|string|max:191',
+            'logo_file' => 'nullable|file|mimes:png,jpg,jpeg,gif,webp,svg,ico,avif,mp4,webm|max:2048',
             'logo_url' => 'nullable|url|max:2048',
             'remove' => 'nullable|boolean',
             'rewind' => 'nullable|integer|min:0',
         ]);
 
-        $this->logoService->handle($validated);
+        if (isset($validated['company_name'])) {
+            $this->settings->set('settings::app:name', $validated['company_name']);
+            unset($validated['company_name']);
+        }
+
+        if (!empty($validated)) {
+            $this->logoService->handle($validated);
+        }
+
         $this->kernel->call('queue:restart');
 
         return new JsonResponse(['success' => true]);

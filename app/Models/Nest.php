@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $author
  * @property string $name
  * @property string|null $description
+ * @property string|null $icon
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Server[] $servers
@@ -38,6 +39,7 @@ class Nest extends Model
     protected $fillable = [
         'name',
         'description',
+        'icon',
     ];
 
 
@@ -46,6 +48,7 @@ class Nest extends Model
         'author' => 'required|string|email',
         'name' => 'required|string|max:191',
         'description' => 'nullable|string',
+        'icon' => 'nullable|string',
     ];
 
     /**

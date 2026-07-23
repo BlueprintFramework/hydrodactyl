@@ -123,8 +123,6 @@ class Handler extends ExceptionHandler
      */
     public function render($request, \Throwable $e): Response
     {
-        $connections = $this->container->make(Connection::class);
-
         // If we are currently wrapped up inside a transaction, we will roll all the way
         // back to the beginning. This needs to happen, otherwise session data does not
         // get properly persisted.
@@ -134,8 +132,12 @@ class Handler extends ExceptionHandler
         // ton of actions and were written before this bug discovery was made.
         //
         // @see https://github.com/pterodactyl/panel/pull/1468
-        if ($connections->transactionLevel()) {
-            $connections->rollBack(0);
+        if ($this->container->bound(Connection::class)) {
+            $connections = $this->container->make(Connection::class);
+
+            if ($connections->transactionLevel()) {
+                $connections->rollBack(0);
+            }
         }
 
         return parent::render($request, $e);

@@ -1,72 +1,120 @@
-import { useState } from 'react';
-import { Link, Route, Routes } from 'react-router-dom';
-import useSWR from 'swr';
 import { CubeIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { MainPageHeader } from '@/components/elements/MainPageHeader';
-import Spinner from '@/components/elements/Spinner';
-import Pagination from '@/components/elements/Pagination';
-import { Button } from '@/components/ui/button';
-import { getNests, createNest, type AdminNest, type CreateNestData } from '@/api/admin/nests';
+import { useState } from 'react';
+import { Link, Route, Routes } from 'react-router-dom';
+import { toast } from 'sonner';
+import useSWR from 'swr';
+import { type AdminNest, type CreateNestData, createNest, deleteNest, getNests } from '@/api/admin/nests';
 import { httpErrorToHuman } from '@/api/http';
 import AdminNestViewContainer from '@/components/admin/nests/AdminNestViewContainer';
+import { Dialog } from '@/components/elements/dialog';
+import { MainPageHeader } from '@/components/elements/MainPageHeader';
+import Pagination from '@/components/elements/Pagination';
+import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
 
-const AdminNestsContainer = () => {
-    const [page, setPage] = useState(1);
-    const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
-    const { data, error, mutate } = useSWR(['admin:nests', page], () => getNests({ page }));
+const inputClass =
+    'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors';
+const labelClass = 'block text-sm text-mocha-200 mb-1';
 
-    const [showCreate, setShowCreate] = useState(false);
-    const [createName, setCreateName] = useState('');
-    const [createDesc, setCreateDesc] = useState('');
+const CreateNestModal = ({
+    open,
+    onClose,
+    onCreated,
+}: {
+    open: boolean;
+    onClose: () => void;
+    onCreated: () => void;
+}) => {
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
     const [saving, setSaving] = useState(false);
-    const [createError, setCreateError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const handleCreate = () => {
-        setCreateError(null);
+        setError(null);
         setSaving(true);
-        createNest({ name: createName, description: createDesc || undefined } as CreateNestData)
+        createNest({ name, description: description || undefined } as CreateNestData)
             .then(() => {
-                setShowCreate(false);
-                setCreateName('');
-                setCreateDesc('');
-                mutate();
+                setName('');
+                setDescription('');
+                onCreated();
+                onClose();
+                toast.success('Nest created successfully');
             })
-            .catch((e) => setCreateError(httpErrorToHuman(e)))
+            .catch((e) => {
+                setError(httpErrorToHuman(e));
+                toast.error(httpErrorToHuman(e));
+            })
             .finally(() => setSaving(false));
     };
 
-    if (showCreate) {
-        return (
-            <div>
-                <MainPageHeader title='Create Nest'>
-                    <Button variant='secondary' onClick={() => setShowCreate(false)}>Back</Button>
-                </MainPageHeader>
-                {createError && <div className='text-red-400 mb-4 text-sm'>{createError}</div>}
-                <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6 max-w-lg'>
-                    <div className='mb-4'>
-                        <label className='block text-sm text-mocha-200 mb-1'>Name</label>
-                        <input
-                            value={createName}
-                            onChange={(e) => setCreateName(e.target.value)}
-                            className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400'
-                        />
-                    </div>
-                    <div className='mb-4'>
-                        <label className='block text-sm text-mocha-200 mb-1'>Description</label>
-                        <input
-                            value={createDesc}
-                            onChange={(e) => setCreateDesc(e.target.value)}
-                            className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400'
-                        />
-                    </div>
-                    <Button variant='default' onClick={handleCreate} disabled={saving || !createName}>
+    return (
+        <Dialog open={open} onClose={onClose} title='Create Nest'>
+            {error && (
+                <div className='text-red-400 mb-4 text-sm bg-red-950/20 border border-red-800/40 rounded-lg p-3 mx-6 mt-4'>
+                    {error}
+                </div>
+            )}
+            <div className='space-y-4 px-6 pt-2'>
+                <div>
+                    <label htmlFor='nest-name' className={labelClass}>
+                        Name *
+                    </label>
+                    <input
+                        id='nest-name'
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className={inputClass}
+                        placeholder='My New Nest'
+                    />
+                </div>
+                <div>
+                    <label htmlFor='nest-description' className={labelClass}>
+                        Description
+                    </label>
+                    <input
+                        id='nest-description'
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className={inputClass}
+                        placeholder='Optional description'
+                    />
+                </div>
+            </div>
+            <Dialog.Footer>
+                <div className='flex items-center justify-end gap-3 p-6 border-t border-mocha-400/30'>
+                    <Button variant='secondary' onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button variant='default' onClick={handleCreate} disabled={saving || !name}>
                         {saving ? 'Creating...' : 'Create Nest'}
                     </Button>
                 </div>
-            </div>
-        );
-    }
+            </Dialog.Footer>
+        </Dialog>
+    );
+};
+
+const AdminNestsContainer = () => {
+    const [page, setPage] = useState(1);
+    const [showCreate, setShowCreate] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState<AdminNest | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const { data, error, mutate } = useSWR(['admin:nests', page], () => getNests({ page }));
+
+    const handleDelete = () => {
+        if (!confirmDelete) return;
+        setDeleting(true);
+        deleteNest(confirmDelete.id)
+            .then(() => {
+                toast.success(`Nest "${confirmDelete.name}" deleted`);
+                setConfirmDelete(null);
+                mutate();
+            })
+            .catch((e) => toast.error(httpErrorToHuman(e)))
+            .finally(() => setDeleting(false));
+    };
 
     return (
         <Routes>
@@ -75,98 +123,148 @@ const AdminNestsContainer = () => {
                 element={
                     <div>
                         <MainPageHeader title='Nests'>
-                            <div className='flex items-center gap-2'>
-                                <div className='flex items-center bg-mocha-600 rounded-lg p-1'>
-                                    <Button variant={viewMode === 'cards' ? 'default' : 'secondary'} size='sm' onClick={() => setViewMode('cards')} title='Card view'>▦</Button>
-                                    <Button variant={viewMode === 'table' ? 'default' : 'secondary'} size='sm' onClick={() => setViewMode('table')} title='Table view'>☰</Button>
-                                </div>
-                                <Button variant='default' onClick={() => setShowCreate(true)}>New Nest</Button>
-                            </div>
+                            <Button variant='default' onClick={() => setShowCreate(true)}>
+                                Create Nest
+                            </Button>
                         </MainPageHeader>
 
-                        {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
+                        {error && (
+                            <div className='text-red-400 mb-4 bg-red-950/20 border border-red-800/40 rounded-lg p-3'>
+                                Error: {httpErrorToHuman(error)}
+                            </div>
+                        )}
 
                         {!data ? (
                             <Spinner />
                         ) : (
                             <Pagination data={data} onPageSelect={setPage}>
                                 {({ items }) => (
-                                    <>
-                                        {items.length === 0 ? (
-                                            <div className='text-center py-8 text-mocha-200'>
-                                                No nests found.
-                                            </div>
-                                        ) : viewMode === 'cards' ? (
-                                            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                                                {items.map((nest: AdminNest) => (
-                                                    <Link
-                                                        key={nest.id}
-                                                        to={String(nest.id)}
-                                                        className='block bg-mocha-500 border border-mocha-400 rounded-lg p-5 hover:border-mocha-400 transition-colors cursor-pointer group'
-                                                    >
-                                                        <div className='flex items-start justify-between mb-4'>
-                                                            <div className='flex items-center gap-3'>
-                                                                <div className='w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center shrink-0'>
-                                                                    <HugeiconsIcon icon={CubeIcon} className='w-5 h-5 text-cream-400' />
+                                    <div className='bg-mocha-500 border border-mocha-400 rounded-xl overflow-hidden shadow-sm'>
+                                        <table className='w-full text-sm border-collapse'>
+                                            <thead>
+                                                <tr className='border-b border-mocha-400/80 bg-mocha-600/20'>
+                                                    <th className='text-left px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs'>
+                                                        Name
+                                                    </th>
+                                                    <th className='text-left px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs hidden md:table-cell'>
+                                                        Description
+                                                    </th>
+                                                    <th className='text-left px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs hidden lg:table-cell'>
+                                                        Author
+                                                    </th>
+                                                    <th className='text-center px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs w-[80px]'>
+                                                        Eggs
+                                                    </th>
+                                                    <th className='text-center px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs w-[90px]'>
+                                                        Servers
+                                                    </th>
+                                                    <th className='text-right px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs w-[160px]'>
+                                                        Actions
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className='divide-y divide-mocha-400/40'>
+                                                {items.length === 0 ? (
+                                                    <tr>
+                                                        <td
+                                                            colSpan={6}
+                                                            className='text-center py-10 text-mocha-200 font-medium'
+                                                        >
+                                                            No nests found.
+                                                        </td>
+                                                    </tr>
+                                                ) : (
+                                                    items.map((nest: AdminNest) => (
+                                                        <tr
+                                                            key={nest.id}
+                                                            className='hover:bg-mocha-400/15 transition-colors'
+                                                        >
+                                                            <td className='px-5 py-4'>
+                                                                <Link
+                                                                    to={String(nest.id)}
+                                                                    className='text-cream-400 font-semibold hover:text-cream-200 transition-colors flex items-center gap-2'
+                                                                >
+                                                                    <div className='w-7 h-7 rounded-md border border-mocha-400 overflow-hidden shrink-0 flex items-center justify-center'>
+                                                                        {nest.icon ? (
+                                                                            <img
+                                                                                src={nest.icon}
+                                                                                alt={nest.name}
+                                                                                className='w-full h-full object-cover'
+                                                                            />
+                                                                        ) : (
+                                                                            <HugeiconsIcon
+                                                                                icon={CubeIcon}
+                                                                                className='w-4 h-4 text-mocha-200'
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                    {nest.name}
+                                                                </Link>
+                                                            </td>
+                                                            <td className='px-5 py-4 text-mocha-100 hidden md:table-cell max-w-[250px] truncate'>
+                                                                {nest.description || (
+                                                                    <span className='text-mocha-300 italic'>
+                                                                        No description
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                            <td className='px-5 py-4 text-mocha-100 hidden lg:table-cell'>
+                                                                {nest.author}
+                                                            </td>
+                                                            <td className='px-5 py-4 text-center'>
+                                                                <span className='inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold bg-mocha-400/30 text-cream-400 rounded-full'>
+                                                                    {nest.eggsCount}
+                                                                </span>
+                                                            </td>
+                                                            <td className='px-5 py-4 text-center'>
+                                                                <span className='inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold bg-mocha-400/30 text-cream-400 rounded-full'>
+                                                                    {nest.serversCount}
+                                                                </span>
+                                                            </td>
+                                                            <td className='px-5 py-4 text-right'>
+                                                                <div className='flex items-center justify-end gap-3'>
+                                                                    <Link
+                                                                        to={String(nest.id)}
+                                                                        className='text-xs font-semibold text-cream-400 hover:text-cream-200 transition-colors'
+                                                                    >
+                                                                        Configure
+                                                                    </Link>
+                                                                    <Button
+                                                                        variant='attention'
+                                                                        size='sm'
+                                                                        onClick={() => setConfirmDelete(nest)}
+                                                                    >
+                                                                        Delete
+                                                                    </Button>
                                                                 </div>
-                                                                <div>
-                                                                    <h3 className='text-cream-400 font-semibold group-hover:text-cream-500 transition-colors'>{nest.name}</h3>
-                                                                    <p className='text-xs text-mocha-200/60 mt-0.5'>{nest.description || 'No description'}</p>
-                                                                </div>
-                                                            </div>
-                                                            <span className='text-xs text-mocha-200/60 font-mono'>#{nest.id}</span>
-                                                        </div>
-                                                        <div className='grid grid-cols-2 gap-3'>
-                                                            <div className='bg-mocha-400/20 rounded-lg p-3 border border-mocha-400/50'>
-                                                                <div className='text-lg font-bold text-cream-200'>{nest.eggsCount}</div>
-                                                                <div className='text-xs text-mocha-200'>eggs</div>
-                                                            </div>
-                                                            <div className='bg-mocha-400/20 rounded-lg p-3 border border-mocha-400/50'>
-                                                                <div className='text-lg font-bold text-cream-200'>{nest.serversCount}</div>
-                                                                <div className='text-xs text-mocha-200'>servers</div>
-                                                            </div>
-                                                        </div>
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className='bg-mocha-500 border border-mocha-400 rounded-lg overflow-hidden'>
-                                                <table className='w-full text-sm'>
-                                                    <thead>
-                                                        <tr className='border-b border-mocha-400'>
-                                                            <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Name</th>
-                                                            <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Description</th>
-                                                            <th className='text-center px-4 py-3 text-mocha-200 font-medium'>Eggs</th>
-                                                            <th className='text-center px-4 py-3 text-mocha-200 font-medium'>Servers</th>
-                                                            <th className='text-right px-4 py-3 text-mocha-200 font-medium'>Actions</th>
+                                                            </td>
                                                         </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {items.map((nest: AdminNest) => (
-                                                            <tr key={nest.id} className='border-b border-mocha-400 last:border-0 hover:bg-mocha-400/20'>
-                                                                <td className='px-4 py-3'>
-                                                                    <Link to={String(nest.id)} className='text-cream-400 font-medium hover:text-cream-200'>
-                                                                        {nest.name}
-                                                                    </Link>
-                                                                </td>
-                                                                <td className='px-4 py-3 text-mocha-100'>{nest.description || '-'}</td>
-                                                                <td className='px-4 py-3 text-center text-mocha-100'>{nest.eggsCount}</td>
-                                                                <td className='px-4 py-3 text-center text-mocha-100'>{nest.serversCount}</td>
-                                                                <td className='px-4 py-3 text-right'>
-                                                                    <Link to={String(nest.id)} className='text-xs text-cream-400 hover:text-cream-500'>
-                                                                        View
-                                                                    </Link>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
-                                    </>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 )}
                             </Pagination>
                         )}
+
+                        <CreateNestModal
+                            open={showCreate}
+                            onClose={() => setShowCreate(false)}
+                            onCreated={() => mutate()}
+                        />
+
+                        <Dialog.Confirm
+                            open={confirmDelete !== null}
+                            onClose={() => setConfirmDelete(null)}
+                            onConfirmed={handleDelete}
+                            title='Delete Nest'
+                            confirm='Delete'
+                            loading={deleting}
+                        >
+                            Are you sure you want to permanently delete <strong>{confirmDelete?.name}</strong>? All eggs
+                            in this nest will also be deleted. This action cannot be undone.
+                        </Dialog.Confirm>
                     </div>
                 }
             />

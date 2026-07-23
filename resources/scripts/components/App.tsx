@@ -34,7 +34,8 @@ interface ExtendedWindow extends Window {
         uuid: string;
         username: string;
         email: string;
-
+        name_first: string;
+        name_last: string;
         root_admin: boolean;
         use_totp: boolean;
         language: string;
@@ -53,6 +54,8 @@ const App = () => {
             language: HydrodactylUser.language,
             rootAdmin: HydrodactylUser.root_admin,
             useTotp: HydrodactylUser.use_totp,
+            nameFirst: HydrodactylUser.name_first || '',
+            nameLast: HydrodactylUser.name_last || '',
             createdAt: new Date(HydrodactylUser.created_at),
             updatedAt: new Date(HydrodactylUser.updated_at),
         });

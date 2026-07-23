@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import useSWR from 'swr';
 import { toast } from 'sonner';
+import useSWR from 'swr';
 import {
     type AdminDatabaseHost,
     type CreateDatabaseHostData,
@@ -13,11 +13,10 @@ import {
 } from '@/api/admin/databaseHosts';
 import { type AdminNode, getNodes } from '@/api/admin/nodes';
 import { httpErrorToHuman } from '@/api/http';
-import { Button } from '@/components/ui/button';
-import { Dialog } from '@/components/elements/dialog';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
 
 const inputClass =
     'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors';
@@ -126,21 +125,37 @@ const AdminDatabaseHostView = () => {
                     <div className='bg-mocha-500 border border-mocha-400 rounded-xl p-6'>
                         <div className='flex items-center gap-3 mb-6'>
                             <div className='w-10 h-10 bg-mocha-400 rounded-lg flex items-center justify-center'>
-                                <svg className='w-5 h-5 text-cream-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4' />
+                                <svg
+                                    className='w-5 h-5 text-cream-400'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    viewBox='0 0 24 24'
+                                    role='presentation'
+                                >
+                                    <path
+                                        strokeLinecap='round'
+                                        strokeLinejoin='round'
+                                        strokeWidth={2}
+                                        d='M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4'
+                                    />
                                 </svg>
                             </div>
                             <div>
                                 <h3 className='text-cream-400 font-semibold text-lg'>Container Configuration</h3>
-                                <p className='text-mocha-200 text-sm'>Databases run exclusively in Docker/Podman containers</p>
+                                <p className='text-mocha-200 text-sm'>
+                                    Databases run exclusively in Docker/Podman containers
+                                </p>
                             </div>
                         </div>
 
                         <div className='space-y-4'>
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                                 <div>
-                                    <label className={labelClass}>Host Name *</label>
+                                    <label htmlFor='host-name' className={labelClass}>
+                                        Host Name *
+                                    </label>
                                     <input
+                                        id='host-name'
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         className={inputClass}
@@ -148,21 +163,29 @@ const AdminDatabaseHostView = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Container Image *</label>
+                                    <label htmlFor='container-image' className={labelClass}>
+                                        Container Image *
+                                    </label>
                                     <input
+                                        id='container-image'
                                         value={containerImage}
                                         onChange={(e) => setContainerImage(e.target.value)}
                                         className={inputClass}
                                         placeholder='mysql:8.0'
                                     />
-                                    <p className='text-mocha-200 text-xs mt-1.5'>Docker image for the database container</p>
+                                    <p className='text-mocha-200 text-xs mt-1.5'>
+                                        Docker image for the database container
+                                    </p>
                                 </div>
                             </div>
 
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                                 <div>
-                                    <label className={labelClass}>Internal Host *</label>
+                                    <label htmlFor='internal-host' className={labelClass}>
+                                        Internal Host *
+                                    </label>
                                     <input
+                                        id='internal-host'
                                         value={hostVal}
                                         onChange={(e) => setHostVal(e.target.value)}
                                         className={inputClass}
@@ -171,8 +194,11 @@ const AdminDatabaseHostView = () => {
                                     <p className='text-mocha-200 text-xs mt-1.5'>Internal container IP or hostname</p>
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Port *</label>
+                                    <label htmlFor='db-port' className={labelClass}>
+                                        Port *
+                                    </label>
                                     <input
+                                        id='db-port'
                                         type='number'
                                         value={port}
                                         onChange={(e) => setPort(e.target.value)}
@@ -183,8 +209,11 @@ const AdminDatabaseHostView = () => {
                             </div>
 
                             <div>
-                                <label className={labelClass}>Username *</label>
+                                <label htmlFor='db-username' className={labelClass}>
+                                    Username *
+                                </label>
                                 <input
+                                    id='db-username'
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     className={inputClass}
@@ -193,8 +222,11 @@ const AdminDatabaseHostView = () => {
                             </div>
 
                             <div>
-                                <label className={labelClass}>Password (leave empty to keep existing)</label>
+                                <label htmlFor='db-password' className={labelClass}>
+                                    Password (leave empty to keep existing)
+                                </label>
                                 <input
+                                    id='db-password'
                                     type='password'
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -208,8 +240,19 @@ const AdminDatabaseHostView = () => {
                     <div className='bg-mocha-500/50 border border-mocha-400/50 rounded-xl p-6'>
                         <div className='flex items-center gap-3 mb-4'>
                             <div className='w-10 h-10 bg-mocha-400/50 rounded-lg flex items-center justify-center'>
-                                <svg className='w-5 h-5 text-mocha-200' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+                                <svg
+                                    className='w-5 h-5 text-mocha-200'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    viewBox='0 0 24 24'
+                                    role='presentation'
+                                >
+                                    <path
+                                        strokeLinecap='round'
+                                        strokeLinejoin='round'
+                                        strokeWidth={2}
+                                        d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                                    />
                                 </svg>
                             </div>
                             <div>
@@ -229,11 +272,15 @@ const AdminDatabaseHostView = () => {
                             </div>
                             <div className='bg-mocha-600/30 rounded-lg p-3'>
                                 <span className='text-mocha-200 text-xs uppercase tracking-wider'>Created</span>
-                                <p className='text-cream-400 text-sm mt-1'>{new Date(host.createdAt).toLocaleDateString()}</p>
+                                <p className='text-cream-400 text-sm mt-1'>
+                                    {new Date(host.createdAt).toLocaleDateString()}
+                                </p>
                             </div>
                             <div className='bg-mocha-600/30 rounded-lg p-3'>
                                 <span className='text-mocha-200 text-xs uppercase tracking-wider'>Updated</span>
-                                <p className='text-cream-400 text-sm mt-1'>{new Date(host.updatedAt).toLocaleDateString()}</p>
+                                <p className='text-cream-400 text-sm mt-1'>
+                                    {new Date(host.updatedAt).toLocaleDateString()}
+                                </p>
                             </div>
                         </div>
                     </div>

@@ -4,6 +4,10 @@ namespace Pterodactyl\Http\Controllers\Api\Application\Nests;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Pterodactyl\Models\Nest;
 use Pterodactyl\Services\Nests\NestCreationService;
 use Pterodactyl\Services\Nests\NestUpdateService;
@@ -18,6 +22,8 @@ use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
 
 class NestController extends ApplicationApiController
 {
+    private const ICON_DIR = 'nests';
+
     public function __construct(
         private NestRepositoryInterface $repository,
         private NestCreationService $creationService,
@@ -77,8 +83,54 @@ class NestController extends ApplicationApiController
             ->toArray();
     }
 
+    public function updateIcon(Request $request, Nest $nest): JsonResponse
+    {
+        $validated = $request->validate([
+            'icon_file' => 'nullable|file|mimes:png,jpg,jpeg,gif,webp,svg,ico,avif|max:2048',
+            'remove' => 'nullable|boolean',
+        ]);
+
+        if (!empty($validated['remove']) && $validated['remove']) {
+            $this->removeIcon($nest);
+            return new JsonResponse(['success' => true, 'icon' => null]);
+        }
+
+        if (!empty($validated['icon_file'])) {
+            $iconPath = $this->storeIcon($validated['icon_file'], $nest);
+            $this->repository->withoutFreshModel()->update($nest->id, ['icon' => $iconPath]);
+            return new JsonResponse(['success' => true, 'icon' => url('storage/' . $iconPath)]);
+        }
+
+        return new JsonResponse(['error' => 'No icon file provided.'], 422);
+    }
+
+    private function storeIcon(UploadedFile $file, Nest $nest): string
+    {
+        $oldIcon = $nest->icon;
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs(self::ICON_DIR, $filename, 'public');
+
+        if ($oldIcon && Storage::disk('public')->exists($oldIcon)) {
+            Storage::disk('public')->delete($oldIcon);
+        }
+
+        return $path;
+    }
+
+    private function removeIcon(Nest $nest): void
+    {
+        if ($nest->icon && Storage::disk('public')->exists($nest->icon)) {
+            Storage::disk('public')->delete($nest->icon);
+        }
+        $this->repository->withoutFreshModel()->update($nest->id, ['icon' => null]);
+    }
+
     public function delete(DeleteNestRequest $request, Nest $nest): Response
     {
+        if ($nest->icon && Storage::disk('public')->exists($nest->icon)) {
+            Storage::disk('public')->delete($nest->icon);
+        }
+
         $this->deletionService->handle($nest->id);
 
         return response('', 204);

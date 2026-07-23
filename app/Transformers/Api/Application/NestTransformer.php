@@ -34,6 +34,7 @@ class NestTransformer extends BaseTransformer
     {
         $response = $model->toArray();
 
+        $response['icon'] = $model->icon ? url('storage/' . $model->icon) : null;
         $response[$model->getUpdatedAtColumn()] = $this->formatTimestamp($model->updated_at);
         $response[$model->getCreatedAtColumn()] = $this->formatTimestamp($model->created_at);
 

@@ -62,6 +62,7 @@ export interface AdminNest {
     author: string;
     name: string;
     description: string;
+    icon: string | null;
     eggsCount: number;
     serversCount: number;
     createdAt: string;
@@ -77,6 +78,7 @@ const rawToNest = (data: FractalResponseData): AdminNest => {
         author: attrs.author as string,
         name: attrs.name as string,
         description: (attrs.description as string) || '',
+        icon: (attrs.icon as string) || null,
         eggsCount:
             (attrs.eggs_count as number) || (attrs.relationships?.eggs?.data as FractalResponseData[])?.length || 0,
         serversCount: (attrs.servers_count as number) || 0,
@@ -178,6 +180,24 @@ export const updateNest = (id: number, data: Partial<CreateNestData>): Promise<A
     });
 
 export const deleteNest = (id: number): Promise<void> => http.delete(`/api/application/nests/${id}`);
+
+export const updateNestIcon = (id: number, file: File): Promise<string | null> =>
+    new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append('icon_file', file);
+        http.post(`/api/application/nests/${id}/icon`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        })
+            .then(({ data }) => resolve(data.icon as string | null))
+            .catch(reject);
+    });
+
+export const removeNestIcon = (id: number): Promise<void> =>
+    new Promise((resolve, reject) => {
+        http.post(`/api/application/nests/${id}/icon`, { remove: true })
+            .then(() => resolve())
+            .catch(reject);
+    });
 
 export const getNestEggs = (nestId: number, params?: QueryBuilderParams): Promise<PaginatedResult<AdminEgg>> =>
     new Promise((resolve, reject) => {

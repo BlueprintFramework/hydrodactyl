@@ -1,7 +1,6 @@
 import http from '@/api/http';
 
 export interface GeneralSettings {
-    'app:name': string;
     'app:locale': string;
     'pterodactyl:auth:2fa_required': number;
     available_languages: Record<string, string>;
@@ -26,6 +25,7 @@ export interface CaptchaSettings {
 }
 
 export interface BrandingSettings {
+    companyName: string;
     logoType: string | null;
     logoUrl: string | null;
     logoValue: string | null;
@@ -75,8 +75,7 @@ export const getMailSettings = (): Promise<MailSettings> =>
 export const updateMailSettings = (settings: Partial<MailSettings>): Promise<void> =>
     http.patch('/api/application/settings/mail', settings);
 
-export const testMailSettings = (): Promise<void> =>
-    http.post('/api/application/settings/mail/test');
+export const testMailSettings = (): Promise<void> => http.post('/api/application/settings/mail/test');
 
 export const getCaptchaSettings = (): Promise<CaptchaSettings> =>
     http.get('/api/application/settings/captcha').then(({ data }) => data);
@@ -107,11 +106,17 @@ export const createDomain = (data: Record<string, unknown>): Promise<void> =>
 export const updateDomain = (id: number, data: Record<string, unknown>): Promise<void> =>
     http.patch(`/api/application/settings/domains/${id}`, data);
 
-export const deleteDomain = (id: number): Promise<void> =>
-    http.delete(`/api/application/settings/domains/${id}`);
+export const deleteDomain = (id: number): Promise<void> => http.delete(`/api/application/settings/domains/${id}`);
 
-export const testDnsConnection = (data: { dns_provider: string; dns_config: Record<string, string> }): Promise<{ success: boolean; message: string }> =>
+export const testDnsConnection = (data: {
+    dns_provider: string;
+    dns_config: Record<string, string>;
+}): Promise<{ success: boolean; message: string }> =>
     http.post('/api/application/settings/domains/test-connection', data).then(({ data: resp }) => resp);
 
-export const getProviderSchema = (provider: string): Promise<{ success: boolean; schema: Record<string, { description: string; required: boolean; sensitive: boolean }> }> =>
-    http.get(`/api/application/settings/domains/provider-schema/${provider}`).then(({ data: resp }) => resp);
+export const getProviderSchema = (
+    provider: string,
+): Promise<{
+    success: boolean;
+    schema: Record<string, { description: string; required: boolean; sensitive: boolean }>;
+}> => http.get(`/api/application/settings/domains/provider-schema/${provider}`).then(({ data: resp }) => resp);

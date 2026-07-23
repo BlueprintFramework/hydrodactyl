@@ -10,11 +10,11 @@ import {
     updateLocation,
 } from '@/api/admin/locations';
 import { httpErrorToHuman } from '@/api/http';
-import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/elements/dialog';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
 
 const inputClass =
     'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors';
@@ -65,7 +65,7 @@ const AdminLocationView = () => {
         try {
             await deleteLocation(locationId);
             navigate('/admin/locations');
-        } catch (e: any) {
+        } catch (e: unknown) {
             setError(httpErrorToHuman(e));
         }
     };
@@ -95,16 +95,10 @@ const AdminLocationView = () => {
             ) : (
                 <>
                     <div className='flex gap-2 mb-6'>
-                        <Button
-                            variant={tab === 'details' ? 'default' : 'ghost'}
-                            onClick={() => setTab('details')}
-                        >
+                        <Button variant={tab === 'details' ? 'default' : 'ghost'} onClick={() => setTab('details')}>
                             Details
                         </Button>
-                        <Button
-                            variant={tab === 'danger' ? 'attention' : 'ghost'}
-                            onClick={() => setTab('danger')}
-                        >
+                        <Button variant={tab === 'danger' ? 'attention' : 'ghost'} onClick={() => setTab('danger')}>
                             Danger Zone
                         </Button>
                     </div>
@@ -112,16 +106,22 @@ const AdminLocationView = () => {
                     {tab === 'details' && (
                         <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6 max-w-2xl'>
                             <div className='mb-4'>
-                                <label className={labelClass}>Short Code</label>
+                                <label htmlFor='short-code' className={labelClass}>
+                                    Short Code
+                                </label>
                                 <input
+                                    id='short-code'
                                     value={short}
                                     onChange={(e) => setShort(e.target.value)}
                                     className={inputClass}
                                 />
                             </div>
                             <div className='mb-4'>
-                                <label className={labelClass}>Description</label>
+                                <label htmlFor='location-description' className={labelClass}>
+                                    Description
+                                </label>
                                 <input
+                                    id='location-description'
                                     value={long}
                                     onChange={(e) => setLong(e.target.value)}
                                     className={inputClass}
@@ -129,11 +129,11 @@ const AdminLocationView = () => {
                             </div>
                             <div className='grid grid-cols-2 gap-4 pt-4 border-t border-mocha-400 mt-4'>
                                 <div>
-                                    <label className={labelClass}>Nodes</label>
+                                    <span className={labelClass}>Nodes</span>
                                     <p className='text-cream-400'>{location.nodesCount}</p>
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Servers</label>
+                                    <span className={labelClass}>Servers</span>
                                     <p className='text-cream-400'>{location.serversCount}</p>
                                 </div>
                             </div>
@@ -181,7 +181,7 @@ const AdminLocationsContainer = () => {
         try {
             await deleteLocation(id);
             mutate();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -248,13 +248,18 @@ const AdminLocationsContainer = () => {
                                                                     <code>{location.short}</code>
                                                                 </Link>
                                                             </td>
-                                                            <td className='px-4 py-3 text-mocha-100'>{location.long}</td>
+                                                            <td className='px-4 py-3 text-mocha-100'>
+                                                                {location.long}
+                                                            </td>
                                                             <td className='px-4 py-3 text-mocha-100'>
                                                                 {location.nodesCount}
                                                             </td>
                                                             <td className='px-4 py-3 text-right'>
                                                                 <div className='flex items-center justify-end gap-2'>
-                                                                    <Button variant='attention' onClick={() => setConfirmDelete(location.id)}>
+                                                                    <Button
+                                                                        variant='attention'
+                                                                        onClick={() => setConfirmDelete(location.id)}
+                                                                    >
                                                                         Delete
                                                                     </Button>
                                                                 </div>
@@ -269,7 +274,11 @@ const AdminLocationsContainer = () => {
                             </Pagination>
                         )}
 
-                        <CreateLocationModal open={showCreate} onClose={() => setShowCreate(false)} onCreated={() => mutate()} />
+                        <CreateLocationModal
+                            open={showCreate}
+                            onClose={() => setShowCreate(false)}
+                            onCreated={() => mutate()}
+                        />
 
                         <Dialog.Confirm
                             open={confirmDelete !== null}
@@ -289,7 +298,15 @@ const AdminLocationsContainer = () => {
     );
 };
 
-const CreateLocationModal = ({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) => {
+const CreateLocationModal = ({
+    open,
+    onClose,
+    onCreated,
+}: {
+    open: boolean;
+    onClose: () => void;
+    onCreated: () => void;
+}) => {
     const [short, setShort] = useState('');
     const [long, setLong] = useState('');
     const [saving, setSaving] = useState(false);
@@ -304,7 +321,7 @@ const CreateLocationModal = ({ open, onClose, onCreated }: { open: boolean; onCl
             setShort('');
             setLong('');
             onClose();
-        } catch (e: any) {
+        } catch (e: unknown) {
             setError(httpErrorToHuman(e));
         } finally {
             setSaving(false);
@@ -316,8 +333,11 @@ const CreateLocationModal = ({ open, onClose, onCreated }: { open: boolean; onCl
             {error && <div className='text-red-400 mb-4 text-sm'>Error: {error}</div>}
             <div className='space-y-4'>
                 <div>
-                    <label className={labelClass}>Short Code *</label>
+                    <label htmlFor='create-short-code' className={labelClass}>
+                        Short Code *
+                    </label>
                     <input
+                        id='create-short-code'
                         value={short}
                         onChange={(e) => setShort(e.target.value)}
                         className={inputClass}
@@ -325,8 +345,11 @@ const CreateLocationModal = ({ open, onClose, onCreated }: { open: boolean; onCl
                     />
                 </div>
                 <div>
-                    <label className={labelClass}>Description *</label>
+                    <label htmlFor='create-description' className={labelClass}>
+                        Description *
+                    </label>
                     <input
+                        id='create-description'
                         value={long}
                         onChange={(e) => setLong(e.target.value)}
                         className={inputClass}

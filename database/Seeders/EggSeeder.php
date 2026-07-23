@@ -57,9 +57,16 @@ class EggSeeder extends Seeder
      */
     protected function parseEggFiles(Nest $nest)
     {
-        $files = new \DirectoryIterator(database_path('Seeders/eggs/' . kebab_case($nest->name)));
+        $dir = database_path('Seeders/eggs/' . kebab_case($nest->name));
+
+        if (!is_dir($dir)) {
+            $this->command->warn("Egg directory not found for nest '{$nest->name}' at '$dir', skipping.");
+            return;
+        }
 
         $this->command->alert('Updating Eggs for Nest: ' . $nest->name);
+
+        $files = new \DirectoryIterator($dir);
 
         $managedIds = [];
         /** @var \DirectoryIterator $file */

@@ -3,6 +3,12 @@
 namespace Pterodactyl\Http\Controllers\Base;
 
 use Pterodactyl\Http\Controllers\Controller;
+use Pterodactyl\Models\S3;
+use Pterodactyl\Models\Node;
+use Pterodactyl\Models\Nest;
+use Pterodactyl\Models\User;
+use Pterodactyl\Models\Server;
+use Pterodactyl\Models\Location;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
@@ -42,6 +48,34 @@ class SystemStatusController extends Controller
             ], 500);
         }
     }
+
+    public function counts(): JsonResponse
+    {
+        return response()->json(Cache::remember('admin_counts', 60, fn () => [
+            'servers' => Server::count(),
+            'nodes' => Node::count(),
+            'users' => User::count(),
+            'locations' => Location::count(),
+            'nests' => Nest::count(),
+            'buckets' => S3::count(),
+        ]));
+    }
+
+    private function getMemoryUsage(): array
+    {
+        if (PHP_OS_FAMILY === 'Darwin') {
+            $memory = shell_exec('vm_stat');
+            if (!$memory) {
+                throw new \RuntimeException('Failed to execute vm_stat command');
+            }
+
+            // Parse memory stats more reliably
+            $stats = [];
+            foreach (explode("\n", $memory) as $line) {
+                if (preg_match('/Pages\s+([^:]+):\s+(\d+)/', $line, $matches)) {
+                    $stats[strtolower($matches[1])] = (int) $matches[2];
+                }
+            }
 
     private function getMemoryUsage(): array
     {

@@ -3,9 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import { deleteMount, getMount, updateMount } from '@/api/admin/mounts';
 import { httpErrorToHuman } from '@/api/http';
-import { Button } from '@/components/ui/button';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const AdminMountViewContainer = () => {
     const { id } = useParams<{ id: string }>();
@@ -100,24 +101,33 @@ const AdminMountViewContainer = () => {
             <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6 max-w-lg mb-8'>
                 <h4 className='text-cream-400 font-medium mb-4'>Mount Details</h4>
                 <div className='mb-4'>
-                    <label className='block text-sm text-mocha-200 mb-1'>Name</label>
+                    <label htmlFor='mount-detail-name' className='block text-sm text-mocha-200 mb-1'>
+                        Name
+                    </label>
                     <input
+                        id='mount-detail-name'
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                         className='w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400'
                     />
                 </div>
                 <div className='mb-4'>
-                    <label className='block text-sm text-mocha-200 mb-1'>Description</label>
+                    <label htmlFor='mount-detail-description' className='block text-sm text-mocha-200 mb-1'>
+                        Description
+                    </label>
                     <input
+                        id='mount-detail-description'
                         value={form.description}
                         onChange={(e) => setForm({ ...form, description: e.target.value })}
                         className='w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400'
                     />
                 </div>
                 <div className='mb-4'>
-                    <label className='block text-sm text-mocha-200 mb-1'>Source</label>
+                    <label htmlFor='mount-detail-source' className='block text-sm text-mocha-200 mb-1'>
+                        Source
+                    </label>
                     <input
+                        id='mount-detail-source'
                         value={form.source}
                         onChange={(e) => setForm({ ...form, source: e.target.value })}
                         className='w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400'
@@ -125,8 +135,11 @@ const AdminMountViewContainer = () => {
                     />
                 </div>
                 <div className='mb-4'>
-                    <label className='block text-sm text-mocha-200 mb-1'>Target</label>
+                    <label htmlFor='mount-detail-target' className='block text-sm text-mocha-200 mb-1'>
+                        Target
+                    </label>
                     <input
+                        id='mount-detail-target'
                         value={form.target}
                         onChange={(e) => setForm({ ...form, target: e.target.value })}
                         className='w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400'
@@ -134,24 +147,16 @@ const AdminMountViewContainer = () => {
                     />
                 </div>
                 <div className='flex gap-4 mb-4'>
-                    <label className='flex items-center gap-2 text-sm text-mocha-200'>
-                        <input
-                            type='checkbox'
-                            checked={form.read_only}
-                            onChange={(e) => setForm({ ...form, read_only: e.target.checked })}
-                            className='rounded border-mocha-400'
-                        />
-                        Read Only
-                    </label>
-                    <label className='flex items-center gap-2 text-sm text-mocha-200'>
-                        <input
-                            type='checkbox'
-                            checked={form.user_mountable}
-                            onChange={(e) => setForm({ ...form, user_mountable: e.target.checked })}
-                            className='rounded border-mocha-400'
-                        />
-                        User Mountable
-                    </label>
+                    <Checkbox
+                        checked={form.read_only}
+                        onChange={(e) => setForm({ ...form, read_only: e.target.checked })}
+                        label='Read Only'
+                    />
+                    <Checkbox
+                        checked={form.user_mountable}
+                        onChange={(e) => setForm({ ...form, user_mountable: e.target.checked })}
+                        label='User Mountable'
+                    />
                 </div>
             </div>
 

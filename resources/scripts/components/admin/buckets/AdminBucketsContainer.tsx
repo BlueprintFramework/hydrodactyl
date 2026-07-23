@@ -1,5 +1,5 @@
 import { Cloud, Database, Eye, EyeSlash, Gear } from '@gravity-ui/icons';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import useSWR from 'swr';
@@ -18,6 +18,7 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const inputClass =
     'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors placeholder-mocha-300/50';
@@ -301,51 +302,24 @@ const AdminBucketView = () => {
                             </div>
 
                             <div className='flex flex-wrap items-center gap-6 pt-3 border-t border-mocha-400/35 mt-4'>
-                                <div className='flex items-center gap-2.5'>
-                                    <input
-                                        type='checkbox'
-                                        checked={isLocal}
-                                        onChange={(e) => setIsLocal(e.target.checked)}
-                                        className='rounded border-mocha-400 w-4 h-4 accent-mocha-300'
-                                        id='bucket-local'
-                                    />
-                                    <label
-                                        htmlFor='bucket-local'
-                                        className='text-sm text-cream-400 cursor-pointer font-medium'
-                                    >
-                                        Self-Hosted (Local)
-                                    </label>
-                                </div>
-                                <div className='flex items-center gap-2.5'>
-                                    <input
-                                        type='checkbox'
-                                        checked={enabled}
-                                        onChange={(e) => setEnabled(e.target.checked)}
-                                        className='rounded border-mocha-400 w-4 h-4 accent-mocha-300'
-                                        id='bucket-enabled'
-                                    />
-                                    <label
-                                        htmlFor='bucket-enabled'
-                                        className='text-sm text-cream-400 cursor-pointer font-medium'
-                                    >
-                                        Enabled
-                                    </label>
-                                </div>
-                                <div className='flex items-center gap-2.5'>
-                                    <input
-                                        type='checkbox'
-                                        checked={usePathStyleEndpoint}
-                                        onChange={(e) => setUsePathStyleEndpoint(e.target.checked)}
-                                        className='rounded border-mocha-400 w-4 h-4 accent-mocha-300'
-                                        id='bucket-path-style'
-                                    />
-                                    <label
-                                        htmlFor='bucket-path-style'
-                                        className='text-sm text-cream-400 cursor-pointer font-medium'
-                                    >
-                                        Path Style Endpoint
-                                    </label>
-                                </div>
+                                <Checkbox
+                                    checked={isLocal}
+                                    onChange={(e) => setIsLocal(e.target.checked)}
+                                    id='bucket-local'
+                                    label='Self-Hosted (Local)'
+                                />
+                                <Checkbox
+                                    checked={enabled}
+                                    onChange={(e) => setEnabled(e.target.checked)}
+                                    id='bucket-enabled'
+                                    label='Enabled'
+                                />
+                                <Checkbox
+                                    checked={usePathStyleEndpoint}
+                                    onChange={(e) => setUsePathStyleEndpoint(e.target.checked)}
+                                    id='bucket-path-style'
+                                    label='Path Style Endpoint'
+                                />
                             </div>
                         </div>
                     </div>
@@ -448,6 +422,19 @@ const CreateBucketModal = ({
     const [localProvider, setLocalProvider] = useState<'minio' | 'garage' | 'custom'>('minio');
     const [showAccessKey, setShowAccessKey] = useState(false);
     const [showSecretKey, setShowSecretKey] = useState(false);
+    const [providerSelectOpen, setProviderSelectOpen] = useState(false);
+    const providerSelectRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!providerSelectOpen) return;
+        const handler = (e: MouseEvent) => {
+            if (providerSelectRef.current && !providerSelectRef.current.contains(e.target as Node)) {
+                setProviderSelectOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [providerSelectOpen]);
 
     const resetForm = () => {
         setCreateName('');
@@ -461,6 +448,7 @@ const CreateBucketModal = ({
         setCreateUsePathStyleEndpoint(false);
         setCreateMinioInstanceUrl('');
         setCreateError(null);
+        setProviderSelectOpen(false);
     };
 
     const applyLocalPreset = (provider: 'minio' | 'garage' | 'custom') => {
@@ -517,102 +505,156 @@ const CreateBucketModal = ({
     };
 
     return (
-        <Dialog open={open} onClose={onClose} title='Add S3 Bucket'>
+        <Dialog
+            open={open}
+            onClose={onClose}
+            title={
+                createIsLocal
+                    ? localProvider === 'minio'
+                        ? 'Add MinIO Bucket'
+                        : localProvider === 'garage'
+                          ? 'Add Garage Bucket'
+                          : 'Add Custom S3 Bucket'
+                    : 'Add Cloud S3 Bucket'
+            }
+        >
             {createError && (
                 <div className='text-red-400 mb-4 text-sm bg-red-950/20 border border-red-800/40 rounded-lg p-3 mx-6 mt-4'>
                     {createError}
                 </div>
             )}
             <div className='space-y-5 max-h-[70vh] overflow-y-auto pr-2 px-6 pt-2'>
-                {/* Visual Connection Type Switcher */}
-                <div className='grid grid-cols-2 gap-3'>
-                    <button
-                        type='button'
-                        onClick={() => {
-                            setCreateIsLocal(false);
-                        }}
-                        className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
-                            !createIsLocal
-                                ? 'bg-mocha-600/40 border-cream-400/40 shadow-sm ring-1 ring-cream-400/20'
-                                : 'bg-mocha-600/10 border-mocha-400/30 hover:border-mocha-400/60'
-                        }`}
-                    >
-                        <div className='flex items-center gap-2 mb-1'>
-                            <Cloud className={`w-4 h-4 ${!createIsLocal ? 'text-cream-400' : 'text-mocha-200'}`} />
-                            <span
-                                className={`text-sm font-semibold ${!createIsLocal ? 'text-cream-400' : 'text-mocha-100'}`}
+                {/* Custom Select: Storage Provider */}
+                <div>
+                    <label htmlFor='storage-provider' className={labelClass}>
+                        Storage Provider *
+                    </label>
+                    <div className='relative' ref={providerSelectRef}>
+                        <button
+                            id='storage-provider'
+                            type='button'
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setProviderSelectOpen(!providerSelectOpen);
+                            }}
+                            className={`w-full flex items-center justify-between gap-2 bg-mocha-600 border rounded px-3 py-2 text-sm text-left transition-colors cursor-pointer ${
+                                providerSelectOpen ? 'border-mocha-300' : 'border-mocha-400 hover:border-mocha-300'
+                            }`}
+                        >
+                            <span className='flex items-center gap-2'>
+                                {!createIsLocal ? (
+                                    <Cloud className='w-4 h-4 text-cream-400 shrink-0' />
+                                ) : (
+                                    <Database className='w-4 h-4 text-cream-400 shrink-0' />
+                                )}
+                                <span className='text-cream-400'>
+                                    {createIsLocal
+                                        ? localProvider === 'minio'
+                                            ? 'MinIO (Self-Hosted)'
+                                            : localProvider === 'garage'
+                                              ? 'Garage (Self-Hosted)'
+                                              : 'Custom S3 (Self-Hosted)'
+                                        : 'Cloud S3'}
+                                </span>
+                            </span>
+                            <svg
+                                className={`w-4 h-4 text-mocha-200 shrink-0 transition-transform ${providerSelectOpen ? 'rotate-180' : ''}`}
+                                viewBox='0 0 20 20'
+                                fill='currentColor'
+                                role='presentation'
                             >
-                                Cloud S3
-                            </span>
-                        </div>
-                        <p className='text-xs text-mocha-200 leading-normal'>
-                            AWS S3, Backblaze B2, Cloudflare R2, Wasabi, or other custom host
-                        </p>
-                    </button>
-
-                    <button
-                        type='button'
-                        onClick={() => {
-                            setCreateIsLocal(true);
-                            applyLocalPreset('minio');
-                        }}
-                        className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
-                            createIsLocal
-                                ? 'bg-mocha-600/40 border-cream-400/40 shadow-sm ring-1 ring-cream-400/20'
-                                : 'bg-mocha-600/10 border-mocha-400/30 hover:border-mocha-400/60'
-                        }`}
-                    >
-                        <div className='flex items-center gap-2 mb-1'>
-                            <Database className={`w-4 h-4 ${createIsLocal ? 'text-cream-400' : 'text-mocha-200'}`} />
-                            <span
-                                className={`text-sm font-semibold ${createIsLocal ? 'text-cream-400' : 'text-mocha-100'}`}
-                            >
-                                Self-Hosted / Local
-                            </span>
-                        </div>
-                        <p className='text-xs text-mocha-200 leading-normal'>
-                            MinIO, Garage, Ceph, SeaweedFS, or other self-hosted service
-                        </p>
-                    </button>
-                </div>
-
-                {/* Local Preset Options */}
-                {createIsLocal && (
-                    <div className='bg-mocha-600/30 border border-mocha-400/35 rounded-xl p-4 space-y-3'>
-                        <div className='flex items-center justify-between'>
-                            <span className='text-xs font-semibold text-mocha-200 uppercase tracking-wider'>
-                                Local Provider Preset
-                            </span>
-                            <span className='text-xs text-green-400 font-medium bg-green-950/20 px-2 py-0.5 rounded border border-green-800/40'>
-                                Path Style Auto-Enabled
-                            </span>
-                        </div>
-                        <div className='flex gap-2'>
-                            {(['minio', 'garage', 'custom'] as const).map((prov) => (
+                                <path
+                                    fillRule='evenodd'
+                                    d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z'
+                                    clipRule='evenodd'
+                                />
+                            </svg>
+                        </button>
+                        {providerSelectOpen && (
+                            <div className='absolute z-50 mt-1 w-full bg-mocha-600 border border-mocha-300 rounded-lg shadow-xl overflow-hidden'>
+                                <div className='px-2 pt-2 pb-1'>
+                                    <span className='text-[10px] font-semibold text-mocha-200 uppercase tracking-wider px-2'>
+                                        Cloud Providers
+                                    </span>
+                                </div>
                                 <button
-                                    key={prov}
                                     type='button'
-                                    onClick={() => applyLocalPreset(prov)}
-                                    className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all cursor-pointer ${
-                                        localProvider === prov
-                                            ? 'bg-cream-400/10 text-cream-400 border-cream-400/40'
-                                            : 'bg-mocha-600/20 text-mocha-200 border-mocha-400/20 hover:border-mocha-400/40'
+                                    onClick={() => {
+                                        setCreateIsLocal(false);
+                                        setProviderSelectOpen(false);
+                                    }}
+                                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left transition-colors cursor-pointer ${
+                                        !createIsLocal
+                                            ? 'bg-cream-400/10 text-cream-400'
+                                            : 'text-mocha-200 hover:bg-mocha-400/20 hover:text-cream-400'
                                     }`}
                                 >
-                                    {prov === 'minio' ? 'MinIO' : prov === 'garage' ? 'Garage' : 'Custom S3'}
+                                    <Cloud className='w-4 h-4 shrink-0' />
+                                    <div>
+                                        <span className='font-medium'>Cloud S3</span>
+                                        <span className='text-xs text-mocha-200 ml-2'>AWS, Backblaze, R2, Wasabi</span>
+                                    </div>
                                 </button>
-                            ))}
-                        </div>
+                                <div className='border-t border-mocha-400/30 mx-2' />
+                                <div className='px-2 pt-2 pb-1'>
+                                    <span className='text-[10px] font-semibold text-mocha-200 uppercase tracking-wider px-2'>
+                                        Self-Hosted
+                                    </span>
+                                </div>
+                                {[
+                                    { key: 'minio' as const, label: 'MinIO', desc: 'Standard local S3 with console' },
+                                    { key: 'garage' as const, label: 'Garage', desc: 'Lightweight self-hosted S3' },
+                                    { key: 'custom' as const, label: 'Custom S3', desc: 'Ceph, SeaweedFS, or other' },
+                                ].map((prov) => (
+                                    <button
+                                        key={prov.key}
+                                        type='button'
+                                        onClick={() => {
+                                            setCreateIsLocal(true);
+                                            applyLocalPreset(prov.key);
+                                            setProviderSelectOpen(false);
+                                        }}
+                                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left transition-colors cursor-pointer ${
+                                            createIsLocal && localProvider === prov.key
+                                                ? 'bg-cream-400/10 text-cream-400'
+                                                : 'text-mocha-200 hover:bg-mocha-400/20 hover:text-cream-400'
+                                        }`}
+                                    >
+                                        <Database className='w-4 h-4 shrink-0' />
+                                        <div>
+                                            <span className='font-medium'>{prov.label}</span>
+                                            <span className='text-xs text-mocha-200 ml-2'>{prov.desc}</span>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <p className='text-xs text-mocha-200/60 mt-1'>
+                        {!createIsLocal
+                            ? 'Use a cloud-hosted S3-compatible storage provider'
+                            : 'Use a locally self-hosted S3-compatible service'}
+                    </p>
+                </div>
+
+                {/* Local Provider Info */}
+                {createIsLocal && (
+                    <div className='bg-mocha-600/30 border border-mocha-400/35 rounded-xl p-4 space-y-2'>
                         {localProvider === 'minio' && (
                             <p className='text-xs text-mocha-200 leading-normal'>
-                                Selecting MinIO applies the standard credentials <code>minioadmin</code> and configs.
-                                Make sure your endpoint matches your host config (e.g.{' '}
-                                <code>http://localhost:9000</code>).
+                                MinIO preset applied with default credentials <code>minioadmin</code>. Make sure your
+                                endpoint matches your host config (e.g. <code>http://localhost:9000</code>).
                             </p>
                         )}
                         {localProvider === 'garage' && (
                             <p className='text-xs text-mocha-200 leading-normal'>
                                 Garage requires Path-Style routing and typically runs on port <code>3900</code>.
+                            </p>
+                        )}
+                        {localProvider === 'custom' && (
+                            <p className='text-xs text-mocha-200 leading-normal'>
+                                Configure your endpoint, access key, and secret key manually for your custom
+                                S3-compatible service.
                             </p>
                         )}
                     </div>
@@ -741,36 +783,18 @@ const CreateBucketModal = ({
                 </div>
 
                 <div className='flex items-center gap-6 pt-3 border-t border-mocha-400/35 mt-4'>
-                    <div className='flex items-center gap-2.5'>
-                        <input
-                            type='checkbox'
-                            checked={createEnabled}
-                            onChange={(e) => setCreateEnabled(e.target.checked)}
-                            className='rounded border-mocha-400 w-4 h-4 accent-mocha-300'
-                            id='modal-bucket-enabled'
-                        />
-                        <label
-                            htmlFor='modal-bucket-enabled'
-                            className='text-sm text-cream-400 cursor-pointer font-medium'
-                        >
-                            Enabled
-                        </label>
-                    </div>
-                    <div className='flex items-center gap-2.5'>
-                        <input
-                            type='checkbox'
-                            checked={createUsePathStyleEndpoint}
-                            onChange={(e) => setCreateUsePathStyleEndpoint(e.target.checked)}
-                            className='rounded border-mocha-400 w-4 h-4'
-                            id='modal-bucket-path-style'
-                        />
-                        <label
-                            htmlFor='modal-bucket-path-style'
-                            className='text-sm text-cream-400 cursor-pointer font-medium'
-                        >
-                            Use Path Style Endpoint
-                        </label>
-                    </div>
+                    <Checkbox
+                        checked={createEnabled}
+                        onChange={(e) => setCreateEnabled(e.target.checked)}
+                        id='modal-bucket-enabled'
+                        label='Enabled'
+                    />
+                    <Checkbox
+                        checked={createUsePathStyleEndpoint}
+                        onChange={(e) => setCreateUsePathStyleEndpoint(e.target.checked)}
+                        id='modal-bucket-path-style'
+                        label='Use Path Style Endpoint'
+                    />
                 </div>
             </div>
             <Dialog.Footer>

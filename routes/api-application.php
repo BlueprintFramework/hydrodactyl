@@ -17,6 +17,7 @@ use Pterodactyl\Http\Controllers\Base;
 
 Route::group(['prefix' => '/panel'], function () {
     Route::get('/status', [Base\SystemStatusController::class, 'index']);
+    Route::get('/counts', [Base\SystemStatusController::class, 'counts']);
 });
 
 
@@ -241,6 +242,8 @@ Route::group(['prefix' => '/nests'], function () {
 
     Route::post('/', [Application\Nests\NestController::class, 'store']);
     Route::patch('/{nest:id}', [Application\Nests\NestController::class, 'update']);
+
+    Route::post('/{nest:id}/icon', [Application\Nests\NestController::class, 'updateIcon'])->name('api.application.nests.icon');
 
     Route::delete('/{nest:id}', [Application\Nests\NestController::class, 'delete']);
 

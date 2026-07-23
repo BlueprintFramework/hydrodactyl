@@ -1,12 +1,11 @@
-import { useState } from 'react';
-import useSWR from 'swr';
-import { toast } from 'sonner';
+import { Edit02Icon, InformationCircleIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { InformationCircleIcon, Edit02Icon } from '@hugeicons/core-free-icons';
-
-import Spinner from '@/components/elements/Spinner';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import useSWR from 'swr';
 import { getGeneralSettings, updateGeneralSettings } from '@/api/admin/settings';
 import { httpErrorToHuman } from '@/api/http';
+import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 
 const inputClass =
@@ -14,20 +13,24 @@ const inputClass =
 const labelClass = 'block text-sm text-mocha-200 mb-1';
 
 const GeneralSettingsTab = () => {
-    const { data: settings, isLoading, error: fetchError, mutate } = useSWR('admin:settings:general', getGeneralSettings);
+    const {
+        data: settings,
+        isLoading,
+        error: fetchError,
+        mutate,
+    } = useSWR('admin:settings:general', getGeneralSettings);
     const [saving, setSaving] = useState(false);
     const [editing, setEditing] = useState(false);
-    const [form, setForm] = useState({ 'app:name': '', 'app:locale': '', 'pterodactyl:auth:2fa_required': 0 });
-    const [formInit, setFormInit] = useState(false);
+    const [form, setForm] = useState({ 'app:locale': '', 'pterodactyl:auth:2fa_required': 0 });
 
-    if (settings && !formInit) {
-        setFormInit(true);
-        setForm({
-            'app:name': settings['app:name'],
-            'app:locale': settings['app:locale'],
-            'pterodactyl:auth:2fa_required': settings['pterodactyl:auth:2fa_required'],
-        });
-    }
+    useEffect(() => {
+        if (settings) {
+            setForm({
+                'app:locale': settings['app:locale'],
+                'pterodactyl:auth:2fa_required': settings['pterodactyl:auth:2fa_required'],
+            });
+        }
+    }, [settings]);
 
     const handleSave = () => {
         setSaving(true);
@@ -44,7 +47,6 @@ const GeneralSettingsTab = () => {
     const handleCancel = () => {
         if (settings) {
             setForm({
-                'app:name': settings['app:name'],
                 'app:locale': settings['app:locale'],
                 'pterodactyl:auth:2fa_required': settings['pterodactyl:auth:2fa_required'],
             });
@@ -82,8 +84,8 @@ const GeneralSettingsTab = () => {
                         <HugeiconsIcon icon={InformationCircleIcon} className='w-8 h-8 text-brand' />
                     </div>
                     <div className='flex-1'>
-                        <h2 className='text-xl font-bold text-cream-400'>{settings['app:name'] || 'Panel'}</h2>
-                        <p className='text-mocha-200 text-sm mt-1'>General panel configuration and authentication settings</p>
+                        <h2 className='text-xl font-bold text-cream-400'>General</h2>
+                        <p className='text-mocha-200 text-sm mt-1'>Locale and authentication settings</p>
                     </div>
                     <div className='flex items-center gap-3'>
                         <div className='text-center bg-mocha-600/50 rounded-lg px-4 py-3'>
@@ -102,25 +104,30 @@ const GeneralSettingsTab = () => {
             <div
                 className={`rounded-xl p-6 transition-all duration-200 ${
                     editing
-                        ? 'bg-mocha-500 border border-brand/50 shadow-[0_0_15px_rgba(59,130,246,0.08)]'
+                        ? 'bg-mocha-500 border border-cream-400/20 shadow-[0_0_20px_rgba(245,240,232,0.04)]'
                         : 'bg-mocha-500 border border-mocha-400'
                 }`}
             >
                 <div className='flex items-center justify-between mb-6'>
                     <div className='flex items-center gap-3'>
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${editing ? 'bg-brand/20' : 'bg-mocha-400'}`}>
-                            <HugeiconsIcon icon={InformationCircleIcon} className={`w-5 h-5 ${editing ? 'text-brand' : 'text-cream-400'}`} />
+                        <div
+                            className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${editing ? 'bg-cream-400/10' : 'bg-mocha-400'}`}
+                        >
+                            <HugeiconsIcon
+                                icon={InformationCircleIcon}
+                                className={`w-5 h-5 ${editing ? 'text-cream-400' : 'text-cream-400'}`}
+                            />
                         </div>
                         <div>
                             <div className='flex items-center gap-2'>
                                 <h3 className='text-cream-400 font-semibold text-lg'>General Settings</h3>
                                 {editing && (
-                                    <span className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand/20 text-brand border border-brand/30'>
+                                    <span className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-cream-400/10 text-cream-400 border border-cream-400/20'>
                                         Editing
                                     </span>
                                 )}
                             </div>
-                            <p className='text-mocha-200 text-sm'>Company name, locale, and authentication</p>
+                            <p className='text-mocha-200 text-sm'>Locale and authentication</p>
                         </div>
                     </div>
                     {!editing && (
@@ -133,37 +140,34 @@ const GeneralSettingsTab = () => {
 
                 {editing ? (
                     <div className='space-y-5'>
-                        <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                            <div>
-                                <label className={labelClass}>Company Name</label>
-                                <input
-                                    type='text'
-                                    className={inputClass}
-                                    value={form['app:name']}
-                                    onChange={(e) => setForm({ ...form, 'app:name': e.target.value })}
-                                />
-                                <p className='text-xs text-mocha-200/60 mt-1'>Displayed throughout the panel and in outgoing emails.</p>
-                            </div>
-                            <div>
-                                <label className={labelClass}>Default Language</label>
-                                <select
-                                    className={inputClass}
-                                    value={form['app:locale']}
-                                    onChange={(e) => setForm({ ...form, 'app:locale': e.target.value })}
-                                >
-                                    {Object.keys(languages).length === 0 && (
-                                        <option value='' disabled className='bg-mocha-600 text-mocha-200'>No languages available</option>
-                                    )}
-                                    {Object.entries(languages).map(([key, value]) => (
-                                        <option key={key} value={key} className='bg-mocha-600 text-cream-400'>{value}</option>
-                                    ))}
-                                </select>
-                                <p className='text-xs text-mocha-200/60 mt-1'>Default language for UI components.</p>
-                            </div>
+                        <div>
+                            <label className={labelClass} htmlFor='default-language'>
+                                Default Language
+                            </label>
+                            <select
+                                className={inputClass}
+                                id='default-language'
+                                value={form['app:locale']}
+                                onChange={(e) => setForm({ ...form, 'app:locale': e.target.value })}
+                            >
+                                {Object.keys(languages).length === 0 && (
+                                    <option value='' disabled className='bg-mocha-600 text-mocha-200'>
+                                        No languages available
+                                    </option>
+                                )}
+                                {Object.entries(languages).map(([key, value]) => (
+                                    <option key={key} value={key} className='bg-mocha-600 text-cream-400'>
+                                        {value}
+                                    </option>
+                                ))}
+                            </select>
+                            <p className='text-xs text-mocha-200/60 mt-1'>Default language for UI components.</p>
                         </div>
 
                         <div>
-                            <label className={labelClass}>Require 2-Factor Authentication</label>
+                            <label className={labelClass} htmlFor='2fa-required'>
+                                Require 2-Factor Authentication
+                            </label>
                             <div className='flex gap-2'>
                                 {levels.map(([val, label, desc]) => (
                                     <label key={val} className='flex-1 cursor-pointer'>
@@ -174,9 +178,14 @@ const GeneralSettingsTab = () => {
                                             checked={form['pterodactyl:auth:2fa_required'] === val}
                                             onChange={() => setForm({ ...form, 'pterodactyl:auth:2fa_required': val })}
                                             className='hidden peer'
+                                            id={val === 2 ? '2fa-required' : undefined}
                                         />
                                         <div className='px-4 py-3 bg-mocha-600 border border-mocha-400 rounded-lg text-center peer-checked:border-brand peer-checked:bg-brand/10 transition-all'>
-                                            <div className={`text-sm font-medium ${form['pterodactyl:auth:2fa_required'] === val ? 'text-cream-400' : 'text-mocha-100'}`}>{label}</div>
+                                            <div
+                                                className={`text-sm font-medium ${form['pterodactyl:auth:2fa_required'] === val ? 'text-cream-400' : 'text-mocha-100'}`}
+                                            >
+                                                {label}
+                                            </div>
                                             <div className='text-xs text-mocha-200/60 mt-1'>{desc}</div>
                                         </div>
                                     </label>
@@ -188,15 +197,13 @@ const GeneralSettingsTab = () => {
                             <Button variant='default' onClick={handleSave} disabled={saving}>
                                 {saving ? 'Saving...' : 'Save Changes'}
                             </Button>
-                            <Button variant='secondary' onClick={handleCancel}>Discard</Button>
+                            <Button variant='secondary' onClick={handleCancel}>
+                                Discard
+                            </Button>
                         </div>
                     </div>
                 ) : (
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                        <div className='bg-mocha-600/50 rounded-lg p-4'>
-                            <p className='text-mocha-200 text-xs uppercase tracking-wider'>Company Name</p>
-                            <p className='text-cream-400 font-medium mt-1'>{settings['app:name'] || '—'}</p>
-                        </div>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div className='bg-mocha-600/50 rounded-lg p-4'>
                             <p className='text-mocha-200 text-xs uppercase tracking-wider'>Default Locale</p>
                             <p className='text-cream-400 font-medium mt-1'>{settings['app:locale'] || '—'}</p>

@@ -37,12 +37,15 @@ export function SkeletonTable({ rows = 5, columns = 4 }: { rows?: number; column
 
 export function SkeletonCards({ count = 4 }: { count?: number }) {
     return (
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3'>
             {Array.from({ length: count }).map((_, i) => (
-                <div key={i} className='bg-mocha-500 border border-mocha-400 rounded-xl p-5'>
-                    <SkeletonBar className='h-3 w-20 mb-3' />
-                    <SkeletonBar className='h-7 w-16 mb-1' />
-                    <SkeletonBar className='h-2 w-28' />
+                <div key={i} className='bg-mocha-500 border border-mocha-400 rounded-xl p-5 animate-pulse'>
+                    <div className='flex items-center justify-between mb-3'>
+                        <div className='h-3 w-16 rounded bg-mocha-400/30' />
+                        <div className='h-9 w-9 rounded-lg bg-mocha-400/20' />
+                    </div>
+                    <div className='h-9 w-14 rounded bg-mocha-400/30 mb-2' />
+                    <div className='h-2 w-24 rounded bg-mocha-400/20' />
                 </div>
             ))}
         </div>

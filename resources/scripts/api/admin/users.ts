@@ -2,8 +2,8 @@ import http, {
     type FractalResponseData,
     getPaginationSet,
     type PaginatedResult,
-    withQueryBuilderParams,
     type QueryBuilderParams,
+    withQueryBuilderParams,
 } from '@/api/http';
 
 export interface AdminServerSummary {
@@ -103,8 +103,7 @@ export const getUser = (id: number, include?: string): Promise<AdminUser> =>
             .catch(reject);
     });
 
-export const deleteUser = (id: number): Promise<void> =>
-    http.delete(`/api/application/users/${id}`);
+export const deleteUser = (id: number): Promise<void> => http.delete(`/api/application/users/${id}`);
 
 export interface CreateUserData {
     username: string;

@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import useSWR from 'swr';
-import Spinner from '@/components/elements/Spinner';
-import { Button } from '@/components/ui/button';
 import {
-    getEggVariables,
-    createEggVariable,
-    updateEggVariable,
-    deleteEggVariable,
     type AdminEggVariable,
+    createEggVariable,
+    deleteEggVariable,
+    getEggVariables,
+    updateEggVariable,
 } from '@/api/admin/nests';
 import { httpErrorToHuman } from '@/api/http';
+import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Props {
     nestId: number;
@@ -37,10 +38,11 @@ const emptyForm = (): VarForm => ({
 });
 
 const AdminEggVariablesContainer = ({ nestId, eggId }: Props) => {
-    const { data: variables, error, mutate } = useSWR(
-        ['admin:egg:variables', nestId, eggId],
-        () => getEggVariables(nestId, eggId),
-    );
+    const {
+        data: variables,
+        error,
+        mutate,
+    } = useSWR(['admin:egg:variables', nestId, eggId], () => getEggVariables(nestId, eggId));
 
     const [showCreate, setShowCreate] = useState(false);
     const [form, setForm] = useState<VarForm>(emptyForm());
@@ -117,57 +119,92 @@ const AdminEggVariablesContainer = ({ nestId, eggId }: Props) => {
                     <h4 className='text-cream-400 font-medium mb-4'>{editingId ? 'Edit' : 'Create'} Variable</h4>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div>
-                            <label className='block text-sm text-mocha-200 mb-1'>Name</label>
-                            <input value={form.name} onChange={(e) => set('name', e.target.value)}
-                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm' />
+                            <label htmlFor='var-name' className='block text-sm text-mocha-200 mb-1'>
+                                Name
+                            </label>
+                            <input
+                                id='var-name'
+                                value={form.name}
+                                onChange={(e) => set('name', e.target.value)}
+                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm'
+                            />
                         </div>
                         <div>
-                            <label className='block text-sm text-mocha-200 mb-1'>Environment Variable</label>
-                            <input value={form.env_variable} onChange={(e) => set('env_variable', e.target.value)}
-                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm font-mono' />
+                            <label htmlFor='var-env' className='block text-sm text-mocha-200 mb-1'>
+                                Environment Variable
+                            </label>
+                            <input
+                                id='var-env'
+                                value={form.env_variable}
+                                onChange={(e) => set('env_variable', e.target.value)}
+                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm font-mono'
+                            />
                         </div>
                         <div className='md:col-span-2'>
-                            <label className='block text-sm text-mocha-200 mb-1'>Description</label>
-                            <textarea value={form.description} onChange={(e) => set('description', e.target.value)}
-                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm' rows={2} />
+                            <label htmlFor='var-description' className='block text-sm text-mocha-200 mb-1'>
+                                Description
+                            </label>
+                            <textarea
+                                id='var-description'
+                                value={form.description}
+                                onChange={(e) => set('description', e.target.value)}
+                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm'
+                                rows={2}
+                            />
                         </div>
                         <div>
-                            <label className='block text-sm text-mocha-200 mb-1'>Default Value</label>
-                            <input value={form.default_value} onChange={(e) => set('default_value', e.target.value)}
-                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm' />
+                            <label htmlFor='var-default' className='block text-sm text-mocha-200 mb-1'>
+                                Default Value
+                            </label>
+                            <input
+                                id='var-default'
+                                value={form.default_value}
+                                onChange={(e) => set('default_value', e.target.value)}
+                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm'
+                            />
                         </div>
                         <div>
-                            <label className='block text-sm text-mocha-200 mb-1'>Validation Rules</label>
-                            <input value={form.rules} onChange={(e) => set('rules', e.target.value)}
-                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm font-mono' />
+                            <label htmlFor='var-rules' className='block text-sm text-mocha-200 mb-1'>
+                                Validation Rules
+                            </label>
+                            <input
+                                id='var-rules'
+                                value={form.rules}
+                                onChange={(e) => set('rules', e.target.value)}
+                                className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm font-mono'
+                            />
                         </div>
                         <div className='flex items-center gap-6'>
-                            <label className='flex items-center gap-2 text-sm text-mocha-200'>
-                                <input type='checkbox' checked={form.user_viewable}
-                                    onChange={(e) => set('user_viewable', e.target.checked)}
-                                    className='rounded border-mocha-400 bg-transparent' />
-                                User Viewable
-                            </label>
-                            <label className='flex items-center gap-2 text-sm text-mocha-200'>
-                                <input type='checkbox' checked={form.user_editable}
-                                    onChange={(e) => set('user_editable', e.target.checked)}
-                                    className='rounded border-mocha-400 bg-transparent' />
-                                User Editable
-                            </label>
+                            <Checkbox
+                                checked={form.user_viewable}
+                                onChange={(e) => set('user_viewable', e.target.checked)}
+                                label='User Viewable'
+                            />
+                            <Checkbox
+                                checked={form.user_editable}
+                                onChange={(e) => set('user_editable', e.target.checked)}
+                                label='User Editable'
+                            />
                         </div>
                     </div>
                     <div className='flex gap-2 mt-4'>
                         <Button variant='default' onClick={handleSave} disabled={saving || !form.name}>
                             {saving ? 'Saving...' : 'Save'}
                         </Button>
-                        <Button variant='secondary' onClick={resetForm}>Cancel</Button>
+                        <Button variant='secondary' onClick={resetForm}>
+                            Cancel
+                        </Button>
                     </div>
                 </div>
             )}
 
             <div className='flex items-center justify-between mb-4'>
                 <h4 className='text-cream-400 font-medium'>Variables ({variables.length})</h4>
-                {!showCreate && <Button variant='default' onClick={() => setShowCreate(true)}>Create Variable</Button>}
+                {!showCreate && (
+                    <Button variant='default' onClick={() => setShowCreate(true)}>
+                        Create Variable
+                    </Button>
+                )}
             </div>
 
             {variables.length === 0 ? (
@@ -182,16 +219,30 @@ const AdminEggVariablesContainer = ({ nestId, eggId }: Props) => {
                                     <span className='text-mocha-200 text-xs ml-2 font-mono'>{v.envVariable}</span>
                                 </div>
                                 <div className='flex gap-2'>
-                                    <Button variant='ghost' size='sm' onClick={() => handleEdit(v)}>Edit</Button>
-                                    <Button variant='attention' size='sm' onClick={() => handleDelete(v)}>Delete</Button>
+                                    <Button variant='ghost' size='sm' onClick={() => handleEdit(v)}>
+                                        Edit
+                                    </Button>
+                                    <Button variant='attention' size='sm' onClick={() => handleDelete(v)}>
+                                        Delete
+                                    </Button>
                                 </div>
                             </div>
                             {v.description && <p className='text-mocha-200 text-xs mb-2'>{v.description}</p>}
                             <div className='flex flex-wrap gap-2 text-xs'>
-                                <span className='text-mocha-200/60'>Default: <span className='text-mocha-200 font-mono'>{v.defaultValue || '-'}</span></span>
-                                {v.rules && <span className='text-mocha-200/60'>Rules: <span className='text-mocha-200 font-mono'>{v.rules}</span></span>}
-                                <span className={v.userViewable ? 'text-green-500' : 'text-mocha-200/60'}>{v.userViewable ? 'Viewable' : 'Hidden'}</span>
-                                <span className={v.userEditable ? 'text-green-500' : 'text-mocha-200/60'}>{v.userEditable ? 'Editable' : 'Read-only'}</span>
+                                <span className='text-mocha-200/60'>
+                                    Default: <span className='text-mocha-200 font-mono'>{v.defaultValue || '-'}</span>
+                                </span>
+                                {v.rules && (
+                                    <span className='text-mocha-200/60'>
+                                        Rules: <span className='text-mocha-200 font-mono'>{v.rules}</span>
+                                    </span>
+                                )}
+                                <span className={v.userViewable ? 'text-green-500' : 'text-mocha-200/60'}>
+                                    {v.userViewable ? 'Viewable' : 'Hidden'}
+                                </span>
+                                <span className={v.userEditable ? 'text-green-500' : 'text-mocha-200/60'}>
+                                    {v.userEditable ? 'Editable' : 'Read-only'}
+                                </span>
                             </div>
                         </div>
                     ))}

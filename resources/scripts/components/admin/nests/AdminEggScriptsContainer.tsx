@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import useSWR from 'swr';
+import { getEgg, getNestEggs, updateEgg } from '@/api/admin/nests';
+import { httpErrorToHuman } from '@/api/http';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
-import { getEgg, updateEgg, getNestEggs, type AdminEgg } from '@/api/admin/nests';
-import { httpErrorToHuman } from '@/api/http';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Props {
     nestId: number;
@@ -11,15 +12,13 @@ interface Props {
 }
 
 const AdminEggScriptsContainer = ({ nestId, eggId }: Props) => {
-    const { data: egg, error: eggError, mutate: eggMutate } = useSWR(
-        ['admin:egg:scripts', nestId, eggId],
-        () => getEgg(nestId, eggId),
-    );
+    const {
+        data: egg,
+        error: eggError,
+        mutate: eggMutate,
+    } = useSWR(['admin:egg:scripts', nestId, eggId], () => getEgg(nestId, eggId));
 
-    const { data: siblings } = useSWR(
-        ['admin:nest:eggs:siblings', nestId],
-        () => getNestEggs(nestId),
-    );
+    const { data: siblings } = useSWR(['admin:nest:eggs:siblings', nestId], () => getNestEggs(nestId));
 
     const [scriptInstall, setScriptInstall] = useState('');
     const [scriptEntry, setScriptEntry] = useState('');
@@ -76,7 +75,8 @@ const AdminEggScriptsContainer = ({ nestId, eggId }: Props) => {
 
             {isCopying && (
                 <div className='bg-yellow-900/30 border border-yellow-700/50 rounded-lg p-4 mb-6 text-sm text-yellow-300'>
-                    This egg is copying its install script from another egg. Changes to the script fields below will be ignored in favor of the copied values.
+                    This egg is copying its install script from another egg. Changes to the script fields below will be
+                    ignored in favor of the copied values.
                 </div>
             )}
 
@@ -89,7 +89,9 @@ const AdminEggScriptsContainer = ({ nestId, eggId }: Props) => {
                 >
                     <option value=''>None (use own script)</option>
                     {copyOptions.map((e) => (
-                        <option key={e.id} value={e.id}>{e.name} ({e.id})</option>
+                        <option key={e.id} value={e.id}>
+                            {e.name} ({e.id})
+                        </option>
                     ))}
                 </select>
             </div>
@@ -97,8 +99,11 @@ const AdminEggScriptsContainer = ({ nestId, eggId }: Props) => {
             <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6 mb-6'>
                 <h4 className='text-cream-400 font-medium mb-4'>Install Script</h4>
                 <div className='mb-4'>
-                    <label className='block text-sm text-mocha-200 mb-1'>Script (Bash/Dockerfile)</label>
+                    <label htmlFor='egg-script-install' className='block text-sm text-mocha-200 mb-1'>
+                        Script (Bash/Dockerfile)
+                    </label>
                     <textarea
+                        id='egg-script-install'
                         value={scriptInstall}
                         onChange={(e) => setScriptInstall(e.target.value)}
                         className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm font-mono'
@@ -109,8 +114,11 @@ const AdminEggScriptsContainer = ({ nestId, eggId }: Props) => {
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <div>
-                        <label className='block text-sm text-mocha-200 mb-1'>Script Container</label>
+                        <label htmlFor='egg-script-container' className='block text-sm text-mocha-200 mb-1'>
+                            Script Container
+                        </label>
                         <input
+                            id='egg-script-container'
                             value={scriptContainer}
                             onChange={(e) => setScriptContainer(e.target.value)}
                             className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm'
@@ -118,8 +126,11 @@ const AdminEggScriptsContainer = ({ nestId, eggId }: Props) => {
                         />
                     </div>
                     <div>
-                        <label className='block text-sm text-mocha-200 mb-1'>Script Entrypoint Command</label>
+                        <label htmlFor='egg-script-entry' className='block text-sm text-mocha-200 mb-1'>
+                            Script Entrypoint Command
+                        </label>
                         <input
+                            id='egg-script-entry'
                             value={scriptEntry}
                             onChange={(e) => setScriptEntry(e.target.value)}
                             className='w-full bg-transparent border border-mocha-400 rounded px-3 py-2 text-cream-400 text-sm'
@@ -128,16 +139,12 @@ const AdminEggScriptsContainer = ({ nestId, eggId }: Props) => {
                     </div>
                 </div>
                 <div className='mt-4'>
-                    <label className='flex items-center gap-2 text-sm text-mocha-200'>
-                        <input
-                            type='checkbox'
-                            checked={scriptIsPrivileged}
-                            onChange={(e) => setScriptIsPrivileged(e.target.checked)}
-                            className='rounded border-mocha-400 bg-transparent'
-                            disabled={isCopying}
-                        />
-                        Privileged Install (run as root)
-                    </label>
+                    <Checkbox
+                        checked={scriptIsPrivileged}
+                        onChange={(e) => setScriptIsPrivileged(e.target.checked)}
+                        disabled={isCopying}
+                        label='Privileged Install (run as root)'
+                    />
                 </div>
             </div>
 

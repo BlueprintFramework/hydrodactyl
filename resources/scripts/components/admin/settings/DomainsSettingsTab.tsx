@@ -1,14 +1,22 @@
-import { useEffect, useState } from 'react';
-import { Link, Route, Routes, useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { Add01Icon, Delete02Icon, Edit02Icon, Globe02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Globe02Icon, Add01Icon, Edit02Icon, Delete02Icon } from '@hugeicons/core-free-icons';
-
-import Spinner from '@/components/elements/Spinner';
-import { getDomains, type DomainData, type DomainsResponse, createDomain, updateDomain, deleteDomain, testDnsConnection, getProviderSchema } from '@/api/admin/settings';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import {
+    createDomain,
+    type DomainData,
+    type DomainsResponse,
+    deleteDomain,
+    getDomains,
+    getProviderSchema,
+    testDnsConnection,
+    updateDomain,
+} from '@/api/admin/settings';
 import { httpErrorToHuman } from '@/api/http';
-import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/elements/dialog';
+import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
 
 const inputClass =
     'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors';
@@ -22,15 +30,17 @@ const DomainsList = () => {
     const [deleteTarget, setDeleteTarget] = useState<DomainData | null>(null);
     const [deleting, setDeleting] = useState(false);
 
-    const fetchDomains = () => {
+    const fetchDomains = useCallback(() => {
         setLoading(true);
         getDomains()
             .then(setData)
             .catch((e) => setError(httpErrorToHuman(e)))
             .finally(() => setLoading(false));
-    };
+    }, []);
 
-    useEffect(() => { fetchDomains(); }, []);
+    useEffect(() => {
+        fetchDomains();
+    }, [fetchDomains]);
 
     const handleDelete = () => {
         if (!deleteTarget) return;
@@ -77,7 +87,9 @@ const DomainsList = () => {
                             <p className='text-xs text-mocha-200'>Domains</p>
                         </div>
                         <div className='text-center bg-mocha-600/50 rounded-lg px-4 py-3'>
-                            <p className='text-2xl font-bold text-green-400'>{domains.filter((d) => d.is_active).length}</p>
+                            <p className='text-2xl font-bold text-green-400'>
+                                {domains.filter((d) => d.is_active).length}
+                            </p>
                             <p className='text-xs text-mocha-200'>Active</p>
                         </div>
                     </div>
@@ -108,7 +120,9 @@ const DomainsList = () => {
                     <div className='text-center py-12'>
                         <HugeiconsIcon icon={Globe02Icon} className='w-12 h-12 mx-auto mb-3 text-mocha-400' />
                         <p className='text-mocha-200 text-sm font-medium'>No domains configured</p>
-                        <p className='text-mocha-200/60 text-xs mt-1'>Configure DNS domains to enable subdomain management for servers.</p>
+                        <p className='text-mocha-200/60 text-xs mt-1'>
+                            Configure DNS domains to enable subdomain management for servers.
+                        </p>
                         <Link to='/admin/settings/domains/create' className='mt-4 inline-block'>
                             <Button variant='default'>Create Your First Domain</Button>
                         </Link>
@@ -119,34 +133,52 @@ const DomainsList = () => {
                             <thead>
                                 <tr className='border-b border-mocha-400'>
                                     <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Domain</th>
-                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden md:table-cell'>Provider</th>
-                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden lg:table-cell'>Status</th>
-                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden lg:table-cell'>Default</th>
+                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden md:table-cell'>
+                                        Provider
+                                    </th>
+                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden lg:table-cell'>
+                                        Status
+                                    </th>
+                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden lg:table-cell'>
+                                        Default
+                                    </th>
                                     <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Subdomains</th>
                                     <th className='text-right px-4 py-3 text-mocha-200 font-medium'>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {domains.map((domain) => (
-                                    <tr key={domain.id} className='border-b border-mocha-400 last:border-0 hover:bg-mocha-400/20'>
+                                    <tr
+                                        key={domain.id}
+                                        className='border-b border-mocha-400 last:border-0 hover:bg-mocha-400/20'
+                                    >
                                         <td className='px-4 py-3'>
-                                            <code className='text-xs text-cream-400 bg-mocha-600/50 px-1.5 py-0.5 rounded'>{domain.name}</code>
+                                            <code className='text-xs text-cream-400 bg-mocha-600/50 px-1.5 py-0.5 rounded'>
+                                                {domain.name}
+                                            </code>
                                         </td>
                                         <td className='px-4 py-3 hidden md:table-cell'>
                                             <span className='inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-mocha-400/50 text-mocha-200'>
-                                                {domain.dns_provider.charAt(0).toUpperCase() + domain.dns_provider.slice(1)}
+                                                {domain.dns_provider.charAt(0).toUpperCase() +
+                                                    domain.dns_provider.slice(1)}
                                             </span>
                                         </td>
                                         <td className='px-4 py-3 hidden lg:table-cell'>
                                             {domain.is_active ? (
-                                                <span className='inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-green-900/50 text-green-400'>Active</span>
+                                                <span className='inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-green-900/50 text-green-400'>
+                                                    Active
+                                                </span>
                                             ) : (
-                                                <span className='inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-red-900/50 text-red-400'>Inactive</span>
+                                                <span className='inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-red-900/50 text-red-400'>
+                                                    Inactive
+                                                </span>
                                             )}
                                         </td>
                                         <td className='px-4 py-3 hidden lg:table-cell'>
                                             {domain.is_default && (
-                                                <span className='inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-mocha-400/50 text-mocha-200'>Default</span>
+                                                <span className='inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-mocha-400/50 text-mocha-200'>
+                                                    Default
+                                                </span>
                                             )}
                                         </td>
                                         <td className='px-4 py-3'>
@@ -156,12 +188,22 @@ const DomainsList = () => {
                                         </td>
                                         <td className='px-4 py-3 text-right'>
                                             <div className='flex items-center justify-end gap-2'>
-                                                <Button variant='secondary' size='sm' onClick={() => navigate(`/admin/settings/domains/${domain.id}/edit`)}>
+                                                <Button
+                                                    variant='secondary'
+                                                    size='sm'
+                                                    onClick={() =>
+                                                        navigate(`/admin/settings/domains/${domain.id}/edit`)
+                                                    }
+                                                >
                                                     <HugeiconsIcon icon={Edit02Icon} className='w-3.5 h-3.5' />
                                                     Edit
                                                 </Button>
                                                 {(domain.server_subdomains_count || 0) === 0 && (
-                                                    <Button variant='attention' size='sm' onClick={() => setDeleteTarget(domain)}>
+                                                    <Button
+                                                        variant='attention'
+                                                        size='sm'
+                                                        onClick={() => setDeleteTarget(domain)}
+                                                    >
                                                         <HugeiconsIcon icon={Delete02Icon} className='w-3.5 h-3.5' />
                                                         Delete
                                                     </Button>
@@ -185,16 +227,24 @@ const DomainsList = () => {
                 confirm='Delete'
                 loading={deleting}
             >
-                Are you sure you want to permanently delete <strong>{deleteTarget?.name}</strong>? This action cannot be undone.
+                Are you sure you want to permanently delete <strong>{deleteTarget?.name}</strong>? This action cannot be
+                undone.
             </Dialog.Confirm>
         </div>
     );
 };
 
-const DomainForm = ({ domain }: { domain?: DomainData }) => {
+const DomainForm = ({
+    domain,
+    providers: propProviders,
+}: {
+    domain?: DomainData;
+    providers?: Record<string, { name: string; description: string }>;
+}) => {
     const navigate = useNavigate();
     const [saving, setSaving] = useState(false);
     const [testing, setTesting] = useState(false);
+    const [fetchedProviders, setFetchedProviders] = useState<Record<string, { name: string; description: string }>>({});
     const [form, setForm] = useState({
         name: domain?.name || '',
         dns_provider: domain?.dns_provider || '',
@@ -202,9 +252,22 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
         is_default: domain?.is_default ?? false,
     });
     const [dnsConfig, setDnsConfig] = useState<Record<string, string>>(domain?.dns_config || {});
-    const [configSchema, setConfigSchema] = useState<Record<string, { description: string; required: boolean; sensitive: boolean }> | null>(null);
+    const [configSchema, setConfigSchema] = useState<Record<
+        string,
+        { description: string; required: boolean; sensitive: boolean }
+    > | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [testResult, setTestResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+    useEffect(() => {
+        if (!propProviders) {
+            getDomains()
+                .then((data) => setFetchedProviders(data.providers))
+                .catch(() => {
+                    // intentionally empty
+                });
+        }
+    }, [propProviders]);
 
     useEffect(() => {
         if (form.dns_provider) {
@@ -244,9 +307,7 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
         setSaving(true);
 
         const payload = { ...form, dns_config: dnsConfig };
-        const promise = domain
-            ? updateDomain(domain.id, payload)
-            : createDomain(payload);
+        const promise = domain ? updateDomain(domain.id, payload) : createDomain(payload);
 
         promise
             .then(() => {
@@ -262,17 +323,17 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
             .finally(() => setSaving(false));
     };
 
-    const providers: Record<string, string> = {
-        cloudflare: 'Cloudflare',
-        hetzner: 'Hetzner',
-        route53: 'AWS Route53',
-    };
+    const activeProviders = propProviders || fetchedProviders;
+    const providerList = Object.fromEntries(Object.entries(activeProviders).map(([key, v]) => [key, v.name]));
 
     return (
         <div className='space-y-6 mt-4'>
             {/* Back Link */}
             <div>
-                <Link to='/admin/settings/domains' className='text-sm text-mocha-200 hover:text-cream-400 transition-colors'>
+                <Link
+                    to='/admin/settings/domains'
+                    className='text-sm text-mocha-200 hover:text-cream-400 transition-colors'
+                >
                     &larr; Back to Domains
                 </Link>
             </div>
@@ -284,18 +345,25 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                         <HugeiconsIcon icon={Globe02Icon} className='w-5 h-5 text-cream-400' />
                     </div>
                     <div>
-                        <h3 className='text-cream-400 font-semibold text-lg'>{domain ? 'Edit Domain' : 'Create Domain'}</h3>
-                        <p className='text-mocha-200 text-sm'>{domain ? 'Update domain configuration' : 'Add a new DNS domain for subdomain management'}</p>
+                        <h3 className='text-cream-400 font-semibold text-lg'>
+                            {domain ? 'Edit Domain' : 'Create Domain'}
+                        </h3>
+                        <p className='text-mocha-200 text-sm'>
+                            {domain ? 'Update domain configuration' : 'Add a new DNS domain for subdomain management'}
+                        </p>
                     </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className='space-y-5'>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
                         <div>
-                            <label className={labelClass}>Domain Name</label>
+                            <label className={labelClass} htmlFor='domain-name'>
+                                Domain Name
+                            </label>
                             <input
                                 type='text'
                                 className={inputClass}
+                                id='domain-name'
                                 value={form.name}
                                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                                 placeholder='example.com'
@@ -304,16 +372,21 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                             <p className='text-xs text-mocha-200/60 mt-1'>The domain name used for subdomains.</p>
                         </div>
                         <div>
-                            <label className={labelClass}>DNS Provider</label>
+                            <label className={labelClass} htmlFor='dns-provider'>
+                                DNS Provider
+                            </label>
                             <select
                                 className={inputClass}
+                                id='dns-provider'
                                 value={form.dns_provider}
                                 onChange={(e) => setForm({ ...form, dns_provider: e.target.value })}
                                 required
                             >
                                 <option value=''>Select a DNS provider...</option>
-                                {Object.entries(providers).map(([key, label]) => (
-                                    <option key={key} value={key}>{label}</option>
+                                {Object.entries(providerList).map(([key, label]) => (
+                                    <option key={key} value={key}>
+                                        {label}
+                                    </option>
                                 ))}
                             </select>
                             <p className='text-xs text-mocha-200/60 mt-1'>The DNS service provider for this domain.</p>
@@ -327,13 +400,17 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                                 {Object.entries(configSchema).map(([key, field]) => (
                                     <div key={key}>
-                                        <label className={labelClass}>
+                                        <label
+                                            className={labelClass}
+                                            htmlFor={`dns-config-${key.replace(/[^a-zA-Z0-9]/g, '-')}`}
+                                        >
                                             {field.description || key}
                                             {field.required && <span className='text-red-400 ml-1'>*</span>}
                                         </label>
                                         <input
                                             type={field.sensitive ? 'password' : 'text'}
                                             className={inputClass}
+                                            id={`dns-config-${key.replace(/[^a-zA-Z0-9]/g, '-')}`}
                                             value={dnsConfig[key] || ''}
                                             onChange={(e) => handleDnsConfigChange(key, e.target.value)}
                                             required={field.required}
@@ -347,9 +424,14 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                     {/* Additional Settings */}
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
                         <div>
-                            <label className={labelClass}>Status</label>
+                            <label className={labelClass} htmlFor='domain-status'>
+                                Status
+                            </label>
                             <div className='flex gap-2'>
-                                {[{ value: true, label: 'Active' }, { value: false, label: 'Inactive' }].map((opt) => (
+                                {[
+                                    { value: true, label: 'Active' },
+                                    { value: false, label: 'Inactive' },
+                                ].map((opt) => (
                                     <label key={String(opt.value)} className='flex-1 cursor-pointer'>
                                         <input
                                             type='radio'
@@ -357,9 +439,12 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                                             checked={form.is_active === opt.value}
                                             onChange={() => setForm({ ...form, is_active: opt.value })}
                                             className='hidden peer'
+                                            id={opt.value ? 'domain-status' : undefined}
                                         />
                                         <div className='px-4 py-2 bg-mocha-600 border border-mocha-400 rounded-lg text-center text-sm peer-checked:border-mocha-300 peer-checked:bg-mocha-500/20 transition-colors'>
-                                            <span className={`font-medium ${form.is_active === opt.value ? 'text-cream-400' : 'text-mocha-100'}`}>
+                                            <span
+                                                className={`font-medium ${form.is_active === opt.value ? 'text-cream-400' : 'text-mocha-100'}`}
+                                            >
                                                 {opt.label}
                                             </span>
                                         </div>
@@ -368,9 +453,14 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                             </div>
                         </div>
                         <div>
-                            <label className={labelClass}>Default Domain</label>
+                            <label className={labelClass} htmlFor='default-domain'>
+                                Default Domain
+                            </label>
                             <div className='flex gap-2'>
-                                {[{ value: true, label: 'Yes' }, { value: false, label: 'No' }].map((opt) => (
+                                {[
+                                    { value: true, label: 'Yes' },
+                                    { value: false, label: 'No' },
+                                ].map((opt) => (
                                     <label key={String(opt.value)} className='flex-1 cursor-pointer'>
                                         <input
                                             type='radio'
@@ -378,9 +468,12 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                                             checked={form.is_default === opt.value}
                                             onChange={() => setForm({ ...form, is_default: opt.value })}
                                             className='hidden peer'
+                                            id={opt.value ? 'default-domain' : undefined}
                                         />
                                         <div className='px-4 py-2 bg-mocha-600 border border-mocha-400 rounded-lg text-center text-sm peer-checked:border-mocha-300 peer-checked:bg-mocha-500/20 transition-colors'>
-                                            <span className={`font-medium ${form.is_default === opt.value ? 'text-cream-400' : 'text-mocha-100'}`}>
+                                            <span
+                                                className={`font-medium ${form.is_default === opt.value ? 'text-cream-400' : 'text-mocha-100'}`}
+                                            >
                                                 {opt.label}
                                             </span>
                                         </div>
@@ -390,12 +483,12 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                         </div>
                     </div>
 
-                    {error && (
-                        <div className='text-red-400 text-sm'>{error}</div>
-                    )}
+                    {error && <div className='text-red-400 text-sm'>{error}</div>}
 
                     {testResult && (
-                        <div className={`rounded-lg p-3 text-sm ${testResult.type === 'success' ? 'bg-green-900/20 border border-green-800 text-green-400' : 'bg-red-900/20 border border-red-800 text-red-400'}`}>
+                        <div
+                            className={`rounded-lg p-3 text-sm ${testResult.type === 'success' ? 'bg-green-900/20 border border-green-800 text-green-400' : 'bg-red-900/20 border border-red-800 text-red-400'}`}
+                        >
                             {testResult.message}
                         </div>
                     )}
@@ -403,7 +496,12 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
                     <div className='flex items-center justify-between gap-3 pt-2'>
                         <div>
                             {form.dns_provider && (
-                                <Button type='button' variant='secondary' onClick={handleTestConnection} disabled={testing}>
+                                <Button
+                                    type='button'
+                                    variant='secondary'
+                                    onClick={handleTestConnection}
+                                    disabled={testing}
+                                >
                                     {testing ? 'Testing...' : 'Test Connection'}
                                 </Button>
                             )}
@@ -424,22 +522,31 @@ const DomainForm = ({ domain }: { domain?: DomainData }) => {
 };
 
 const DomainFormWrapper = () => {
+    const { id } = useParams<{ id: string }>();
     const [loading, setLoading] = useState(true);
     const [domain, setDomain] = useState<DomainData | null>(null);
+    const [providers, setProviders] = useState<Record<string, { name: string; description: string }>>({});
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        getDomains().then((data) => {
-            const id = parseInt(window.location.pathname.split('/').slice(-2, -1)[0]);
-            const found = data.domains.find((d) => d.id === id);
-            if (found) {
-                setDomain(found);
-            } else {
-                setError('Domain not found.');
-            }
-        }).catch((e) => setError(httpErrorToHuman(e)))
+        if (!id) {
+            setError('No domain ID provided.');
+            setLoading(false);
+            return;
+        }
+        getDomains()
+            .then((data) => {
+                setProviders(data.providers);
+                const found = data.domains.find((d) => d.id === Number(id));
+                if (found) {
+                    setDomain(found);
+                } else {
+                    setError('Domain not found.');
+                }
+            })
+            .catch((e) => setError(httpErrorToHuman(e)))
             .finally(() => setLoading(false));
-    }, []);
+    }, [id]);
 
     if (loading) {
         return (
@@ -453,7 +560,7 @@ const DomainFormWrapper = () => {
         return <div className='text-red-400 p-4'>Error: {error || 'Domain not found.'}</div>;
     }
 
-    return <DomainForm domain={domain} />;
+    return <DomainForm domain={domain} providers={providers} />;
 };
 
 const DomainsSettingsTab = () => {

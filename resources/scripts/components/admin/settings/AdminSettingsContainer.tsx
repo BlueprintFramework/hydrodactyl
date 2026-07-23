@@ -1,15 +1,20 @@
-import { Route, Routes, NavLink, useLocation } from 'react-router-dom';
+import {
+    Globe02Icon,
+    InformationCircleIcon,
+    Mail02Icon,
+    PaintBrush02Icon,
+    Settings02Icon,
+    Shield01Icon,
+} from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { InformationCircleIcon, Mail02Icon, Shield01Icon, Globe02Icon, PaintBrush02Icon, Settings02Icon } from '@hugeicons/core-free-icons';
-
-import { MainPageHeader } from '@/components/elements/MainPageHeader';
-
-import GeneralSettingsTab from '@/components/admin/settings/GeneralSettingsTab';
-import MailSettingsTab from '@/components/admin/settings/MailSettingsTab';
+import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import AdvancedSettingsTab from '@/components/admin/settings/AdvancedSettingsTab';
+import BrandingSettingsTab from '@/components/admin/settings/BrandingSettingsTab';
 import CaptchaSettingsTab from '@/components/admin/settings/CaptchaSettingsTab';
 import DomainsSettingsTab from '@/components/admin/settings/DomainsSettingsTab';
-import BrandingSettingsTab from '@/components/admin/settings/BrandingSettingsTab';
-import AdvancedSettingsTab from '@/components/admin/settings/AdvancedSettingsTab';
+import GeneralSettingsTab from '@/components/admin/settings/GeneralSettingsTab';
+import MailSettingsTab from '@/components/admin/settings/MailSettingsTab';
+import { MainPageHeader } from '@/components/elements/MainPageHeader';
 
 const tabs = [
     { to: '/admin/settings', label: 'General', end: true, icon: InformationCircleIcon },
@@ -23,7 +28,7 @@ const tabs = [
 const AdminSettingsContainer = () => {
     const location = useLocation();
 
-    const isActive = (tab: typeof tabs[0]) => {
+    const isActive = (tab: (typeof tabs)[0]) => {
         if (tab.end) return location.pathname === tab.to;
         return location.pathname.startsWith(tab.to);
     };

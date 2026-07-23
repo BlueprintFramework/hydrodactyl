@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import useSWR, { mutate } from 'swr';
+import { Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import useSWR from 'swr';
 import { getEggVariables, getNestEggs, getNests } from '@/api/admin/nests';
-import { getNodes } from '@/api/admin/nodes';
-import { getUsers } from '@/api/admin/users';
-import { getDomains } from '@/api/admin/settings';
+import { getNodeAllocations, getNodes } from '@/api/admin/nodes';
 import {
     type AdminServer,
     createServer,
@@ -23,18 +21,29 @@ import {
     updateServerDetails,
     updateServerStartup,
 } from '@/api/admin/servers';
+import { getDomains } from '@/api/admin/settings';
+import { getUsers } from '@/api/admin/users';
 import { httpErrorToHuman } from '@/api/http';
 import { Dialog } from '@/components/elements/dialog';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const inputClass =
     'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors';
 const labelClass = 'block text-sm text-mocha-200 mb-1';
 
-const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) => {
+const CreateServerModal = ({
+    open,
+    onClose,
+    onCreated,
+}: {
+    open: boolean;
+    onClose: () => void;
+    onCreated: () => void;
+}) => {
     const [nestId, setNestId] = useState<number>(0);
     const [eggId, setEggId] = useState<number>(0);
 
@@ -44,6 +53,10 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
     const { data: usersData } = useSWR(open ? 'admin:users:list' : null, () => getUsers({ page: 1 }));
     const { data: domainsData } = useSWR(open ? 'admin:domains:list' : null, () => getDomains());
     const [nodeId, setNodeId] = useState<number>(0);
+    const [allocationId, setAllocationId] = useState<number>(0);
+    const { data: allocationsData } = useSWR(open && nodeId ? ['admin:node:allocations', nodeId] : null, () =>
+        getNodeAllocations(nodeId),
+    );
     const [name, setName] = useState('');
     const [userId, setUserId] = useState<number>(0);
     const [memory, setMemory] = useState<number | string>('');
@@ -63,6 +76,7 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
         setNestId(0);
         setEggId(0);
         setNodeId(0);
+        setAllocationId(0);
         setName('');
         setUserId(0);
         setMemory('');
@@ -85,39 +99,40 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
             envVars.forEach(({ key, value }) => {
                 if (key.trim()) environment[key.trim()] = value;
             });
-            
-            // Convert empty string and 0 to undefined for "infinite" resources
+
+            const toNum = (v: number | string) => (v === '' || Number(v) === 0 ? undefined : Number(v));
+
+            // biome-ignore lint/suspicious/noExplicitAny: Server data shape differs from CreateServerData interface
             const serverData: any = {
                 name,
                 user: userId,
                 egg: eggId,
                 docker_image: dockerImage || undefined,
-                startup_command: startupCommand || undefined,
+                startup: startupCommand || undefined,
                 environment: Object.keys(environment).length > 0 ? environment : undefined,
-                memory: memory === '' || Number(memory) === 0 ? undefined : Number(memory),
-                swap: swap === '' || Number(swap) === 0 ? undefined : Number(swap),
-                disk: disk === '' || Number(disk) === 0 ? undefined : Number(disk),
-                cpu: cpu === '' || Number(cpu) === 0 ? undefined : Number(cpu),
-                io: io === '' || Number(io) === 0 ? undefined : Number(io),
-                feature_limits: {
-                    databases: databases === '' || Number(databases) === 0 ? undefined : Number(databases),
-                    allocations: allocations === '' || Number(allocations) === 0 ? undefined : Number(allocations),
-                    backups: backups === '' || Number(backups) === 0 ? undefined : Number(backups),
+                limits: {
+                    memory: toNum(memory),
+                    swap: toNum(swap),
+                    disk: toNum(disk),
+                    io: toNum(io),
+                    cpu: toNum(cpu),
                 },
+                feature_limits: {
+                    databases: toNum(databases) ?? 0,
+                    allocations: toNum(allocations) ?? 0,
+                    backups: toNum(backups) ?? 0,
+                },
+                ...(allocationId ? { allocation: { default: allocationId } } : {}),
             };
-            
+
             await createServer(serverData);
             toast.success('Server created successfully');
             resetForm();
             onCreated();
             onClose();
-        } catch (e: any) {
+        } catch (e: unknown) {
             const errorMessage = httpErrorToHuman(e);
             toast.error(errorMessage);
-            // If it's a validation error about startup, show a more helpful message
-            if (errorMessage.toLowerCase().includes('startup')) {
-                toast.error('Startup command is required. Please enter a startup command or select an egg that provides one.');
-            }
         } finally {
             setSaving(false);
         }
@@ -138,8 +153,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
         <Dialog open={open} onClose={onClose} title='Create Server'>
             <div className='space-y-4 max-h-[60vh] overflow-y-auto pr-2'>
                 <div>
-                    <label className={labelClass}>Nest *</label>
+                    <label htmlFor='create-nest' className={labelClass}>
+                        Nest *
+                    </label>
                     <select
+                        id='create-nest'
                         value={nestId}
                         onChange={(e) => {
                             setNestId(Number(e.target.value));
@@ -158,8 +176,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
 
                 {nestId > 0 && (
                     <div>
-                        <label className={labelClass}>Egg *</label>
+                        <label htmlFor='create-egg' className={labelClass}>
+                            Egg *
+                        </label>
                         <select
+                            id='create-egg'
                             value={eggId}
                             onChange={(e) => {
                                 setEggId(Number(e.target.value));
@@ -183,10 +204,16 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
 
                 {eggId > 0 && (
                     <div>
-                        <label className={labelClass}>Node *</label>
+                        <label htmlFor='create-node' className={labelClass}>
+                            Node *
+                        </label>
                         <select
+                            id='create-node'
                             value={nodeId}
-                            onChange={(e) => setNodeId(Number(e.target.value))}
+                            onChange={(e) => {
+                                setNodeId(Number(e.target.value));
+                                setAllocationId(0);
+                            }}
                             className={inputClass}
                         >
                             <option value={0}>Select a node</option>
@@ -200,11 +227,38 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                 )}
 
                 {nodeId > 0 && (
+                    <div>
+                        <label htmlFor='create-allocation' className={labelClass}>
+                            Allocation *
+                        </label>
+                        <select
+                            id='create-allocation'
+                            value={allocationId}
+                            onChange={(e) => setAllocationId(Number(e.target.value))}
+                            className={inputClass}
+                        >
+                            <option value={0}>Select an allocation</option>
+                            {allocationsData
+                                ?.filter((a) => !a.serverId)
+                                .map((a) => (
+                                    <option key={a.id} value={a.id}>
+                                        {a.ip}:{a.port} {a.alias ? `(${a.alias})` : ''}
+                                    </option>
+                                ))}
+                        </select>
+                        <p className='text-mocha-200 text-xs mt-1.5'>Select an unassigned allocation for this server</p>
+                    </div>
+                )}
+
+                {allocationId > 0 && (
                     <>
                         <div className='grid grid-cols-2 gap-4'>
                             <div>
-                                <label className={labelClass}>Server Name *</label>
+                                <label htmlFor='create-name' className={labelClass}>
+                                    Server Name *
+                                </label>
                                 <input
+                                    id='create-name'
                                     type='text'
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
@@ -213,8 +267,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>User *</label>
+                                <label htmlFor='create-user' className={labelClass}>
+                                    User *
+                                </label>
                                 <select
+                                    id='create-user'
                                     value={userId}
                                     onChange={(e) => setUserId(Number(e.target.value))}
                                     className={inputClass}
@@ -234,12 +291,17 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                             </div>
                         </div>
 
-                        {domainsData && domainsData.domains && domainsData.domains.length > 0 && (
+                        {domainsData?.domains?.length && (
                             <div>
-                                <label className={labelClass}>Domain</label>
+                                <label htmlFor='create-domain' className={labelClass}>
+                                    Domain
+                                </label>
                                 <select
+                                    id='create-domain'
                                     value={0}
-                                    onChange={(e) => {}}
+                                    onChange={(_e) => {
+                                        /* noop */
+                                    }}
                                     className={inputClass}
                                 >
                                     <option value={0}>No domain (assign later)</option>
@@ -256,8 +318,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                         )}
                         <div className='grid grid-cols-2 gap-4'>
                             <div>
-                                <label className={labelClass}>Memory (MB)</label>
+                                <label htmlFor='create-memory' className={labelClass}>
+                                    Memory (MB)
+                                </label>
                                 <input
+                                    id='create-memory'
                                     type='number'
                                     value={memory}
                                     onChange={(e) => setMemory(e.target.value)}
@@ -266,8 +331,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Disk (MB)</label>
+                                <label htmlFor='create-disk' className={labelClass}>
+                                    Disk (MB)
+                                </label>
                                 <input
+                                    id='create-disk'
                                     type='number'
                                     value={disk}
                                     onChange={(e) => setDisk(e.target.value)}
@@ -278,8 +346,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                         </div>
                         <div className='grid grid-cols-2 gap-4'>
                             <div>
-                                <label className={labelClass}>CPU (%)</label>
+                                <label htmlFor='create-cpu' className={labelClass}>
+                                    CPU (%)
+                                </label>
                                 <input
+                                    id='create-cpu'
                                     type='number'
                                     value={cpu}
                                     onChange={(e) => setCpu(e.target.value)}
@@ -288,8 +359,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>IO Weight</label>
+                                <label htmlFor='create-io' className={labelClass}>
+                                    IO Weight
+                                </label>
                                 <input
+                                    id='create-io'
                                     type='number'
                                     value={io}
                                     onChange={(e) => setIo(e.target.value)}
@@ -300,8 +374,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                         </div>
                         <div className='grid grid-cols-2 gap-4'>
                             <div>
-                                <label className={labelClass}>Swap (MB)</label>
+                                <label htmlFor='create-swap' className={labelClass}>
+                                    Swap (MB)
+                                </label>
                                 <input
+                                    id='create-swap'
                                     type='number'
                                     value={swap}
                                     onChange={(e) => setSwap(e.target.value)}
@@ -310,8 +387,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Startup Command</label>
+                                <label htmlFor='create-startup' className={labelClass}>
+                                    Startup Command
+                                </label>
                                 <input
+                                    id='create-startup'
                                     type='text'
                                     value={startupCommand}
                                     onChange={(e) => setStartupCommand(e.target.value)}
@@ -321,8 +401,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                             </div>
                         </div>
                         <div>
-                            <label className={labelClass}>Docker Image</label>
+                            <label htmlFor='create-docker-image' className={labelClass}>
+                                Docker Image
+                            </label>
                             <input
+                                id='create-docker-image'
                                 type='text'
                                 value={dockerImage}
                                 onChange={(e) => setDockerImage(e.target.value)}
@@ -333,12 +416,17 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
 
                         <div>
                             <div className='flex items-center justify-between mb-2'>
-                                <label className='text-mocha-200 font-medium'>Environment Variables</label>
-                                <Button variant='ghost' size='sm' type='button' onClick={addEnvVar}>+ Add Variable</Button>
+                                <label htmlFor='create-env-var-key' className='text-mocha-200 font-medium'>
+                                    Environment Variables
+                                </label>
+                                <Button variant='ghost' size='sm' type='button' onClick={addEnvVar}>
+                                    + Add Variable
+                                </Button>
                             </div>
                             {envVars.map((v, i) => (
                                 <div key={i} className='flex gap-2 mb-2'>
                                     <input
+                                        id={i === 0 ? 'create-env-var-key' : undefined}
                                         type='text'
                                         value={v.key}
                                         onChange={(e) => updateEnvVar(i, 'key', e.target.value)}
@@ -352,15 +440,20 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                                         className={inputClass}
                                         placeholder='value'
                                     />
-                                    <Button variant='ghost' size='sm' type='button' onClick={() => removeEnvVar(i)}>×</Button>
+                                    <Button variant='ghost' size='sm' type='button' onClick={() => removeEnvVar(i)}>
+                                        ×
+                                    </Button>
                                 </div>
                             ))}
                         </div>
 
                         <div className='grid grid-cols-3 gap-4'>
                             <div>
-                                <label className={labelClass}>Databases</label>
+                                <label htmlFor='create-databases' className={labelClass}>
+                                    Databases
+                                </label>
                                 <input
+                                    id='create-databases'
                                     type='number'
                                     value={databases}
                                     onChange={(e) => setDatabases(e.target.value)}
@@ -369,8 +462,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Allocations</label>
+                                <label htmlFor='create-allocations' className={labelClass}>
+                                    Allocations
+                                </label>
                                 <input
+                                    id='create-allocations'
                                     type='number'
                                     value={allocations}
                                     onChange={(e) => setAllocations(e.target.value)}
@@ -379,8 +475,11 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
                                 />
                             </div>
                             <div>
-                                <label className={labelClass}>Backups</label>
+                                <label htmlFor='create-backups' className={labelClass}>
+                                    Backups
+                                </label>
                                 <input
+                                    id='create-backups'
                                     type='number'
                                     value={backups}
                                     onChange={(e) => setBackups(e.target.value)}
@@ -395,8 +494,16 @@ const CreateServerModal = ({ open, onClose, onCreated }: { open: boolean; onClos
 
             <Dialog.Footer>
                 <div className='flex items-center gap-3 p-6'>
-                    <Button variant='default' onClick={handleSubmit} disabled={saving || !name || !userId || !eggId || !nodeId}>{saving ? 'Creating...' : 'Create Server'}</Button>
-                    <Button variant='secondary' onClick={onClose}>Cancel</Button>
+                    <Button
+                        variant='default'
+                        onClick={handleSubmit}
+                        disabled={saving || !name || !userId || !eggId || !allocationId}
+                    >
+                        {saving ? 'Creating...' : 'Create Server'}
+                    </Button>
+                    <Button variant='secondary' onClick={onClose}>
+                        Cancel
+                    </Button>
                 </div>
             </Dialog.Footer>
         </Dialog>
@@ -510,7 +617,7 @@ const AdminServerViewContainer = () => {
             mutateServer();
             setDetailsSuccess(true);
             setTimeout(() => setDetailsSuccess(false), 3000);
-        } catch (e: any) {
+        } catch (e: unknown) {
             setDetailsError(httpErrorToHuman(e));
         } finally {
             setDetailsSaving(false);
@@ -534,7 +641,7 @@ const AdminServerViewContainer = () => {
             mutateServer();
             setBuildSuccess(true);
             setTimeout(() => setBuildSuccess(false), 3000);
-        } catch (e: any) {
+        } catch (e: unknown) {
             setBuildError(httpErrorToHuman(e));
         } finally {
             setBuildSaving(false);
@@ -558,7 +665,7 @@ const AdminServerViewContainer = () => {
             mutateServer();
             setStartupSuccess(true);
             setTimeout(() => setStartupSuccess(false), 3000);
-        } catch (e: any) {
+        } catch (e: unknown) {
             setStartupError(httpErrorToHuman(e));
         } finally {
             setStartupSaving(false);
@@ -578,7 +685,7 @@ const AdminServerViewContainer = () => {
             setDbHostId(0);
             setDbName('');
             setDbUsername('');
-        } catch (e: any) {
+        } catch (e: unknown) {
             setDbError(httpErrorToHuman(e));
         } finally {
             setDbSaving(false);
@@ -592,7 +699,7 @@ const AdminServerViewContainer = () => {
         try {
             await deleteServerDatabase(serverId, dbId);
             mutateDatabases();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -602,7 +709,7 @@ const AdminServerViewContainer = () => {
         try {
             await reinstallServer(serverId);
             mutateServer();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -612,7 +719,7 @@ const AdminServerViewContainer = () => {
         try {
             await suspendServer(serverId);
             mutateServer();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -622,7 +729,7 @@ const AdminServerViewContainer = () => {
         try {
             await unsuspendServer(serverId);
             mutateServer();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -632,7 +739,7 @@ const AdminServerViewContainer = () => {
         try {
             await deleteServer(serverId);
             navigate('/admin/servers');
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -755,8 +862,11 @@ const AdminServerViewContainer = () => {
                             <div className='space-y-4'>
                                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                                     <div>
-                                        <label className={labelClass}>Name</label>
+                                        <label htmlFor='edit-name' className={labelClass}>
+                                            Name
+                                        </label>
                                         <input
+                                            id='edit-name'
                                             type='text'
                                             value={dName}
                                             onChange={(e) => setDName(e.target.value)}
@@ -764,8 +874,11 @@ const AdminServerViewContainer = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className={labelClass}>Description</label>
+                                        <label htmlFor='edit-description' className={labelClass}>
+                                            Description
+                                        </label>
                                         <input
+                                            id='edit-description'
                                             type='text'
                                             value={dDescription}
                                             onChange={(e) => setDDescription(e.target.value)}
@@ -773,8 +886,11 @@ const AdminServerViewContainer = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className={labelClass}>Docker Image</label>
+                                        <label htmlFor='edit-docker-image' className={labelClass}>
+                                            Docker Image
+                                        </label>
                                         <input
+                                            id='edit-docker-image'
                                             type='text'
                                             value={dImage}
                                             onChange={(e) => setDImage(e.target.value)}
@@ -782,8 +898,11 @@ const AdminServerViewContainer = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className={labelClass}>Startup Command</label>
+                                        <label htmlFor='edit-startup' className={labelClass}>
+                                            Startup Command
+                                        </label>
                                         <input
+                                            id='edit-startup'
                                             type='text'
                                             value={dStartup}
                                             onChange={(e) => setDStartup(e.target.value)}
@@ -794,12 +913,17 @@ const AdminServerViewContainer = () => {
 
                                 <div>
                                     <div className='flex items-center justify-between mb-2'>
-                                        <label className='text-mocha-200 font-medium'>Environment Variables</label>
-                                        <Button variant='ghost' size='sm' type='button' onClick={addDetailsEnvVar}>+ Add Variable</Button>
+                                        <label htmlFor='edit-env-var-key' className='text-mocha-200 font-medium'>
+                                            Environment Variables
+                                        </label>
+                                        <Button variant='ghost' size='sm' type='button' onClick={addDetailsEnvVar}>
+                                            + Add Variable
+                                        </Button>
                                     </div>
                                     {dEnvVars.map((v, i) => (
                                         <div key={i} className='flex gap-2 mb-2'>
                                             <input
+                                                id={i === 0 ? 'edit-env-var-key' : undefined}
                                                 type='text'
                                                 value={v.key}
                                                 onChange={(e) => updateDetailsEnvVar(i, 'key', e.target.value)}
@@ -813,13 +937,22 @@ const AdminServerViewContainer = () => {
                                                 className={inputClass}
                                                 placeholder='value'
                                             />
-                                            <Button variant='ghost' size='sm' type='button' onClick={() => removeDetailsEnvVar(i)}>×</Button>
+                                            <Button
+                                                variant='ghost'
+                                                size='sm'
+                                                type='button'
+                                                onClick={() => removeDetailsEnvVar(i)}
+                                            >
+                                                ×
+                                            </Button>
                                         </div>
                                     ))}
                                 </div>
 
                                 <div className='flex justify-end'>
-                                <Button variant='default' onClick={handleDetailsSave} disabled={detailsSaving}>{detailsSaving ? 'Saving...' : 'Save Details'}</Button>
+                                    <Button variant='default' onClick={handleDetailsSave} disabled={detailsSaving}>
+                                        {detailsSaving ? 'Saving...' : 'Save Details'}
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -836,8 +969,11 @@ const AdminServerViewContainer = () => {
                         <div className='space-y-4'>
                             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                                 <div>
-                                    <label className={labelClass}>Memory (MB)</label>
+                                    <label htmlFor='build-memory' className={labelClass}>
+                                        Memory (MB)
+                                    </label>
                                     <input
+                                        id='build-memory'
                                         type='number'
                                         value={bMemory}
                                         onChange={(e) => setBMemory(Number(e.target.value))}
@@ -845,8 +981,11 @@ const AdminServerViewContainer = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Swap (MB)</label>
+                                    <label htmlFor='build-swap' className={labelClass}>
+                                        Swap (MB)
+                                    </label>
                                     <input
+                                        id='build-swap'
                                         type='number'
                                         value={bSwap}
                                         onChange={(e) => setBSwap(Number(e.target.value))}
@@ -854,8 +993,11 @@ const AdminServerViewContainer = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Disk (MB)</label>
+                                    <label htmlFor='build-disk' className={labelClass}>
+                                        Disk (MB)
+                                    </label>
                                     <input
+                                        id='build-disk'
                                         type='number'
                                         value={bDisk}
                                         onChange={(e) => setBDisk(Number(e.target.value))}
@@ -863,8 +1005,11 @@ const AdminServerViewContainer = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClass}>IO Weight</label>
+                                    <label htmlFor='build-io' className={labelClass}>
+                                        IO Weight
+                                    </label>
                                     <input
+                                        id='build-io'
                                         type='number'
                                         value={bIO}
                                         onChange={(e) => setBIO(Number(e.target.value))}
@@ -872,8 +1017,11 @@ const AdminServerViewContainer = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClass}>CPU (%)</label>
+                                    <label htmlFor='build-cpu' className={labelClass}>
+                                        CPU (%)
+                                    </label>
                                     <input
+                                        id='build-cpu'
                                         type='number'
                                         value={bCPU}
                                         onChange={(e) => setBCPU(Number(e.target.value))}
@@ -881,8 +1029,11 @@ const AdminServerViewContainer = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className={labelClass}>Threads</label>
+                                    <label htmlFor='build-threads' className={labelClass}>
+                                        Threads
+                                    </label>
                                     <input
+                                        id='build-threads'
                                         type='text'
                                         value={bThreads}
                                         onChange={(e) => setBThreads(e.target.value)}
@@ -893,20 +1044,18 @@ const AdminServerViewContainer = () => {
                             </div>
 
                             <div className='flex items-center space-x-2'>
-                                <input
-                                    type='checkbox'
+                                <Checkbox
                                     id='oomKill'
                                     checked={bOomKill}
                                     onChange={(e) => setBOomKill(e.target.checked)}
-                                    className='rounded-lg border-mocha-400'
+                                    label='Enable OOM Kill'
                                 />
-                                <label htmlFor='oomKill' className='text-sm text-mocha-100'>
-                                    Enable OOM Kill
-                                </label>
                             </div>
 
                             <div className='flex justify-end'>
-                                <Button variant='default' onClick={handleBuildSave} disabled={buildSaving}>{buildSaving ? 'Saving...' : 'Save Build'}</Button>
+                                <Button variant='default' onClick={handleBuildSave} disabled={buildSaving}>
+                                    {buildSaving ? 'Saving...' : 'Save Build'}
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -940,8 +1089,11 @@ const AdminServerViewContainer = () => {
                             <div className='space-y-4'>
                                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                                     <div>
-                                        <label className={labelClass}>Startup Command</label>
+                                        <label htmlFor='startup-command' className={labelClass}>
+                                            Startup Command
+                                        </label>
                                         <input
+                                            id='startup-command'
                                             type='text'
                                             value={sStartup}
                                             onChange={(e) => setSStartup(e.target.value)}
@@ -949,8 +1101,11 @@ const AdminServerViewContainer = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className={labelClass}>Docker Image</label>
+                                        <label htmlFor='startup-image' className={labelClass}>
+                                            Docker Image
+                                        </label>
                                         <input
+                                            id='startup-image'
                                             type='text'
                                             value={sImage}
                                             onChange={(e) => setSImage(e.target.value)}
@@ -961,12 +1116,17 @@ const AdminServerViewContainer = () => {
 
                                 <div>
                                     <div className='flex items-center justify-between mb-2'>
-                                        <label className='text-mocha-200 font-medium'>Environment Variables</label>
-                                        <Button variant='ghost' size='sm' type='button' onClick={addStartupEnvVar}>+ Add Variable</Button>
+                                        <label htmlFor='startup-env-var-key' className='text-mocha-200 font-medium'>
+                                            Environment Variables
+                                        </label>
+                                        <Button variant='ghost' size='sm' type='button' onClick={addStartupEnvVar}>
+                                            + Add Variable
+                                        </Button>
                                     </div>
                                     {sEnvVars.map((v, i) => (
                                         <div key={i} className='flex gap-2 mb-2'>
                                             <input
+                                                id={i === 0 ? 'startup-env-var-key' : undefined}
                                                 type='text'
                                                 value={v.key}
                                                 onChange={(e) => updateStartupEnvVar(i, 'key', e.target.value)}
@@ -980,13 +1140,22 @@ const AdminServerViewContainer = () => {
                                                 className={inputClass}
                                                 placeholder='value'
                                             />
-                                            <Button variant='ghost' size='sm' type='button' onClick={() => removeStartupEnvVar(i)}>×</Button>
+                                            <Button
+                                                variant='ghost'
+                                                size='sm'
+                                                type='button'
+                                                onClick={() => removeStartupEnvVar(i)}
+                                            >
+                                                ×
+                                            </Button>
                                         </div>
                                     ))}
                                 </div>
 
                                 <div className='flex justify-end'>
-                                <Button variant='default' onClick={handleStartupSave} disabled={startupSaving}>{startupSaving ? 'Saving...' : 'Save Startup'}</Button>
+                                    <Button variant='default' onClick={handleStartupSave} disabled={startupSaving}>
+                                        {startupSaving ? 'Saving...' : 'Save Startup'}
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -1032,7 +1201,13 @@ const AdminServerViewContainer = () => {
                                                 <td className='px-6 py-3 text-mocha-100'>{db.username}</td>
                                                 <td className='px-6 py-3 text-mocha-100'>#{db.hostId}</td>
                                                 <td className='px-6 py-3 text-right'>
-                                                    <Button variant='attention' size='sm' onClick={() => setConfirmDeleteDb(db.id)}>Delete</Button>
+                                                    <Button
+                                                        variant='attention'
+                                                        size='sm'
+                                                        onClick={() => setConfirmDeleteDb(db.id)}
+                                                    >
+                                                        Delete
+                                                    </Button>
                                                 </td>
                                             </tr>
                                         ))
@@ -1048,8 +1223,11 @@ const AdminServerViewContainer = () => {
                             <div className='space-y-4'>
                                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                                     <div>
-                                        <label className={labelClass}>Database Host ID *</label>
+                                        <label htmlFor='db-host-id' className={labelClass}>
+                                            Database Host ID *
+                                        </label>
                                         <input
+                                            id='db-host-id'
                                             type='number'
                                             value={dbHostId || ''}
                                             onChange={(e) => setDbHostId(Number(e.target.value))}
@@ -1058,8 +1236,11 @@ const AdminServerViewContainer = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className={labelClass}>Database Name</label>
+                                        <label htmlFor='db-name' className={labelClass}>
+                                            Database Name
+                                        </label>
                                         <input
+                                            id='db-name'
                                             type='text'
                                             value={dbName}
                                             onChange={(e) => setDbName(e.target.value)}
@@ -1068,8 +1249,11 @@ const AdminServerViewContainer = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className={labelClass}>Username</label>
+                                        <label htmlFor='db-username' className={labelClass}>
+                                            Username
+                                        </label>
                                         <input
+                                            id='db-username'
                                             type='text'
                                             value={dbUsername}
                                             onChange={(e) => setDbUsername(e.target.value)}
@@ -1080,7 +1264,13 @@ const AdminServerViewContainer = () => {
                                 </div>
 
                                 <div className='flex justify-end'>
-                                <Button variant='default' onClick={handleCreateDatabase} disabled={dbSaving || !dbHostId}>{dbSaving ? 'Creating...' : 'Create Database'}</Button>
+                                    <Button
+                                        variant='default'
+                                        onClick={handleCreateDatabase}
+                                        disabled={dbSaving || !dbHostId}
+                                    >
+                                        {dbSaving ? 'Creating...' : 'Create Database'}
+                                    </Button>
                                 </div>
                             </div>
                         </div>
@@ -1093,12 +1283,18 @@ const AdminServerViewContainer = () => {
                         <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6'>
                             <h3 className='text-cream-400 font-medium mb-4'>Server Actions</h3>
                             <div className='flex flex-wrap gap-3'>
-                                <Button variant='secondary' onClick={() => setConfirmReinstall(true)}>Reinstall Server</Button>
+                                <Button variant='secondary' onClick={() => setConfirmReinstall(true)}>
+                                    Reinstall Server
+                                </Button>
 
                                 {server.suspended ? (
-                                    <Button variant='secondary' onClick={() => setConfirmUnsuspend(true)}>Unsuspend Server</Button>
+                                    <Button variant='secondary' onClick={() => setConfirmUnsuspend(true)}>
+                                        Unsuspend Server
+                                    </Button>
                                 ) : (
-                                    <Button variant='secondary' onClick={() => setConfirmSuspend(true)}>Suspend Server</Button>
+                                    <Button variant='secondary' onClick={() => setConfirmSuspend(true)}>
+                                        Suspend Server
+                                    </Button>
                                 )}
                             </div>
                         </div>
@@ -1108,7 +1304,9 @@ const AdminServerViewContainer = () => {
                             <p className='text-sm text-mocha-200 mb-4'>
                                 Deleting this server will permanently remove all data. This action cannot be undone.
                             </p>
-                            <Button variant='attention' onClick={() => setConfirmDelete(true)}>Delete Server</Button>
+                            <Button variant='attention' onClick={() => setConfirmDelete(true)}>
+                                Delete Server
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -1169,8 +1367,9 @@ const AdminServerViewContainer = () => {
 };
 
 const AdminServersContainer = () => {
+    const location = useLocation();
     const [page, setPage] = useState(1);
-    const [showCreate, setShowCreate] = useState(false);
+    const [showCreate, setShowCreate] = useState(location.pathname.endsWith('/new'));
     const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
     const { data, error, mutate } = useSWR(['admin:servers', page], () => getServers({ page }));
 
@@ -1178,7 +1377,7 @@ const AdminServersContainer = () => {
         try {
             await suspendServer(id);
             mutate();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -1187,7 +1386,7 @@ const AdminServersContainer = () => {
         try {
             await unsuspendServer(id);
             mutate();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -1199,152 +1398,160 @@ const AdminServersContainer = () => {
         try {
             await deleteServer(id);
             mutate();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
 
+    const serverListElement = (
+        <div>
+            <MainPageHeader title='Servers'>
+                <Button variant='default' onClick={() => setShowCreate(true)}>
+                    Create Server
+                </Button>
+            </MainPageHeader>
+
+            {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
+
+            {!data ? (
+                <Spinner />
+            ) : (
+                <Pagination data={data} onPageSelect={setPage}>
+                    {({ items }) => (
+                        <div className='bg-mocha-500 border border-mocha-400 rounded-lg overflow-hidden'>
+                            <table className='w-full text-sm'>
+                                <thead>
+                                    <tr className='border-b border-mocha-400'>
+                                        <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Name</th>
+                                        <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden sm:table-cell'>
+                                            Owner
+                                        </th>
+                                        <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden md:table-cell'>
+                                            Node
+                                        </th>
+                                        <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden lg:table-cell'>
+                                            Egg
+                                        </th>
+                                        <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden xl:table-cell'>
+                                            Memory
+                                        </th>
+                                        <th className='text-left px-4 py-3 text-mocha-200 font-medium hidden xl:table-cell'>
+                                            Disk
+                                        </th>
+                                        <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Status</th>
+                                        <th className='text-right px-4 py-3 text-mocha-200 font-medium'>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {items.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={8} className='text-center py-8 text-mocha-200'>
+                                                No servers found.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        items.map((server: AdminServer) => (
+                                            <tr
+                                                key={server.id}
+                                                className='border-b border-mocha-400 last:border-0 hover:bg-mocha-400/20'
+                                            >
+                                                <td className='px-4 py-3'>
+                                                    <Link
+                                                        to={String(server.id)}
+                                                        className='text-cream-400 font-medium hover:text-cream-200 cursor-pointer'
+                                                    >
+                                                        {server.name}
+                                                    </Link>
+                                                    {server.description && (
+                                                        <p className='text-xs text-mocha-200 truncate max-w-[200px]'>
+                                                            {server.description}
+                                                        </p>
+                                                    )}
+                                                </td>
+                                                <td className='px-4 py-3 text-mocha-100 hidden sm:table-cell'>
+                                                    #{server.user}
+                                                </td>
+                                                <td className='px-4 py-3 text-mocha-100 hidden md:table-cell'>
+                                                    #{server.node}
+                                                </td>
+                                                <td className='px-4 py-3 text-mocha-100 hidden lg:table-cell'>
+                                                    #{server.egg}
+                                                </td>
+                                                <td className='px-4 py-3 text-mocha-100 hidden xl:table-cell'>
+                                                    {server.memory} MB
+                                                </td>
+                                                <td className='px-4 py-3 text-mocha-100 hidden xl:table-cell'>
+                                                    {server.disk} MB
+                                                </td>
+                                                <td className='px-4 py-3'>
+                                                    <span
+                                                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${server.suspended ? 'bg-yellow-900/50 text-yellow-400' : 'bg-green-900/50 text-green-400'}`}
+                                                    >
+                                                        {server.suspended ? 'Suspended' : server.status || 'Running'}
+                                                    </span>
+                                                </td>
+                                                <td className='px-4 py-3 text-right'>
+                                                    <div className='flex items-center justify-end gap-2'>
+                                                        <Link
+                                                            to={String(server.id)}
+                                                            className='text-xs text-cream-400 hover:text-cream-500 cursor-pointer'
+                                                        >
+                                                            View
+                                                        </Link>
+                                                        {server.suspended ? (
+                                                            <Button
+                                                                variant='ghost'
+                                                                size='sm'
+                                                                onClick={() => handleUnsuspend(server.id)}
+                                                            >
+                                                                Unsuspend
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
+                                                                variant='ghost'
+                                                                size='sm'
+                                                                onClick={() => handleSuspend(server.id)}
+                                                            >
+                                                                Suspend
+                                                            </Button>
+                                                        )}
+                                                        <Button
+                                                            variant='attention'
+                                                            size='sm'
+                                                            onClick={() => setConfirmDelete(server.id)}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </Pagination>
+            )}
+
+            <CreateServerModal open={showCreate} onClose={() => setShowCreate(false)} onCreated={() => mutate()} />
+
+            <Dialog.Confirm
+                open={confirmDelete !== null}
+                onClose={() => setConfirmDelete(null)}
+                onConfirmed={handleDelete}
+                title='Delete Server'
+                confirm='Delete'
+            >
+                Are you sure you want to delete this server? This cannot be undone.
+            </Dialog.Confirm>
+        </div>
+    );
+
     return (
         <Routes>
-            <Route
-                index
-                element={
-                    <div>
-                        <MainPageHeader title='Servers'>
-                            <Button variant='default' onClick={() => setShowCreate(true)}>Create Server</Button>
-                        </MainPageHeader>
-
-                        {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
-
-                        {!data ? (
-                            <Spinner />
-                        ) : (
-                            <Pagination data={data} onPageSelect={setPage}>
-                                {({ items }) => (
-                                    <div className='bg-mocha-500 border border-mocha-400 rounded-lg overflow-hidden'>
-                                        <table className='w-full text-sm'>
-                                            <thead>
-                                                <tr className='border-b border-mocha-400'>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
-                                                        Name
-                                                    </th>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
-                                                        Owner
-                                                    </th>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
-                                                        Node
-                                                    </th>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
-                                                        Egg
-                                                    </th>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
-                                                        Memory
-                                                    </th>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
-                                                        Disk
-                                                    </th>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
-                                                        Status
-                                                    </th>
-                                                    <th className='text-right px-4 py-3 text-mocha-200 font-medium'>
-                                                        Actions
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {items.length === 0 ? (
-                                                    <tr>
-                                                        <td colSpan={8} className='text-center py-8 text-mocha-200'>
-                                                            No servers found.
-                                                        </td>
-                                                    </tr>
-                                                ) : (
-                                                    items.map((server: AdminServer) => (
-                                                        <tr
-                                                            key={server.id}
-                                                            className='border-b border-mocha-400 last:border-0 hover:bg-mocha-400/20'
-                                                        >
-                                                            <td className='px-4 py-3'>
-                                                                <Link
-                                                                    to={String(server.id)}
-                                                                    className='text-cream-400 font-medium hover:text-cream-200 cursor-pointer'
-                                                                >
-                                                                    {server.name}
-                                                                </Link>
-                                                                {server.description && (
-                                                                    <p className='text-xs text-mocha-200 truncate max-w-[200px]'>
-                                                                        {server.description}
-                                                                    </p>
-                                                                )}
-                                                            </td>
-                                                            <td className='px-4 py-3 text-mocha-100 cursor-default'>
-                                                                #{server.user}
-                                                            </td>
-                                                            <td className='px-4 py-3 text-mocha-100 cursor-default'>
-                                                                #{server.node}
-                                                            </td>
-                                                            <td className='px-4 py-3 text-mocha-100 cursor-default'>
-                                                                #{server.egg}
-                                                            </td>
-                                                            <td className='px-4 py-3 text-mocha-100 cursor-default'>
-                                                                {server.memory} MB
-                                                            </td>
-                                                            <td className='px-4 py-3 text-mocha-100 cursor-default'>
-                                                                {server.disk} MB
-                                                            </td>
-                                                            <td className='px-4 py-3'>
-                                                                <span
-                                                                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium cursor-default ${
-                                                                        server.suspended
-                                                                            ? 'bg-yellow-900/50 text-yellow-400'
-                                                                            : 'bg-green-900/50 text-green-400'
-                                                                    }`}
-                                                                >
-                                                                    {server.suspended
-                                                                        ? 'Suspended'
-                                                                        : server.status || 'Running'}
-                                                                </span>
-                                                            </td>
-                                                            <td className='px-4 py-3 text-right'>
-                                                                <div className='flex items-center justify-end gap-2'>
-                                                                    <Link
-                                                                        to={String(server.id)}
-                                                                        className='text-xs text-cream-400 hover:text-cream-500 cursor-pointer'
-                                                                    >
-                                                                        View
-                                                                    </Link>
-                                                                    {server.suspended ? (
-                                                                        <Button variant='ghost' size='sm' onClick={() => handleUnsuspend(server.id)} title='Unsuspend server'>Unsuspend</Button>
-                                                                    ) : (
-                                                                        <Button variant='ghost' size='sm' onClick={() => handleSuspend(server.id)} title='Suspend server'>Suspend</Button>
-                                                                    )}
-                                                                    <Button variant='attention' size='sm' onClick={() => setConfirmDelete(server.id)} title='Delete server'>Delete</Button>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                            </Pagination>
-                        )}
-
-                        <CreateServerModal open={showCreate} onClose={() => setShowCreate(false)} onCreated={() => mutate()} />
-
-                        <Dialog.Confirm
-                            open={confirmDelete !== null}
-                            onClose={() => setConfirmDelete(null)}
-                            onConfirmed={handleDelete}
-                            title='Delete Server'
-                            confirm='Delete'
-                        >
-                            Are you sure you want to delete this server? This cannot be undone.
-                        </Dialog.Confirm>
-                    </div>
-                }
-            />
+            <Route index element={serverListElement} />
+            <Route path='new' element={serverListElement} />
             <Route path=':id/*' element={<AdminServerViewContainer />} />
         </Routes>
     );

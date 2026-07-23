@@ -10,6 +10,7 @@ use Pterodactyl\Facades\Activity;
 use Pterodactyl\Services\Users\UserUpdateService;
 use Pterodactyl\Transformers\Api\Client\AccountTransformer;
 use Pterodactyl\Http\Requests\Api\Client\Account\UpdateEmailRequest;
+use Pterodactyl\Http\Requests\Api\Client\Account\UpdateNameRequest;
 use Pterodactyl\Http\Requests\Api\Client\Account\UpdatePasswordRequest;
 
 class AccountController extends ClientApiController
@@ -45,6 +46,26 @@ class AccountController extends ClientApiController
                 ->property(['old' => $original, 'new' => $request->input('email')])
                 ->log();
         }
+
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Update account display name
+     */
+    public function updateName(UpdateNameRequest $request): JsonResponse
+    {
+        $name = trim($request->input('name'));
+        $parts = preg_split('/\s+/', $name, 2);
+        $firstName = $parts[0] ?? '';
+        $lastName = $parts[1] ?? '';
+
+        $this->updateService->handle($request->user(), [
+            'name_first' => $firstName,
+            'name_last' => $lastName,
+        ]);
+
+        Activity::event('user:account.name-changed')->log();
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }

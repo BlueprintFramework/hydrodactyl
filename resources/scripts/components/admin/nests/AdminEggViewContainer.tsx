@@ -1,16 +1,25 @@
-import { useEffect, useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import useSWR from 'swr';
-import { toast } from 'sonner';
+import {
+    CodeIcon,
+    CubeIcon,
+    Delete02Icon,
+    EggsIcon,
+    InformationCircleIcon,
+    Settings02Icon,
+    SlidersHorizontalIcon,
+} from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { InformationCircleIcon, SlidersHorizontalIcon, CodeIcon, Settings02Icon, EggsIcon } from '@hugeicons/core-free-icons';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import useSWR from 'swr';
+import { deleteEgg, getEgg, updateEgg } from '@/api/admin/nests';
+import { httpErrorToHuman } from '@/api/http';
+import AdminEggScriptsContainer from '@/components/admin/nests/AdminEggScriptsContainer';
+import AdminEggVariablesContainer from '@/components/admin/nests/AdminEggVariablesContainer';
+import { Dialog } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
-import { Dialog } from '@/components/elements/dialog';
-import { getEgg, updateEgg, deleteEgg, type AdminEgg } from '@/api/admin/nests';
-import { httpErrorToHuman } from '@/api/http';
-import AdminEggVariablesContainer from '@/components/admin/nests/AdminEggVariablesContainer';
-import AdminEggScriptsContainer from '@/components/admin/nests/AdminEggScriptsContainer';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const inputClass =
     'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors';
@@ -23,7 +32,6 @@ const AdminEggViewContainer = () => {
     const eggId = Number(eggIdParam);
     const [activeTab, setActiveTab] = useState<'configuration' | 'variables' | 'scripts' | 'manage'>('configuration');
     const [editing, setEditing] = useState(false);
-    const [formInit, setFormInit] = useState(false);
     const [saving, setSaving] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -40,17 +48,22 @@ const AdminEggViewContainer = () => {
     const [configLogs, setConfigLogs] = useState('');
     const [configFiles, setConfigFiles] = useState('');
 
-    const { data: egg, error: fetchError, mutate } = useSWR(
-        eggId ? ['admin:egg', nestId, eggId] : null,
-        () => getEgg(nestId, eggId),
-    );
+    const {
+        data: egg,
+        error: fetchError,
+        mutate,
+    } = useSWR(eggId ? ['admin:egg', nestId, eggId] : null, () => getEgg(nestId, eggId));
 
     useEffect(() => {
-        if (egg && !formInit) {
+        if (egg) {
             setName(egg.name);
             setDescription(egg.description || '');
             setStartup(egg.startup || '');
-            setDockerImages(Object.entries(egg.dockerImages || {}).map(([k, v]) => `${k}|${v}`).join('\n'));
+            setDockerImages(
+                Object.entries(egg.dockerImages || {})
+                    .map(([k, v]) => `${k}|${v}`)
+                    .join('\n'),
+            );
             setForceOutgoingIp(egg.forceOutgoingIp || false);
             setFeatures((egg.features || []).join(', '));
             setConfigFrom(egg.config.extends);
@@ -58,16 +71,19 @@ const AdminEggViewContainer = () => {
             setConfigStartup(egg.config.startup || '');
             setConfigLogs(egg.config.logs || '');
             setConfigFiles(egg.config.files ? JSON.stringify(egg.config.files, null, 2) : '');
-            setFormInit(true);
         }
-    }, [egg, formInit]);
+    }, [egg]);
 
     const syncFromEgg = () => {
         if (!egg) return;
         setName(egg.name);
         setDescription(egg.description || '');
         setStartup(egg.startup || '');
-        setDockerImages(Object.entries(egg.dockerImages || {}).map(([k, v]) => `${k}|${v}`).join('\n'));
+        setDockerImages(
+            Object.entries(egg.dockerImages || {})
+                .map(([k, v]) => `${k}|${v}`)
+                .join('\n'),
+        );
         setForceOutgoingIp(egg.forceOutgoingIp || false);
         setFeatures((egg.features || []).join(', '));
         setConfigFrom(egg.config.extends);
@@ -81,12 +97,15 @@ const AdminEggViewContainer = () => {
         setSaving(true);
 
         const images: Record<string, string> = {};
-        dockerImages.split('\n').filter(Boolean).forEach((line) => {
-            const [key, ...rest] = line.split('|');
-            if (key) {
-                images[key.trim()] = rest.join('|').trim() || key.trim();
-            }
-        });
+        dockerImages
+            .split('\n')
+            .filter(Boolean)
+            .forEach((line) => {
+                const [key, ...rest] = line.split('|');
+                if (key) {
+                    images[key.trim()] = rest.join('|').trim() || key.trim();
+                }
+            });
 
         const data: Record<string, unknown> = {
             name,
@@ -94,7 +113,12 @@ const AdminEggViewContainer = () => {
             startup,
             docker_images: images,
             force_outgoing_ip: forceOutgoingIp,
-            features: features ? features.split(',').map((f) => f.trim()).filter(Boolean) : null,
+            features: features
+                ? features
+                      .split(',')
+                      .map((f) => f.trim())
+                      .filter(Boolean)
+                : null,
             config_from: configFrom,
             config_stop: configStop || null,
             config_startup: configStartup || null,
@@ -103,7 +127,11 @@ const AdminEggViewContainer = () => {
 
         let filesParsed: Record<string, unknown> | null = null;
         if (configFiles.trim()) {
-            try { filesParsed = JSON.parse(configFiles); } catch { /* ignore */ }
+            try {
+                filesParsed = JSON.parse(configFiles);
+            } catch {
+                /* ignore */
+            }
         }
         if (filesParsed) {
             data.config_files = JSON.stringify(filesParsed);
@@ -114,7 +142,7 @@ const AdminEggViewContainer = () => {
             await mutate();
             setEditing(false);
             toast.success('Egg saved successfully');
-        } catch (e: any) {
+        } catch (e: unknown) {
             toast.error(httpErrorToHuman(e));
         } finally {
             setSaving(false);
@@ -128,7 +156,7 @@ const AdminEggViewContainer = () => {
             await deleteEgg(nestId, eggId);
             toast.success('Egg deleted successfully');
             navigate(`/admin/nests/${nestId}`);
-        } catch (e: any) {
+        } catch (e: unknown) {
             toast.error(httpErrorToHuman(e));
         } finally {
             setDeleting(false);
@@ -170,8 +198,17 @@ const AdminEggViewContainer = () => {
             {/* ── Header ── */}
             <div className='flex items-center justify-between gap-4 mb-6 mt-8 md:mt-0 flex-col sm:flex-row'>
                 <div className='flex items-center gap-3'>
-                    <Link to={`/admin/nests/${nestId}`} className='text-sm text-mocha-200 hover:text-cream-400 transition-colors'>
-                        <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <Link
+                        to={`/admin/nests/${nestId}`}
+                        className='w-9 h-9 rounded-lg bg-mocha-500 border border-mocha-400 flex items-center justify-center text-mocha-200 hover:text-cream-400 hover:border-mocha-300 transition-all shrink-0'
+                    >
+                        <svg
+                            className='w-4 h-4'
+                            fill='none'
+                            stroke='currentColor'
+                            viewBox='0 0 24 24'
+                            role='presentation'
+                        >
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
                         </svg>
                     </Link>
@@ -181,8 +218,9 @@ const AdminEggViewContainer = () => {
                     </span>
                     <Link
                         to={`/admin/nests/${nestId}`}
-                        className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand/10 text-cream-400 border border-brand/20 hover:bg-brand/20 transition-colors'
+                        className='inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-mocha-400/30 text-cream-400 border border-mocha-400/50 hover:bg-mocha-400/50 transition-colors'
                     >
+                        <HugeiconsIcon icon={CubeIcon} className='w-3 h-3' />
                         Nest #{nestId}
                     </Link>
                 </div>
@@ -203,14 +241,17 @@ const AdminEggViewContainer = () => {
 
             {/* ── Tab Navigation ── */}
             <div className='flex items-center gap-2 p-1 bg-mocha-500/50 border border-mocha-400/50 rounded-xl w-fit mt-4'>
-                {([
-                    { key: 'configuration', label: 'Configuration', icon: InformationCircleIcon },
-                    { key: 'variables', label: 'Variables', icon: SlidersHorizontalIcon },
-                    { key: 'scripts', label: 'Install Script', icon: CodeIcon },
-                    { key: 'manage', label: 'Manage', icon: Settings02Icon },
-                ] as const).map(({ key, label, icon: Icon }) => (
+                {(
+                    [
+                        { key: 'configuration', label: 'Configuration', icon: InformationCircleIcon },
+                        { key: 'variables', label: 'Variables', icon: SlidersHorizontalIcon },
+                        { key: 'scripts', label: 'Install Script', icon: CodeIcon },
+                        { key: 'manage', label: 'Manage', icon: Settings02Icon },
+                    ] as const
+                ).map(({ key, label, icon: Icon }) => (
                     <button
                         key={key}
+                        type='button'
                         onClick={() => setActiveTab(key)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             activeTab === key
@@ -261,14 +302,13 @@ const AdminEggViewContainer = () => {
                             <div className='flex items-center justify-between mb-6'>
                                 <div className='flex items-center gap-3'>
                                     <div className='w-10 h-10 bg-mocha-400 rounded-lg flex items-center justify-center'>
-                                        <svg className='w-5 h-5 text-cream-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' />
-                                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
-                                        </svg>
+                                        <HugeiconsIcon icon={Settings02Icon} className='w-5 h-5 text-cream-400' />
                                     </div>
                                     <div>
                                         <h3 className='text-cream-400 font-semibold text-lg'>Basic Settings</h3>
-                                        <p className='text-mocha-200 text-sm'>Core egg configuration and identification</p>
+                                        <p className='text-mocha-200 text-sm'>
+                                            Core egg configuration and identification
+                                        </p>
                                     </div>
                                 </div>
                                 {!editing && (
@@ -282,38 +322,72 @@ const AdminEggViewContainer = () => {
                                 <div className='space-y-5'>
                                     <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
                                         <div>
-                                            <label className={labelClass}>Egg Name *</label>
-                                            <input value={name} onChange={(e) => setName(e.target.value)}
-                                                className={inputClass} placeholder='My Egg' />
+                                            <label className={labelClass} htmlFor='egg-name'>
+                                                Egg Name *
+                                            </label>
+                                            <input
+                                                id='egg-name'
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                className={inputClass}
+                                                placeholder='My Egg'
+                                            />
                                         </div>
                                         <div>
-                                            <label className={labelClass}>Features (comma-separated)</label>
-                                            <input value={features} onChange={(e) => setFeatures(e.target.value)}
+                                            <label className={labelClass} htmlFor='features'>
+                                                Features (comma-separated)
+                                            </label>
+                                            <input
+                                                id='features'
+                                                value={features}
+                                                onChange={(e) => setFeatures(e.target.value)}
                                                 placeholder='e.g. eula, auto_update'
-                                                className={inputClass} />
-                                            <p className='text-mocha-200 text-xs mt-1.5'>Common: eula, auto_update, force_update</p>
+                                                className={inputClass}
+                                            />
+                                            <p className='text-mocha-200 text-xs mt-1.5'>
+                                                Common: eula, auto_update, force_update
+                                            </p>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className={labelClass}>Description</label>
-                                        <textarea value={description} onChange={(e) => setDescription(e.target.value)}
-                                            className={inputClass} rows={3} placeholder='Optional description for this egg' />
+                                        <label className={labelClass} htmlFor='description'>
+                                            Description
+                                        </label>
+                                        <textarea
+                                            id='description'
+                                            value={description}
+                                            onChange={(e) => setDescription(e.target.value)}
+                                            className={inputClass}
+                                            rows={3}
+                                            placeholder='Optional description for this egg'
+                                        />
                                     </div>
 
                                     <div>
-                                        <label className={labelClass}>Startup Command *</label>
-                                        <textarea value={startup} onChange={(e) => setStartup(e.target.value)}
-                                            className={inputClass + ' font-mono text-xs'} rows={4}
-                                            placeholder='{"{{SERVER_JAVA}}" {{SERVER_JAVA_FLAGS}} -jar {{SERVER_JAR}}}' />
-                                        <p className='text-mocha-200 text-xs mt-1.5'>Use variables like {'{{SERVER_JAVA}}'}, {'{{SERVER_JAR}}'}, etc.</p>
+                                        <label className={labelClass} htmlFor='startup-command'>
+                                            Startup Command *
+                                        </label>
+                                        <textarea
+                                            id='startup-command'
+                                            value={startup}
+                                            onChange={(e) => setStartup(e.target.value)}
+                                            className={`${inputClass} font-mono text-xs`}
+                                            rows={4}
+                                            placeholder='{"{{SERVER_JAVA}}" {{SERVER_JAVA_FLAGS}} -jar {{SERVER_JAR}}}'
+                                        />
+                                        <p className='text-mocha-200 text-xs mt-1.5'>
+                                            Use variables like {'{{SERVER_JAVA}}'}, {'{{SERVER_JAR}}'}, etc.
+                                        </p>
                                     </div>
 
                                     <div className='flex items-center gap-2'>
-                                        <input type='checkbox' id='forceIp' checked={forceOutgoingIp}
+                                        <Checkbox
+                                            id='forceIp'
+                                            checked={forceOutgoingIp}
                                             onChange={(e) => setForceOutgoingIp(e.target.checked)}
-                                            className='rounded border-mocha-400 w-4 h-4' />
-                                        <label htmlFor='forceIp' className='text-sm text-cream-400 cursor-pointer'>Force Outgoing IP</label>
+                                            label='Force Outgoing IP'
+                                        />
                                     </div>
 
                                     <div className='flex items-center gap-3 pt-2'>
@@ -335,49 +409,80 @@ const AdminEggViewContainer = () => {
                                 <div className='space-y-4'>
                                     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Egg ID</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Egg ID
+                                            </span>
                                             <p className='text-cream-400 font-medium mt-1'>{egg.id}</p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>UUID</span>
-                                            <p className='text-cream-400 font-mono text-sm mt-1 truncate' title={egg.uuid}>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                UUID
+                                            </span>
+                                            <p
+                                                className='text-cream-400 font-mono text-sm mt-1 truncate'
+                                                title={egg.uuid}
+                                            >
                                                 {egg.uuid}
                                             </p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Author</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Author
+                                            </span>
                                             <p className='text-cream-400 text-sm mt-1'>{egg.author}</p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Name</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Name
+                                            </span>
                                             <p className='text-cream-400 font-medium mt-1'>{egg.name}</p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Description</span>
-                                            <p className='text-cream-400 text-sm mt-1'>{egg.description || <span className='text-mocha-200/60'>None</span>}</p>
-                                        </div>
-                                        <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Docker Images</span>
-                                            <p className='text-cream-400 font-medium mt-1'>{dockerImageCount}</p>
-                                        </div>
-                                        <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Features</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Description
+                                            </span>
                                             <p className='text-cream-400 text-sm mt-1'>
-                                                {egg.features && egg.features.length > 0
-                                                    ? egg.features.join(', ')
-                                                    : <span className='text-mocha-200/60'>None</span>}
+                                                {egg.description || <span className='text-mocha-200/60'>None</span>}
                                             </p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Force Outgoing IP</span>
-                                            <p className='text-cream-400 text-sm mt-1'>{egg.forceOutgoingIp ? 'Yes' : 'No'}</p>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Docker Images
+                                            </span>
+                                            <p className='text-cream-400 font-medium mt-1'>{dockerImageCount}</p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Created</span>
-                                            <p className='text-cream-400 text-sm mt-1' title={egg.createdAt}>{createdAge}</p>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Features
+                                            </span>
+                                            <p className='text-cream-400 text-sm mt-1'>
+                                                {egg.features && egg.features.length > 0 ? (
+                                                    egg.features.join(', ')
+                                                ) : (
+                                                    <span className='text-mocha-200/60'>None</span>
+                                                )}
+                                            </p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Last Updated</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Force Outgoing IP
+                                            </span>
+                                            <p className='text-cream-400 text-sm mt-1'>
+                                                {egg.forceOutgoingIp ? 'Yes' : 'No'}
+                                            </p>
+                                        </div>
+                                        <div className='bg-mocha-600/50 rounded-lg p-4'>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Created
+                                            </span>
+                                            <p className='text-cream-400 text-sm mt-1' title={egg.createdAt}>
+                                                {createdAge}
+                                            </p>
+                                        </div>
+                                        <div className='bg-mocha-600/50 rounded-lg p-4'>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Last Updated
+                                            </span>
                                             <p className='text-cream-400 text-sm mt-1' title={egg.updatedAt}>
                                                 {egg.updatedAt ? new Date(egg.updatedAt).toLocaleDateString() : '—'}
                                             </p>
@@ -391,9 +496,7 @@ const AdminEggViewContainer = () => {
                         <div className='bg-mocha-500 border border-mocha-400 rounded-xl p-6'>
                             <div className='flex items-center gap-3 mb-6'>
                                 <div className='w-10 h-10 bg-mocha-400 rounded-lg flex items-center justify-center'>
-                                    <svg className='w-5 h-5 text-cream-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4' />
-                                    </svg>
+                                    <HugeiconsIcon icon={SlidersHorizontalIcon} className='w-5 h-5 text-cream-400' />
                                 </div>
                                 <div>
                                     <h3 className='text-cream-400 font-semibold text-lg'>Docker Images</h3>
@@ -403,17 +506,32 @@ const AdminEggViewContainer = () => {
 
                             {editing ? (
                                 <div>
-                                    <label className={labelClass}>Image Definitions</label>
-                                    <textarea value={dockerImages} onChange={(e) => setDockerImages(e.target.value)}
-                                        className={inputClass + ' font-mono text-xs'} rows={6}
-                                        placeholder='java|ghcr.io/pterodactyl/yolks:java_17' />
-                                    <p className='text-mocha-200 text-xs mt-1.5'>Format: key|image (one per line). Example: <code className='text-cream-400'>java|ghcr.io/pterodactyl/yolks:java_17</code></p>
+                                    <label className={labelClass} htmlFor='image-definitions'>
+                                        Image Definitions
+                                    </label>
+                                    <textarea
+                                        id='image-definitions'
+                                        value={dockerImages}
+                                        onChange={(e) => setDockerImages(e.target.value)}
+                                        className={`${inputClass} font-mono text-xs`}
+                                        rows={6}
+                                        placeholder='java|ghcr.io/pterodactyl/yolks:java_17'
+                                    />
+                                    <p className='text-mocha-200 text-xs mt-1.5'>
+                                        Format: key|image (one per line). Example:{' '}
+                                        <code className='text-cream-400'>java|ghcr.io/pterodactyl/yolks:java_17</code>
+                                    </p>
                                 </div>
                             ) : (
                                 <div className='space-y-2'>
                                     {Object.entries(egg.dockerImages || {}).map(([key, value]) => (
-                                        <div key={key} className='flex items-center gap-3 bg-mocha-600/50 rounded-lg p-3'>
-                                            <code className='text-cream-400 text-sm font-medium min-w-[80px]'>{key}</code>
+                                        <div
+                                            key={key}
+                                            className='flex items-center gap-3 bg-mocha-600/50 rounded-lg p-3'
+                                        >
+                                            <code className='text-cream-400 text-sm font-medium min-w-[80px]'>
+                                                {key}
+                                            </code>
                                             <span className='text-mocha-200/40'>→</span>
                                             <code className='text-mocha-200 text-xs font-mono break-all'>{value}</code>
                                         </div>
@@ -429,9 +547,7 @@ const AdminEggViewContainer = () => {
                         <div className='bg-mocha-500 border border-mocha-400 rounded-xl p-6'>
                             <div className='flex items-center gap-3 mb-6'>
                                 <div className='w-10 h-10 bg-mocha-400 rounded-lg flex items-center justify-center'>
-                                    <svg className='w-5 h-5 text-cream-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' />
-                                    </svg>
+                                    <HugeiconsIcon icon={CodeIcon} className='w-5 h-5 text-cream-400' />
                                 </div>
                                 <div>
                                     <h3 className='text-cream-400 font-semibold text-lg'>Process Management</h3>
@@ -442,73 +558,144 @@ const AdminEggViewContainer = () => {
                             {editing ? (
                                 <div className='space-y-4'>
                                     <div>
-                                        <label className={labelClass}>Copy Settings From (Egg ID)</label>
-                                        <input type='number' value={configFrom ?? ''}
-                                            onChange={(e) => setConfigFrom(e.target.value ? Number(e.target.value) : null)}
-                                            className={inputClass} placeholder='Leave empty to use default settings' />
-                                        <p className='text-mocha-200 text-xs mt-1.5'>Inherit configuration from another egg</p>
+                                        <label className={labelClass} htmlFor='config-from'>
+                                            Copy Settings From (Egg ID)
+                                        </label>
+                                        <input
+                                            id='config-from'
+                                            type='number'
+                                            value={configFrom ?? ''}
+                                            onChange={(e) =>
+                                                setConfigFrom(e.target.value ? Number(e.target.value) : null)
+                                            }
+                                            className={inputClass}
+                                            placeholder='Leave empty to use default settings'
+                                        />
+                                        <p className='text-mocha-200 text-xs mt-1.5'>
+                                            Inherit configuration from another egg
+                                        </p>
                                     </div>
 
                                     <div>
-                                        <label className={labelClass}>Stop Command</label>
-                                        <input value={configStop} onChange={(e) => setConfigStop(e.target.value)}
-                                            className={inputClass + ' font-mono text-xs'}
-                                            placeholder='{{SERVER_JAVA}} {{SERVER_JAVA_FLAGS}} -jar {{SERVER_JAR}}' />
+                                        <label className={labelClass} htmlFor='stop-command'>
+                                            Stop Command
+                                        </label>
+                                        <input
+                                            id='stop-command'
+                                            value={configStop}
+                                            onChange={(e) => setConfigStop(e.target.value)}
+                                            className={`${inputClass} font-mono text-xs`}
+                                            placeholder='{{SERVER_JAVA}} {{SERVER_JAVA_FLAGS}} -jar {{SERVER_JAR}}'
+                                        />
                                     </div>
 
                                     <div>
-                                        <label className={labelClass}>Startup Configuration (JSON)</label>
-                                        <textarea value={configStartup} onChange={(e) => setConfigStartup(e.target.value)}
-                                            className={inputClass + ' font-mono text-xs'} rows={4}
-                                            placeholder='{"done": "Server started successfully"}' />
-                                        <p className='text-mocha-200 text-xs mt-1.5'>Regex patterns to detect when server is ready</p>
+                                        <label className={labelClass} htmlFor='startup-config'>
+                                            Startup Configuration (JSON)
+                                        </label>
+                                        <textarea
+                                            id='startup-config'
+                                            value={configStartup}
+                                            onChange={(e) => setConfigStartup(e.target.value)}
+                                            className={`${inputClass} font-mono text-xs`}
+                                            rows={4}
+                                            placeholder='{"done": "Server started successfully"}'
+                                        />
+                                        <p className='text-mocha-200 text-xs mt-1.5'>
+                                            Regex patterns to detect when server is ready
+                                        </p>
                                     </div>
 
                                     <div>
-                                        <label className={labelClass}>Log Configuration (JSON)</label>
-                                        <textarea value={configLogs} onChange={(e) => setConfigLogs(e.target.value)}
-                                            className={inputClass + ' font-mono text-xs'} rows={4}
-                                            placeholder='{"prefix": "\\u001b[32m\\[Server\\]"}' />
+                                        <label className={labelClass} htmlFor='log-config'>
+                                            Log Configuration (JSON)
+                                        </label>
+                                        <textarea
+                                            id='log-config'
+                                            value={configLogs}
+                                            onChange={(e) => setConfigLogs(e.target.value)}
+                                            className={`${inputClass} font-mono text-xs`}
+                                            rows={4}
+                                            placeholder='{"prefix": "\\u001b[32m\\[Server\\]"}'
+                                        />
                                     </div>
 
                                     <div>
-                                        <label className={labelClass}>Configuration Files (JSON)</label>
-                                        <textarea value={configFiles} onChange={(e) => setConfigFiles(e.target.value)}
-                                            className={inputClass + ' font-mono text-xs'} rows={5}
-                                            placeholder='{"server.properties": {"match": "//", "replace": "..."}}' />
-                                        <p className='text-mocha-200 text-xs mt-1.5'>Define files that should be created/updated on server</p>
+                                        <label className={labelClass} htmlFor='config-files'>
+                                            Configuration Files (JSON)
+                                        </label>
+                                        <textarea
+                                            id='config-files'
+                                            value={configFiles}
+                                            onChange={(e) => setConfigFiles(e.target.value)}
+                                            className={`${inputClass} font-mono text-xs`}
+                                            rows={5}
+                                            placeholder='{"server.properties": {"match": "//", "replace": "..."}}'
+                                        />
+                                        <p className='text-mocha-200 text-xs mt-1.5'>
+                                            Define files that should be created/updated on server
+                                        </p>
                                     </div>
                                 </div>
                             ) : (
                                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                                     <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>Copy From</span>
+                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                            Copy From
+                                        </span>
                                         <p className='text-cream-400 text-sm mt-1'>
-                                            {egg.config.extends ? `Egg #${egg.config.extends}` : <span className='text-mocha-200/60'>None</span>}
+                                            {egg.config.extends ? (
+                                                `Egg #${egg.config.extends}`
+                                            ) : (
+                                                <span className='text-mocha-200/60'>None</span>
+                                            )}
                                         </p>
                                     </div>
                                     <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>Stop Command</span>
-                                        <p className='text-cream-400 font-mono text-xs mt-1 truncate' title={egg.config.stop || ''}>
+                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                            Stop Command
+                                        </span>
+                                        <p
+                                            className='text-cream-400 font-mono text-xs mt-1 truncate'
+                                            title={egg.config.stop || ''}
+                                        >
                                             {egg.config.stop || <span className='text-mocha-200/60'>Default</span>}
                                         </p>
                                     </div>
                                     <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>Startup Config</span>
+                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                            Startup Config
+                                        </span>
                                         <p className='text-cream-400 text-sm mt-1'>
-                                            {egg.config.startup ? 'Configured' : <span className='text-mocha-200/60'>None</span>}
+                                            {egg.config.startup ? (
+                                                'Configured'
+                                            ) : (
+                                                <span className='text-mocha-200/60'>None</span>
+                                            )}
                                         </p>
                                     </div>
                                     <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>Log Config</span>
+                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                            Log Config
+                                        </span>
                                         <p className='text-cream-400 text-sm mt-1'>
-                                            {egg.config.logs ? 'Configured' : <span className='text-mocha-200/60'>None</span>}
+                                            {egg.config.logs ? (
+                                                'Configured'
+                                            ) : (
+                                                <span className='text-mocha-200/60'>None</span>
+                                            )}
                                         </p>
                                     </div>
                                     <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>Config Files</span>
+                                        <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                            Config Files
+                                        </span>
                                         <p className='text-cream-400 text-sm mt-1'>
-                                            {egg.config.files ? 'Defined' : <span className='text-mocha-200/60'>None</span>}
+                                            {egg.config.files ? (
+                                                'Defined'
+                                            ) : (
+                                                <span className='text-mocha-200/60'>None</span>
+                                            )}
                                         </p>
                                     </div>
                                 </div>
@@ -536,14 +723,10 @@ const AdminEggViewContainer = () => {
                 )}
 
                 {/* ── Variables Tab ── */}
-                {activeTab === 'variables' && (
-                    <AdminEggVariablesContainer nestId={nestId} eggId={eggId} />
-                )}
+                {activeTab === 'variables' && <AdminEggVariablesContainer nestId={nestId} eggId={eggId} />}
 
                 {/* ── Install Script Tab ── */}
-                {activeTab === 'scripts' && (
-                    <AdminEggScriptsContainer nestId={nestId} eggId={eggId} />
-                )}
+                {activeTab === 'scripts' && <AdminEggScriptsContainer nestId={nestId} eggId={eggId} />}
 
                 {/* ── Manage Tab ── */}
                 {activeTab === 'manage' && (
@@ -551,9 +734,7 @@ const AdminEggViewContainer = () => {
                         <div className='bg-mocha-500 border-2 border-red-800/50 rounded-xl p-6'>
                             <div className='flex items-center gap-3 mb-4'>
                                 <div className='w-10 h-10 bg-red-900/50 rounded-lg flex items-center justify-center'>
-                                    <svg className='w-5 h-5 text-red-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' />
-                                    </svg>
+                                    <HugeiconsIcon icon={Delete02Icon} className='w-5 h-5 text-red-400' />
                                 </div>
                                 <div>
                                     <h3 className='text-red-400 font-semibold text-lg'>Danger Zone</h3>
@@ -562,7 +743,8 @@ const AdminEggViewContainer = () => {
                             </div>
 
                             <p className='text-sm text-mocha-200 mb-4'>
-                                Permanently delete this egg. Any servers using this egg will not be affected, but they will no longer be able to be reinstalled. This action cannot be undone.
+                                Permanently delete this egg. Any servers using this egg will not be affected, but they
+                                will no longer be able to be reinstalled. This action cannot be undone.
                             </p>
                             <Button variant='attention' onClick={() => setShowDeleteConfirm(true)} disabled={deleting}>
                                 {deleting ? 'Deleting...' : 'Delete Egg'}
@@ -579,7 +761,8 @@ const AdminEggViewContainer = () => {
                 title='Delete Egg'
                 confirm='Delete'
             >
-                Are you sure you want to permanently delete egg <strong>{egg.name}</strong>? This action cannot be undone.
+                Are you sure you want to permanently delete egg <strong>{egg.name}</strong>? This action cannot be
+                undone.
             </Dialog.Confirm>
         </div>
     );

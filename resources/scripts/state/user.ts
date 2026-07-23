@@ -9,6 +9,8 @@ export interface UserData {
     language: string;
     rootAdmin: boolean;
     useTotp: boolean;
+    nameFirst: string;
+    nameLast: string;
     createdAt: Date;
     updatedAt: Date;
 }

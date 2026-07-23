@@ -1,16 +1,17 @@
+import { InformationCircleIcon, ServerStack02Icon, Settings02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Settings02Icon, ServerStack02Icon, InformationCircleIcon } from '@hugeicons/core-free-icons';
 import { useEffect, useState } from 'react';
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
-import useSWR, { mutate } from 'swr';
 import { toast } from 'sonner';
+import useSWR, { mutate } from 'swr';
 import { type AdminUser, createUser, deleteUser, getUser, getUsers, updateUser } from '@/api/admin/users';
 import { httpErrorToHuman } from '@/api/http';
-import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/elements/dialog';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const inputClass =
     'w-full bg-mocha-600 border border-mocha-400 rounded px-3 py-2 text-sm text-cream-400 focus:outline-none focus:border-mocha-300 transition-colors';
@@ -30,7 +31,7 @@ const AdminUserList = () => {
         try {
             await deleteUser(id);
             mutate();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -140,27 +141,46 @@ const AdminUserList = () => {
 
 // ─── Create User Modal ─────────────────────────────────────────────────────
 
-const CreateUserModal = ({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) => {
+const CreateUserModal = ({
+    open,
+    onClose,
+    onCreated,
+}: {
+    open: boolean;
+    onClose: () => void;
+    onCreated: () => void;
+}) => {
     const [error, setError] = useState('');
-    const [form, setForm] = useState({
-        username: '',
-        email: '',
-        name_first: '',
-        name_last: '',
-        password: '',
-        language: '',
-        root_admin: false,
-    });
+    const [displayName, setDisplayName] = useState('');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [language, setLanguage] = useState('');
+    const [rootAdmin, setRootAdmin] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         try {
-            await createUser(form);
+            const parts = displayName.trim().split(/\s+/);
+            await createUser({
+                username,
+                email,
+                name_first: parts[0] || '',
+                name_last: parts.slice(1).join(' '),
+                password: password || undefined,
+                language: language || undefined,
+                root_admin: rootAdmin,
+            });
             onCreated();
-            setForm({ username: '', email: '', name_first: '', name_last: '', password: '', language: '', root_admin: false });
+            setDisplayName('');
+            setUsername('');
+            setEmail('');
+            setPassword('');
+            setLanguage('');
+            setRootAdmin(false);
             onClose();
-        } catch (e: any) {
+        } catch (e: unknown) {
             setError(httpErrorToHuman(e));
         }
     };
@@ -170,75 +190,75 @@ const CreateUserModal = ({ open, onClose, onCreated }: { open: boolean; onClose:
             {error && <div className='text-red-400 mb-4 text-sm'>Error: {error}</div>}
             <form onSubmit={handleSubmit} className='space-y-4'>
                 <div>
-                    <label className={labelClass}>Username *</label>
+                    <label htmlFor='username' className={labelClass}>
+                        Username *
+                    </label>
                     <input
+                        id='username'
                         type='text'
-                        value={form.username}
-                        onChange={(e) => setForm({ ...form, username: e.target.value })}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                         className={inputClass}
                     />
                 </div>
                 <div>
-                    <label className={labelClass}>Email *</label>
+                    <label htmlFor='email' className={labelClass}>
+                        Email *
+                    </label>
                     <input
+                        id='email'
                         type='email'
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                         className={inputClass}
                     />
                 </div>
-                <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                        <label className={labelClass}>First Name</label>
-                        <input
-                            type='text'
-                            value={form.name_first}
-                            onChange={(e) => setForm({ ...form, name_first: e.target.value })}
-                            className={inputClass}
-                        />
-                    </div>
-                    <div>
-                        <label className={labelClass}>Last Name</label>
-                        <input
-                            type='text'
-                            value={form.name_last}
-                            onChange={(e) => setForm({ ...form, name_last: e.target.value })}
-                            className={inputClass}
-                        />
-                    </div>
-                </div>
                 <div>
-                    <label className={labelClass}>Password</label>
+                    <label htmlFor='displayname' className={labelClass}>
+                        Displayname
+                    </label>
                     <input
-                        type='password'
-                        value={form.password}
-                        onChange={(e) => setForm({ ...form, password: e.target.value })}
+                        id='displayname'
+                        type='text'
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
                         className={inputClass}
                     />
                 </div>
                 <div>
-                    <label className={labelClass}>Language</label>
+                    <label htmlFor='password' className={labelClass}>
+                        Password
+                    </label>
                     <input
+                        id='password'
+                        type='password'
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className={inputClass}
+                    />
+                </div>
+                <div>
+                    <label htmlFor='create-language' className={labelClass}>
+                        Language
+                    </label>
+                    <input
+                        id='create-language'
                         type='text'
-                        value={form.language}
-                        onChange={(e) => setForm({ ...form, language: e.target.value })}
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value)}
                         placeholder='en'
                         className={inputClass}
                     />
                 </div>
                 <div className='flex items-center gap-2'>
-                    <input
-                        type='checkbox'
+                    <Checkbox
                         id='modal_root_admin'
-                        checked={form.root_admin}
-                        onChange={(e) => setForm({ ...form, root_admin: e.target.checked })}
-                        className='rounded border-mocha-400 bg-mocha-600 text-brand focus:ring-mocha-300'
+                        checked={rootAdmin}
+                        onChange={(e) => setRootAdmin(e.target.checked)}
+                        label='Root Admin'
                     />
-                    <label htmlFor='modal_root_admin' className='text-sm text-mocha-200'>
-                        Root Admin
-                    </label>
                 </div>
             </form>
             <Dialog.Footer>
@@ -264,28 +284,27 @@ const AdminUserView = () => {
     const [editing, setEditing] = useState(false);
     const [formInit, setFormInit] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const [_error, setError] = useState('');
+    const [_success, setSuccess] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleting, setDeleting] = useState(false);
 
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    const [displayName, setDisplayName] = useState('');
     const [email, setEmail] = useState('');
     const [language, setLanguage] = useState('');
     const [rootAdmin, setRootAdmin] = useState(false);
 
-    const { data: user, error: fetchError, mutate } = useSWR(
-        id ? ['admin:user', id] : null,
-        () => getUser(id, 'servers'),
-    );
+    const {
+        data: user,
+        error: fetchError,
+        mutate,
+    } = useSWR(id ? ['admin:user', id] : null, () => getUser(id, 'servers'));
 
     const navigate = useNavigate();
 
     useEffect(() => {
         if (user && !formInit) {
-            setFirstName(user.nameFirst);
-            setLastName(user.nameLast);
+            setDisplayName([user.nameFirst, user.nameLast].filter(Boolean).join(' '));
             setEmail(user.email);
             setLanguage(user.language);
             setRootAdmin(user.rootAdmin);
@@ -295,8 +314,7 @@ const AdminUserView = () => {
 
     const syncFromUser = () => {
         if (!user) return;
-        setFirstName(user.nameFirst);
-        setLastName(user.nameLast);
+        setDisplayName([user.nameFirst, user.nameLast].filter(Boolean).join(' '));
         setEmail(user.email);
         setLanguage(user.language);
         setRootAdmin(user.rootAdmin);
@@ -307,9 +325,10 @@ const AdminUserView = () => {
         setSuccess('');
         setSaving(true);
         try {
+            const parts = displayName.trim().split(/\s+/);
             await updateUser(id, {
-                name_first: firstName,
-                name_last: lastName,
+                name_first: parts[0] || '',
+                name_last: parts.slice(1).join(' '),
                 email,
                 language,
                 root_admin: rootAdmin,
@@ -317,7 +336,7 @@ const AdminUserView = () => {
             await mutate();
             setEditing(false);
             toast.success('User updated successfully');
-        } catch (e: any) {
+        } catch (e: unknown) {
             toast.error(httpErrorToHuman(e));
         } finally {
             setSaving(false);
@@ -331,7 +350,7 @@ const AdminUserView = () => {
             await deleteUser(id);
             toast.success('User deleted successfully');
             navigate('/admin/users');
-        } catch (e: any) {
+        } catch (e: unknown) {
             toast.error(httpErrorToHuman(e));
         } finally {
             setDeleting(false);
@@ -341,7 +360,9 @@ const AdminUserView = () => {
     if (fetchError) return <div className='text-red-400 p-4'>Error: {httpErrorToHuman(fetchError)}</div>;
     if (!user) return <Spinner />;
 
-    const gravatarUrl = `https://www.gravatar.com/avatar/${Array.from(new TextEncoder().encode(user.email.toLowerCase().trim()))
+    const gravatarUrl = `https://www.gravatar.com/avatar/${Array.from(
+        new TextEncoder().encode(user.email.toLowerCase().trim()),
+    )
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('')}?d=identicon&s=96`;
 
@@ -364,7 +385,13 @@ const AdminUserView = () => {
             <div className='flex items-center justify-between gap-4 mb-6 mt-8 md:mt-0 flex-col sm:flex-row'>
                 <div className='flex items-center gap-3'>
                     <Link to='..' className='text-sm text-mocha-200 hover:text-cream-400 transition-colors'>
-                        <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <svg
+                            className='w-4 h-4'
+                            fill='none'
+                            stroke='currentColor'
+                            viewBox='0 0 24 24'
+                            role='presentation'
+                        >
                             <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 19l-7-7 7-7' />
                         </svg>
                     </Link>
@@ -397,13 +424,16 @@ const AdminUserView = () => {
             </div>
 
             <div className='flex items-center gap-2 p-1 bg-mocha-500/50 border border-mocha-400/50 rounded-xl w-fit mt-4'>
-                {([
-                    { key: 'details', label: 'Details', icon: InformationCircleIcon },
-                    { key: 'servers', label: 'Servers', icon: ServerStack02Icon },
-                    { key: 'manage', label: 'Manage', icon: Settings02Icon },
-                ] as const).map(({ key, label, icon: Icon }) => (
+                {(
+                    [
+                        { key: 'details', label: 'Details', icon: InformationCircleIcon },
+                        { key: 'servers', label: 'Servers', icon: ServerStack02Icon },
+                        { key: 'manage', label: 'Manage', icon: Settings02Icon },
+                    ] as const
+                ).map(({ key, label, icon: Icon }) => (
                     <button
                         key={key}
+                        type='button'
                         onClick={() => setActiveTab(key)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                             activeTab === key
@@ -451,8 +481,19 @@ const AdminUserView = () => {
                             <div className='flex items-center justify-between mb-6'>
                                 <div className='flex items-center gap-3'>
                                     <div className='w-10 h-10 bg-mocha-400 rounded-lg flex items-center justify-center'>
-                                        <svg className='w-5 h-5 text-cream-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' />
+                                        <svg
+                                            className='w-5 h-5 text-cream-400'
+                                            fill='none'
+                                            stroke='currentColor'
+                                            viewBox='0 0 24 24'
+                                            role='presentation'
+                                        >
+                                            <path
+                                                strokeLinecap='round'
+                                                strokeLinejoin='round'
+                                                strokeWidth={2}
+                                                d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
+                                            />
                                         </svg>
                                     </div>
                                     <div>
@@ -469,30 +510,25 @@ const AdminUserView = () => {
 
                             {editing ? (
                                 <div className='space-y-5'>
-                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                                        <div>
-                                            <label className={labelClass}>First Name</label>
-                                            <input
-                                                type='text'
-                                                value={firstName}
-                                                onChange={(e) => setFirstName(e.target.value)}
-                                                className={inputClass}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className={labelClass}>Last Name</label>
-                                            <input
-                                                type='text'
-                                                value={lastName}
-                                                onChange={(e) => setLastName(e.target.value)}
-                                                className={inputClass}
-                                            />
-                                        </div>
+                                    <div>
+                                        <label htmlFor='edit-displayname' className={labelClass}>
+                                            Displayname
+                                        </label>
+                                        <input
+                                            id='edit-displayname'
+                                            type='text'
+                                            value={displayName}
+                                            onChange={(e) => setDisplayName(e.target.value)}
+                                            className={inputClass}
+                                        />
                                     </div>
 
                                     <div>
-                                        <label className={labelClass}>Email Address</label>
+                                        <label htmlFor='edit-email' className={labelClass}>
+                                            Email Address
+                                        </label>
                                         <input
+                                            id='edit-email'
                                             type='email'
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
@@ -502,8 +538,11 @@ const AdminUserView = () => {
 
                                     <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
                                         <div>
-                                            <label className={labelClass}>Language</label>
+                                            <label htmlFor='edit-language' className={labelClass}>
+                                                Language
+                                            </label>
                                             <input
+                                                id='edit-language'
                                                 type='text'
                                                 value={language}
                                                 onChange={(e) => setLanguage(e.target.value)}
@@ -512,17 +551,13 @@ const AdminUserView = () => {
                                             />
                                         </div>
                                         <div className='flex items-end'>
-                                            <div className='flex items-center space-x-2 pb-2'>
-                                                <input
-                                                    type='checkbox'
+                                            <div className='pb-2'>
+                                                <Checkbox
                                                     id='edit_root_admin'
                                                     checked={rootAdmin}
                                                     onChange={(e) => setRootAdmin(e.target.checked)}
-                                                    className='rounded border-mocha-400 w-4 h-4'
+                                                    label='Root Admin'
                                                 />
-                                                <label htmlFor='edit_root_admin' className='text-sm text-cream-400 cursor-pointer'>
-                                                    Root Admin
-                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -546,49 +581,72 @@ const AdminUserView = () => {
                                 <div className='space-y-4'>
                                     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>User ID</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                User ID
+                                            </span>
                                             <p className='text-cream-400 font-medium mt-1'>{user.id}</p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>UUID</span>
-                                            <p className='text-cream-400 font-mono text-sm mt-1 truncate' title={user.uuid}>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                UUID
+                                            </span>
+                                            <p
+                                                className='text-cream-400 font-mono text-sm mt-1 truncate'
+                                                title={user.uuid}
+                                            >
                                                 {user.uuid}
                                             </p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>External ID</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                External ID
+                                            </span>
                                             <p className='text-cream-400 font-mono text-sm mt-1'>
                                                 {user.externalId || <span className='text-mocha-200/60'>None</span>}
                                             </p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Username</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Username
+                                            </span>
                                             <p className='text-cream-400 font-medium mt-1'>{user.username}</p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Email</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Email
+                                            </span>
                                             <p className='text-cream-400 text-sm mt-1'>{user.email}</p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Full Name</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Displayname
+                                            </span>
                                             <p className='text-cream-400 text-sm mt-1'>
-                                                {user.nameFirst || user.nameLast
-                                                    ? `${user.nameFirst} ${user.nameLast}`.trim()
-                                                    : <span className='text-mocha-200/60'>Not set</span>}
+                                                {user.nameFirst || user.nameLast ? (
+                                                    `${user.nameFirst} ${user.nameLast}`.trim()
+                                                ) : (
+                                                    <span className='text-mocha-200/60'>Not set</span>
+                                                )}
                                             </p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Language</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Language
+                                            </span>
                                             <p className='text-cream-400 font-medium mt-1'>{user.language || 'en'}</p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Created</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Created
+                                            </span>
                                             <p className='text-cream-400 text-sm mt-1' title={user.createdAt}>
                                                 {accountAge}
                                             </p>
                                         </div>
                                         <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>Last Updated</span>
+                                            <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                                Last Updated
+                                            </span>
                                             <p className='text-cream-400 text-sm mt-1' title={user.updatedAt}>
                                                 {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : '—'}
                                             </p>
@@ -606,14 +664,26 @@ const AdminUserView = () => {
                         <div className='bg-mocha-500 border border-mocha-400 rounded-xl p-6'>
                             <div className='flex items-center gap-3 mb-6'>
                                 <div className='w-10 h-10 bg-mocha-400 rounded-lg flex items-center justify-center'>
-                                    <svg className='w-5 h-5 text-cream-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01' />
+                                    <svg
+                                        className='w-5 h-5 text-cream-400'
+                                        fill='none'
+                                        stroke='currentColor'
+                                        viewBox='0 0 24 24'
+                                        role='presentation'
+                                    >
+                                        <path
+                                            strokeLinecap='round'
+                                            strokeLinejoin='round'
+                                            strokeWidth={2}
+                                            d='M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01'
+                                        />
                                     </svg>
                                 </div>
                                 <div>
                                     <h3 className='text-cream-400 font-semibold text-lg'>User Servers</h3>
                                     <p className='text-mocha-200 text-sm'>
-                                        {user.serversCount} server{user.serversCount !== 1 ? 's' : ''} owned by this user
+                                        {user.serversCount} server{user.serversCount !== 1 ? 's' : ''} owned by this
+                                        user
                                     </p>
                                 </div>
                             </div>
@@ -624,10 +694,16 @@ const AdminUserView = () => {
                                         <thead>
                                             <tr className='border-b border-mocha-400'>
                                                 <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Name</th>
-                                                <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Identifier</th>
+                                                <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
+                                                    Identifier
+                                                </th>
                                                 <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Node</th>
-                                                <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Status</th>
-                                                <th className='text-left px-4 py-3 text-mocha-200 font-medium'>Created</th>
+                                                <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
+                                                    Status
+                                                </th>
+                                                <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
+                                                    Created
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -645,7 +721,9 @@ const AdminUserView = () => {
                                                         </Link>
                                                     </td>
                                                     <td className='px-4 py-3'>
-                                                        <code className='text-cream-400 text-xs'>{server.identifier}</code>
+                                                        <code className='text-cream-400 text-xs'>
+                                                            {server.identifier}
+                                                        </code>
                                                     </td>
                                                     <td className='px-4 py-3 text-mocha-100'>#{server.nodeId}</td>
                                                     <td className='px-4 py-3'>
@@ -660,7 +738,9 @@ const AdminUserView = () => {
                                                         </span>
                                                     </td>
                                                     <td className='px-4 py-3 text-mocha-100 text-sm'>
-                                                        {server.createdAt ? new Date(server.createdAt).toLocaleDateString() : '—'}
+                                                        {server.createdAt
+                                                            ? new Date(server.createdAt).toLocaleDateString()
+                                                            : '—'}
                                                     </td>
                                                 </tr>
                                             ))}
@@ -669,8 +749,19 @@ const AdminUserView = () => {
                                 </div>
                             ) : (
                                 <div className='text-center py-12 text-mocha-200'>
-                                    <svg className='w-12 h-12 mx-auto mb-3 text-mocha-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5} d='M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2' />
+                                    <svg
+                                        className='w-12 h-12 mx-auto mb-3 text-mocha-400'
+                                        fill='none'
+                                        stroke='currentColor'
+                                        viewBox='0 0 24 24'
+                                        role='presentation'
+                                    >
+                                        <path
+                                            strokeLinecap='round'
+                                            strokeLinejoin='round'
+                                            strokeWidth={1.5}
+                                            d='M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2'
+                                        />
                                     </svg>
                                     <p className='text-sm'>This user has no servers.</p>
                                 </div>
@@ -685,8 +776,19 @@ const AdminUserView = () => {
                         <div className='bg-mocha-500 border-2 border-red-800/50 rounded-xl p-6'>
                             <div className='flex items-center gap-3 mb-4'>
                                 <div className='w-10 h-10 bg-red-900/50 rounded-lg flex items-center justify-center'>
-                                    <svg className='w-5 h-5 text-red-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z' />
+                                    <svg
+                                        className='w-5 h-5 text-red-400'
+                                        fill='none'
+                                        stroke='currentColor'
+                                        viewBox='0 0 24 24'
+                                        role='presentation'
+                                    >
+                                        <path
+                                            strokeLinecap='round'
+                                            strokeLinejoin='round'
+                                            strokeWidth={2}
+                                            d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+                                        />
                                     </svg>
                                 </div>
                                 <div>
@@ -696,7 +798,8 @@ const AdminUserView = () => {
                             </div>
 
                             <p className='text-sm text-mocha-200 mb-4'>
-                                Permanently delete this user and all associated data including servers. This action cannot be undone.
+                                Permanently delete this user and all associated data including servers. This action
+                                cannot be undone.
                             </p>
                             <Button variant='attention' onClick={() => setShowDeleteConfirm(true)} disabled={deleting}>
                                 {deleting ? 'Deleting...' : 'Delete User'}
@@ -713,7 +816,8 @@ const AdminUserView = () => {
                 title='Delete User'
                 confirm='Delete'
             >
-                Are you sure you want to permanently delete user <strong>{user.username}</strong>? This action cannot be undone.
+                Are you sure you want to permanently delete user <strong>{user.username}</strong>? This action cannot be
+                undone.
             </Dialog.Confirm>
         </div>
     );

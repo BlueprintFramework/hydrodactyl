@@ -2,10 +2,10 @@ import { useState } from 'react';
 import useSWR from 'swr';
 import { type AdminApiKey, type CreateApiKeyData, createApiKey, deleteApiKey, getApiKeys } from '@/api/admin/apiKeys';
 import { httpErrorToHuman } from '@/api/http';
-import { Button } from '@/components/ui/button';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
+import { Button } from '@/components/ui/button';
 
 const AdminApiContainer = () => {
     const [page, setPage] = useState(1);
@@ -35,7 +35,7 @@ const AdminApiContainer = () => {
             setAllowedIps('');
             setShowCreate(false);
             mutate();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         } finally {
             setCreating(false);
@@ -47,7 +47,7 @@ const AdminApiContainer = () => {
         try {
             await deleteApiKey(id);
             mutate();
-        } catch (e: any) {
+        } catch (e: unknown) {
             alert(httpErrorToHuman(e));
         }
     };
@@ -61,7 +61,15 @@ const AdminApiContainer = () => {
     return (
         <div>
             <MainPageHeader title='API Keys'>
-                <Button variant='default' onClick={() => { setShowCreate(!showCreate); setCreatedToken(null); }}>Create API Key</Button>
+                <Button
+                    variant='default'
+                    onClick={() => {
+                        setShowCreate(!showCreate);
+                        setCreatedToken(null);
+                    }}
+                >
+                    Create API Key
+                </Button>
             </MainPageHeader>
 
             {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
@@ -80,7 +88,9 @@ const AdminApiContainer = () => {
                                 {createdToken}
                             </code>
                         </div>
-                        <Button variant='secondary' onClick={handleCopyToken}>Copy</Button>
+                        <Button variant='secondary' onClick={handleCopyToken}>
+                            Copy
+                        </Button>
                     </div>
                 </div>
             )}
@@ -90,8 +100,11 @@ const AdminApiContainer = () => {
                     <h3 className='text-sm font-medium text-cream-400 mb-3'>New API Key</h3>
                     <div className='space-y-3'>
                         <div>
-                            <label className='block text-xs text-mocha-200 mb-1'>Memo</label>
+                            <label htmlFor='api-memo' className='block text-xs text-mocha-200 mb-1'>
+                                Memo
+                            </label>
                             <input
+                                id='api-memo'
                                 type='text'
                                 value={memo}
                                 onChange={(e) => setMemo(e.target.value)}
@@ -100,8 +113,11 @@ const AdminApiContainer = () => {
                             />
                         </div>
                         <div>
-                            <label className='block text-xs text-mocha-200 mb-1'>Allowed IPs (comma-separated)</label>
+                            <label htmlFor='api-allowed-ips' className='block text-xs text-mocha-200 mb-1'>
+                                Allowed IPs (comma-separated)
+                            </label>
                             <textarea
+                                id='api-allowed-ips'
                                 value={allowedIps}
                                 onChange={(e) => setAllowedIps(e.target.value)}
                                 placeholder='e.g. 192.168.1.1, 10.0.0.1'
@@ -110,8 +126,19 @@ const AdminApiContainer = () => {
                             />
                         </div>
                         <div className='flex gap-2'>
-                            <Button variant='default' onClick={handleCreate} disabled={!memo.trim() || creating}>{creating ? 'Creating...' : 'Create Key'}</Button>
-                            <Button variant='secondary' onClick={() => { setShowCreate(false); setMemo(''); setAllowedIps(''); }}>Cancel</Button>
+                            <Button variant='default' onClick={handleCreate} disabled={!memo.trim() || creating}>
+                                {creating ? 'Creating...' : 'Create Key'}
+                            </Button>
+                            <Button
+                                variant='secondary'
+                                onClick={() => {
+                                    setShowCreate(false);
+                                    setMemo('');
+                                    setAllowedIps('');
+                                }}
+                            >
+                                Cancel
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -169,7 +196,9 @@ const AdminApiContainer = () => {
                                                     {new Date(apiKey.createdAt).toLocaleDateString()}
                                                 </td>
                                                 <td className='px-4 py-3 text-right'>
-                                                    <Button variant='attention' onClick={() => handleDelete(apiKey.id)}>Delete</Button>
+                                                    <Button variant='attention' onClick={() => handleDelete(apiKey.id)}>
+                                                        Delete
+                                                    </Button>
                                                 </td>
                                             </tr>
                                         ))
