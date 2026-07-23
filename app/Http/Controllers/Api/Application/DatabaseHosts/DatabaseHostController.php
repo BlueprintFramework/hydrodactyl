@@ -2,8 +2,10 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Application\DatabaseHosts;
 
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use PDOException;
 use Pterodactyl\Models\DatabaseHost;
 use Spatie\QueryBuilder\QueryBuilder;
 use Pterodactyl\Services\Databases\Hosts\HostCreationService;
@@ -48,7 +50,18 @@ class DatabaseHostController extends ApplicationApiController
 
     public function store(StoreDatabaseHostRequest $request): JsonResponse
     {
-        $host = $this->creationService->handle($request->validated());
+        try {
+            $host = $this->creationService->handle($request->validated());
+        } catch (Exception $exception) {
+            if ($exception instanceof PDOException || $exception->getPrevious() instanceof PDOException) {
+                return response()->json([
+                    'error' => 'There was an error while trying to connect to the host or while executing a query.',
+                    'message' => $exception->getMessage(),
+                ], 422);
+            }
+
+            throw $exception;
+        }
 
         return $this->fractal->item($host)
             ->transformWith($this->getTransformer(DatabaseHostTransformer::class))
@@ -62,7 +75,15 @@ class DatabaseHostController extends ApplicationApiController
 
     public function update(UpdateDatabaseHostRequest $request, DatabaseHost $host): array
     {
-        $host = $this->updateService->handle($host->id, $request->validated());
+        try {
+            $host = $this->updateService->handle($host->id, $request->validated());
+        } catch (Exception $exception) {
+            if ($exception instanceof PDOException || $exception->getPrevious() instanceof PDOException) {
+                abort(422, 'There was an error while trying to connect to the host or while executing a query: ' . $exception->getMessage());
+            }
+
+            throw $exception;
+        }
 
         return $this->fractal->item($host)
             ->transformWith($this->getTransformer(DatabaseHostTransformer::class))

@@ -13,6 +13,7 @@ import {
 } from '@/api/admin/databaseHosts';
 import { type AdminNode, getNodes } from '@/api/admin/nodes';
 import { httpErrorToHuman } from '@/api/http';
+import { Dialog } from '@/components/elements/dialog';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
@@ -310,23 +311,231 @@ const AdminDatabaseHostView = () => {
     );
 };
 
+const CreateDatabaseHostModal = ({
+    open,
+    onClose,
+    onCreated,
+}: {
+    open: boolean;
+    onClose: () => void;
+    onCreated: () => void;
+}) => {
+    const { data: nodesData } = useSWR(['admin:nodes', 1], () => getNodes({ page: 1 }));
+
+    const [name, setName] = useState('');
+    const [host, setHost] = useState('');
+    const [port, setPort] = useState('3306');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [containerImage, setContainerImage] = useState('');
+    const [nodeId, setNodeId] = useState<string>('');
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleCreate = () => {
+        setError(null);
+        setSaving(true);
+
+        const payload: CreateDatabaseHostData = {
+            name,
+            host,
+            port: Number(port),
+            username,
+            password,
+            container_image: containerImage || undefined,
+        };
+        if (nodeId) {
+            payload.node_id = Number(nodeId);
+        }
+
+        createDatabaseHost(payload)
+            .then(() => {
+                setName('');
+                setHost('');
+                setPort('3306');
+                setUsername('');
+                setPassword('');
+                setContainerImage('');
+                setNodeId('');
+                onCreated();
+                onClose();
+                toast.success('Database host created successfully');
+            })
+            .catch((e) => {
+                setError(httpErrorToHuman(e));
+                toast.error(httpErrorToHuman(e));
+            })
+            .finally(() => setSaving(false));
+    };
+
+    return (
+        <Dialog open={open} onClose={onClose} title='Add Database Host'>
+            {error && (
+                <div className='text-red-400 mb-4 text-sm bg-red-950/20 border border-red-800/40 rounded-lg p-3 mx-6 mt-4'>
+                    {error}
+                </div>
+            )}
+            <div className='bg-mocha-400/20 border border-mocha-400/50 rounded-lg p-4 mx-6 mt-4 mb-4'>
+                <div className='flex items-start gap-3'>
+                    <svg
+                        className='w-5 h-5 text-mocha-200 mt-0.5'
+                        fill='none'
+                        stroke='currentColor'
+                        viewBox='0 0 24 24'
+                        role='presentation'
+                    >
+                        <path
+                            strokeLinecap='round'
+                            strokeLinejoin='round'
+                            strokeWidth={2}
+                            d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+                        />
+                    </svg>
+                    <div>
+                        <p className='text-sm text-cream-400 font-medium'>Container-Based Databases</p>
+                        <p className='text-xs text-mocha-200 mt-1'>
+                            All databases run exclusively inside Docker/Podman containers for isolation and security.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className='space-y-4 px-6 pt-2'>
+                <div>
+                    <label htmlFor='create-host-name' className={labelClass}>
+                        Host Name *
+                    </label>
+                    <input
+                        id='create-host-name'
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className={inputClass}
+                        placeholder='MySQL Primary'
+                    />
+                </div>
+                <div>
+                    <label htmlFor='create-container-image' className={labelClass}>
+                        Container Image *
+                    </label>
+                    <input
+                        id='create-container-image'
+                        value={containerImage}
+                        onChange={(e) => setContainerImage(e.target.value)}
+                        className={inputClass}
+                        placeholder='mysql:8.0'
+                    />
+                    <p className='text-mocha-200 text-xs mt-1.5'>
+                        Docker image to use for this database (e.g., mysql:8.0, postgres:15, redis:7)
+                    </p>
+                </div>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div>
+                        <label htmlFor='create-internal-host' className={labelClass}>
+                            Internal Host *
+                        </label>
+                        <input
+                            id='create-internal-host'
+                            value={host}
+                            onChange={(e) => setHost(e.target.value)}
+                            className={inputClass}
+                            placeholder='127.0.0.1'
+                        />
+                        <p className='text-mocha-200 text-xs mt-1.5'>Internal container IP or hostname</p>
+                    </div>
+                    <div>
+                        <label htmlFor='create-port' className={labelClass}>
+                            Port *
+                        </label>
+                        <input
+                            id='create-port'
+                            type='number'
+                            value={port}
+                            onChange={(e) => setPort(e.target.value)}
+                            className={inputClass}
+                            placeholder='3306'
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label htmlFor='create-username' className={labelClass}>
+                        Username *
+                    </label>
+                    <input
+                        id='create-username'
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className={inputClass}
+                        placeholder='root'
+                    />
+                </div>
+                <div>
+                    <label htmlFor='create-password' className={labelClass}>
+                        Password *
+                    </label>
+                    <input
+                        id='create-password'
+                        type='password'
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className={inputClass}
+                    />
+                </div>
+                <div>
+                    <label htmlFor='create-node' className={labelClass}>
+                        Node (Optional)
+                    </label>
+                    <select
+                        id='create-node'
+                        value={nodeId}
+                        onChange={(e) => setNodeId(e.target.value)}
+                        className={inputClass}
+                    >
+                        <option value=''>No Node</option>
+                        {nodesData?.items?.map((node: AdminNode) => (
+                            <option key={node.id} value={String(node.id)}>
+                                {node.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+            <Dialog.Footer>
+                <div className='flex items-center justify-end gap-3 p-6 border-t border-mocha-400/30'>
+                    <Button variant='secondary' onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant='default'
+                        onClick={handleCreate}
+                        disabled={saving || !name || !host || !username || !password || !containerImage}
+                    >
+                        {saving ? 'Creating...' : 'Add Database Host'}
+                    </Button>
+                </div>
+            </Dialog.Footer>
+        </Dialog>
+    );
+};
+
 const AdminDatabasesContainer = () => {
     const [page, setPage] = useState(1);
-    const [showCreate, setShowCreate] = useState(false);
-    const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
     const { data, error, mutate } = useSWR(['admin:database-hosts', page], () => getDatabaseHosts({ page }));
 
-    const handleDelete = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault();
-        if (confirmDelete === null) return;
-        const id = confirmDelete;
-        setConfirmDelete(null);
-        deleteDatabaseHost(id)
+    const [showCreate, setShowCreate] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState<AdminDatabaseHost | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    const handleDelete = () => {
+        if (!confirmDelete) return;
+        setDeleting(true);
+        deleteDatabaseHost(confirmDelete.id)
             .then(() => {
+                toast.success(`Database host "${confirmDelete.name}" deleted`);
+                setConfirmDelete(null);
                 mutate();
-                toast.success('Database host deleted successfully');
             })
-            .catch((error: any) => toast.error(httpErrorToHuman(error)));
+            .catch((e) => toast.error(httpErrorToHuman(e)))
+            .finally(() => setDeleting(false));
     };
 
     return (
@@ -341,38 +550,45 @@ const AdminDatabasesContainer = () => {
                             </Button>
                         </MainPageHeader>
 
-                        {error && <div className='text-red-400 mb-4'>Error: {httpErrorToHuman(error)}</div>}
+                        {error && (
+                            <div className='text-red-400 mb-4 bg-red-950/20 border border-red-800/40 rounded-lg p-3'>
+                                Error: {httpErrorToHuman(error)}
+                            </div>
+                        )}
 
                         {!data ? (
                             <Spinner />
                         ) : (
                             <Pagination data={data} onPageSelect={setPage}>
                                 {({ items }) => (
-                                    <div className='bg-mocha-500 border border-mocha-400 rounded-lg overflow-hidden'>
-                                        <table className='w-full text-sm'>
+                                    <div className='bg-mocha-500 border border-mocha-400 rounded-xl overflow-hidden shadow-sm'>
+                                        <table className='w-full text-sm border-collapse'>
                                             <thead>
-                                                <tr className='border-b border-mocha-400'>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
+                                                <tr className='border-b border-mocha-400/80 bg-mocha-600/20'>
+                                                    <th className='text-left px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs'>
                                                         Name
                                                     </th>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
+                                                    <th className='text-left px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs'>
                                                         Host
                                                     </th>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
+                                                    <th className='text-left px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs'>
                                                         Port
                                                     </th>
-                                                    <th className='text-left px-4 py-3 text-mocha-200 font-medium'>
+                                                    <th className='text-left px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs hidden md:table-cell'>
                                                         Node
                                                     </th>
-                                                    <th className='text-right px-4 py-3 text-mocha-200 font-medium'>
+                                                    <th className='text-right px-5 py-4 text-mocha-200 font-semibold tracking-wide uppercase text-xs w-[160px]'>
                                                         Actions
                                                     </th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody className='divide-y divide-mocha-400/40'>
                                                 {items.length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={5} className='text-center py-8 text-mocha-200'>
+                                                        <td
+                                                            colSpan={5}
+                                                            className='text-center py-10 text-mocha-200 font-medium'
+                                                        >
                                                             No database hosts found.
                                                         </td>
                                                     </tr>
@@ -380,38 +596,39 @@ const AdminDatabasesContainer = () => {
                                                     items.map((dbHost: AdminDatabaseHost) => (
                                                         <tr
                                                             key={dbHost.id}
-                                                            className='border-b border-mocha-400 last:border-0 hover:bg-mocha-400/20'
+                                                            className='hover:bg-mocha-400/15 transition-colors'
                                                         >
-                                                            <td className='px-4 py-3'>
+                                                            <td className='px-5 py-4'>
                                                                 <Link
                                                                     to={String(dbHost.id)}
-                                                                    className='text-cream-400 font-medium hover:text-cream-200 cursor-pointer'
+                                                                    className='text-cream-400 font-semibold hover:text-cream-200 transition-colors'
                                                                 >
                                                                     {dbHost.name}
                                                                 </Link>
                                                             </td>
-                                                            <td className='px-4 py-3'>
-                                                                <code className='text-cream-400 text-xs'>
+                                                            <td className='px-5 py-4'>
+                                                                <code className='text-cream-400 text-xs font-mono bg-mocha-400/20 px-2 py-1 rounded'>
                                                                     {dbHost.host}
                                                                 </code>
                                                             </td>
-                                                            <td className='px-4 py-3 text-mocha-100 cursor-default'>
+                                                            <td className='px-5 py-4 text-mocha-100 font-mono'>
                                                                 {dbHost.port}
                                                             </td>
-                                                            <td className='px-4 py-3 text-mocha-100 cursor-default'>
-                                                                {dbHost.node !== null ? `#${dbHost.node}` : '\u2014'}
+                                                            <td className='px-5 py-4 text-mocha-100 hidden md:table-cell'>
+                                                                {dbHost.node !== null ? `#${dbHost.node}` : '—'}
                                                             </td>
-                                                            <td className='px-4 py-3 text-right'>
-                                                                <div className='flex items-center justify-end gap-2'>
+                                                            <td className='px-5 py-4 text-right'>
+                                                                <div className='flex items-center justify-end gap-3'>
                                                                     <Link
                                                                         to={String(dbHost.id)}
-                                                                        className='text-xs text-cream-400 hover:text-cream-500 cursor-pointer'
+                                                                        className='text-xs font-semibold text-cream-400 hover:text-cream-200 transition-colors'
                                                                     >
                                                                         View
                                                                     </Link>
                                                                     <Button
                                                                         variant='attention'
-                                                                        onClick={() => setConfirmDelete(dbHost.id)}
+                                                                        size='sm'
+                                                                        onClick={() => setConfirmDelete(dbHost)}
                                                                     >
                                                                         Delete
                                                                     </Button>
@@ -427,7 +644,11 @@ const AdminDatabasesContainer = () => {
                             </Pagination>
                         )}
 
-                        <CreateDatabaseHostModal open={showCreate} onClose={() => setShowCreate(false)} onCreated={() => mutate()} />
+                        <CreateDatabaseHostModal
+                            open={showCreate}
+                            onClose={() => setShowCreate(false)}
+                            onCreated={() => mutate()}
+                        />
 
                         <Dialog.Confirm
                             open={confirmDelete !== null}
@@ -435,159 +656,16 @@ const AdminDatabasesContainer = () => {
                             onConfirmed={handleDelete}
                             title='Delete Database Host'
                             confirm='Delete'
+                            loading={deleting}
                         >
-                            Are you sure you want to delete this database host?
+                            Are you sure you want to permanently delete <strong>{confirmDelete?.name}</strong>? This
+                            action cannot be undone.
                         </Dialog.Confirm>
                     </div>
                 }
             />
             <Route path=':id/*' element={<AdminDatabaseHostView />} />
         </Routes>
-    );
-};
-
-const CreateDatabaseHostModal = ({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) => {
-    const { data: nodesData } = useSWR(['admin:nodes', 1], () => getNodes({ page: 1 }));
-
-    const [name, setName] = useState('');
-    const [hostVal, setHostVal] = useState('');
-    const [port, setPort] = useState('3306');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [containerImage, setContainerImage] = useState('');
-    const [nodeId, setNodeId] = useState<string>('');
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
-
-    const handleCreate = async () => {
-        setError('');
-        setSaving(true);
-
-        const payload: CreateDatabaseHostData = {
-            name,
-            host: hostVal,
-            port: Number(port),
-            username,
-            password,
-            container_image: containerImage || undefined,
-        };
-        if (nodeId) {
-            payload.node_id = Number(nodeId);
-        }
-
-        try {
-            await createDatabaseHost(payload);
-            onCreated();
-            setName('');
-            setHostVal('');
-            setPort('3306');
-            setUsername('');
-            setPassword('');
-            setContainerImage('');
-            setNodeId('');
-            onClose();
-            toast.success('Database host created successfully');
-        } catch (e: any) {
-            setError(httpErrorToHuman(e));
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    return (
-        <Dialog open={open} onClose={onClose} title='Add Database Host'>
-            {error && <div className='text-red-400 mb-4 text-sm'>{error}</div>}
-            <div className='space-y-4'>
-                <div>
-                    <label className={labelClass}>Host Name *</label>
-                    <input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className={inputClass}
-                        placeholder='MySQL Primary'
-                    />
-                </div>
-                <div>
-                    <label className={labelClass}>Container Image *</label>
-                    <input
-                        value={containerImage}
-                        onChange={(e) => setContainerImage(e.target.value)}
-                        className={inputClass}
-                        placeholder='mysql:8.0'
-                    />
-                    <p className='text-mocha-200 text-xs mt-1.5'>Docker image to use for this database (e.g., mysql:8.0, postgres:15, redis:7)</p>
-                </div>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <div>
-                        <label className={labelClass}>Internal Host *</label>
-                        <input
-                            value={hostVal}
-                            onChange={(e) => setHostVal(e.target.value)}
-                            className={inputClass}
-                            placeholder='127.0.0.1'
-                        />
-                        <p className='text-mocha-200 text-xs mt-1.5'>Internal container IP or hostname</p>
-                    </div>
-                    <div>
-                        <label className={labelClass}>Port *</label>
-                        <input
-                            type='number'
-                            value={port}
-                            onChange={(e) => setPort(e.target.value)}
-                            className={inputClass}
-                            placeholder='3306'
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label className={labelClass}>Username *</label>
-                    <input
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className={inputClass}
-                        placeholder='root'
-                    />
-                </div>
-                <div>
-                    <label className={labelClass}>Password *</label>
-                    <input
-                        type='password'
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={inputClass}
-                    />
-                </div>
-                <div>
-                    <label className={labelClass}>Node (Optional)</label>
-                    <select
-                        value={nodeId}
-                        onChange={(e) => setNodeId(e.target.value)}
-                        className={inputClass}
-                    >
-                        <option value=''>No Node</option>
-                        {nodesData?.items?.map((node: AdminNode) => (
-                            <option key={node.id} value={String(node.id)}>
-                                {node.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-            <Dialog.Footer>
-                <div className='flex items-center gap-3 p-6'>
-                    <Button
-                        variant='default'
-                        onClick={handleCreate}
-                        disabled={saving || !name || !hostVal || !username || !password || !containerImage}
-                    >
-                        {saving ? 'Creating...' : 'Add Database Host'}
-                    </Button>
-                    <Button variant='secondary' onClick={onClose}>
-                        Cancel
-                    </Button>
-                </div>
-            </Dialog.Footer>
-        </Dialog>
     );
 };
 

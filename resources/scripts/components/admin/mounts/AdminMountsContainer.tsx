@@ -1,3 +1,5 @@
+import { InformationCircleIcon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { useState } from 'react';
 import { Link, Route, Routes } from 'react-router-dom';
 import useSWR from 'swr';
@@ -9,6 +11,7 @@ import Pagination from '@/components/elements/Pagination';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const AdminMountsContainer = () => {
     const [page, setPage] = useState(1);
@@ -117,7 +120,30 @@ const AdminMountsContainer = () => {
                 index
                 element={
                     <div>
-                        <MainPageHeader title='Mounts'>
+                        <MainPageHeader
+                            title='Mounts'
+                            titleChildren={
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                type='button'
+                                                className='text-mocha-100/60 hover:text-cream-400 transition-colors cursor-pointer -ml-2'
+                                            >
+                                                <HugeiconsIcon icon={InformationCircleIcon} size={18} />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent
+                                            side='bottom'
+                                            className='rounded-lg max-w-[280px] whitespace-normal text-center'
+                                        >
+                                            Mounts let you map host directories or Docker volumes into game server
+                                            containers, providing persistent storage or shared data access.
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            }
+                        >
                             <Button variant='default' onClick={() => setShowCreate(true)}>
                                 New Mount
                             </Button>

@@ -155,7 +155,7 @@ const CreateUserModal = ({
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [language, setLanguage] = useState('');
+    const [language, setLanguage] = useState('en');
     const [rootAdmin, setRootAdmin] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -169,7 +169,7 @@ const CreateUserModal = ({
                 name_first: parts[0] || '',
                 name_last: parts.slice(1).join(' '),
                 password: password || undefined,
-                language: language || undefined,
+                language,
                 root_admin: rootAdmin,
             });
             onCreated();
@@ -177,7 +177,7 @@ const CreateUserModal = ({
             setUsername('');
             setEmail('');
             setPassword('');
-            setLanguage('');
+            setLanguage('en');
             setRootAdmin(false);
             onClose();
         } catch (e: unknown) {
@@ -187,87 +187,95 @@ const CreateUserModal = ({
 
     return (
         <Dialog open={open} onClose={onClose} title='Create User'>
-            {error && <div className='text-red-400 mb-4 text-sm'>Error: {error}</div>}
-            <form onSubmit={handleSubmit} className='space-y-4'>
+            {error && (
+                <div className='text-red-400 mb-4 text-sm bg-red-950/20 border border-red-800/40 rounded-lg p-3 mx-6 mt-4'>
+                    {error}
+                </div>
+            )}
+            <div className='space-y-4 px-6 pt-2'>
                 <div>
-                    <label htmlFor='username' className={labelClass}>
+                    <label htmlFor='create-displayname' className={labelClass}>
+                        Display Name
+                    </label>
+                    <input
+                        id='create-displayname'
+                        type='text'
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        className={inputClass}
+                        placeholder='John Doe'
+                    />
+                </div>
+                <div>
+                    <label htmlFor='create-username' className={labelClass}>
                         Username *
                     </label>
                     <input
-                        id='username'
+                        id='create-username'
                         type='text'
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
                         className={inputClass}
+                        placeholder='johndoe'
                     />
                 </div>
                 <div>
-                    <label htmlFor='email' className={labelClass}>
+                    <label htmlFor='create-email' className={labelClass}>
                         Email *
                     </label>
                     <input
-                        id='email'
+                        id='create-email'
                         type='email'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         className={inputClass}
+                        placeholder='john@example.com'
                     />
                 </div>
                 <div>
-                    <label htmlFor='displayname' className={labelClass}>
-                        Displayname
-                    </label>
-                    <input
-                        id='displayname'
-                        type='text'
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        className={inputClass}
-                    />
-                </div>
-                <div>
-                    <label htmlFor='password' className={labelClass}>
+                    <label htmlFor='create-password' className={labelClass}>
                         Password
                     </label>
                     <input
-                        id='password'
+                        id='create-password'
                         type='password'
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className={inputClass}
+                        placeholder='••••••••'
                     />
                 </div>
                 <div>
                     <label htmlFor='create-language' className={labelClass}>
                         Language
                     </label>
-                    <input
+                    <select
                         id='create-language'
-                        type='text'
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
-                        placeholder='en'
                         className={inputClass}
-                    />
+                    >
+                        <option value='en'>English</option>
+                    </select>
                 </div>
-                <div className='flex items-center gap-2'>
+                <div className='flex items-center gap-2 pt-1'>
                     <Checkbox
-                        id='modal_root_admin'
+                        id='create_root_admin'
                         checked={rootAdmin}
                         onChange={(e) => setRootAdmin(e.target.checked)}
-                        label='Root Admin'
+                        label='Admin'
                     />
                 </div>
-            </form>
+            </div>
             <Dialog.Footer>
-                <div className='flex items-center gap-3 p-6'>
-                    <Button variant='default' onClick={handleSubmit}>
-                        Create User
-                    </Button>
+                <div className='flex items-center justify-end gap-3 p-6 border-t border-mocha-400/30'>
                     <Button variant='secondary' onClick={onClose}>
                         Cancel
+                    </Button>
+                    <Button variant='default' onClick={handleSubmit} disabled={!username || !email}>
+                        Create User
                     </Button>
                 </div>
             </Dialog.Footer>

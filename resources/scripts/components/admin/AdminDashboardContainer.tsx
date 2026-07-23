@@ -427,7 +427,7 @@ const AdminDashboardContainer = () => {
         status && status.metrics.disk.total > 0 ? (status.metrics.disk.used / status.metrics.disk.total) * 100 : 0;
 
     return (
-        <div className='space-y-10 pb-10'>
+        <div className='space-y-14 pb-10'>
             {/* ── page header ── */}
             <div className='flex flex-col gap-1'>
                 <h1 className='text-[42px] font-extrabold leading-[98%] tracking-[-0.1rem] text-cream-400'>Overview</h1>
@@ -451,25 +451,25 @@ const AdminDashboardContainer = () => {
                 <div className='lg:col-span-3 rounded-xl border border-mocha-400 bg-mocha-500 p-6'>
                     <SectionHeader title='Resource Health' sub='Real-time system metrics' />
                     {!status ? (
-                        <div className='flex items-center justify-around py-4'>
+                        <div className='flex items-center justify-around py-6'>
                             <GaugeSkeleton />
                             <GaugeSkeleton />
                             <GaugeSkeleton />
                         </div>
                     ) : (
-                        <div className='flex items-center justify-around py-6 gap-6 flex-wrap'>
+                        <div className='flex items-center justify-between py-8 px-4'>
                             <SvgGauge
                                 percent={parseFloat(cpuPct.toFixed(1))}
                                 label='CPU'
                                 sub={`${cpuPct.toFixed(1)}%`}
                             />
-                            <div className='h-24 w-px bg-mocha-400 hidden sm:block' />
+                            <div className='h-28 w-px bg-gradient-to-b from-transparent via-mocha-400/60 to-transparent hidden sm:block' />
                             <SvgGauge
                                 percent={parseFloat(memPct.toFixed(1))}
                                 label='Memory'
                                 sub={`${formatBytes(status.metrics.memory.used)} / ${formatBytes(status.metrics.memory.total)}`}
                             />
-                            <div className='h-24 w-px bg-mocha-400 hidden sm:block' />
+                            <div className='h-28 w-px bg-gradient-to-b from-transparent via-mocha-400/60 to-transparent hidden sm:block' />
                             <SvgGauge
                                 percent={parseFloat(diskPct.toFixed(1))}
                                 label='Disk'
@@ -506,7 +506,7 @@ const AdminDashboardContainer = () => {
                                     </span>
                                 </div>
                             </div>
-                            <div className='mt-5'>
+                            <div className='mt-6'>
                                 <p className='text-xs font-semibold uppercase tracking-wider text-mocha-100/50 mb-3'>
                                     Load Average
                                 </p>
