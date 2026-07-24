@@ -3,7 +3,7 @@
     "version": "canary",
     "buildNumber": "30",
     "engines": {
-        "node": ">=22.13"
+        "node": ">=26"
     },
     "type": "module",
     "dependencies": {
@@ -122,11 +122,6 @@
         "test:unit": "php vendor/bin/phpunit --testsuite=Unit",
         "test:integration": "php vendor/bin/phpunit --testsuite=Integration"
     },
-    "browserslist": [
-        "> 0.5%",
-        "last 2 versions",
-        "firefox esr",
-        "not dead"
-    ],
-    "packageManager": "pnpm@11.3.0"
+    "browserslist": ["> 0.5%", "last 2 versions", "firefox esr", "not dead"],
+    "packageManager": "pnpm@11.17.0"
 }

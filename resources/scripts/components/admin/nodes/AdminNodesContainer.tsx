@@ -635,7 +635,9 @@ const OverviewTab = ({
                             </div>
                             {node.internalFqdn && (
                                 <div className='bg-mocha-600/50 rounded-lg p-4'>
-                                    <span className='text-mocha-200 text-xs uppercase tracking-wider'>Internal FQDN</span>
+                                    <span className='text-mocha-200 text-xs uppercase tracking-wider'>
+                                        Internal FQDN
+                                    </span>
                                     <p className='text-cream-400 font-medium mt-1'>
                                         <code className='text-sm'>{node.internalFqdn}</code>
                                     </p>
@@ -1378,7 +1380,8 @@ const AdminNodesContainer = () => {
                                                                 </code>
                                                             </td>
                                                             <td className='px-4 py-3 text-mocha-100'>
-                                                                {locationMap.get(node.locationId) ?? `#${node.locationId}`}
+                                                                {locationMap.get(node.locationId) ??
+                                                                    `#${node.locationId}`}
                                                             </td>
                                                             <td className='px-4 py-3 text-mocha-100'>
                                                                 {node.memory} MB

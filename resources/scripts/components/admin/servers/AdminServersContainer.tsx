@@ -564,15 +564,23 @@ const CreateServerModal = ({
                                         </div>
                                     </div>
                                     <div className='flex items-center gap-4'>
-                                        <label className='flex items-center gap-2 text-sm text-mocha-200'>
+                                        <label
+                                            htmlFor='oom-disabled'
+                                            className='flex items-center gap-2 text-sm text-mocha-200'
+                                        >
                                             <Checkbox
+                                                id='oom-disabled'
                                                 checked={oomDisabled}
                                                 onChange={(e) => setOomDisabled(e.target.checked)}
                                             />
                                             Disable OOM Killer
                                         </label>
-                                        <label className='flex items-center gap-2 text-sm text-mocha-200'>
+                                        <label
+                                            htmlFor='skip-scripts'
+                                            className='flex items-center gap-2 text-sm text-mocha-200'
+                                        >
                                             <Checkbox
+                                                id='skip-scripts'
                                                 checked={skipScripts}
                                                 onChange={(e) => setSkipScripts(e.target.checked)}
                                             />

@@ -1,14 +1,4 @@
-import {
-    Archive,
-    ChartBar,
-    ChartLine,
-    Clock,
-    Cube,
-    Globe,
-    Pulse,
-    Server,
-    Persons,
-} from '@gravity-ui/icons';
+import { Archive, ChartBar, ChartLine, Clock, Cube, Globe, Persons, Pulse, Server } from '@gravity-ui/icons';
 import type { ComponentType, SVGProps } from 'react';
 import { createContext, useContext } from 'react';
 

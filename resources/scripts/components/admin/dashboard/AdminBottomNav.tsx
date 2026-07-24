@@ -1,15 +1,4 @@
-import {
-    Archive,
-    Cube,
-    Database,
-    Folder,
-    Gear,
-    Globe,
-    Key,
-    Persons,
-    Pulse,
-    Server,
-} from '@gravity-ui/icons';
+import { Archive, Cube, Database, Folder, Gear, Globe, Key, Persons, Pulse, Server } from '@gravity-ui/icons';
 import type { ComponentType, SVGProps } from 'react';
 import { memo, useMemo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
