@@ -74,7 +74,7 @@ class MountController extends Controller
 
         $this->alert->success('Mount was created successfully.')->flash();
 
-        return redirect()->route('admin.mounts.view', $mount->id);
+        return redirect()->route('admin.depr.mounts.view', $mount->id);
     }
 
     /**
@@ -92,7 +92,7 @@ class MountController extends Controller
 
         $this->alert->success('Mount was updated successfully.')->flash();
 
-        return redirect()->route('admin.mounts.view', $mount->id);
+        return redirect()->route('admin.depr.mounts.view', $mount->id);
     }
 
     /**
@@ -104,7 +104,7 @@ class MountController extends Controller
     {
         $mount->delete();
 
-        return redirect()->route('admin.mounts');
+        return redirect()->route('admin.depr.mounts');
     }
 
     /**
@@ -123,7 +123,7 @@ class MountController extends Controller
 
         $this->alert->success('Mount was updated successfully.')->flash();
 
-        return redirect()->route('admin.mounts.view', $mount->id);
+        return redirect()->route('admin.depr.mounts.view', $mount->id);
     }
 
     /**
@@ -140,7 +140,7 @@ class MountController extends Controller
 
         $this->alert->success('Mount was updated successfully.')->flash();
 
-        return redirect()->route('admin.mounts.view', $mount->id);
+        return redirect()->route('admin.depr.mounts.view', $mount->id);
     }
 
     /**

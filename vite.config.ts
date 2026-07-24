@@ -56,7 +56,7 @@ export default defineConfig({
         outDir: 'public/build',
 
         rollupOptions: {
-            input: [path.resolve('resources/scripts/index.tsx'), path.resolve('resources/scripts/admin/index.tsx')],
+            input: [path.resolve('resources/scripts/index.tsx'), path.resolve('resources/scripts/admin/admin.css')],
             output: {
                 // @ts-expect-error It won't fail lol
                 manualChunks(id) {
@@ -81,7 +81,7 @@ export default defineConfig({
     },
 
     plugins: [
-        laravel(['resources/scripts/index.tsx', 'resources/scripts/admin/index.tsx']),
+        laravel(['resources/scripts/index.tsx', 'resources/scripts/admin/admin.css']),
         manifestSRI(),
         million.vite({
             auto: {

@@ -8,7 +8,7 @@
   <h1>{{ $node->name }}<small>A quick overview of your node.</small></h1>
   <ol class="breadcrumb">
     <li><a href="{{ route('admin.index') }}">Admin</a></li>
-    <li><a href="{{ route('admin.nodes') }}">Nodes</a></li>
+    <li><a href="{{ route('admin.depr.nodes') }}">Nodes</a></li>
     <li class="active">{{ $node->name }}</li>
   </ol>
 @endsection
@@ -18,11 +18,11 @@
     <div class="col-xs-12">
     <div class="nav-tabs-custom nav-tabs-floating">
       <ul class="nav nav-tabs">
-      <li class="active"><a href="{{ route('admin.nodes.view', $node->id) }}">About</a></li>
-      <li><a href="{{ route('admin.nodes.view.settings', $node->id) }}">Settings</a></li>
-      <li><a href="{{ route('admin.nodes.view.configuration', $node->id) }}">Configuration</a></li>
-      <li><a href="{{ route('admin.nodes.view.allocation', $node->id) }}">Allocation</a></li>
-      <li><a href="{{ route('admin.nodes.view.servers', $node->id) }}">Servers</a></li>
+      <li class="active"><a href="{{ route('admin.depr.nodes.view', $node->id) }}">About</a></li>
+      <li><a href="{{ route('admin.depr.nodes.view.settings', $node->id) }}">Settings</a></li>
+      <li><a href="{{ route('admin.depr.nodes.view.configuration', $node->id) }}">Configuration</a></li>
+      <li><a href="{{ route('admin.depr.nodes.view.allocation', $node->id) }}">Allocation</a></li>
+      <li><a href="{{ route('admin.depr.nodes.view.servers', $node->id) }}">Servers</a></li>
       </ul>
     </div>
     </div>
@@ -77,7 +77,7 @@
           panel. There must be no servers associated with this node in order to continue.</p>
         </div>
         <div class="box-footer">
-        <form action="{{ route('admin.nodes.view.delete', $node->id) }}" method="POST">
+        <form action="{{ route('admin.depr.nodes.view.delete', $node->id) }}" method="POST">
           {!! csrf_field() !!}
           {!! method_field('DELETE') !!}
           <button type="submit" class="btn btn-danger btn-sm pull-right" {{ ($node->servers_count < 1) ?: 'disabled' }}>Yes, Delete This Node</button>

@@ -8,15 +8,15 @@
     <h1>{{ $server->name }}<small>Control startup command as well as variables.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
-        <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
+        <li><a href="{{ route('admin.depr.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.depr.servers.view', $server->id) }}">{{ $server->name }}</a></li>
         <li class="active">Startup</li>
     </ol>
 @endsection
 
 @section('content')
 @include('admin.servers.partials.navigation')
-<form action="{{ route('admin.servers.view.startup', $server->id) }}" method="POST">
+<form action="{{ route('admin.depr.servers.view.startup', $server->id) }}" method="POST">
     <div class="row">
         <div class="col-xs-12">
             <div class="box box-primary">

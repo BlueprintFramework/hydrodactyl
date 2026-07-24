@@ -48,7 +48,7 @@
                             @foreach ($mounts as $mount)
                                 <tr>
                                     <td><code>{{ $mount->id }}</code></td>
-                                    <td><a href="{{ route('admin.mounts.view', $mount->id) }}">{{ $mount->name }}</a></td>
+                                    <td><a href="{{ route('admin.depr.mounts.view', $mount->id) }}">{{ $mount->name }}</a></td>
                                     <td><code>{{ $mount->source }}</code></td>
                                     <td><code>{{ $mount->target }}</code></td>
                                     <td class="text-center">{{ $mount->eggs_count }}</td>
@@ -66,7 +66,7 @@
     <div class="modal fade" id="newMountModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="{{ route('admin.mounts') }}" method="POST">
+                <form action="{{ route('admin.depr.mounts') }}" method="POST">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true" style="color: #FFFFFF">&times;</span>

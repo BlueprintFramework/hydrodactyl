@@ -8,13 +8,13 @@
     <h1>Create Server<small>Add a new server to the panel.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.depr.servers') }}">Servers</a></li>
         <li class="active">Create Server</li>
     </ol>
 @endsection
 
 @section('content')
-<form action="{{ route('admin.servers.new') }}" method="POST">
+<form action="{{ route('admin.depr.servers.new') }}" method="POST">
     <div class="row">
         <div class="col-xs-12">
             <div class="box">

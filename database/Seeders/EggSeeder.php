@@ -20,6 +20,7 @@ class EggSeeder extends Seeder
      */
     public static array $import = [
         'Minecraft',
+        'Minecraft (itzg)',
         'Hytale',
         'Source Engine',
         'Voice Servers',
@@ -56,9 +57,18 @@ class EggSeeder extends Seeder
      */
     protected function parseEggFiles(Nest $nest)
     {
-        $files = new \DirectoryIterator(database_path('Seeders/eggs/' . kebab_case($nest->name)));
+        $dir = database_path('Seeders/eggs/' . kebab_case($nest->name));
+
+        if (!is_dir($dir)) {
+            $this->command->warn("Egg directory not found for nest '{$nest->name}' at '$dir', skipping.");
+            return;
+        }
 
         $this->command->alert('Updating Eggs for Nest: ' . $nest->name);
+
+        $files = new \DirectoryIterator($dir);
+
+        $managedIds = [];
         /** @var \DirectoryIterator $file */
         foreach ($files as $file) {
             if (!$file->isFile() || !$file->isReadable()) {
@@ -66,7 +76,7 @@ class EggSeeder extends Seeder
             }
 
             $decoded = json_decode(file_get_contents($file->getRealPath()), true, 512, JSON_THROW_ON_ERROR);
-            $file = new UploadedFile($file->getPathname(), $file->getFilename(), 'application/json');
+            $eggFile = new UploadedFile($file->getPathname(), $file->getFilename(), 'application/json');
 
             $egg = $nest->eggs()
                 ->where('author', $decoded['author'])
@@ -74,12 +84,19 @@ class EggSeeder extends Seeder
                 ->first();
 
             if ($egg instanceof Egg) {
-                $this->updateImporterService->handle($egg, $file);
+                $this->updateImporterService->handle($egg, $eggFile);
                 $this->command->info('Updated ' . $decoded['name']);
             } else {
-                $this->importerService->handle($file, $nest->id);
+                $egg = $this->importerService->handle($eggFile, $nest->id);
                 $this->command->comment('Created ' . $decoded['name']);
             }
+
+            $managedIds[] = $egg->id;
+        }
+
+        $removed = $nest->eggs()->whereNotIn('id', $managedIds)->delete();
+        if ($removed > 0) {
+            $this->command->warn("Removed {$removed} stale egg(s) from nest '{$nest->name}'");
         }
 
         $this->command->line('');

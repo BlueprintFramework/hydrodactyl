@@ -121,6 +121,8 @@ class ApiKey extends Model
    * Fields that are mass assignable.
    */
   protected $fillable = [
+    'user_id',
+    'key_type',
     'identifier',
     'token',
     'allowed_ips',

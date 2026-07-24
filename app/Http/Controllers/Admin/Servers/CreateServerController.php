@@ -38,7 +38,7 @@ class CreateServerController extends Controller
         if (count($nodes) < 1) {
             $this->alert->warning(trans('admin/server.alerts.node_required'))->flash();
 
-            return redirect()->route('admin.nodes');
+            return redirect()->route('admin.depr.nodes');
         }
 
         $nests = $this->nestRepository->getWithEggs();

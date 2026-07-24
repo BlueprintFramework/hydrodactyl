@@ -8,7 +8,14 @@
     "name": "Waterfall",
     "author": "support@phosphor.host",
     "description": "Waterfall is a fork of the well-known BungeeCord server proxy.",
-    "features": ["eula", "java_version", "pid_limit", "plugin/waterfall", "mclogs", "subdomain_minecraft"],
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit",
+        "plugin/waterfall",
+        "mclogs",
+        "subdomain_minecraft"
+    ],
     "docker_images": {
         "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
         "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",

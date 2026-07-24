@@ -1,0 +1,117 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY HYDRODACTYL PANEL",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-07-09T00:00:00+00:00",
+    "name": "Minecraft Bedrock",
+    "author": "support@pterodactyl.io",
+    "description": "Bedrock Dedicated Server allows you to run a Minecraft Bedrock Edition server. Uses the itzg/minecraft-bedrock-server Docker image.",
+    "features": [
+        "eula",
+        "pid_limit",
+        "mclogs",
+        "subdomain_minecraft"
+    ],
+    "docker_images": {
+        "itzg Bedrock Server": "itzg/minecraft-bedrock-server:latest"
+    },
+    "file_denylist": [],
+    "startup": "/start",
+    "config": {
+        "files": "{}",
+        "startup": "{\"done\": \"Server started.\"}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/ash\n# Bedrock installation script\n# itzg/minecraft-bedrock-server handles server binary download at container start\nmkdir -p /mnt/server\n",
+            "container": "ghcr.io/pterodactyl/installers:alpine",
+            "entrypoint": "ash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Minecraft Version",
+            "description": "The version of Bedrock to run. Set to LATEST for the latest release.",
+            "env_variable": "VERSION",
+            "default_value": "LATEST",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Difficulty",
+            "description": "The difficulty level of the server.",
+            "env_variable": "DIFFICULTY",
+            "default_value": "easy",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:peaceful,easy,normal,hard",
+            "field_type": "text"
+        },
+        {
+            "name": "Game Mode",
+            "description": "Default game mode for new players.",
+            "env_variable": "MODE",
+            "default_value": "survival",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:survival,creative,adventure,spectator",
+            "field_type": "text"
+        },
+        {
+            "name": "Max Players",
+            "description": "Maximum number of players that can join the server.",
+            "env_variable": "MAX_PLAYERS",
+            "default_value": "10",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|min:1|max:1000",
+            "field_type": "text"
+        },
+        {
+            "name": "Server Name",
+            "description": "The name displayed in the Minecraft server list.",
+            "env_variable": "SERVER_NAME",
+            "default_value": "Bedrock Server",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:100",
+            "field_type": "text"
+        },
+        {
+            "name": "Level Name",
+            "description": "The name of the world/level.",
+            "env_variable": "LEVEL_NAME",
+            "default_value": "Bedrock Level",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:50",
+            "field_type": "text"
+        },
+        {
+            "name": "Allow Cheats",
+            "description": "Enable cheats on the server.",
+            "env_variable": "ALLOW_CHEATS",
+            "default_value": "FALSE",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:TRUE,FALSE",
+            "field_type": "text"
+        },
+        {
+            "name": "Tick Distance",
+            "description": "The radius (in chunks) around the player that the server will tick.",
+            "env_variable": "TICK_DISTANCE",
+            "default_value": "4",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|min:1|max:12",
+            "field_type": "text"
+        }
+    ]
+}

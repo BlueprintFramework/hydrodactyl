@@ -256,7 +256,7 @@ const DashboardContainer = () => {
                             </div>
                         ) : (
                             <div
-                                className={`text-center text-sm text-zinc-400 absolute w-full left-1/2 -translate-x-1/2`}
+                                className={`text-center text-sm text-mocha-200 absolute w-full left-1/2 -translate-x-1/2`}
                             >
                                 <p className='max-w-sm mx-auto mb-5'>
                                     {ownerFilter === 'admin-all'
@@ -265,7 +265,7 @@ const DashboardContainer = () => {
                                           ? 'No Server Shared With your Account'
                                           : 'There are no servers associated with your account.'}
                                 </p>
-                                <h3 className='text-lg font-medium text-zinc-200 mb-2'>
+                                <h3 className='text-lg font-medium text-cream-400 mb-2'>
                                     {ownerFilter === 'admin-all' ? 'No other servers found' : 'No servers found'}
                                 </h3>
                             </div>

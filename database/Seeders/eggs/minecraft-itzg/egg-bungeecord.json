@@ -1,0 +1,88 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY HYDRODACTYL PANEL",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-07-09T00:00:00+00:00",
+    "name": "Bungeecord",
+    "author": "support@pterodactyl.io",
+    "description": "For a long time, Minecraft server owners have had a dream that encompasses a free, easy, and reliable way to connect multiple Minecraft servers together. Uses the itzg/mc-proxy Docker image.",
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit",
+        "mclogs",
+        "subdomain_minecraft"
+    ],
+    "docker_images": {
+        "itzg MC Proxy": "itzg/mc-proxy:latest"
+    },
+    "file_denylist": [],
+    "startup": "/start",
+    "config": {
+        "files": "{}",
+        "startup": "{\"done\": \"Listening on \"}",
+        "logs": "{}",
+        "stop": "end"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/ash\n# Bungeecord installation script\n# itzg/mc-proxy handles server jar download at container start\nmkdir -p /mnt/server\n",
+            "container": "ghcr.io/pterodactyl/installers:alpine",
+            "entrypoint": "ash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Server Type",
+            "description": "The type of proxy to run. Fixed for this egg.",
+            "env_variable": "TYPE",
+            "default_value": "BUNGEECORD",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Proxy Version",
+            "description": "The version of the proxy to run. Set to LATEST for the latest release.",
+            "env_variable": "VERSION",
+            "default_value": "LATEST",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Max Memory",
+            "description": "Maximum memory allocated to the Java heap (e.g., 1G, 512M).",
+            "env_variable": "MEMORY",
+            "default_value": "1G",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:10",
+            "field_type": "text"
+        },
+        {
+            "name": "Online Mode",
+            "description": "Whether to authenticate players with Mojang servers. Set FALSE for offline/cracked servers.",
+            "env_variable": "ONLINE_MODE",
+            "default_value": "TRUE",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:TRUE,FALSE",
+            "field_type": "text"
+        },
+        {
+            "name": "Max Players",
+            "description": "Maximum number of players that can connect through the proxy.",
+            "env_variable": "MAX_PLAYERS",
+            "default_value": "100",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|min:1|max:10000",
+            "field_type": "text"
+        }
+    ]
+}

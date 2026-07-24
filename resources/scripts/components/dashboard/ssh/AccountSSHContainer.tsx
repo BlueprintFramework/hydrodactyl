@@ -181,11 +181,11 @@ const AccountSSHContainer = () => {
 
                         {!data || data.length === 0 ? (
                             <div className='text-center py-12'>
-                                <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-[#ffffff11] flex items-center justify-center'>
-                                    <Key width={22} height={22} className='text-zinc-400' fill='currentColor' />
+                                <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-mocha-400/20 flex items-center justify-center'>
+                                    <Key width={22} height={22} className='text-mocha-200' fill='currentColor' />
                                 </div>
-                                <h3 className='text-lg font-medium text-zinc-200 mb-2'>No SSH Keys</h3>
-                                <p className='text-sm text-zinc-400 max-w-sm mx-auto'>
+                                <h3 className='text-lg font-medium text-cream-400 mb-2'>No SSH Keys</h3>
+                                <p className='text-sm text-mocha-200 max-w-sm mx-auto'>
                                     {!data
                                         ? 'Loading your SSH keys...'
                                         : "You haven't added any SSH keys yet. Add one to securely access your servers."}
@@ -207,15 +207,15 @@ const AccountSSHContainer = () => {
                                             <div className='flex items-center justify-between'>
                                                 <div className='flex-1 min-w-0'>
                                                     <div className='flex items-center gap-3 mb-2'>
-                                                        <h4 className='text-sm font-medium text-zinc-100 truncate'>
+                                                        <h4 className='text-sm font-medium text-cream-400 truncate'>
                                                             {key.name}
                                                         </h4>
                                                     </div>
-                                                    <div className='flex items-center gap-4 text-xs text-zinc-400'>
+                                                    <div className='flex items-center gap-4 text-xs text-mocha-200'>
                                                         <span>Added: {format(key.createdAt, 'MMM d, yyyy HH:mm')}</span>
                                                         <div className='flex items-center gap-2'>
                                                             <span>Fingerprint:</span>
-                                                            <code className='flex gap-1 font-mono px-2 py-1 bg-mocha-400 border border-mocha-200 rounded text-zinc-300'>
+                                                            <code className='flex gap-1 font-mono px-2 py-1 bg-mocha-400 border border-mocha-400 rounded text-cream-400'>
                                                                 {showKeys[key.fingerprint] ? (
                                                                     <EyeSlash
                                                                         onClick={() =>

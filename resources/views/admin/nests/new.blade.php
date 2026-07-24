@@ -8,13 +8,13 @@
     <h1>New Nest<small>Configure a new nest to deploy to all nodes.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.nests') }}">Nests</a></li>
+        <li><a href="{{ route('admin.depr.nests') }}">Nests</a></li>
         <li class="active">New</li>
     </ol>
 @endsection
 
 @section('content')
-<form action="{{ route('admin.nests.new') }}" method="POST">
+<form action="{{ route('admin.depr.nests.new') }}" method="POST">
     <div class="row">
         <div class="col-md-12">
             <div class="box">

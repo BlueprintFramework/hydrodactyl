@@ -8,8 +8,8 @@
     <h1>{{ $server->name }}<small>Additional actions to control this server.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
-        <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
+        <li><a href="{{ route('admin.depr.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.depr.servers.view', $server->id) }}">{{ $server->name }}</a></li>
         <li class="active">Manage</li>
     </ol>
 @endsection
@@ -27,7 +27,7 @@
                 </div>
                 <div class="box-footer">
                     @if($server->isInstalled())
-                        <form action="{{ route('admin.servers.view.manage.reinstall', $server->id) }}" method="POST">
+                        <form action="{{ route('admin.depr.servers.view.manage.reinstall', $server->id) }}" method="POST">
                             {!! csrf_field() !!}
                             <button type="submit" class="btn btn-danger">Reinstall Server</button>
                         </form>
@@ -46,7 +46,7 @@
                     <p>If you need to change the install status from uninstalled to installed, or vice versa, you may do so with the button below.</p>
                 </div>
                 <div class="box-footer">
-                    <form action="{{ route('admin.servers.view.manage.toggle', $server->id) }}" method="POST">
+                    <form action="{{ route('admin.depr.servers.view.manage.toggle', $server->id) }}" method="POST">
                         {!! csrf_field() !!}
                         <button type="submit" class="btn btn-primary">Toggle Install Status</button>
                     </form>
@@ -64,7 +64,7 @@
                         <p>This will suspend the server, stop any running processes, and immediately block the user from being able to access their files or otherwise manage the server through the panel or API.</p>
                     </div>
                     <div class="box-footer">
-                        <form action="{{ route('admin.servers.view.manage.suspension', $server->id) }}" method="POST">
+                        <form action="{{ route('admin.depr.servers.view.manage.suspension', $server->id) }}" method="POST">
                             {!! csrf_field() !!}
                             <input type="hidden" name="action" value="suspend" />
                             <button type="submit" class="btn btn-warning @if(! is_null($server->transfer)) disabled @endif">Suspend Server</button>
@@ -82,7 +82,7 @@
                         <p>This will unsuspend the server and restore normal user access.</p>
                     </div>
                     <div class="box-footer">
-                        <form action="{{ route('admin.servers.view.manage.suspension', $server->id) }}" method="POST">
+                        <form action="{{ route('admin.depr.servers.view.manage.suspension', $server->id) }}" method="POST">
                             {!! csrf_field() !!}
                             <input type="hidden" name="action" value="unsuspend" />
                             <button type="submit" class="btn btn-success">Unsuspend Server</button>
@@ -139,7 +139,7 @@
     <div class="modal fade" id="transferServerModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="{{ route('admin.servers.view.manage.transfer', $server->id) }}" method="POST">
+                <form action="{{ route('admin.depr.servers.view.manage.transfer', $server->id) }}" method="POST">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title">Transfer Server</h4>

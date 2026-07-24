@@ -68,7 +68,7 @@ class Kernel extends HttpKernel
             EncryptCookies::class,
             AddQueuedCookiesToResponse::class,
             /* StartSession::class, */
-            /* EnsureStatefulRequests::class, */
+            EnsureStatefulRequests::class,
             'auth:sanctum',
             IsValidJson::class,
             TrackAPIKey::class,

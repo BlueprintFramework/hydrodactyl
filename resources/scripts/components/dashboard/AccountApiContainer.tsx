@@ -142,7 +142,7 @@ const AccountApiContainer = () => {
                                             <div className='flex items-center gap-2 hover:cursor-pointer'>
                                                 <span>Key:</span>
 
-                                                <code className='font-mono px-2 py-1 bg-mocha-400 border border-mocha-200 rounded text-zinc-300 flex'>
+                                                <code className='font-mono px-2 py-1 bg-mocha-400 border border-mocha-400 rounded text-cream-400 flex'>
                                                     <span className='flex items-center gap-1'>
                                                         {showKeys[key.identifier] ? (
                                                             <EyeSlash
@@ -194,10 +194,10 @@ const AccountApiContainer = () => {
                             emptyState={
                                 <div className='text-center py-12'>
                                     <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-mocha-400 flex items-center justify-center'>
-                                        <Key width={22} height={22} className='text-zinc-400' fill='currentColor' />
+                                        <Key width={22} height={22} className='text-mocha-200' fill='currentColor' />
                                     </div>
-                                    <h3 className='text-lg font-medium text-zinc-200 mb-2'>No API Keys</h3>
-                                    <p className='text-sm text-zinc-400 max-w-sm mx-auto'>
+                                    <h3 className='text-lg font-medium text-cream-400 mb-2'>No API Keys</h3>
+                                    <p className='text-sm text-mocha-200 max-w-sm mx-auto'>
                                         You haven't created any API keys yet. Create one to get started with the API.
                                     </p>
                                 </div>

@@ -59,7 +59,7 @@ class NodesController extends Controller
         if (count($locations) < 1) {
             $this->alert->warning(trans('admin/node.notices.location_required'))->flash();
 
-            return redirect()->route('admin.locations');
+            return redirect()->route('admin.depr.locations');
         }
 
         return $this->view->make('admin.nodes.new', [
@@ -80,7 +80,7 @@ class NodesController extends Controller
         $node = $this->creationService->handle($request->normalize());
         $this->alert->info(trans('admin/node.notices.node_created'))->flash();
 
-        return redirect()->route('admin.nodes.view.allocation', $node->id);
+        return redirect()->route('admin.depr.nodes.view.allocation', $node->id);
     }
 
     /**
@@ -95,7 +95,7 @@ class NodesController extends Controller
         $this->updateService->handle($node, $request->normalize(), $request->input('reset_secret') === 'on');
         $this->alert->success(trans('admin/node.notices.node_updated'))->flash();
 
-        return redirect()->route('admin.nodes.view.settings', $node->id)->withInput();
+        return redirect()->route('admin.depr.nodes.view.settings', $node->id)->withInput();
     }
 
     /**
@@ -141,7 +141,7 @@ class NodesController extends Controller
         $this->alert->success(trans('admin/node.notices.unallocated_deleted', ['ip' => htmlspecialchars($request->input('ip'))]))
             ->flash();
 
-        return redirect()->route('admin.nodes.view.allocation', $node);
+        return redirect()->route('admin.depr.nodes.view.allocation', $node);
     }
 
     /**
@@ -172,7 +172,7 @@ class NodesController extends Controller
         $this->assignmentService->handle($node, $request->normalize());
         $this->alert->success(trans('admin/node.notices.allocations_added'))->flash();
 
-        return redirect()->route('admin.nodes.view.allocation', $node->id);
+        return redirect()->route('admin.depr.nodes.view.allocation', $node->id);
     }
 
     /**
@@ -185,6 +185,6 @@ class NodesController extends Controller
         $this->deletionService->handle($node);
         $this->alert->success(trans('admin/node.notices.node_deleted'))->flash();
 
-        return redirect()->route('admin.nodes');
+        return redirect()->route('admin.depr.nodes');
     }
 }

@@ -22,6 +22,7 @@ import HydrodactylProvider from './HydrodactylProvider';
 
 // const DashboardRouter = lazy(() => import('@/routers/DashboardRouter'));
 // const ServerRouter = lazy(() => import('@/routers/ServerRouter'));
+const AdminRouter = lazy(() => import('@/routers/AdminRouter'));
 const UnifiedRouter = lazy(() => import('@/routers/UnifiedRouter'));
 const AuthenticationRouter = lazy(() => import('@/routers/AuthenticationRouter'));
 const SetupRouter = lazy(() => import('@/routers/SetupRouter'));
@@ -33,7 +34,8 @@ interface ExtendedWindow extends Window {
         uuid: string;
         username: string;
         email: string;
-
+        name_first: string;
+        name_last: string;
         root_admin: boolean;
         use_totp: boolean;
         language: string;
@@ -52,6 +54,8 @@ const App = () => {
             language: HydrodactylUser.language,
             rootAdmin: HydrodactylUser.root_admin,
             useTotp: HydrodactylUser.use_totp,
+            nameFirst: HydrodactylUser.name_first || '',
+            nameLast: HydrodactylUser.name_last || '',
             createdAt: new Date(HydrodactylUser.created_at),
             updatedAt: new Date(HydrodactylUser.updated_at),
         });
@@ -101,6 +105,17 @@ const App = () => {
                                 />
 
                                 <Route
+                                    path='/admin/*'
+                                    element={
+                                        <AuthenticatedRoute>
+                                            <Spinner.Suspense>
+                                                <AdminRouter />
+                                            </Spinner.Suspense>
+                                        </AuthenticatedRoute>
+                                    }
+                                />
+
+                                <Route
                                     path='/*'
                                     element={
                                         <AuthenticatedRoute>
@@ -112,17 +127,6 @@ const App = () => {
                                         </AuthenticatedRoute>
                                     }
                                 />
-
-                                {/* <Route */}
-                                {/*     path='/*' */}
-                                {/*     element={ */}
-                                {/*         <AuthenticatedRoute> */}
-                                {/*             <Spinner.Suspense> */}
-                                {/*                 <DashboardRouter /> */}
-                                {/*             </Spinner.Suspense> */}
-                                {/*         </AuthenticatedRoute> */}
-                                {/*     } */}
-                                {/* /> */}
 
                                 <Route path='*' element={<NotFound />} />
                             </Routes>

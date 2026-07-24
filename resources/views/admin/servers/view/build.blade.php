@@ -8,8 +8,8 @@
     <h1>{{ $server->name }}<small>Control allocations and system resources for this server.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
-        <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
+        <li><a href="{{ route('admin.depr.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.depr.servers.view', $server->id) }}">{{ $server->name }}</a></li>
         <li class="active">Build Configuration</li>
     </ol>
 @endsection
@@ -17,7 +17,7 @@
 @section('content')
 @include('admin.servers.partials.navigation')
 <div class="row">
-    <form action="{{ route('admin.servers.view.build', $server->id) }}" method="POST">
+    <form action="{{ route('admin.depr.servers.view.build', $server->id) }}" method="POST">
         <div class="col-sm-5">
             <div class="box">
                 <div class="box-header with-border">

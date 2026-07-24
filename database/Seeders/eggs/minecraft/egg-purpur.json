@@ -6,9 +6,16 @@
     },
     "exported_at": "2024-06-01T19:39:58+00:00",
     "name": "Purpur",
-    "author": "purpur@birdflop.com",
+    "author": "support@pterodactyl.io",
     "description": "A drop-in replacement for Paper servers designed for configurability, and new fun and exciting gameplay features.",
-    "features": ["eula", "java_version", "pid_limit", "plugin/purpur", "mclogs", "subdomain_minecraft"],
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit",
+        "plugin/purpur",
+        "mclogs",
+        "subdomain_minecraft"
+    ],
     "docker_images": {
         "Java 25": "ghcr.io/pyrodactyl-oss/images:java_25",
         "Java 21": "ghcr.io/pterodactyl/yolks:java_21",

@@ -8,8 +8,12 @@
     "name": "Insurgency",
     "author": "support@pterodactyl.io",
     "description": "Take to the streets for intense close quarters combat, where a team's survival depends upon securing crucial strongholds and destroying enemy supply in this multiplayer and cooperative Source Engine based experience.",
-    "features": ["steam_disk_space"],
-    "images": ["ghcr.io\/pterodactyl\/games:source"],
+    "features": [
+        "steam_disk_space"
+    ],
+    "images": [
+        "ghcr.io\/pterodactyl\/games:source"
+    ],
     "file_denylist": [],
     "startup": ".\/srcds_run -game insurgency -console -port {{SERVER_PORT}} +map {{SRCDS_MAP}} +ip 0.0.0.0 -strictportbind -norestart",
     "config": {

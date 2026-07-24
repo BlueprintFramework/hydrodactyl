@@ -37,14 +37,14 @@
                         @foreach ($hosts as $host)
                             <tr>
                                 <td><code>{{ $host->id }}</code></td>
-                                <td><a href="{{ route('admin.databases.view', $host->id) }}">{{ $host->name }}</a></td>
+                                <td><a href="{{ route('admin.depr.databases.view', $host->id) }}">{{ $host->name }}</a></td>
                                 <td><code>{{ $host->host }}</code></td>
                                 <td><code>{{ $host->port }}</code></td>
                                 <td>{{ $host->username }}</td>
                                 <td class="text-center">{{ $host->databases_count }}</td>
                                 <td class="text-center">
                                     @if(! is_null($host->node))
-                                        <a href="{{ route('admin.nodes.view', $host->node->id) }}">{{ $host->node->name }}</a>
+                                        <a href="{{ route('admin.depr.nodes.view', $host->node->id) }}">{{ $host->node->name }}</a>
                                     @else
                                         <span class="label label-default">None</span>
                                     @endif
@@ -61,7 +61,7 @@
 <div class="modal fade" id="newHostModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="{{ route('admin.databases') }}" method="POST" id="databaseHostForm">
+            <form action="{{ route('admin.depr.databases') }}" method="POST" id="databaseHostForm">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Create New Database Host</h4>
@@ -159,7 +159,7 @@
 
             // Simple AJAX request
             $.ajax({
-                url: '{{ route('admin.databases.test') }}',
+                url: '{{ route('admin.depr.databases.test') }}',
                 method: 'POST',
                 data: formData,
                 success: function(response) {

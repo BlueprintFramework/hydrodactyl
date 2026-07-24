@@ -33,7 +33,7 @@ class UserController extends ApplicationApiController
      */
     public function index(GetUsersRequest $request): array
     {
-        $users = QueryBuilder::for(User::query())
+        $users = QueryBuilder::for(User::query()->withCount('servers'))
             ->allowedFilters(['email', 'uuid', 'username', 'external_id'])
             ->allowedSorts(['id', 'uuid'])
             ->paginate($request->query('per_page') ?? 50);
@@ -48,6 +48,8 @@ class UserController extends ApplicationApiController
      */
     public function view(GetUsersRequest $request, User $user): array
     {
+        $user->loadCount('servers');
+
         return $this->fractal->item($user)
             ->transformWith($this->getTransformer(UserTransformer::class))
             ->toArray();

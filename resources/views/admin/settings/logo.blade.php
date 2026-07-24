@@ -9,7 +9,7 @@
   <h1>Branding<small>Customize your Hydrodactyl logo.</small></h1>
   <ol class="breadcrumb">
     <li><a href="{{ route('admin.index') }}">Admin</a></li>
-    <li><a href="{{ route('admin.settings') }}">Settings</a></li>
+    <li><a href="{{ route('admin.depr.settings') }}">Settings</a></li>
     <li class="active">Branding</li>
   </ol>
 @endsection
@@ -48,7 +48,7 @@
         <div class="box-header with-border">
           <h3 class="box-title">Upload New Logo</h3>
         </div>
-        <form action="{{ route('admin.settings.logo') }}" method="POST" enctype="multipart/form-data" id="logoForm">
+        <form action="{{ route('admin.depr.settings.logo') }}" method="POST" enctype="multipart/form-data" id="logoForm">
           <div class="box-body">
             <div class="row">
               <div class="col-md-6">
@@ -139,7 +139,7 @@
   </div>
   @endif
 
-  <form id="rewindForm" action="{{ route('admin.settings.logo') }}" method="POST" style="display:none;">
+  <form id="rewindForm" action="{{ route('admin.depr.settings.logo') }}" method="POST" style="display:none;">
     {!! csrf_field() !!}
     <input type="hidden" name="_method" value="PATCH">
     <input type="hidden" name="rewind" id="rewindInput" value="">

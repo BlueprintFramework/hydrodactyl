@@ -1,0 +1,149 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY HYDRODACTYL PANEL",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-07-09T00:00:00+00:00",
+    "name": "Folia",
+    "author": "support@pterodactyl.io",
+    "description": "Folia is a fork of Paper that adds regionized multithreading to the server scheduler. Uses the itzg/minecraft-server Docker image.",
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit",
+        "mclogs",
+        "subdomain_minecraft",
+        "plugin/paper"
+    ],
+    "docker_images": {
+        "itzg Minecraft Server": "itzg/docker-minecraft-server:latest"
+    },
+    "file_denylist": [],
+    "startup": "/start",
+    "config": {
+        "files": "{}",
+        "startup": "{\"done\": \")! For help, type \"}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/ash\n# Folia installation script\n# itzg/docker-minecraft-server handles server jar download at container start\nmkdir -p /mnt/server\n",
+            "container": "ghcr.io/pterodactyl/installers:alpine",
+            "entrypoint": "ash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Server Type",
+            "description": "The type of Minecraft server to run. Fixed for this egg.",
+            "env_variable": "TYPE",
+            "default_value": "FOLIA",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Minecraft Version",
+            "description": "The version of Minecraft to run. Set to LATEST for the latest release, or specify a version number (e.g., 1.20.4).",
+            "env_variable": "VERSION",
+            "default_value": "LATEST",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Max Memory",
+            "description": "Maximum memory allocated to the Java heap (e.g., 2G, 4096M).",
+            "env_variable": "MEMORY",
+            "default_value": "2G",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:10",
+            "field_type": "text"
+        },
+        {
+            "name": "Difficulty",
+            "description": "The difficulty level of the server.",
+            "env_variable": "DIFFICULTY",
+            "default_value": "easy",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:peaceful,easy,normal,hard",
+            "field_type": "text"
+        },
+        {
+            "name": "Game Mode",
+            "description": "Default game mode for new players.",
+            "env_variable": "MODE",
+            "default_value": "survival",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:survival,creative,adventure,spectator",
+            "field_type": "text"
+        },
+        {
+            "name": "Max Players",
+            "description": "Maximum number of players that can join the server.",
+            "env_variable": "MAX_PLAYERS",
+            "default_value": "20",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|numeric|min:1|max:10000",
+            "field_type": "text"
+        },
+        {
+            "name": "Message of the Day",
+            "description": "The MOTD displayed in the server list.",
+            "env_variable": "MOTD",
+            "default_value": "A Minecraft Server",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:255",
+            "field_type": "text"
+        },
+        {
+            "name": "Online Mode",
+            "description": "Whether to authenticate players with Mojang servers. Set FALSE for offline/cracked servers.",
+            "env_variable": "ONLINE_MODE",
+            "default_value": "TRUE",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:TRUE,FALSE",
+            "field_type": "text"
+        },
+        {
+            "name": "Server Name",
+            "description": "The internal server name used for the world folder and level-name property.",
+            "env_variable": "SERVER_NAME",
+            "default_value": "Folia Server",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:100",
+            "field_type": "text"
+        },
+        {
+            "name": "Enable RCON",
+            "description": "Enable RCON for remote server administration.",
+            "env_variable": "ENABLE_RCON",
+            "default_value": "FALSE",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|in:TRUE,FALSE",
+            "field_type": "text"
+        },
+        {
+            "name": "Override Server Properties",
+            "description": "Allow environment variables to override server.properties values.",
+            "env_variable": "OVERRIDE_SERVER_PROPERTIES",
+            "default_value": "TRUE",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|string|in:TRUE,FALSE",
+            "field_type": "text"
+        }
+    ]
+}

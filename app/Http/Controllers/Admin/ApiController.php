@@ -72,7 +72,7 @@ class ApiController extends Controller
 
         $this->alert->success('A new application API key has been generated for your account.')->flash();
 
-        return redirect()->route('admin.api.index');
+        return redirect()->route('admin.depr.api.index');
     }
 
     /**

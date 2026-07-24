@@ -6,9 +6,16 @@
     },
     "exported_at": "2024-05-07T12:55:56+00:00",
     "name": "Neoforge",
-    "author": "support@phosphor.host",
+    "author": "support@pterodactyl.io",
     "description": "Minecraft Neoforge Server. Minecraft Neoforge is a modding API (Application Programming Interface), which makes it easier to create mods, and also make sure mods are compatible with each other.",
-    "features": ["eula", "java_version", "pid_limit", "mod/neoforge", "mclogs", "subdomain_minecraft"],
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit",
+        "mod/neoforge",
+        "mclogs",
+        "subdomain_minecraft"
+    ],
     "docker_images": {
         "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
         "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",

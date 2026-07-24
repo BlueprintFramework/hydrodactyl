@@ -76,7 +76,7 @@ class DomainsController extends Controller
                 ]);
             });
 
-            return redirect()->route('admin.settings.domains.index')
+            return redirect()->route('admin.depr.settings.domains.index')
                 ->with('success', 'Domain created successfully.');
         } catch (DnsProviderException $e) {
             return back()->withInput()->withErrors(['dns_config' => $e->getMessage()]);
@@ -139,7 +139,7 @@ class DomainsController extends Controller
                 ]);
             });
 
-            return redirect()->route('admin.settings.domains.index')
+            return redirect()->route('admin.depr.settings.domains.index')
                 ->with('success', 'Domain updated successfully.');
         } catch (DnsProviderException $e) {
             return back()->withInput()->withErrors(['dns_config' => $e->getMessage()]);
@@ -170,7 +170,7 @@ class DomainsController extends Controller
 
             $domain->delete();
 
-            return redirect()->route('admin.settings.domains.index')
+            return redirect()->route('admin.depr.settings.domains.index')
                 ->with('success', 'Domain deleted successfully.');
         } catch (\Exception $e) {
             return back()->withErrors(['general' => 'Failed to delete domain: ' . $e->getMessage()]);

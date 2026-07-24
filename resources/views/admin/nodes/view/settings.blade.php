@@ -8,8 +8,8 @@
   <h1>{{ $node->name }}<small>Configure your node settings.</small></h1>
   <ol class="breadcrumb">
     <li><a href="{{ route('admin.index') }}">Admin</a></li>
-    <li><a href="{{ route('admin.nodes') }}">Nodes</a></li>
-    <li><a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a></li>
+    <li><a href="{{ route('admin.depr.nodes') }}">Nodes</a></li>
+    <li><a href="{{ route('admin.depr.nodes.view', $node->id) }}">{{ $node->name }}</a></li>
     <li class="active">Settings</li>
   </ol>
 @endsection
@@ -19,16 +19,16 @@
     <div class="col-xs-12">
     <div class="nav-tabs-custom nav-tabs-floating">
       <ul class="nav nav-tabs">
-      <li><a href="{{ route('admin.nodes.view', $node->id) }}">About</a></li>
-      <li class="active"><a href="{{ route('admin.nodes.view.settings', $node->id) }}">Settings</a></li>
-      <li><a href="{{ route('admin.nodes.view.configuration', $node->id) }}">Configuration</a></li>
-      <li><a href="{{ route('admin.nodes.view.allocation', $node->id) }}">Allocation</a></li>
-      <li><a href="{{ route('admin.nodes.view.servers', $node->id) }}">Servers</a></li>
+      <li><a href="{{ route('admin.depr.nodes.view', $node->id) }}">About</a></li>
+      <li class="active"><a href="{{ route('admin.depr.nodes.view.settings', $node->id) }}">Settings</a></li>
+      <li><a href="{{ route('admin.depr.nodes.view.configuration', $node->id) }}">Configuration</a></li>
+      <li><a href="{{ route('admin.depr.nodes.view.allocation', $node->id) }}">Allocation</a></li>
+      <li><a href="{{ route('admin.depr.nodes.view.servers', $node->id) }}">Servers</a></li>
       </ul>
     </div>
     </div>
   </div>
-  <form action="{{ route('admin.nodes.view.settings', $node->id) }}" method="POST">
+  <form action="{{ route('admin.depr.nodes.view.settings', $node->id) }}" method="POST">
     <div class="row">
     <div class="col-sm-6">
       <div class="box">

@@ -183,7 +183,7 @@ const ActivityLogContainer = () => {
                             >
                                 <Funnel width={22} height={22} fill='currentColor' />
                                 Filters
-                                {hasActiveFilters && <span className='w-2 h-2 bg-blue-500 rounded-full'></span>}
+                                {hasActiveFilters && <span className='w-2 h-2 bg-brand rounded-full'></span>}
                             </Button>
                             <Button
                                 variant={autoRefresh ? 'default' : 'secondary'}
@@ -221,19 +221,19 @@ const ActivityLogContainer = () => {
                                 'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
                         }}
                     >
-                        <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-4 hover:border-[#ffffff20] transition-all duration-150 shadow-sm'>
+                        <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-mocha-400 rounded-xl p-4 hover:border-[#ffffff20] transition-all duration-150 shadow-sm'>
                             <div className='flex items-center gap-2 mb-4'>
-                                <div className='w-5 h-5 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
-                                    <Funnel width={22} height={22} className='text-zinc-400' fill='currentColor' />
+                                <div className='w-5 h-5 rounded-lg bg-mocha-400/20 flex items-center justify-center'>
+                                    <Funnel width={22} height={22} className='text-mocha-200' fill='currentColor' />
                                 </div>
-                                <h3 className='text-base font-semibold text-zinc-100'>Filters</h3>
+                                <h3 className='text-base font-semibold text-cream-400'>Filters</h3>
                             </div>
 
                             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                                 <div>
                                     <label
                                         htmlFor='activity-search'
-                                        className='block text-sm font-medium text-zinc-300 mb-2'
+                                        className='block text-sm font-medium text-cream-400 mb-2'
                                     >
                                         Search
                                     </label>
@@ -241,7 +241,7 @@ const ActivityLogContainer = () => {
                                         <Magnifier
                                             width={22}
                                             height={22}
-                                            className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none z-10'
+                                            className='absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-mocha-200 pointer-events-none z-10'
                                             fill='currentColor'
                                         />
                                         <Input.Text
@@ -258,7 +258,7 @@ const ActivityLogContainer = () => {
                                 <div>
                                     <label
                                         htmlFor='activity-event-type'
-                                        className='block text-sm font-medium text-zinc-300 mb-2'
+                                        className='block text-sm font-medium text-cream-400 mb-2'
                                     >
                                         Event Type
                                     </label>
@@ -266,7 +266,7 @@ const ActivityLogContainer = () => {
                                         id='activity-event-type'
                                         value={selectedEventType}
                                         onChange={(e) => setSelectedEventType(e.target.value)}
-                                        className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-zinc-500 transition-colors duration-150'
+                                        className='w-full px-3 py-2 bg-mocha-600 border border-mocha-400 rounded-lg text-cream-400 focus:border-mocha-300 focus:ring-1 focus:ring-mocha-300 hover:border-mocha-300 transition-colors duration-150'
                                     >
                                         <option value='' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
                                             All Events
@@ -286,7 +286,7 @@ const ActivityLogContainer = () => {
                                 <div>
                                     <label
                                         htmlFor='activity-time-range'
-                                        className='block text-sm font-medium text-zinc-300 mb-2'
+                                        className='block text-sm font-medium text-cream-400 mb-2'
                                     >
                                         Time Range
                                     </label>
@@ -294,7 +294,7 @@ const ActivityLogContainer = () => {
                                         id='activity-time-range'
                                         value={dateRange}
                                         onChange={(e) => setDateRange(e.target.value)}
-                                        className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-zinc-500 transition-colors duration-150'
+                                        className='w-full px-3 py-2 bg-mocha-600 border border-mocha-400 rounded-lg text-cream-400 focus:border-mocha-300 focus:ring-1 focus:ring-mocha-300 hover:border-mocha-300 transition-colors duration-150'
                                     >
                                         <option value='all' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
                                             All Time
@@ -339,14 +339,14 @@ const ActivityLogContainer = () => {
                             'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
                     }}
                 >
-                    <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff12] rounded-xl p-4 hover:border-[#ffffff20] transition-all duration-150 shadow-sm'>
+                    <div className='bg-gradient-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-mocha-400 rounded-xl p-4 hover:border-[#ffffff20] transition-all duration-150 shadow-sm'>
                         <div className='flex items-center gap-2 mb-4'>
-                            <div className='w-5 h-5 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
-                                <Magnifier width={22} height={22} className=' text-zinc-400' fill='currentColor' />
+                            <div className='w-5 h-5 rounded-lg bg-mocha-400/20 flex items-center justify-center'>
+                                <Magnifier width={22} height={22} className=' text-mocha-200' fill='currentColor' />
                             </div>
-                            <h3 className='text-base font-semibold text-zinc-100'>Activity Events</h3>
+                            <h3 className='text-base font-semibold text-cream-400'>Activity Events</h3>
                             {filteredData?.items && (
-                                <span className='text-sm text-zinc-400'>
+                                <span className='text-sm text-mocha-200'>
                                     ({filteredData.items.length} {filteredData.items.length === 1 ? 'event' : 'events'})
                                 </span>
                             )}
@@ -359,13 +359,13 @@ const ActivityLogContainer = () => {
                                 <ArrowRotateLeft
                                     width={22}
                                     height={22}
-                                    className=' text-zinc-600 mb-4'
+                                    className=' text-mocha-200/60 mb-4'
                                     fill='currentColor'
                                 />
-                                <h3 className='text-lg font-semibold text-zinc-300 mb-2'>
+                                <h3 className='text-lg font-semibold text-cream-400 mb-2'>
                                     {hasActiveFilters ? 'No Matching Activity' : 'No Activity Yet'}
                                 </h3>
-                                <p className='text-sm text-zinc-400 mb-4 max-w-lg mx-auto leading-relaxed'>
+                                <p className='text-sm text-mocha-200 mb-4 max-w-lg mx-auto leading-relaxed'>
                                     {hasActiveFilters
                                         ? "Try adjusting your filters or search terms to find the activity you're looking for."
                                         : 'Activity logs will appear here as you use your account. Check back later or perform some actions to see them here.'}
@@ -382,7 +382,7 @@ const ActivityLogContainer = () => {
                                 )}
                             </div>
                         ) : (
-                            <div className='divide-y divide-zinc-800/30'>
+                            <div className='divide-y divide-mocha-400/30'>
                                 {filteredData.items.map((activity) => (
                                     <ActivityLogEntry key={activity.id} activity={activity}>
                                         {typeof activity.properties.useragent === 'string' && <span></span>}

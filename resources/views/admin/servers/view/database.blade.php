@@ -8,8 +8,8 @@
     <h1>{{ $server->name }}<small>Manage server databases.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
-        <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
+        <li><a href="{{ route('admin.depr.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.depr.servers.view', $server->id) }}">{{ $server->name }}</a></li>
         <li class="active">Databases</li>
     </ol>
 @endsection
@@ -61,7 +61,7 @@
             <div class="box-header with-border">
                 <h3 class="box-title">Create New Database</h3>
             </div>
-            <form action="{{ route('admin.servers.view.database', $server->id) }}" method="POST">
+            <form action="{{ route('admin.depr.servers.view.database', $server->id) }}" method="POST">
                 <div class="box-body">
                     <div class="form-group">
                         <label for="pDatabaseHostId" class="control-label">Database Host</label>

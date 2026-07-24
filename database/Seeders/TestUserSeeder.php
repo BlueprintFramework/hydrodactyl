@@ -15,7 +15,10 @@ class TestUserSeeder extends Seeder
         // while seeding these fixture accounts.
         \Illuminate\Database\Eloquent\Model::unguard();
 
-        User::query()->updateOrCreate(['email' => 'admin@hydrodactyl.dev'], [
+        // Delete all existing users (dev/test mode only)
+        User::query()->forceDelete();
+
+        User::create([
             'uuid' => Uuid::uuid4()->toString(),
             'username' => 'admin',
             'email' => 'admin@hydrodactyl.dev',
@@ -29,7 +32,21 @@ class TestUserSeeder extends Seeder
             'updated_at' => Carbon::now(),
         ]);
 
-        User::query()->updateOrCreate(['email' => 'test@hydrodactyl.dev'], [
+        User::create([
+            'uuid' => Uuid::uuid4()->toString(),
+            'username' => 'dev',
+            'email' => 'dev@hydrodactyl.dev',
+            'name_first' => 'Dev',
+            'name_last' => 'User',
+            'password' => bcrypt('dev'),
+            'language' => 'en',
+            'root_admin' => true,
+            'use_totp' => false,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        User::create([
             'uuid' => Uuid::uuid4()->toString(),
             'username' => 'test',
             'email' => 'test@hydrodactyl.dev',

@@ -2,18 +2,20 @@
 
 @section('settings::nav')
     @yield('settings::notice')
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="nav-tabs-custom nav-tabs-floating">
-                <ul class="nav nav-tabs">
-                    <li @if($activeTab === 'basic')class="active"@endif><a href="{{ route('admin.settings') }}">General</a></li>
-                    <li @if($activeTab === 'mail')class="active"@endif><a href="{{ route('admin.settings.mail') }}">Mail</a></li>
-                    <li @if($activeTab === 'captcha')class="active"@endif><a href="{{ route('admin.settings.captcha') }}">Captcha</a></li>
-                    <li @if($activeTab === 'domains')class="active"@endif><a href="{{ route('admin.settings.domains.index') }}">Domains</a></li>
-                    <li @if($activeTab === 'logo')class="active"@endif><a href="{{ route('admin.settings.logo') }}">Branding</a></li>
-                    <li @if($activeTab === 'advanced')class="active"@endif><a href="{{ route('admin.settings.advanced') }}">Advanced</a></li>
-                </ul>
-            </div>
-        </div>
+    <div class="flex items-center space-x-1 border-b border-gray-800 mt-6 overflow-x-auto">
+        @foreach([
+            ['route' => route('admin.depr.settings'), 'label' => 'General', 'tab' => 'basic'],
+            ['route' => route('admin.depr.settings.mail'), 'label' => 'Mail', 'tab' => 'mail'],
+            ['route' => route('admin.depr.settings.captcha'), 'label' => 'Captcha', 'tab' => 'captcha'],
+            ['route' => route('admin.depr.settings.domains.index'), 'label' => 'Domains', 'tab' => 'domains'],
+            ['route' => route('admin.depr.settings.logo'), 'label' => 'Branding', 'tab' => 'logo'],
+            ['route' => route('admin.depr.settings.advanced'), 'label' => 'Advanced', 'tab' => 'advanced'],
+        ] as $item)
+            <a href="{{ $item['route'] }}"
+               class="whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px
+                      {{ $activeTab === $item['tab'] ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600' }}">
+                {{ $item['label'] }}
+            </a>
+        @endforeach
     </div>
 @endsection

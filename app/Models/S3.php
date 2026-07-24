@@ -55,6 +55,8 @@ class S3 extends Model
         'bucket_name',
         'use_path_style_endpoint',
         'enabled',
+        'is_local',
+        'minio_instance_url',
     ];
 
     protected static array $validationRules = [
@@ -67,11 +69,14 @@ class S3 extends Model
         'bucket_name' => 'required|string|max:255',
         'use_path_style_endpoint' => 'boolean',
         'enabled' => 'boolean',
+        'is_local' => 'boolean',
+        'minio_instance_url' => 'nullable|string|max:255',
     ];
 
     protected $casts = [
         'use_path_style_endpoint' => 'boolean',
         'enabled'                  => 'boolean',
+        'is_local'                 => 'boolean',
     ];
 
     protected $hidden = [

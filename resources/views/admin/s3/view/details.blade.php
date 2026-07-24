@@ -5,86 +5,107 @@
 @endsection
 
 @section('content-header')
-    <h1>{{ $s3->name }}<small>Edit details for this S3 configuration.</small></h1>
-    <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.buckets') }}">S3 Configurations</a></li>
-        <li><a href="{{ route('admin.buckets.view', $s3->id) }}">{{ $s3->name }}</a></li>
-        <li class="active">Details</li>
-    </ol>
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-100">{{ $s3->name }}
+                <small class="text-gray-500 ml-2">Edit details for this S3 configuration.</small>
+            </h1>
+        </div>
+        <ol class="flex items-center space-x-2 text-sm text-gray-500">
+            <li><a href="{{ route('admin.index') }}" class="text-blue-400 hover:text-blue-300">Admin</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li><a href="{{ route('admin.depr.buckets') }}" class="text-blue-400 hover:text-blue-300">S3 Configurations</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li><a href="{{ route('admin.depr.buckets.view', $s3->id) }}" class="text-blue-400 hover:text-blue-300">{{ $s3->name }}</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li class="text-gray-400">Details</li>
+        </ol>
+    </div>
 @endsection
 
 @section('content')
 @include('admin.s3.partials.navigation')
-<div class="row">
-    <div class="col-xs-12">
-        <div class="box box-primary">
-            <div class="box-header with-border">
-                <h3 class="box-title">S3 Configuration</h3>
-            </div>
-            <form action="{{ route('admin.buckets.view.details', $s3->id) }}" method="POST">
-                <div class="box-body">
-                    <div class="form-group">
-                        <label for="name" class="control-label">Name <span class="field-required"></span></label>
-                        <input type="text" name="name" value="{{ old('name', $s3->name) }}" class="form-control" required />
-                        <p class="text-muted small">A display name for this S3 configuration.</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="description" class="control-label">Description</label>
-                        <textarea name="description" rows="3" class="form-control">{{ old('description', $s3->description) }}</textarea>
-                        <p class="text-muted small">A brief description of this S3 configuration.</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="access_key" class="control-label">Access Key <span class="field-required"></span></label>
-                        <input type="text" name="access_key" value="{{ old('access_key', $s3->access_key) }}" class="form-control" required />
-                        <p class="text-muted small">The access key for the S3 service.</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="secret_key" class="control-label">Secret Key <span class="field-required"></span></label>
-                        <input type="password" name="secret_key" value="{{ old('secret_key', $s3->secret_key) }}" class="form-control" required />
-                        <p class="text-muted small">The secret key for the S3 service.</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="endpoint" class="control-label">Endpoint</label>
-                        <input type="url" name="endpoint" value="{{ old('endpoint', $s3->endpoint) }}" class="form-control" />
-                        <p class="text-muted small">The endpoint URL for the S3 service, make sure to include <code>https://</code>. Leave empty for AWS S3.</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="region" class="control-label">Region</label>
-                        <input type="text" name="region" value="{{ old('region', $s3->region ?: 'us-east-1') }}" class="form-control" />
-                        <p class="text-muted small">The region for the S3 service. For example, <code>us-west-004</code> on BackBlaze. Leave blank for us-east-1 on AWS</p>
-                    </div>
-                    <div class="form-group">
-                        <label for="bucket_name" class="control-label">Bucket Name <span class="field-required"></span></label>
-                        <input type="text" name="bucket_name" value="{{ old('bucket_name', $s3->bucket_name) }}" class="form-control" required />
-                        <p class="text-muted small">The name of the S3 bucket.</p>
-                    </div>
-                    <div class="form-group">
-                        <div class="checkbox checkbox-primary no-margin-bottom">
-                            <input type="hidden" name="use_path_style_endpoint" value="0" />
-                            <input id="use_path_style_endpoint" name="use_path_style_endpoint" type="checkbox" value="1" {{ ((int) old('use_path_style_endpoint', $s3->use_path_style_endpoint ? 1 : 0)) ? 'checked' : '' }} />
-                            <label for="use_path_style_endpoint" class="strong">Use Path Style Endpoints</label>
-                        </div>
-                        <p class="text-muted small">Enable this for some S3-compatible services that require path-style endpoints.</p>
-                    </div>
-                    <div class="form-group">
-                        <div class="checkbox checkbox-primary no-margin-bottom">
-                            <input type="hidden" name="enabled" value="0" />
-                            <input id="enabled" name="enabled" type="checkbox" value="1" {{ ((int) old('enabled', $s3->enabled ? 1 : 0)) ? 'checked' : '' }} />
-                            <label for="enabled" class="strong">Enabled</label>
-                        </div>
-                        <p class="text-muted small">Enable or disable this S3 configuration.</p>
-                    </div>
-                </div>
-                <div class="box-footer">
-                    {!! csrf_field() !!}
-                    <button type="button" id="test-connection" class="btn btn-sm btn-info">
-                        <i class="fa fa-refresh fa-spin" style="display: none;"></i> Test Connection
-                    </button>
-                    <button type="submit" class="btn btn-primary pull-right">Update Configuration</button>
-                </div>
-            </form>
+
+<div class="max-w-3xl mt-6">
+    <div class="bg-[#1a1a1a] rounded-lg border border-gray-800 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-800">
+            <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider">S3 Configuration</h3>
         </div>
+        <form action="{{ route('admin.depr.buckets.view.details', $s3->id) }}" method="POST">
+            <div class="p-5 space-y-4">
+                @if($s3->is_local)
+                    <div class="bg-indigo-900/20 border border-indigo-800/30 rounded-lg p-4 text-sm text-indigo-300">
+                        This is a local MinIO bucket. Some fields are auto-configured.
+                    </div>
+                @endif
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-400 mb-1">Name <span class="text-red-400">*</span></label>
+                        <input type="text" id="name" name="name" value="{{ old('name', $s3->name) }}"
+                               class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500" required />
+                        <p class="text-xs text-gray-600 mt-1">A display name for this S3 configuration.</p>
+                    </div>
+                    <div>
+                        <label for="bucket_name" class="block text-sm font-medium text-gray-400 mb-1">Bucket Name <span class="text-red-400">*</span></label>
+                        <input type="text" id="bucket_name" name="bucket_name" value="{{ old('bucket_name', $s3->bucket_name) }}"
+                               class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500" required />
+                        <p class="text-xs text-gray-600 mt-1">The name of the S3 bucket.</p>
+                    </div>
+                    <div>
+                        <label for="access_key" class="block text-sm font-medium text-gray-400 mb-1">Access Key <span class="text-red-400">*</span></label>
+                        <input type="text" id="access_key" name="access_key" value="{{ old('access_key', $s3->access_key) }}"
+                               class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500" required />
+                        <p class="text-xs text-gray-600 mt-1">The access key for the S3 service.</p>
+                    </div>
+                    <div>
+                        <label for="secret_key" class="block text-sm font-medium text-gray-400 mb-1">Secret Key <span class="text-red-400">*</span></label>
+                        <input type="password" id="secret_key" name="secret_key" value="{{ old('secret_key', $s3->secret_key) }}"
+                               class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500" required />
+                        <p class="text-xs text-gray-600 mt-1">The secret key for the S3 service.</p>
+                    </div>
+                    <div>
+                        <label for="endpoint" class="block text-sm font-medium text-gray-400 mb-1">Endpoint</label>
+                        <input type="url" id="endpoint" name="endpoint" value="{{ old('endpoint', $s3->endpoint) }}"
+                               class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500" />
+                        <p class="text-xs text-gray-600 mt-1">Leave empty for AWS S3.</p>
+                    </div>
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-400 mb-1">Description</label>
+                        <textarea id="description" name="description" rows="3"
+                                  class="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-blue-500">{{ old('description', $s3->description) }}</textarea>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="hidden" name="use_path_style_endpoint" value="0" />
+                        <input id="use_path_style_endpoint" name="use_path_style_endpoint" type="checkbox" value="1"
+                               {{ ((int) old('use_path_style_endpoint', $s3->use_path_style_endpoint ? 1 : 0)) ? 'checked' : '' }}
+                               class="w-4 h-4 rounded border-gray-600 bg-gray-900 text-blue-600 focus:ring-blue-500" {{ $s3->is_local ? 'disabled' : '' }}>
+                        <span class="text-sm text-gray-300 font-medium">Use Path Style Endpoints</span>
+                    </label>
+                    <p class="text-xs text-gray-600 ml-7">Enable for S3-compatible services requiring path-style endpoints.</p>
+
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="hidden" name="enabled" value="0" />
+                        <input id="enabled" name="enabled" type="checkbox" value="1"
+                               {{ ((int) old('enabled', $s3->enabled ? 1 : 0)) ? 'checked' : '' }}
+                               class="w-4 h-4 rounded border-gray-600 bg-gray-900 text-blue-600 focus:ring-blue-500">
+                        <span class="text-sm text-gray-300 font-medium">Enabled</span>
+                    </label>
+                    <p class="text-xs text-gray-600 ml-7">Enable or disable this S3 configuration.</p>
+                </div>
+            </div>
+            <div class="px-5 py-4 border-t border-gray-800 flex items-center justify-between">
+                {!! csrf_field() !!}
+                <button type="button" id="test-connection"
+                        class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 text-sm rounded transition-colors border border-gray-700">
+                    <span class="spinner hidden"><svg class="animate-spin w-4 h-4 inline mr-1" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg></span>
+                    <span class="btn-text">Test Connection</span>
+                </button>
+                <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded font-medium transition-colors">Update Configuration</button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection
@@ -94,12 +115,14 @@
     <script>
     $('#test-connection').click(function () {
         const $button = $(this);
-        const $spinner = $button.find('.fa-spin');
+        const $spinner = $button.find('.spinner');
+        const $text = $button.find('.btn-text');
 
         $button.prop('disabled', true);
-        $spinner.show();
+        $spinner.removeClass('hidden');
+        $text.text('Testing...');
 
-        $.post('{{ route('admin.buckets.test-connection') }}', {
+        $.post('{{ route('admin.depr.buckets.test-connection') }}', {
             _token: '{{ csrf_token() }}',
             access_key: $('input[name="access_key"]').val(),
             secret_key: $('input[name="secret_key"]').val(),
@@ -118,7 +141,8 @@
         })
         .always(function () {
             $button.prop('disabled', false);
-            $spinner.hide();
+            $spinner.addClass('hidden');
+            $text.text('Test Connection');
         });
     });
     </script>

@@ -142,7 +142,7 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                         </div>
                     ) : server.isTransferring || server.status ? (
                         <div className={`flex-1 text-center`}>
-                            <span className={`text-zinc-100 text-xs`}>
+                            <span className={`text-cream-400 text-xs`}>
                                 {server.isTransferring
                                     ? 'Transferring'
                                     : server.status === 'installing'

@@ -1,0 +1,8 @@
+[tools]
+php = "8.5"
+node = "26"
+pnpm = "11.17"
+just = "latest"
+
+[env]
+_.file = ".env"

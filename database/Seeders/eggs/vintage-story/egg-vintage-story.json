@@ -8,7 +8,9 @@
     "name": "Vintage Story",
     "author": "mail@wuffy.eu",
     "description": "Vintage Story is an uncompromising wilderness survival sandbox game inspired by lovecraftian horror themes. Find yourself in a ruined world reclaimed by nature and permeated by unnerving temporal disturbances. Relive the advent of human civilization, or take your own path.",
-    "features": ["subdomain_vintagestory"],
+    "features": [
+        "subdomain_vintagestory"
+    ],
     "docker_images": {
         "Dotnet 7": "ghcr.io/ptero-eggs/yolks:dotnet_7",
         "Dotnet 8": "ghcr.io/ptero-eggs/yolks:dotnet_8"

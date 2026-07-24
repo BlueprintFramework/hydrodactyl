@@ -75,7 +75,7 @@ class ServersController extends Controller
 
         $this->alert->success(trans('admin/server.alerts.details_updated'))->flash();
 
-        return redirect()->route('admin.servers.view.details', $server->id);
+        return redirect()->route('admin.depr.servers.view.details', $server->id);
     }
 
     /**
@@ -97,7 +97,7 @@ class ServersController extends Controller
 
         $this->alert->success(trans('admin/server.alerts.install_toggled'))->flash();
 
-        return redirect()->route('admin.servers.view.manage', $server->id);
+        return redirect()->route('admin.depr.servers.view.manage', $server->id);
     }
 
     /**
@@ -112,7 +112,7 @@ class ServersController extends Controller
         $this->reinstallService->handle($server);
         $this->alert->success(trans('admin/server.alerts.server_reinstalled'))->flash();
 
-        return redirect()->route('admin.servers.view.manage', $server->id);
+        return redirect()->route('admin.depr.servers.view.manage', $server->id);
     }
 
     /**
@@ -129,7 +129,7 @@ class ServersController extends Controller
             'status' => $request->input('action') . 'ed',
         ]))->flash();
 
-        return redirect()->route('admin.servers.view.manage', $server->id);
+        return redirect()->route('admin.depr.servers.view.manage', $server->id);
     }
 
     /**
@@ -154,7 +154,7 @@ class ServersController extends Controller
 
         $this->alert->success(trans('admin/server.alerts.build_updated'))->flash();
 
-        return redirect()->route('admin.servers.view.build', $server->id);
+        return redirect()->route('admin.depr.servers.view.build', $server->id);
     }
 
     /**
@@ -168,7 +168,7 @@ class ServersController extends Controller
         $this->deletionService->withForce($request->filled('force_delete'))->handle($server);
         $this->alert->success(trans('admin/server.alerts.server_deleted'))->flash();
 
-        return redirect()->route('admin.servers');
+        return redirect()->route('admin.depr.servers');
     }
 
     /**
@@ -194,7 +194,7 @@ class ServersController extends Controller
 
         $this->alert->success(trans('admin/server.alerts.startup_changed'))->flash();
 
-        return redirect()->route('admin.servers.view.startup', $server->id);
+        return redirect()->route('admin.depr.servers.view.startup', $server->id);
     }
 
     /**
@@ -211,7 +211,7 @@ class ServersController extends Controller
             'max_connections' => $request->input('max_connections'),
         ]);
 
-        return redirect()->route('admin.servers.view.database', $server->id)->withInput();
+        return redirect()->route('admin.depr.servers.view.database', $server->id)->withInput();
     }
 
     /**
@@ -257,7 +257,7 @@ class ServersController extends Controller
 
         $this->alert->success('Mount was added successfully.')->flash();
 
-        return redirect()->route('admin.servers.view.mounts', $server->id);
+        return redirect()->route('admin.depr.servers.view.mounts', $server->id);
     }
 
     /**
@@ -269,6 +269,6 @@ class ServersController extends Controller
 
         $this->alert->success('Mount was removed successfully.')->flash();
 
-        return redirect()->route('admin.servers.view.mounts', $server->id);
+        return redirect()->route('admin.depr.servers.view.mounts', $server->id);
     }
 }

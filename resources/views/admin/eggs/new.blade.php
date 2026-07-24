@@ -8,13 +8,13 @@
     <h1>New Egg<small>Create a new Egg to assign to servers.</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.nests') }}">Nests</a></li>
+        <li><a href="{{ route('admin.depr.nests') }}">Nests</a></li>
         <li class="active">New Egg</li>
     </ol>
 @endsection
 
 @section('content')
-<form action="{{ route('admin.nests.egg.new') }}" method="POST">
+<form action="{{ route('admin.depr.nests.egg.new') }}" method="POST">
     <div class="row">
         <div class="col-xs-12">
             <div class="box">

@@ -60,6 +60,6 @@ class EggScriptController extends Controller
         $this->installScriptService->handle($egg, $request->normalize());
         $this->alert->success(trans('admin/nests.eggs.notices.script_updated'))->flash();
 
-        return redirect()->route('admin.nests.egg.scripts', $egg);
+        return redirect()->route('admin.depr.nests.egg.scripts', $egg);
     }
 }

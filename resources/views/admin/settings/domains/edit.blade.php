@@ -9,8 +9,8 @@
   <h1>Edit Domain<small>Update DNS domain configuration.</small></h1>
   <ol class="breadcrumb">
     <li><a href="{{ route('admin.index') }}">Admin</a></li>
-    <li><a href="{{ route('admin.settings') }}">Settings</a></li>
-    <li><a href="{{ route('admin.settings.domains.index') }}">Domains</a></li>
+    <li><a href="{{ route('admin.depr.settings') }}">Settings</a></li>
+    <li><a href="{{ route('admin.depr.settings.domains.index') }}">Domains</a></li>
     <li class="active">{{ $domain->name }}</li>
   </ol>
 @endsection
@@ -19,7 +19,7 @@
   @yield('settings::nav')
   <div class="row">
     <div class="col-xs-12">
-      <form action="{{ route('admin.settings.domains.update', $domain) }}" method="POST" id="domain-form">
+      <form action="{{ route('admin.depr.settings.domains.update', $domain) }}" method="POST" id="domain-form">
         <div class="box">
           <div class="box-header with-border">
             <h3 class="box-title">Domain Information</h3>
@@ -120,7 +120,7 @@
             <button type="button" id="test-connection" class="btn btn-sm btn-info" disabled>
               <i class="fa fa-refresh fa-spin" style="display: none;"></i> Test Connection
             </button>
-            <a href="{{ route('admin.settings.domains.index') }}" class="btn btn-sm btn-default">Cancel</a>
+            <a href="{{ route('admin.depr.settings.domains.index') }}" class="btn btn-sm btn-default">Cancel</a>
             <button type="submit" class="btn btn-sm btn-success pull-right">Update Domain</button>
           </div>
         </div>
@@ -176,7 +176,7 @@
         $button.prop('disabled', true);
         $spinner.show();
 
-        $.post('{{ route('admin.settings.domains.test-connection') }}', {
+        $.post('{{ route('admin.depr.settings.domains.test-connection') }}', {
           _token: '{{ csrf_token() }}',
           ...formData
         })
@@ -211,7 +211,7 @@
 
       // Load provider configuration
       function loadProviderConfig(provider) {
-        $.get(`{{ route('admin.settings.domains.provider-schema', ':provider') }}`.replace(':provider', provider))
+        $.get(`{{ route('admin.depr.settings.domains.provider-schema', ':provider') }}`.replace(':provider', provider))
           .done(function(response) {
             if (response.success) {
               renderConfigForm(response.schema);

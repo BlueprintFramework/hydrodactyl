@@ -129,13 +129,23 @@ body[data-sidebar-minimized="false"] .nav-item .nav-text {
     display: none;
 }
 
+/* subtle transition on nav items for smoother feel */
+.sidebar-container .nav-item {
+    @apply transition-all duration-150;
+}
+
 /* hover highlighting */
 .sidebar-container li:hover a {
     @apply !text-cream-400 !fill-cream-400 opacity-100;
 }
-/* active tab highlighting - applies to the active tab when only when nothing's hovered */
+/* active tab highlighting - applies to the active tab only when nothing's hovered */
 .sidebar-container:not(:has(li:hover)) li[data-active="true"] a {
     @apply !text-cream-400 !fill-cream-400 opacity-100;
+}
+
+/* focus-visible ring for keyboard navigation */
+.sidebar-container a:focus-visible {
+    @apply outline-none ring-2 ring-brand/50 ring-offset-2 ring-offset-bg rounded-lg;
 }
 
 /* ---- Mobile drawer ----

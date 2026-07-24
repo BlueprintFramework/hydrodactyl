@@ -19,14 +19,14 @@ const ApiKeyModal = ({ apiKey }: Props) => {
             <FlashMessageRender byKey='account' />
 
             {/* Modal Header */}
-            <p className='text-sm text-white-600 mt-2'>
+            <p className='text-sm text-mocha-200 mt-2'>
                 The API key you have requested is shown below. Please store it in a safe place, as it will not be shown
                 again.
             </p>
 
             {/* API Key Display Section */}
             <div className='relative mt-6'>
-                <pre className='bg-gray-900 text-white p-4 rounded-lg font-mono overflow-x-auto'>
+                <pre className='bg-mocha-600 text-cream-400 p-4 rounded-lg font-mono overflow-x-auto'>
                     <CopyOnClick text={apiKey}>
                         <code className='text-sm break-words'>{apiKey}</code>
                     </CopyOnClick>

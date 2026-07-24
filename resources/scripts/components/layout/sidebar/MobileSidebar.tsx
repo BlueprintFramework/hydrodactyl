@@ -1,6 +1,6 @@
 import { Menu02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react';
-import { memo, type RefObject, useEffect } from 'react';
+import { memo, type RefObject, useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import Logo from '@/components/elements/HydroLogo';
@@ -29,6 +29,9 @@ interface MobileSidebarProps {
 const MobileSidebarPanel = memo<{ navItems: NavItemData[] }>(({ navItems }) => {
     const { setMobileOpen, isMobileOpen } = useSidebar();
     const location = useLocation();
+    const [shouldRender, _setShouldRender] = useState(false);
+    const [isAnimating, _setIsAnimating] = useState(false);
+    const panelRef = useRef<HTMLDivElement>(null);
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: close menu on route change; setMobileOpen is stable
     useEffect(() => {
@@ -46,13 +49,16 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[] }>(({ navItems }) => {
         };
     }, [isMobileOpen]);
 
-    if (!isMobileOpen) return null;
+    if (!shouldRender) return null;
 
     return (
         <div className='lg:hidden fixed inset-0 z-[9999]'>
             <button
                 type='button'
-                className='absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default'
+                className={cn(
+                    'absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default transition-opacity duration-300',
+                    isAnimating ? 'opacity-100' : 'opacity-0',
+                )}
                 onClick={() => setMobileOpen(false)}
                 aria-label='Close menu'
                 aria-hidden='true'
@@ -60,10 +66,13 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[] }>(({ navItems }) => {
             />
 
             <div
+                ref={panelRef}
                 className={cn(
                     'sidebar-container absolute top-0 left-0 h-full w-[300px] max-w-[85vw] shrink-0',
                     'flex flex-col bg-bg-lowered border-r border-mocha-400',
                     'rounded-none overflow-y-auto overflow-x-hidden',
+                    'transition-transform duration-300 ease-out',
+                    isAnimating ? 'translate-x-0' : '-translate-x-full',
                 )}
                 data-sidebar-minimized='false'
             >

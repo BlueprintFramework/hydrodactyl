@@ -45,6 +45,8 @@ class S3Controller extends Controller
                 's3.bucket_name',
                 's3.use_path_style_endpoint',
                 's3.enabled',
+                's3.is_local',
+                's3.minio_instance_url',
                 's3.created_at',
                 's3.updated_at',
             ])
@@ -60,7 +62,10 @@ class S3Controller extends Controller
 
     public function create(): View
     {
-        return $this->view->make('admin.s3.new');
+        return $this->view->make('admin.s3.new', [
+            'minio_endpoint' => config('filesystems.disks.s3.endpoint', 'http://localhost:9000'),
+            'minio_console_url' => env('MINIO_CONSOLE_URL', 'http://localhost:9001'),
+        ]);
     }
 
     public function view(S3 $s3): View
@@ -74,25 +79,32 @@ class S3Controller extends Controller
 
     public function delete(Request $request, S3 $s3): RedirectResponse
     {
-        // Optional: check if in use
         if ($s3->servers()->exists()) {
             $this->alert->error('Cannot delete: bucket is used by servers.')->flash();
-            return redirect()->route('admin.buckets.view', $s3->id);
+            return redirect()->route('admin.depr.buckets.view', $s3->id);
         }
 
         $this->deletionService->handle($s3);
         $this->alert->success('S3 configuration deleted.')->flash();
 
-        return redirect()->route('admin.buckets');
+        return redirect()->route('admin.depr.buckets');
     }
 
     public function store(NewS3FormRequest $request): RedirectResponse
     {
-        $s3 = $this->creationService->handle($request->validated());
+        $data = $request->validated();
+
+        if (!empty($data['is_local'])) {
+            $data['is_local'] = true;
+            $data['minio_instance_url'] = $data['minio_instance_url'] ?? config('filesystems.disks.s3.endpoint', 'http://localhost:9000');
+            $data['use_path_style_endpoint'] = true;
+        }
+
+        $s3 = $this->creationService->handle($data);
 
         $this->alert->success('S3 configuration created.')->flash();
 
-        return redirect()->route('admin.buckets.view', $s3->id);
+        return redirect()->route('admin.depr.buckets.view', $s3->id);
     }
 
     public function update(S3FormRequest $request, S3 $s3): RedirectResponse
@@ -101,7 +113,66 @@ class S3Controller extends Controller
 
         $this->alert->success('S3 configuration updated.')->flash();
 
-        return redirect()->route('admin.buckets.view', $s3->id);
+        return redirect()->route('admin.depr.buckets.view', $s3->id);
+    }
+
+    public function provisionLocal(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'bucket_name' => 'required|string|max:255|unique:s3,bucket_name',
+        ]);
+
+        $accessKey = env('MINIO_ROOT_USER', 'minioadmin');
+        $secretKey = env('MINIO_ROOT_PASSWORD', 'minioadmin');
+        $endpoint = env('MINIO_ENDPOINT', 'http://minio:9000');
+        $consoleUrl = env('MINIO_CONSOLE_URL', 'http://localhost:9001');
+        $bucketName = $request->input('bucket_name');
+        $region = 'us-east-1';
+
+        try {
+            $client = new S3Client([
+                'version' => 'latest',
+                'region' => $region,
+                'endpoint' => $endpoint,
+                'use_path_style_endpoint' => true,
+                'credentials' => [
+                    'key' => $accessKey,
+                    'secret' => $secretKey,
+                ],
+            ]);
+
+            if (!$client->doesBucketExist($bucketName)) {
+                $client->createBucket(['Bucket' => $bucketName]);
+            }
+
+            $s3 = $this->creationService->handle([
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'access_key' => $accessKey,
+                'secret_key' => $secretKey,
+                'endpoint' => $endpoint,
+                'bucket_name' => $bucketName,
+                'use_path_style_endpoint' => true,
+                'enabled' => true,
+                'is_local' => true,
+                'minio_instance_url' => $consoleUrl,
+            ]);
+
+            $this->alert->success("Local MinIO bucket '{$bucketName}' created and configured.")->flash();
+
+            return redirect()->route('admin.depr.buckets.view', $s3->id);
+        } catch (AwsException $e) {
+            $error = $e->getAwsErrorMessage() ?: $e->getMessage();
+            $this->alert->error("MinIO provisioning failed: {$error}")->flash();
+
+            return redirect()->route('admin.depr.buckets.new');
+        } catch (\Exception $e) {
+            $this->alert->error("Failed to provision MinIO bucket: {$e->getMessage()}")->flash();
+
+            return redirect()->route('admin.depr.buckets.new');
+        }
     }
 
     public function testConnection(Request $request): \Illuminate\Http\JsonResponse

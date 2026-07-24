@@ -61,7 +61,7 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
     return (
         <form id={'enable-totp-form'} onSubmit={submit}>
             <FlashMessageRender byKey={'account:two-step'} />
-            <div className={'flex items-center justify-center w-56 h-56 p-2 bg-zinc-50 shadow-sm mx-auto mt-6'}>
+            <div className={'flex items-center justify-center w-56 h-56 p-2 bg-mocha-400/20 shadow-sm mx-auto mt-6'}>
                 {!token ? (
                     <Spinner />
                 ) : (
@@ -69,7 +69,7 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
                 )}
             </div>
             <CopyOnClick text={token?.secret}>
-                <p className={'font-mono text-sm text-zinc-100 text-center mt-2'}>
+                <p className={'font-mono text-sm text-cream-400 text-center mt-2'}>
                     {token?.secret.match(/.{1,4}/g)?.join(' ') || 'Loading...'}
                 </p>
             </CopyOnClick>

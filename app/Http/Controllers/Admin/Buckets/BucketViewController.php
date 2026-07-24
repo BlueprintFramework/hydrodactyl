@@ -54,7 +54,7 @@ class BucketViewController extends Controller
 
         $s3->update($validated);
 
-        return redirect()->route('admin.buckets.view.details', $s3->id)->with('success', 'S3 configuration updated.');
+        return redirect()->route('admin.depr.buckets.view.details', $s3->id)->with('success', 'S3 configuration updated.');
     }
 
     public function servers(Request $request, S3 $s3): View

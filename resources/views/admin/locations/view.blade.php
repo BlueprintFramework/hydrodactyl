@@ -8,7 +8,7 @@
     <h1>{{ $location->short }}<small>{{ str_limit($location->long, 75) }}</small></h1>
     <ol class="breadcrumb">
         <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.locations') }}">Locations</a></li>
+        <li><a href="{{ route('admin.depr.locations') }}">Locations</a></li>
         <li class="active">{{ $location->short }}</li>
     </ol>
 @endsection
@@ -46,7 +46,7 @@
             <div class="box-header with-border">
                 <h3 class="box-title">Location Details</h3>
             </div>
-            <form action="{{ route('admin.locations.view', $location->id) }}" method="POST">
+            <form action="{{ route('admin.depr.locations.view', $location->id) }}" method="POST">
                 <div class="box-body">
                     <div class="form-group">
                         <label for="pShort" class="form-label">Short Code</label>
@@ -115,7 +115,7 @@
                     @foreach($location->nodes as $node)
                         <tr>
                             <td><code>{{ $node->id }}</code></td>
-                            <td><a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a></td>
+                            <td><a href="{{ route('admin.depr.nodes.view', $node->id) }}">{{ $node->name }}</a></td>
                             <td><code>{{ $node->fqdn }}</code></td>
                             @php
                                 $nodeMemoryLimit = $node->memory * (1 + ($node->memory_overallocate / 100));

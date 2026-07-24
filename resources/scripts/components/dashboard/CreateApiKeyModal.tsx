@@ -69,7 +69,7 @@ export default function CreateApiKeyModal({ open, onClose, onSubmit, isSubmittin
                                 name='allowedIps'
                                 as='textarea'
                                 rows={4}
-                                className='w-full rounded bg-[#ffffff0d] border border-[#ffffff12] p-3 text-sm text-zinc-100 focus:outline-none focus:border-blue-500'
+                                className='w-full rounded bg-mocha-600 border border-mocha-400 p-3 text-sm text-cream-400 focus:outline-none focus:border-mocha-300'
                             />
                         </FormikFieldWrapper>
 

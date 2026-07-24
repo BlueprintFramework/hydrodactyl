@@ -103,4 +103,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build dev image
-        run: docker compose -f docker-compose.develop.yml build panel
+        run: docker compose -f compose.yml build panel

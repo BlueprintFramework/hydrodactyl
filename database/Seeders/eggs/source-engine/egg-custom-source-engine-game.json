@@ -8,8 +8,12 @@
     "name": "Custom Source Engine Game",
     "author": "support@pterodactyl.io",
     "description": "This option allows modifying the startup arguments and other details to run a custom SRCDS based game on the panel.",
-    "features": ["steam_disk_space"],
-    "images": ["ghcr.io\/pterodactyl\/games:source"],
+    "features": [
+        "steam_disk_space"
+    ],
+    "images": [
+        "ghcr.io\/pterodactyl\/games:source"
+    ],
     "file_denylist": [],
     "startup": ".\/srcds_run -game {{SRCDS_GAME}} -console -port {{SERVER_PORT}} +map {{SRCDS_MAP}} +ip 0.0.0.0 -strictportbind -norestart",
     "config": {

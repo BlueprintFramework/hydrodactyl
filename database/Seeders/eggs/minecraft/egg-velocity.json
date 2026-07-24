@@ -6,9 +6,16 @@
     },
     "exported_at": "2026-03-07T23:02:39+00:00",
     "name": "Velocity",
-    "author": "hostmaster@waterfallgaming.net",
+    "author": "support@pterodactyl.io",
     "description": "Velocity is a Minecraft server proxy with unparalleled server support, scalability, and flexibility.",
-    "features": ["eula", "java_version", "pid_limit", "plugin/velocity", "mclogs", "subdomain_minecraft"],
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit",
+        "plugin/velocity",
+        "mclogs",
+        "subdomain_minecraft"
+    ],
     "docker_images": {
         "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
         "Java 22": "ghcr.io\/pterodactyl\/yolks:java_22",

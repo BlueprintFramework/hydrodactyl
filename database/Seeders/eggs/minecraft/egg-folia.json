@@ -6,9 +6,16 @@
     },
     "exported_at": "2026-03-27T14:36:34+01:00",
     "name": "Folia",
-    "author": "Hosting@NeverStopGaming.net",
+    "author": "support@pterodactyl.io",
     "description": "Fork of Paper which adds recognised multithreading to the dedicated server.",
-    "features": ["eula", "java_version", "pid_limit", "plugin/paper", "mclogs", "subdomain_minecraft"],
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit",
+        "plugin/paper",
+        "mclogs",
+        "subdomain_minecraft"
+    ],
     "docker_images": {
         "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
         "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",
