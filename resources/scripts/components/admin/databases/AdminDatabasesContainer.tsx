@@ -93,7 +93,7 @@ const AdminDatabaseHostView = () => {
                 navigate('/admin/databases');
                 toast.success('Database host deleted successfully');
             })
-            .catch((error: any) => {
+            .catch((error: { response?: { data?: unknown }; message?: string }) => {
                 setError(httpErrorToHuman(error));
                 toast.error(httpErrorToHuman(error));
             });

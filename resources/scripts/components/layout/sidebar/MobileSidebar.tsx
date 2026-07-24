@@ -29,8 +29,8 @@ interface MobileSidebarProps {
 const MobileSidebarPanel = memo<{ navItems: NavItemData[] }>(({ navItems }) => {
     const { setMobileOpen, isMobileOpen } = useSidebar();
     const location = useLocation();
-    const [shouldRender, setShouldRender] = useState(false);
-    const [isAnimating, setIsAnimating] = useState(false);
+    const [shouldRender, _setShouldRender] = useState(false);
+    const [isAnimating, _setIsAnimating] = useState(false);
     const panelRef = useRef<HTMLDivElement>(null);
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: close menu on route change; setMobileOpen is stable
