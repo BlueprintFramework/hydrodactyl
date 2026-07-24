@@ -15,6 +15,7 @@ export interface AdminNode {
     locationName?: string;
     public: boolean;
     fqdn: string;
+    internalFqdn: string | null;
     scheme: string;
     behindProxy: boolean;
     maintenanceMode: boolean;
@@ -40,6 +41,7 @@ const rawToNode = (data: FractalResponseData): AdminNode => {
         locationId: attrs.location_id as number,
         public: attrs.public as boolean,
         fqdn: attrs.fqdn as string,
+        internalFqdn: (attrs.internal_fqdn as string) || null,
         scheme: attrs.scheme as string,
         behindProxy: attrs.behind_proxy as boolean,
         maintenanceMode: attrs.maintenance_mode as boolean,
@@ -83,6 +85,7 @@ export interface CreateNodeData {
     name: string;
     location_id: number;
     fqdn: string;
+    internal_fqdn?: string;
     scheme?: string;
     behind_proxy?: boolean;
     memory?: number;
@@ -105,7 +108,6 @@ export const createNode = (data: CreateNodeData): Promise<AdminNode> =>
 
 export interface UpdateNodeData extends Partial<CreateNodeData> {
     maintenance_mode?: boolean;
-    location_id?: number;
 }
 
 export const updateNode = (id: number, data: UpdateNodeData): Promise<AdminNode> =>
@@ -149,7 +151,7 @@ export const getNodeAllocations = (id: number): Promise<AdminAllocation[]> =>
 
 export interface CreateAllocationData {
     ip: string;
-    port: number;
+    ports: string[];
     alias?: string;
 }
 

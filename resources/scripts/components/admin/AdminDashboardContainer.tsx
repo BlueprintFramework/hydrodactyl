@@ -1,6 +1,4 @@
-import { Add01Icon, Refresh01Icon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
@@ -8,20 +6,15 @@ import { getAdminCounts, getPanelStatus, type PanelStatus } from '@/api/admin';
 import { getMetricsHistory, type MetricsSample } from '@/api/admin/metrics';
 import { type AdminServer, getServers } from '@/api/admin/servers';
 import {
-    AdminBottomNav,
     ChartCard,
     type DashboardData,
     DashboardDataContext,
     DashboardGrid,
     type DashboardWidget,
-    EditModeToggle,
     getWidgetType,
-    useDashboardLayout,
-    WidgetSelectorModal,
 } from '@/components/admin/dashboard';
 import { AdminErrorState } from '@/components/admin/shared/AdminErrorState';
 import { SkeletonCards } from '@/components/admin/shared/AdminSkeleton';
-import { Button } from '@/components/ui/button';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 
@@ -114,22 +107,14 @@ function buildDefaultWidgets(): DashboardWidget[] {
 
 /* ──────────────────────── widget renderer ──────────────────────── */
 
-function WidgetRenderer({
-    widget,
-    isEditing,
-    onRemove,
-}: {
-    widget: DashboardWidget;
-    isEditing: boolean;
-    onRemove: (id: string) => void;
-}) {
+function WidgetRenderer({ widget }: { widget: DashboardWidget }) {
     const widgetType = getWidgetType(widget.typeId);
     if (!widgetType) return null;
 
     const WidgetComponent = widgetType.component;
 
     return (
-        <ChartCard widget={widget} title={widgetType.title} isEditing={isEditing} onRemove={onRemove}>
+        <ChartCard title={widgetType.title}>
             <WidgetComponent />
         </ChartCard>
     );
@@ -159,19 +144,6 @@ const AdminDashboardContainer = () => {
     });
 
     const defaultWidgets = useMemo(() => buildDefaultWidgets(), []);
-
-    const {
-        widgets,
-        isEditing,
-        toggleEditing,
-        addWidget,
-        removeWidget,
-        onLayoutChange,
-        handleStopDragging,
-        resetLayout,
-    } = useDashboardLayout(defaultWidgets);
-
-    const [selectorOpen, setSelectorOpen] = useState(false);
 
     /* ── computed data ── */
     const serverCount = counts?.servers ?? 0;
@@ -240,46 +212,12 @@ const AdminDashboardContainer = () => {
         <DashboardDataContext.Provider value={dashboardData}>
             <div className='space-y-4 sm:space-y-6 pb-20 lg:pb-10'>
                 {/* ── page header ── */}
-                <div className='flex flex-col gap-2 sm:gap-1 sm:flex-row sm:items-end sm:justify-between'>
-                    <div>
-                        <h1 className='text-3xl sm:text-[42px] font-extrabold leading-[98%] tracking-[-0.05rem] sm:tracking-[-0.1rem] text-cream-400'>
-                            Overview
-                        </h1>
-                        <p className='text-xs sm:text-sm text-mocha-100/60'>Panel health, resources, and quick access</p>
-                    </div>
-
-                    <div className='flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-0'>
-                        {isEditing && (
-                            <>
-                                <Button
-                                    variant='secondary'
-                                    size='sm'
-                                    onClick={() => setSelectorOpen(true)}
-                                    className='gap-1.5 text-xs'
-                                >
-                                    <HugeiconsIcon icon={Add01Icon} size={14} />
-                                    <span className='hidden sm:inline'>Add Widget</span>
-                                </Button>
-                                <Button variant='ghost' size='sm' onClick={resetLayout} className='gap-1.5 text-xs'>
-                                    <HugeiconsIcon icon={Refresh01Icon} size={14} />
-                                    <span className='hidden sm:inline'>Reset</span>
-                                </Button>
-                            </>
-                        )}
-                        <EditModeToggle isEditing={isEditing} onToggle={toggleEditing} />
-                    </div>
+                <div>
+                    <h1 className='text-3xl sm:text-[42px] font-extrabold leading-[98%] tracking-[-0.05rem] sm:tracking-[-0.1rem] text-cream-400'>
+                        Overview
+                    </h1>
+                    <p className='text-xs sm:text-sm text-mocha-100/60'>Panel health, resources, and quick access</p>
                 </div>
-
-                {/* ── edit mode banner ── */}
-                {isEditing && (
-                    <div className='rounded-xl border border-brand/30 bg-brand/5 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-3'>
-                        <div className='h-2 w-2 rounded-full bg-brand animate-pulse shrink-0' />
-                        <p className='text-[11px] sm:text-xs text-brand font-medium'>
-                            <span className='hidden sm:inline'>Dashboard edit mode — drag widgets to reposition, resize from corners, or add new widgets.</span>
-                            <span className='sm:hidden'>Edit mode — add or remove widgets.</span>
-                        </p>
-                    </div>
-                )}
 
                 {/* ── loading / error states for initial data ── */}
                 {countsError ? (
@@ -293,21 +231,16 @@ const AdminDashboardContainer = () => {
                 ) : null}
 
                 {/* ── dashboard grid ── */}
-                <DashboardGrid
-                    widgets={widgets}
-                    isEditing={isEditing}
-                    onLayoutChange={onLayoutChange}
-                    onStopDragging={handleStopDragging}
-                >
-                    {(widget) => <WidgetRenderer widget={widget} isEditing={isEditing} onRemove={removeWidget} />}
-                </DashboardGrid>
+                <DashboardGrid widgets={defaultWidgets}>{(widget) => <WidgetRenderer widget={widget} />}</DashboardGrid>
 
                 {/* ── recent servers ── */}
                 <div>
                     <div className='flex items-end justify-between mb-3 sm:mb-5'>
                         <div>
                             <h2 className='text-sm sm:text-base font-bold text-cream-400'>Recent Servers</h2>
-                            <p className='text-[10px] sm:text-xs text-mocha-100/60 mt-0.5 sm:mt-1'>Latest deployments</p>
+                            <p className='text-[10px] sm:text-xs text-mocha-100/60 mt-0.5 sm:mt-1'>
+                                Latest deployments
+                            </p>
                         </div>
                         <Link
                             to='/admin/servers'
@@ -326,7 +259,10 @@ const AdminDashboardContainer = () => {
                         ) : !serversPage && serversLoading ? (
                             <div className='divide-y divide-mocha-400'>
                                 {Array.from({ length: 5 }).map((_, i) => (
-                                    <div key={i} className='flex items-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 animate-pulse'>
+                                    <div
+                                        key={i}
+                                        className='flex items-center gap-3 sm:gap-4 px-3 sm:px-5 py-3 sm:py-4 animate-pulse'
+                                    >
                                         <div className='h-3 w-24 sm:w-32 rounded bg-mocha-400/30' />
                                         <div className='h-3 w-16 sm:w-20 rounded bg-mocha-400/20' />
                                         <div className='ml-auto h-5 w-14 sm:w-16 rounded bg-mocha-400/20' />
@@ -351,7 +287,9 @@ const AdminDashboardContainer = () => {
                                             className='flex items-center justify-between px-3 py-3 hover:bg-mocha-400/20 transition-colors duration-150'
                                         >
                                             <div className='min-w-0 flex-1'>
-                                                <p className='text-sm font-medium text-cream-400 truncate'>{server.name}</p>
+                                                <p className='text-sm font-medium text-cream-400 truncate'>
+                                                    {server.name}
+                                                </p>
                                                 <p className='text-[10px] text-mocha-100/50 font-mono mt-0.5'>
                                                     {server.userName ?? `UID ${server.user}`}
                                                 </p>
@@ -423,12 +361,6 @@ const AdminDashboardContainer = () => {
                     </div>
                 </div>
             </div>
-
-            {/* ── widget selector modal ── */}
-            <WidgetSelectorModal open={selectorOpen} onClose={() => setSelectorOpen(false)} onAddWidget={addWidget} />
-
-            {/* ── mobile bottom nav ── */}
-            <AdminBottomNav />
         </DashboardDataContext.Provider>
     );
 };

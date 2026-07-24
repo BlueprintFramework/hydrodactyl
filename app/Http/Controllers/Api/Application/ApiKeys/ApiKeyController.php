@@ -46,7 +46,9 @@ class ApiKeyController extends ApplicationApiController
     {
         $key = $this->creationService
             ->setKeyType(ApiKey::TYPE_APPLICATION)
-            ->handle($request->validated(), $request->permissions() ?? []);
+            ->handle(array_merge($request->validated(), [
+                'user_id' => $request->user()->id,
+            ]), $request->permissions() ?? []);
 
         return $this->fractal->item($key)
             ->transformWith($this->getTransformer(ApiKeyTransformer::class))

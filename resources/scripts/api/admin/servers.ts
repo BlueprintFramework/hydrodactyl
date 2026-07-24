@@ -229,26 +229,32 @@ export const deleteServerDatabase = (id: number, databaseId: number): Promise<vo
 
 export interface CreateServerData {
     name: string;
+    description?: string;
     user: number;
     egg: number;
     docker_image?: string;
-    startup_command?: string;
+    startup?: string;
     environment?: Record<string, string>;
     allocation_id?: number;
     allocation_ids?: number[];
-    memory?: number;
-    swap?: number;
-    disk?: number;
-    io?: number;
-    cpu?: number;
-    threads?: string | null;
+    limits?: {
+        memory?: number;
+        overhead_memory?: number;
+        swap?: number;
+        disk?: number;
+        io?: number;
+        cpu?: number;
+        threads?: string | null;
+    };
     feature_limits?: {
         databases?: number;
         allocations?: number;
         backups?: number;
+        backup_storage_mb?: number;
     };
     skip_scripts?: boolean;
     start_on_completion?: boolean;
+    oom_disabled?: boolean;
 }
 
 export const createServer = (data: CreateServerData): Promise<AdminServer> =>

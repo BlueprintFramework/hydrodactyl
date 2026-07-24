@@ -1,15 +1,15 @@
 import {
-    Activity02Icon,
-    Archive01Icon,
-    BarChartIcon,
-    ChartLineData01Icon,
-    Clock01Icon,
-    CubeIcon,
-    GlobalIcon,
-    ServerStack02Icon,
-    UserMultiple02Icon,
-} from '@hugeicons/core-free-icons';
-import type { IconSvgElement } from '@hugeicons/react';
+    Archive,
+    ChartBar,
+    ChartLine,
+    Clock,
+    Cube,
+    Globe,
+    Pulse,
+    Server,
+    Persons,
+} from '@gravity-ui/icons';
+import type { ComponentType, SVGProps } from 'react';
 import { createContext, useContext } from 'react';
 
 /* ────────────────────── dashboard data context ────────────────────── */
@@ -348,7 +348,7 @@ function UptimeWidgetWrapper() {
 export interface DashboardWidgetType {
     id: string;
     title: string;
-    icon: IconSvgElement;
+    icon: ComponentType<SVGProps<SVGSVGElement>>;
     description: string;
     component: React.ComponentType;
     defaultW: number;
@@ -361,7 +361,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'resource-health',
         title: 'Resource Health',
-        icon: Activity02Icon,
+        icon: Pulse,
         description: 'CPU, memory, and disk usage gauges',
         component: ResourceHealthWidget,
         defaultW: 6,
@@ -372,7 +372,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'system-info',
         title: 'System Info',
-        icon: CubeIcon,
+        icon: Cube,
         description: 'Host details and load averages',
         component: SystemInfoWidget,
         defaultW: 4,
@@ -383,7 +383,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'metrics-timeline',
         title: 'Metrics Timeline',
-        icon: ChartLineData01Icon,
+        icon: ChartLine,
         description: 'CPU usage over time',
         component: MetricsTimelineWidget,
         defaultW: 8,
@@ -394,7 +394,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'entity-distribution',
         title: 'Entity Distribution',
-        icon: BarChartIcon,
+        icon: ChartBar,
         description: 'Resource counts across the panel',
         component: EntityDistributionWidget,
         defaultW: 4,
@@ -405,7 +405,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'stat-servers',
         title: 'Servers',
-        icon: ServerStack02Icon,
+        icon: Server,
         description: 'Active server count',
         component: StatServersWidget,
         defaultW: 2,
@@ -416,7 +416,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'stat-nodes',
         title: 'Nodes',
-        icon: Activity02Icon,
+        icon: Pulse,
         description: 'Active infrastructure nodes',
         component: StatNodesWidget,
         defaultW: 2,
@@ -427,7 +427,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'stat-users',
         title: 'Users',
-        icon: UserMultiple02Icon,
+        icon: Persons,
         description: 'Registered panel accounts',
         component: StatUsersWidget,
         defaultW: 2,
@@ -438,7 +438,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'stat-locations',
         title: 'Locations',
-        icon: GlobalIcon,
+        icon: Globe,
         description: 'Deployment regions',
         component: StatLocationsWidget,
         defaultW: 2,
@@ -449,7 +449,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'stat-nests',
         title: 'Nests',
-        icon: CubeIcon,
+        icon: Cube,
         description: 'Egg containers',
         component: StatNestsWidget,
         defaultW: 2,
@@ -460,7 +460,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'stat-buckets',
         title: 'S3 Buckets',
-        icon: Archive01Icon,
+        icon: Archive,
         description: 'Object storage buckets',
         component: StatBucketsWidget,
         defaultW: 2,
@@ -471,7 +471,7 @@ export const WIDGET_TYPES: DashboardWidgetType[] = [
     {
         id: 'uptime',
         title: 'Uptime',
-        icon: Clock01Icon,
+        icon: Clock,
         description: 'Panel host uptime counter',
         component: UptimeWidgetWrapper,
         defaultW: 3,

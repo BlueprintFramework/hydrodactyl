@@ -15,6 +15,7 @@ import { Route, Routes } from 'react-router-dom';
 import AdminDashboardContainer from '@/components/admin/AdminDashboardContainer';
 import AdminApiContainer from '@/components/admin/api/AdminApiContainer';
 import AdminBucketsContainer from '@/components/admin/buckets/AdminBucketsContainer';
+import { AdminBottomNav } from '@/components/admin/dashboard';
 import AdminDatabasesContainer from '@/components/admin/databases/AdminDatabasesContainer';
 import AdminLocationsContainer from '@/components/admin/locations/AdminLocationsContainer';
 import AdminMountsContainer from '@/components/admin/mounts/AdminMountsContainer';
@@ -160,6 +161,8 @@ const AdminRouter = () => {
                             </Suspense>
                         </PageContentBlock>
                     </div>
+
+                    <AdminBottomNav />
                 </div>
             </HeaderProvider>
         </SidebarProvider>

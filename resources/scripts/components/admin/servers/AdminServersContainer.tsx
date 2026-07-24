@@ -1,6 +1,6 @@
 import { Delete02Icon, Edit02Icon, PauseIcon, PlayIcon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import useSWR from 'swr';
@@ -72,7 +72,13 @@ const CreateServerModal = ({
     const [databases, setDatabases] = useState<number | string>('');
     const [allocations, setAllocations] = useState<number | string>('');
     const [backups, setBackups] = useState<number | string>('');
+    const [description, setDescription] = useState('');
+    const [overheadMemory, setOverheadMemory] = useState<number | string>('');
+    const [backupStorageMb, setBackupStorageMb] = useState<number | string>('');
+    const [oomDisabled, setOomDisabled] = useState(false);
+    const [skipScripts, setSkipScripts] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     const resetForm = () => {
         setNestId(0);
@@ -92,6 +98,12 @@ const CreateServerModal = ({
         setDatabases('');
         setAllocations('');
         setBackups('');
+        setDescription('');
+        setOverheadMemory('');
+        setBackupStorageMb('');
+        setOomDisabled(false);
+        setSkipScripts(false);
+        setShowAdvanced(false);
     };
 
     const handleSubmit = async () => {
@@ -107,6 +119,7 @@ const CreateServerModal = ({
             // biome-ignore lint/suspicious/noExplicitAny: Server data shape differs from CreateServerData interface
             const serverData: any = {
                 name,
+                description: description || undefined,
                 user: userId,
                 egg: eggId,
                 docker_image: dockerImage || undefined,
@@ -114,6 +127,7 @@ const CreateServerModal = ({
                 environment: Object.keys(environment).length > 0 ? environment : undefined,
                 limits: {
                     memory: toNum(memory),
+                    overhead_memory: toNum(overheadMemory) ?? 0,
                     swap: toNum(swap),
                     disk: toNum(disk),
                     io: toNum(io),
@@ -123,7 +137,10 @@ const CreateServerModal = ({
                     databases: toNum(databases) ?? 0,
                     allocations: toNum(allocations) ?? 0,
                     backups: toNum(backups) ?? 0,
+                    backup_storage_mb: toNum(backupStorageMb) ?? 0,
                 },
+                oom_disabled: oomDisabled,
+                skip_scripts: skipScripts,
                 ...(allocationId ? { allocation: { default: allocationId } } : {}),
             };
 
@@ -291,6 +308,20 @@ const CreateServerModal = ({
                                     </p>
                                 )}
                             </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor='create-description' className={labelClass}>
+                                Description
+                            </label>
+                            <input
+                                id='create-description'
+                                type='text'
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className={inputClass}
+                                placeholder='Optional server description'
+                            />
                         </div>
 
                         {domainsData?.domains?.length && (
@@ -489,6 +520,67 @@ const CreateServerModal = ({
                                     placeholder='0'
                                 />
                             </div>
+                        </div>
+
+                        <div>
+                            <button
+                                type='button'
+                                onClick={() => setShowAdvanced(!showAdvanced)}
+                                className='flex items-center gap-2 text-sm text-mocha-200 hover:text-cream-400 transition-colors'
+                            >
+                                <span className={`transform transition-transform ${showAdvanced ? 'rotate-90' : ''}`}>
+                                    ▶
+                                </span>
+                                Advanced Options
+                            </button>
+                            {showAdvanced && (
+                                <div className='mt-3 space-y-4 pl-4 border-l-2 border-mocha-400/30'>
+                                    <div className='grid grid-cols-2 gap-4'>
+                                        <div>
+                                            <label htmlFor='create-overhead-memory' className={labelClass}>
+                                                Overhead Memory (MB)
+                                            </label>
+                                            <input
+                                                id='create-overhead-memory'
+                                                type='number'
+                                                value={overheadMemory}
+                                                onChange={(e) => setOverheadMemory(e.target.value)}
+                                                className={inputClass}
+                                                placeholder='0'
+                                            />
+                                        </div>
+                                        <div>
+                                            <label htmlFor='create-backup-storage' className={labelClass}>
+                                                Backup Storage (MB)
+                                            </label>
+                                            <input
+                                                id='create-backup-storage'
+                                                type='number'
+                                                value={backupStorageMb}
+                                                onChange={(e) => setBackupStorageMb(e.target.value)}
+                                                className={inputClass}
+                                                placeholder='0'
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className='flex items-center gap-4'>
+                                        <label className='flex items-center gap-2 text-sm text-mocha-200'>
+                                            <Checkbox
+                                                checked={oomDisabled}
+                                                onChange={(e) => setOomDisabled(e.target.checked)}
+                                            />
+                                            Disable OOM Killer
+                                        </label>
+                                        <label className='flex items-center gap-2 text-sm text-mocha-200'>
+                                            <Checkbox
+                                                checked={skipScripts}
+                                                onChange={(e) => setSkipScripts(e.target.checked)}
+                                            />
+                                            Skip Startup Scripts
+                                        </label>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </>
                 )}
@@ -1374,6 +1466,24 @@ const AdminServersContainer = () => {
     const [showCreate, setShowCreate] = useState(location.pathname.endsWith('/new'));
     const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
     const { data, error, mutate } = useSWR(['admin:servers', page], () => getServers({ page }));
+    const { data: usersData } = useSWR('admin:users:all', () => getUsers({ page: 1 }));
+    const { data: nodesData } = useSWR('admin:nodes:all', () => getNodes({ page: 1 }));
+
+    const userMap = useMemo(() => {
+        const map = new Map<number, string>();
+        for (const u of usersData?.items ?? []) {
+            map.set(u.id, u.username);
+        }
+        return map;
+    }, [usersData]);
+
+    const nodeMap = useMemo(() => {
+        const map = new Map<number, string>();
+        for (const n of nodesData?.items ?? []) {
+            map.set(n.id, n.name);
+        }
+        return map;
+    }, [nodesData]);
 
     const handleSuspend = async (id: number) => {
         try {
@@ -1471,10 +1581,10 @@ const AdminServersContainer = () => {
                                                     )}
                                                 </td>
                                                 <td className='px-4 py-3 text-mocha-100 hidden sm:table-cell'>
-                                                    #{server.user}
+                                                    {userMap.get(server.user) ?? `#${server.user}`}
                                                 </td>
                                                 <td className='px-4 py-3 text-mocha-100 hidden md:table-cell'>
-                                                    #{server.node}
+                                                    {nodeMap.get(server.node) ?? `#${server.node}`}
                                                 </td>
                                                 <td className='px-4 py-3 text-mocha-100 hidden lg:table-cell'>
                                                     #{server.egg}

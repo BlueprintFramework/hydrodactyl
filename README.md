@@ -45,11 +45,38 @@ See the [Installation Guide](https://hydrodactyl.dev/docs/hydrodactyl/installati
 
 ![Dashboard Image](./.github/dashboard.jpeg)
 
+## Development
+
+Prerequisites are managed via [mise](https://mise.jdx.dev/) (formerly rtx). Install it, then run:
+
+```bash
+mise install        # install php, node, pnpm
+just install        # composer install + pnpm install
+just dev            # start vite dev server
+```
+
+Other useful recipes:
+
+| Command | Description |
+|---------|-------------|
+| `just build` | Production build |
+| `just lint` | Biome lint (auto-fix) |
+| `just check` | Biome check |
+| `just test` | PHPUnit tests |
+| `just analyse` | PHPStan static analysis |
+| `just cs-fix` | PHP CS Fixer |
+| `just up` | Docker Compose up |
+| `just artisan <cmd>` | Run artisan command |
+
+Run `just` to list all available recipes.
+
 ## License
 
 Hydrodactyl is open-source software licensed under the **Apache License 2.0**.
 
 You are free to use, modify, and redistribute Hydrodactyl under the terms of the license. A copy of the full license text is available in the [LICENSE](./LICENSE) file included in this repository.
+
+The original Pterodactyl panel is also available under the **MIT License** — see [LICENSE_MIT.md](./LICENSE_MIT.md).
 
 ### Copyright & Attribution
 

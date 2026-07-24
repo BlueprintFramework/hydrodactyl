@@ -1,6 +1,6 @@
 import { Delete02Icon, Edit02Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import useSWR from 'swr';
@@ -42,6 +42,7 @@ const CreateNodeModal = ({
 
     const [name, setName] = useState('');
     const [fqdn, setFqdn] = useState('');
+    const [internalFqdn, setInternalFqdn] = useState('');
     const [description, setDescription] = useState('');
     const [locationId, setLocationId] = useState<number>(0);
     const [scheme, setScheme] = useState('https');
@@ -59,6 +60,7 @@ const CreateNodeModal = ({
     const resetForm = () => {
         setName('');
         setFqdn('');
+        setInternalFqdn('');
         setDescription('');
         setLocationId(0);
         setScheme('https');
@@ -80,6 +82,7 @@ const CreateNodeModal = ({
             await createNode({
                 name,
                 fqdn,
+                internal_fqdn: internalFqdn || undefined,
                 description,
                 location_id: locationId,
                 scheme,
@@ -131,6 +134,22 @@ const CreateNodeModal = ({
                         className={inputClass}
                         placeholder='node.example.com'
                     />
+                </div>
+                <div>
+                    <label htmlFor='create-internal-fqdn' className={labelClass}>
+                        Internal FQDN
+                    </label>
+                    <input
+                        id='create-internal-fqdn'
+                        type='text'
+                        value={internalFqdn}
+                        onChange={(e) => setInternalFqdn(e.target.value)}
+                        className={inputClass}
+                        placeholder='internal.node.example.com'
+                    />
+                    <p className='text-mocha-200 text-xs mt-1.5'>
+                        Optional. Used for panel-to-Wings communication if different from the public FQDN.
+                    </p>
                 </div>
                 <div>
                     <label htmlFor='create-description' className={labelClass}>
@@ -381,11 +400,13 @@ const OverviewTab = ({
     onUpdate: () => Promise<unknown>;
     locations: { id: number; short: string; long: string }[];
 }) => {
+    const locationName = locations.find((l) => l.id === node.locationId)?.short;
     const [editing, setEditing] = useState(false);
     const [formInit, setFormInit] = useState(false);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [fqdn, setFqdn] = useState('');
+    const [internalFqdn, setInternalFqdn] = useState('');
     const [scheme, setScheme] = useState('https');
     const [memory, setMemory] = useState(0);
     const [disk, setDisk] = useState(0);
@@ -401,6 +422,7 @@ const OverviewTab = ({
         setName(node.name);
         setDescription(node.description);
         setFqdn(node.fqdn);
+        setInternalFqdn(node.internalFqdn || '');
         setScheme(node.scheme);
         setMemory(node.memory);
         setDisk(node.disk);
@@ -424,6 +446,7 @@ const OverviewTab = ({
                 name,
                 description,
                 fqdn,
+                internal_fqdn: internalFqdn || undefined,
                 scheme,
                 memory,
                 disk,
@@ -524,19 +547,33 @@ const OverviewTab = ({
                                 />
                             </div>
                             <div>
-                                <label htmlFor='edit-scheme' className={labelClass}>
-                                    Connection Scheme
+                                <label htmlFor='edit-internal-fqdn' className={labelClass}>
+                                    Internal FQDN
                                 </label>
-                                <select
-                                    id='edit-scheme'
-                                    value={scheme}
-                                    onChange={(e) => setScheme(e.target.value)}
+                                <input
+                                    id='edit-internal-fqdn'
+                                    type='text'
+                                    value={internalFqdn}
+                                    onChange={(e) => setInternalFqdn(e.target.value)}
                                     className={inputClass}
-                                >
-                                    <option value='https'>HTTPS (Recommended)</option>
-                                    <option value='http'>HTTP</option>
-                                </select>
+                                    placeholder='internal.node.example.com'
+                                />
                             </div>
+                        </div>
+
+                        <div>
+                            <label htmlFor='edit-scheme' className={labelClass}>
+                                Connection Scheme
+                            </label>
+                            <select
+                                id='edit-scheme'
+                                value={scheme}
+                                onChange={(e) => setScheme(e.target.value)}
+                                className={inputClass}
+                            >
+                                <option value='https'>HTTPS (Recommended)</option>
+                                <option value='http'>HTTP</option>
+                            </select>
                         </div>
 
                         <div className='flex items-center gap-6 pt-2'>
@@ -584,7 +621,9 @@ const OverviewTab = ({
                             </div>
                             <div className='bg-mocha-600/50 rounded-lg p-4'>
                                 <span className='text-mocha-200 text-xs uppercase tracking-wider'>Location</span>
-                                <p className='text-cream-400 font-medium mt-1'>Location #{node.locationId}</p>
+                                <p className='text-cream-400 font-medium mt-1'>
+                                    {locationName ?? `#${node.locationId}`}
+                                </p>
                             </div>
                             <div className='bg-mocha-600/50 rounded-lg p-4'>
                                 <span className='text-mocha-200 text-xs uppercase tracking-wider'>Public FQDN</span>
@@ -594,6 +633,14 @@ const OverviewTab = ({
                                     </code>
                                 </p>
                             </div>
+                            {node.internalFqdn && (
+                                <div className='bg-mocha-600/50 rounded-lg p-4'>
+                                    <span className='text-mocha-200 text-xs uppercase tracking-wider'>Internal FQDN</span>
+                                    <p className='text-cream-400 font-medium mt-1'>
+                                        <code className='text-sm'>{node.internalFqdn}</code>
+                                    </p>
+                                </div>
+                            )}
                             <div className='bg-mocha-600/50 rounded-lg p-4'>
                                 <span className='text-mocha-200 text-xs uppercase tracking-wider'>Status</span>
                                 <p className='mt-1'>
@@ -670,16 +717,14 @@ const AllocationsTab = ({
     const [port, setPort] = useState<number>(25565);
     const [alias, setAlias] = useState('');
     const [adding, setAdding] = useState(false);
-    const [addError, setAddError] = useState('');
     const [confirmDeleteAlloc, setConfirmDeleteAlloc] = useState<number | null>(null);
 
     const handleAdd = async () => {
-        setAddError('');
         setAdding(true);
         try {
             await createAllocation(nodeId, {
                 ip,
-                port,
+                ports: [String(port)],
                 ...(alias ? { alias } : {}),
             });
             setIp('');
@@ -687,7 +732,7 @@ const AllocationsTab = ({
             setAlias('');
             await onRefresh();
         } catch (e: unknown) {
-            setAddError(httpErrorToHuman(e));
+            toast.error(httpErrorToHuman(e));
         } finally {
             setAdding(false);
         }
@@ -701,7 +746,7 @@ const AllocationsTab = ({
             await deleteAllocation(nodeId, allocId);
             await onRefresh();
         } catch (e: unknown) {
-            alert(httpErrorToHuman(e));
+            toast.error(httpErrorToHuman(e));
         }
     };
 
@@ -711,7 +756,6 @@ const AllocationsTab = ({
 
             <div className='bg-mocha-500 border border-mocha-400 rounded-lg p-6'>
                 <h3 className='text-cream-400 font-medium mb-4'>Add Allocation</h3>
-                {addError && <div className='text-red-400 text-sm mb-3'>Error: {addError}</div>}
                 <div className='grid grid-cols-3 gap-3 mb-3'>
                     <div>
                         <label htmlFor='alloc-ip' className={labelClass}>
@@ -842,6 +886,7 @@ const SettingsTab = ({
     const [formInit, setFormInit] = useState(false);
     const [name, setName] = useState('');
     const [fqdn, setFqdn] = useState('');
+    const [internalFqdn, setInternalFqdn] = useState('');
     const [locationId, setLocationId] = useState(node.locationId);
     const [memory, setMemory] = useState(0);
     const [disk, setDisk] = useState(0);
@@ -858,6 +903,7 @@ const SettingsTab = ({
     if (!formInit) {
         setName(node.name);
         setFqdn(node.fqdn);
+        setInternalFqdn(node.internalFqdn || '');
         setLocationId(node.locationId);
         setMemory(node.memory);
         setDisk(node.disk);
@@ -876,6 +922,7 @@ const SettingsTab = ({
             await updateNode(node.id, {
                 name,
                 fqdn,
+                internal_fqdn: internalFqdn || undefined,
                 memory,
                 disk,
                 memory_overallocate: memoryOverallocate,
@@ -983,6 +1030,23 @@ const SettingsTab = ({
                         />
                         <p className='text-mocha-200 text-xs mt-1.5'>
                             The domain name that will be used to connect to this node
+                        </p>
+                    </div>
+
+                    <div>
+                        <label htmlFor='settings-internal-fqdn' className={labelClass}>
+                            Internal FQDN
+                        </label>
+                        <input
+                            id='settings-internal-fqdn'
+                            type='text'
+                            value={internalFqdn}
+                            onChange={(e) => setInternalFqdn(e.target.value)}
+                            className={inputClass}
+                            placeholder='internal.node.example.com'
+                        />
+                        <p className='text-mocha-200 text-xs mt-1.5'>
+                            Optional. Used for panel-to-Wings communication if different from the public FQDN.
                         </p>
                     </div>
                 </div>
@@ -1219,6 +1283,15 @@ const AdminNodesContainer = () => {
     const [showCreate, setShowCreate] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
     const { data, error, mutate } = useSWR(['admin:nodes', page], () => getNodes({ page }));
+    const { data: locationsData } = useSWR('admin:locations:all', () => getLocations({ page: 1 }));
+
+    const locationMap = useMemo(() => {
+        const map = new Map<number, string>();
+        for (const loc of locationsData?.items ?? []) {
+            map.set(loc.id, loc.short);
+        }
+        return map;
+    }, [locationsData]);
 
     const handleDelete = async () => {
         if (confirmDelete === null) return;
@@ -1228,7 +1301,7 @@ const AdminNodesContainer = () => {
             await deleteNode(id);
             mutate();
         } catch (e: unknown) {
-            alert(httpErrorToHuman(e));
+            toast.error(httpErrorToHuman(e));
         }
     };
 
@@ -1305,7 +1378,7 @@ const AdminNodesContainer = () => {
                                                                 </code>
                                                             </td>
                                                             <td className='px-4 py-3 text-mocha-100'>
-                                                                #{node.locationId}
+                                                                {locationMap.get(node.locationId) ?? `#${node.locationId}`}
                                                             </td>
                                                             <td className='px-4 py-3 text-mocha-100'>
                                                                 {node.memory} MB

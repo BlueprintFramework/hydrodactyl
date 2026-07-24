@@ -1,5 +1,4 @@
-import type { IconSvgElement } from '@hugeicons/react';
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode, SVGProps } from 'react';
 
 export type WidgetSize = 'sm' | 'md' | 'lg' | 'xl';
 
@@ -13,7 +12,7 @@ export interface WidgetSizeConfig {
 export interface WidgetType {
     id: string;
     title: string;
-    icon: IconSvgElement;
+    icon: ComponentType<SVGProps<SVGSVGElement>>;
     description: string;
     defaultSize: WidgetSize;
     sizes: Record<WidgetSize, WidgetSizeConfig>;
