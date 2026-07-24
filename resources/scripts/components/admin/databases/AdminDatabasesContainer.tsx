@@ -1,3 +1,5 @@
+import { Delete02Icon, Edit02Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { useState } from 'react';
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -618,19 +620,22 @@ const AdminDatabasesContainer = () => {
                                                                 {dbHost.node !== null ? `#${dbHost.node}` : '—'}
                                                             </td>
                                                             <td className='px-5 py-4 text-right'>
-                                                                <div className='flex items-center justify-end gap-3'>
+                                                                <div className='flex items-center justify-end gap-2'>
                                                                     <Link
                                                                         to={String(dbHost.id)}
-                                                                        className='text-xs font-semibold text-cream-400 hover:text-cream-200 transition-colors'
+                                                                        className='inline-flex items-center justify-center h-8 w-8 rounded-lg text-mocha-100 hover:text-cream-400 hover:bg-mocha-400/40 transition-colors'
+                                                                        title='View'
                                                                     >
-                                                                        View
+                                                                        <HugeiconsIcon icon={Edit02Icon} size={16} />
                                                                     </Link>
                                                                     <Button
                                                                         variant='attention'
                                                                         size='sm'
                                                                         onClick={() => setConfirmDelete(dbHost)}
+                                                                        title='Delete'
+                                                                        className='h-8 w-8 p-0 flex items-center justify-center'
                                                                     >
-                                                                        Delete
+                                                                        <HugeiconsIcon icon={Delete02Icon} size={16} />
                                                                     </Button>
                                                                 </div>
                                                             </td>

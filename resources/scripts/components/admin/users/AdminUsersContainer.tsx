@@ -1,4 +1,10 @@
-import { InformationCircleIcon, ServerStack02Icon, Settings02Icon } from '@hugeicons/core-free-icons';
+import {
+    Delete02Icon,
+    Edit02Icon,
+    InformationCircleIcon,
+    ServerStack02Icon,
+    Settings02Icon,
+} from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useEffect, useState } from 'react';
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
@@ -104,15 +110,19 @@ const AdminUserList = () => {
                                                     <div className='flex items-center justify-end gap-2'>
                                                         <Link
                                                             to={`view/${user.id}`}
-                                                            className='text-xs text-cream-400 hover:text-cream-500'
+                                                            className='inline-flex items-center justify-center h-8 w-8 rounded-lg text-mocha-100 hover:text-cream-400 hover:bg-mocha-400/40 transition-colors'
+                                                            title='View'
                                                         >
-                                                            View
+                                                            <HugeiconsIcon icon={Edit02Icon} size={16} />
                                                         </Link>
                                                         <Button
                                                             variant='attention'
+                                                            size='sm'
                                                             onClick={() => setConfirmDelete(user.id)}
+                                                            title='Delete'
+                                                            className='h-8 w-8 p-0 flex items-center justify-center'
                                                         >
-                                                            Delete
+                                                            <HugeiconsIcon icon={Delete02Icon} size={16} />
                                                         </Button>
                                                     </div>
                                                 </td>

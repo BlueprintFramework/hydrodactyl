@@ -1,4 +1,4 @@
-import { DangerIcon, InformationCircleIcon, Location01Icon } from '@hugeicons/core-free-icons';
+import { DangerIcon, Delete02Icon, InformationCircleIcon, Location01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useState } from 'react';
 import { Link, Route, Routes, useNavigate, useParams } from 'react-router-dom';
@@ -374,9 +374,12 @@ const AdminLocationsContainer = () => {
                                                                 <div className='flex items-center justify-end gap-2'>
                                                                     <Button
                                                                         variant='attention'
+                                                                        size='sm'
                                                                         onClick={() => setConfirmDelete(location.id)}
+                                                                        title='Delete'
+                                                                        className='h-8 w-8 p-0 flex items-center justify-center'
                                                                     >
-                                                                        Delete
+                                                                        <HugeiconsIcon icon={Delete02Icon} size={16} />
                                                                     </Button>
                                                                 </div>
                                                             </td>

@@ -18,6 +18,7 @@ use Pterodactyl\Http\Controllers\Base;
 Route::group(['prefix' => '/panel'], function () {
     Route::get('/status', [Base\SystemStatusController::class, 'index']);
     Route::get('/counts', [Base\SystemStatusController::class, 'counts']);
+    Route::get('/metrics/history', [Base\SystemStatusController::class, 'metricsHistory']);
 });
 
 

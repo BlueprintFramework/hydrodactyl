@@ -13,7 +13,13 @@ import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 
 import { getAdminCounts, getPanelStatus, type PanelStatus } from '@/api/admin';
+import { getMetricsHistory, type MetricsSample } from '@/api/admin/metrics';
 import { type AdminServer, getServers } from '@/api/admin/servers';
+import { CountsBarChart } from '@/components/admin/charts/CountsBarChart';
+import { LoadBarChart } from '@/components/admin/charts/LoadBarChart';
+import { MetricsTimeline } from '@/components/admin/charts/MetricsTimeline';
+import { ResourceGauge } from '@/components/admin/charts/ResourceGauge';
+import { AdminErrorState } from '@/components/admin/shared/AdminErrorState';
 import { SkeletonCards } from '@/components/admin/shared/AdminSkeleton';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
@@ -108,88 +114,6 @@ function useCountUp(target: number, duration = 900): number {
     }, [target, duration]);
 
     return value;
-}
-
-/* ──────────────────────── svg gauge ──────────────────────── */
-
-function gaugeColor(pct: number): string {
-    if (pct >= 80) return '#f87171';
-    if (pct >= 60) return '#fbbf24';
-    return '#34d399';
-}
-
-function SvgGauge({ percent, label, sub }: { percent: number; label: string; sub: string }) {
-    const color = gaugeColor(percent);
-    const radius = 44;
-    const stroke = 8;
-    const startAngle = -225;
-    const endAngle = 45;
-    const totalAngle = endAngle - startAngle;
-    const circumference = 2 * Math.PI * radius;
-    const arcLength = (totalAngle / 360) * circumference;
-    const fillLength = (Math.max(percent, 0.5) / 100) * arcLength;
-
-    const toRad = (deg: number) => (deg * Math.PI) / 180;
-    const cx = 50;
-    const cy = 50;
-
-    const x1 = cx + radius * Math.cos(toRad(startAngle));
-    const y1 = cy + radius * Math.sin(toRad(startAngle));
-    const x2 = cx + radius * Math.cos(toRad(endAngle));
-    const y2 = cy + radius * Math.sin(toRad(endAngle));
-
-    const bgD = `M ${x1} ${y1} A ${radius} ${radius} 0 1 1 ${x2} ${y2}`;
-
-    return (
-        <div className='flex flex-col items-center gap-2'>
-            <div className='relative' style={{ width: 120, height: 100 }}>
-                <svg viewBox='0 0 100 85' className='w-full h-full' role='presentation'>
-                    <path d={bgD} fill='none' stroke='#3f3f46' strokeWidth={stroke} strokeLinecap='round' />
-                    <path
-                        d={bgD}
-                        fill='none'
-                        stroke={color}
-                        strokeWidth={stroke}
-                        strokeLinecap='round'
-                        strokeDasharray={`${fillLength} ${arcLength}`}
-                        className='transition-all duration-1000 ease-out'
-                    />
-                </svg>
-                <div className='absolute inset-0 flex items-center justify-center pb-2'>
-                    <span className='text-xl font-bold text-cream-400 tabular-nums leading-none'>
-                        {Math.round(percent)}%
-                    </span>
-                </div>
-            </div>
-            <div className='text-center'>
-                <p className='text-sm font-semibold text-cream-400'>{label}</p>
-                <p className='text-xs text-mocha-100/60'>{sub}</p>
-            </div>
-        </div>
-    );
-}
-
-/* ──────────────────────── load sparkline ──────────────────────── */
-
-function LoadSparkline({ loads }: { loads: number[] }) {
-    const max = Math.max(...loads, 1);
-    return (
-        <div className='flex items-end gap-1.5 h-12'>
-            {loads.map((v, i) => {
-                const pct = (v / max) * 100;
-                const color = v > 2 ? '#f87171' : v > 1 ? '#fbbf24' : '#34d399';
-                return (
-                    <div key={i} className='flex-1 flex flex-col items-center gap-1'>
-                        <div
-                            className='w-full rounded-sm transition-all duration-700'
-                            style={{ height: `${Math.max(pct, 8)}%`, backgroundColor: color }}
-                        />
-                        <span className='text-[9px] text-mocha-100/40'>{i + 1}m</span>
-                    </div>
-                );
-            })}
-        </div>
-    );
 }
 
 /* ──────────────────────── live uptime ticker ──────────────────────── */
@@ -304,9 +228,33 @@ function ServerStatusBadge({ server }: { server: AdminServer }) {
 /* ──────────────────────── main component ──────────────────────── */
 
 const AdminDashboardContainer = () => {
-    const { data: status } = useSWR<PanelStatus>('admin:status', getPanelStatus, { refreshInterval: 30000 });
-    const { data: counts } = useSWR('admin:counts', getAdminCounts, { refreshInterval: 60000 });
-    const { data: serversPage } = useSWR('admin:dashboard:servers', () => getServers({ page: 1 }));
+    const {
+        data: status,
+        error: statusError,
+        isLoading: statusLoading,
+        mutate: mutateStatus,
+    } = useSWR<PanelStatus>('admin:status', getPanelStatus, { refreshInterval: 30000 });
+
+    const {
+        data: counts,
+        error: countsError,
+        isLoading: countsLoading,
+        mutate: mutateCounts,
+    } = useSWR('admin:counts', getAdminCounts, { refreshInterval: 60000 });
+
+    const {
+        data: serversPage,
+        error: serversError,
+        isLoading: serversLoading,
+        mutate: mutateServers,
+    } = useSWR('admin:dashboard:servers', () => getServers({ page: 1 }));
+
+    const {
+        data: metricsHistory,
+        error: metricsError,
+        isLoading: metricsLoading,
+        mutate: mutateMetrics,
+    } = useSWR<MetricsSample[]>('admin:metrics:history', getMetricsHistory, { refreshInterval: 30000 });
 
     const serverCount = counts?.servers ?? 0;
     const nodeCount = counts?.nodes ?? 0;
@@ -427,7 +375,7 @@ const AdminDashboardContainer = () => {
         status && status.metrics.disk.total > 0 ? (status.metrics.disk.used / status.metrics.disk.total) * 100 : 0;
 
     return (
-        <div className='space-y-14 pb-10'>
+        <div className='space-y-16 pb-10'>
             {/* ── page header ── */}
             <div className='flex flex-col gap-1'>
                 <h1 className='text-[42px] font-extrabold leading-[98%] tracking-[-0.1rem] text-cream-400'>Overview</h1>
@@ -435,7 +383,13 @@ const AdminDashboardContainer = () => {
             </div>
 
             {/* ── stat cards ── */}
-            {!counts ? (
+            {countsError ? (
+                <AdminErrorState
+                    message='Failed to load entity counts.'
+                    onRetry={() => mutateCounts()}
+                    className='rounded-xl'
+                />
+            ) : !counts && countsLoading ? (
                 <SkeletonCards count={6} />
             ) : (
                 <div className='grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4'>
@@ -450,39 +404,51 @@ const AdminDashboardContainer = () => {
                 {/* gauges — 3/5 */}
                 <div className='lg:col-span-3 rounded-xl border border-mocha-400 bg-mocha-500 p-6'>
                     <SectionHeader title='Resource Health' sub='Real-time system metrics' />
-                    {!status ? (
+                    {statusError ? (
+                        <AdminErrorState
+                            message='Failed to load system metrics.'
+                            onRetry={() => mutateStatus()}
+                            className='rounded-xl'
+                        />
+                    ) : !status && statusLoading ? (
                         <div className='flex items-center justify-around py-6'>
                             <GaugeSkeleton />
                             <GaugeSkeleton />
                             <GaugeSkeleton />
                         </div>
-                    ) : (
+                    ) : status ? (
                         <div className='flex items-center justify-between py-8 px-4'>
-                            <SvgGauge
-                                percent={parseFloat(cpuPct.toFixed(1))}
+                            <ResourceGauge
+                                value={parseFloat(cpuPct.toFixed(1))}
                                 label='CPU'
-                                sub={`${cpuPct.toFixed(1)}%`}
+                                sublabel={`${cpuPct.toFixed(1)}%`}
                             />
                             <div className='h-28 w-px bg-gradient-to-b from-transparent via-mocha-400/60 to-transparent hidden sm:block' />
-                            <SvgGauge
-                                percent={parseFloat(memPct.toFixed(1))}
+                            <ResourceGauge
+                                value={parseFloat(memPct.toFixed(1))}
                                 label='Memory'
-                                sub={`${formatBytes(status.metrics.memory.used)} / ${formatBytes(status.metrics.memory.total)}`}
+                                sublabel={`${formatBytes(status.metrics.memory.used)} / ${formatBytes(status.metrics.memory.total)}`}
                             />
                             <div className='h-28 w-px bg-gradient-to-b from-transparent via-mocha-400/60 to-transparent hidden sm:block' />
-                            <SvgGauge
-                                percent={parseFloat(diskPct.toFixed(1))}
+                            <ResourceGauge
+                                value={parseFloat(diskPct.toFixed(1))}
                                 label='Disk'
-                                sub={`${formatBytes(status.metrics.disk.used)} / ${formatBytes(status.metrics.disk.total)}`}
+                                sublabel={`${formatBytes(status.metrics.disk.used)} / ${formatBytes(status.metrics.disk.total)}`}
                             />
                         </div>
-                    )}
+                    ) : null}
                 </div>
 
                 {/* system info — 2/5 */}
                 <div className='lg:col-span-2 rounded-xl border border-mocha-400 bg-mocha-500 p-6'>
                     <SectionHeader title='System Info' sub='Host details' />
-                    {!status ? (
+                    {statusError ? (
+                        <AdminErrorState
+                            message='Failed to load system info.'
+                            onRetry={() => mutateStatus()}
+                            className='rounded-xl'
+                        />
+                    ) : !status && statusLoading ? (
                         <div className='space-y-3 animate-pulse'>
                             {[80, 56, 64, 72].map((w, i) => (
                                 <div key={i} className='flex justify-between py-2 border-b border-mocha-400'>
@@ -491,7 +457,7 @@ const AdminDashboardContainer = () => {
                                 </div>
                             ))}
                         </div>
-                    ) : (
+                    ) : status ? (
                         <>
                             <div className='space-y-0'>
                                 <InfoRow label='Hostname' value={status.system.hostname} />
@@ -510,11 +476,51 @@ const AdminDashboardContainer = () => {
                                 <p className='text-xs font-semibold uppercase tracking-wider text-mocha-100/50 mb-3'>
                                     Load Average
                                 </p>
-                                <LoadSparkline loads={status.system.load_average} />
+                                <LoadBarChart loads={status.system.load_average} />
                             </div>
                         </>
-                    )}
+                    ) : null}
                 </div>
+            </div>
+
+            {/* ── metrics timeline ── */}
+            <div>
+                {metricsError ? (
+                    <AdminErrorState
+                        message='Failed to load metrics history.'
+                        onRetry={() => mutateMetrics()}
+                        className='rounded-xl'
+                    />
+                ) : !metricsHistory && metricsLoading ? (
+                    <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-6 animate-pulse'>
+                        <div className='h-4 w-48 rounded bg-mocha-400/30 mb-4' />
+                        <div className='h-56 rounded bg-mocha-400/20' />
+                    </div>
+                ) : metricsHistory && metricsHistory.length > 0 ? (
+                    <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-6'>
+                        <SectionHeader title='Metrics Timeline' sub='CPU, memory, and disk usage over time' />
+                        <MetricsTimeline samples={metricsHistory} />
+                    </div>
+                ) : null}
+            </div>
+
+            {/* ── entity counts chart ── */}
+            <div>
+                {counts && (
+                    <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-6'>
+                        <SectionHeader title='Entity Distribution' sub='Resource counts across the panel' />
+                        <CountsBarChart
+                            counts={{
+                                servers: serverCount,
+                                nodes: nodeCount,
+                                users: userCount,
+                                locations: locationCount,
+                                nests: nestCount,
+                                buckets: bucketCount,
+                            }}
+                        />
+                    </div>
+                )}
             </div>
 
             {/* ── quick actions ── */}
@@ -555,7 +561,13 @@ const AdminDashboardContainer = () => {
                     }
                 />
                 <div className='rounded-xl border border-mocha-400 bg-mocha-500 overflow-hidden'>
-                    {!serversPage ? (
+                    {serversError ? (
+                        <AdminErrorState
+                            message='Failed to load recent servers.'
+                            onRetry={() => mutateServers()}
+                            className='rounded-xl'
+                        />
+                    ) : !serversPage && serversLoading ? (
                         <div className='divide-y divide-mocha-400'>
                             {Array.from({ length: 5 }).map((_, i) => (
                                 <div key={i} className='flex items-center gap-4 px-5 py-4 animate-pulse'>

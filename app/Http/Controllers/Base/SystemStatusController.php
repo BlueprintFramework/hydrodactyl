@@ -14,8 +14,12 @@ use Illuminate\Support\Facades\Cache;
 
 class SystemStatusController extends Controller
 {
+    private const METRICS_HISTORY_KEY = 'system_metrics_history';
+
+    private const METRICS_HISTORY_MAX = 30;
+
     /**
-     * Get system metrics and status
+     * Get system metrics and status, and store a sample in the history ring buffer.
      */
     public function index(): JsonResponse
     {
@@ -32,19 +36,21 @@ class SystemStatusController extends Controller
                     ],
                     'system' => [
                         'php_version' => PHP_VERSION,
-                        'os' => php_uname("r"),
+                        'os' => php_uname('r'),
                         'hostname' => gethostname(),
                         'load_average' => sys_getloadavg(),
-                    ]
+                    ],
                 ];
             });
+
+            $this->recordMetricsSample($metrics);
 
             return response()->json($metrics);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to retrieve system metrics',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -61,6 +67,42 @@ class SystemStatusController extends Controller
         ]));
     }
 
+    /**
+     * Return the stored metrics history ring buffer.
+     */
+    public function metricsHistory(): JsonResponse
+    {
+        $history = Cache::get(self::METRICS_HISTORY_KEY, []);
+
+        return response()->json(['data' => $history]);
+    }
+
+    /**
+     * Push a metrics snapshot into the ring buffer cache.
+     */
+    private function recordMetricsSample(array $metrics): void
+    {
+        $history = Cache::get(self::METRICS_HISTORY_KEY, []);
+
+        $mem = $metrics['metrics']['memory'];
+        $disk = $metrics['metrics']['disk'];
+
+        $history[] = [
+            'timestamp' => $metrics['timestamp'],
+            'cpu' => $metrics['metrics']['cpu'],
+            'memory_used' => $mem['used'],
+            'memory_total' => $mem['total'],
+            'disk_used' => $disk['used'],
+            'disk_total' => $disk['total'],
+        ];
+
+        if (count($history) > self::METRICS_HISTORY_MAX) {
+            $history = array_slice($history, -self::METRICS_HISTORY_MAX);
+        }
+
+        Cache::put(self::METRICS_HISTORY_KEY, $history, 1800);
+    }
+
     private function getMemoryUsage(): array
     {
         if (PHP_OS_FAMILY === 'Darwin') {
@@ -69,7 +111,6 @@ class SystemStatusController extends Controller
                 throw new \RuntimeException('Failed to execute vm_stat command');
             }
 
-            // Parse memory stats more reliably
             $stats = [];
             foreach (explode("\n", $memory) as $line) {
                 if (preg_match('/Pages\s+([^:]+):\s+(\d+)/', $line, $matches)) {
@@ -77,23 +118,7 @@ class SystemStatusController extends Controller
                 }
             }
 
-    private function getMemoryUsage(): array
-    {
-        if (PHP_OS_FAMILY === 'Darwin') {
-            $memory = shell_exec('vm_stat');
-            if (!$memory) {
-                throw new \RuntimeException('Failed to execute vm_stat command');
-            }
-
-            // Parse memory stats more reliably
-            $stats = [];
-            foreach (explode("\n", $memory) as $line) {
-                if (preg_match('/Pages\s+([^:]+):\s+(\d+)/', $line, $matches)) {
-                    $stats[strtolower($matches[1])] = (int) $matches[2];
-                }
-            }
-
-            $page_size = 4096; // Default page size for macOS
+            $page_size = 4096;
 
             $total_memory = $this->getTotalMemoryMac();
             $free_memory = ($stats['free'] ?? 0) * $page_size;
@@ -103,11 +128,10 @@ class SystemStatusController extends Controller
                 'total' => $total_memory,
                 'used' => $used_memory,
                 'free' => $free_memory,
-                'page_size' => $page_size
+                'page_size' => $page_size,
             ];
         }
 
-        // Linux memory calculation
         $memory = shell_exec('free -b');
         if (!$memory) {
             throw new \RuntimeException('Failed to execute free command');
@@ -120,7 +144,7 @@ class SystemStatusController extends Controller
         return [
             'total' => (int) $matches[1],
             'used' => (int) $matches[2],
-            'free' => (int) $matches[3]
+            'free' => (int) $matches[3],
         ];
     }
 
@@ -130,6 +154,7 @@ class SystemStatusController extends Controller
         if (!$memory || !preg_match('/hw.memsize: (\d+)/', $memory, $matches)) {
             throw new \RuntimeException('Failed to get total memory size');
         }
+
         return (int) $matches[1];
     }
 
@@ -155,13 +180,13 @@ class SystemStatusController extends Controller
         $free = disk_free_space('/');
 
         if ($total === false || $free === false) {
-            throw new \RuntimeException('Failed to get disk  space information');
+            throw new \RuntimeException('Failed to get disk space information');
         }
 
         return [
             'total' => $total,
             'free' => $free,
-            'used' => $total - $free
+            'used' => $total - $free,
         ];
     }
 
@@ -172,6 +197,7 @@ class SystemStatusController extends Controller
             if (!$uptime || !preg_match('/sec = (\d+)/', $uptime, $matches)) {
                 throw new \RuntimeException('Failed to get system uptime');
             }
+
             return time() - (int) $matches[1];
         }
 
@@ -183,4 +209,3 @@ class SystemStatusController extends Controller
         return (int) floatval($uptime);
     }
 }
-
