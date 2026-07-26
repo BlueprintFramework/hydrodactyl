@@ -15,8 +15,10 @@
     <a href="https://github.com/BlueprintFramework/hydrodactyl/actions/workflows/dev-build.yaml">
         <img src="https://shieldcn.dev/badge/Build-Passing-success.svg?logo=githubactions" alt="Build">
     </a>
+    <img src="https://shieldcn.dev/badge/PHP-8.4+-8892BF.svg?logo=php" alt="PHP 8.4+">
     <img src="https://shieldcn.dev/badge/Formatter-Biome-60a5fa.svg?logo=biome" alt="Formatted with Biome">
     <img src="https://shieldcn.dev/badge/Linter-Biome-60a5fa.svg?logo=biome" alt="Linted with Biome">
+    <img src="https://shieldcn.dev/badge/License-Apache%202.0-blue.svg" alt="License">
 </p>
 
 <br/>
@@ -44,6 +46,78 @@ docker compose up -d
 See the [Installation Guide](https://hydrodactyl.dev/docs/hydrodactyl/installation) and [Local Development Guide](https://hydrodactyl.dev/docs/hydrodactyl/local-development) for detailed instructions. Windows is supported for local development only.
 
 ![Dashboard Image](./.github/dashboard.jpeg)
+
+## Development
+
+Hydrodactyl uses [mise](https://mise.jdx.dev) for tool version management and [just](https://just.systems) as a command runner. Install them first, then run `mise install` to set up the correct PHP, Node, and pnpm versions.
+
+### Prerequisites
+
+| Tool | Purpose |
+|------|---------|
+| [Docker](https://docs.docker.com/get-docker/) | Container runtime for the dev stack |
+| [mise](https://mise.jdx.dev) | Manages PHP, Node, pnpm, and docker-compose versions |
+| [just](https://just.systems) | Command runner (like Make, but simpler) |
+
+### Getting started
+
+```bash
+# Install tool versions (PHP 8.4, Node LTS, pnpm, docker-compose)
+mise install
+
+# Start the full development stack (MariaDB, Redis, Panel, MinIO, Elytra, Mailpit)
+just dev
+
+# Or rebuild everything from scratch
+just dev-build
+```
+
+The panel will be available at `http://localhost:3000`.
+
+### Available commands
+
+Run `just` to see all available recipes:
+
+| Command | Description |
+|---------|-------------|
+| `just dev` | Start the development stack |
+| `just dev-build` | Rebuild and start the stack |
+| `just dev-down` | Stop the development stack |
+| `just dev-logs` | View container logs |
+| `just lint` | Run Biome linter with auto-fix |
+| `just check-frontend` | Check frontend formatting |
+| `just build` | Build frontend assets |
+| `just phpstan` | Run PHPStan static analysis |
+| `just cs-fix` | Fix PHP code style |
+| `just cs-check` | Check PHP code style |
+| `just test` | Run all tests |
+| `just test-unit` | Run unit tests only |
+| `just test-integration` | Run integration tests only |
+| `just check` | Run full quality pipeline (lint + format + phpstan + tests) |
+| `just clear` | Clear Laravel caches |
+| `just migrate` | Run database migrations |
+| `just seed` | Seed the database |
+
+### Tech stack
+
+- **Backend**: PHP 8.4+ / Laravel 13
+- **Frontend**: React 19 / TypeScript 5.9 / Vite 7
+- **Database**: MariaDB (MySQL compatible)
+- **Cache**: Redis
+- **Object Storage**: MinIO (S3-compatible, for backups)
+- **Daemon**: [Elytra](https://github.com/PyroHost/elytra) (Wings fork)
+- **Linting**: Biome (JS/TS), php-cs-fixer (PHP), PHPStan (static analysis)
+- **Testing**: PHPUnit 12, Vitest
+
+## UUIDv7
+
+Hydrodactyl uses **UUIDv7** for all entity identifiers. UUIDv7 encodes a Unix timestamp in the most significant bits, providing:
+
+- **Time-ordered generation** — UUIDs are naturally sortable by creation time
+- **Better index performance** — sequential keys improve InnoDB clustered index efficiency
+- **Backward compatibility** — existing UUIDv4 records are untouched; mixed v4/v7 databases work transparently
+
+The `UuidService` class at `app/Services/UuidService.php` is the single generation point. See the [UUIDv7 migration PR](https://github.com/BlueprintFramework/hydrodactyl/pull/83) for implementation details.
 
 ## License
 
