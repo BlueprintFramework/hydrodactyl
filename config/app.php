@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Facade;
 
 return [
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Application Version
   |--------------------------------------------------------------------------
@@ -11,9 +11,9 @@ return [
   | change this value if you are not maintaining your own internal versions.
   */
 
-  'version' => 'canary',
+    'version' => 'canary',
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Application Name
   |--------------------------------------------------------------------------
@@ -24,11 +24,11 @@ return [
   |
   */
 
-  'name' => env('APP_NAME', 'Hydrodactyl'),
+    'name' => env('APP_NAME', 'Hydrodactyl'),
 
-  'custom_nav_items' => '[]',
+    'custom_nav_items' => '[]',
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Application Environment
   |--------------------------------------------------------------------------
@@ -39,9 +39,9 @@ return [
   |
   */
 
-  'env' => env('APP_ENV', 'production'),
+    'env' => env('APP_ENV', 'production'),
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Application Debug Mode
   |--------------------------------------------------------------------------
@@ -52,9 +52,9 @@ return [
   |
   */
 
-  'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool) env('APP_DEBUG', false),
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Application URL
   |--------------------------------------------------------------------------
@@ -65,9 +65,9 @@ return [
   |
   */
 
-  'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://localhost'),
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Application Timezone
   |--------------------------------------------------------------------------
@@ -78,9 +78,9 @@ return [
   |
   */
 
-  'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Application Locale Configuration
   |--------------------------------------------------------------------------
@@ -91,13 +91,13 @@ return [
   |
   */
 
-  'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'en'),
 
-  'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
-  'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Encryption Key
   |--------------------------------------------------------------------------
@@ -108,17 +108,17 @@ return [
   |
   */
 
-  'cipher' => 'AES-256-CBC',
+    'cipher' => 'AES-256-CBC',
 
-  'key' => env('APP_KEY'),
+    'key' => env('APP_KEY'),
 
-  'previous_keys' => [
-    ...array_filter(
-      explode(',', env('APP_PREVIOUS_KEYS', ''))
-    ),
-  ],
+    'previous_keys' => [
+        ...array_filter(
+            explode(',', env('APP_PREVIOUS_KEYS', ''))
+        ),
+    ],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Maintenance Mode Driver
   |--------------------------------------------------------------------------
@@ -131,12 +131,12 @@ return [
   |
   */
 
-  'maintenance' => [
-    'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
-    'store' => env('APP_MAINTENANCE_STORE', 'database'),
-  ],
+    'maintenance' => [
+        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
+        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+    ],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Exception Reporter Configuration
   |--------------------------------------------------------------------------
@@ -148,11 +148,11 @@ return [
   |
   */
 
-  'exceptions' => [
-    'report_all' => env('APP_REPORT_ALL_EXCEPTIONS', false),
-  ],
+    'exceptions' => [
+        'report_all' => env('APP_REPORT_ALL_EXCEPTIONS', false),
+    ],
 
-  /*
+    /*
   |--------------------------------------------------------------------------
   | Autoloaded Service Providers
   |--------------------------------------------------------------------------
@@ -163,58 +163,58 @@ return [
   |
   */
 
-  'providers' => [
-    /*
-     * Laravel Framework Service Providers...
-     */
-    Illuminate\Auth\AuthServiceProvider::class,
-    Illuminate\Broadcasting\BroadcastServiceProvider::class,
-    Illuminate\Bus\BusServiceProvider::class,
-    Illuminate\Cache\CacheServiceProvider::class,
-    Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
-    Illuminate\Cookie\CookieServiceProvider::class,
-    Illuminate\Database\DatabaseServiceProvider::class,
-    Illuminate\Encryption\EncryptionServiceProvider::class,
-    Illuminate\Filesystem\FilesystemServiceProvider::class,
-    Illuminate\Foundation\Providers\FoundationServiceProvider::class,
-    Illuminate\Hashing\HashServiceProvider::class,
-    Illuminate\Mail\MailServiceProvider::class,
-    Illuminate\Notifications\NotificationServiceProvider::class,
-    Illuminate\Pagination\PaginationServiceProvider::class,
-    Illuminate\Pipeline\PipelineServiceProvider::class,
-    Illuminate\Queue\QueueServiceProvider::class,
-    Illuminate\Redis\RedisServiceProvider::class,
-    Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
-    Illuminate\Session\SessionServiceProvider::class,
-    Illuminate\Translation\TranslationServiceProvider::class,
-    Illuminate\Validation\ValidationServiceProvider::class,
-    Illuminate\View\ViewServiceProvider::class,
+    'providers' => [
+        /*
+         * Laravel Framework Service Providers...
+         */
+        Illuminate\Auth\AuthServiceProvider::class,
+        Illuminate\Broadcasting\BroadcastServiceProvider::class,
+        Illuminate\Bus\BusServiceProvider::class,
+        Illuminate\Cache\CacheServiceProvider::class,
+        Illuminate\Foundation\Providers\ConsoleSupportServiceProvider::class,
+        Illuminate\Cookie\CookieServiceProvider::class,
+        Illuminate\Database\DatabaseServiceProvider::class,
+        Illuminate\Encryption\EncryptionServiceProvider::class,
+        Illuminate\Filesystem\FilesystemServiceProvider::class,
+        Illuminate\Foundation\Providers\FoundationServiceProvider::class,
+        Illuminate\Hashing\HashServiceProvider::class,
+        Illuminate\Mail\MailServiceProvider::class,
+        Illuminate\Notifications\NotificationServiceProvider::class,
+        Illuminate\Pagination\PaginationServiceProvider::class,
+        Illuminate\Pipeline\PipelineServiceProvider::class,
+        Illuminate\Queue\QueueServiceProvider::class,
+        Illuminate\Redis\RedisServiceProvider::class,
+        Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
+        Illuminate\Session\SessionServiceProvider::class,
+        Illuminate\Translation\TranslationServiceProvider::class,
+        Illuminate\Validation\ValidationServiceProvider::class,
+        Illuminate\View\ViewServiceProvider::class,
+
+        /*
+         * Application Service Providers...
+         */
+        Pterodactyl\Providers\ActivityLogServiceProvider::class,
+        Pterodactyl\Providers\AppServiceProvider::class,
+        Pterodactyl\Providers\AuthServiceProvider::class,
+        Pterodactyl\Providers\BackupsServiceProvider::class,
+        Pterodactyl\Providers\BladeServiceProvider::class,
+        Pterodactyl\Providers\CaptchaServiceProvider::class,
+        Pterodactyl\Providers\EventServiceProvider::class,
+        Pterodactyl\Providers\HashidsServiceProvider::class,
+        Pterodactyl\Providers\ObserverServiceProvider::class,
+        Pterodactyl\Providers\RouteServiceProvider::class,
+        Pterodactyl\Providers\RepositoryServiceProvider::class,
+        Pterodactyl\Providers\ServerOperationServiceProvider::class,
+        Pterodactyl\Providers\SubdomainServiceProvider::class,
+        Pterodactyl\Providers\ViewComposerServiceProvider::class,
+
+        /*
+         * Additional Dependencies
+         */
+        Prologue\Alerts\AlertsServiceProvider::class,
+    ],
 
     /*
-     * Application Service Providers...
-     */
-    Pterodactyl\Providers\ActivityLogServiceProvider::class,
-    Pterodactyl\Providers\AppServiceProvider::class,
-    Pterodactyl\Providers\AuthServiceProvider::class,
-    Pterodactyl\Providers\BackupsServiceProvider::class,
-    Pterodactyl\Providers\BladeServiceProvider::class,
-    Pterodactyl\Providers\CaptchaServiceProvider::class,
-    Pterodactyl\Providers\EventServiceProvider::class,
-    Pterodactyl\Providers\HashidsServiceProvider::class,
-    Pterodactyl\Providers\ObserverServiceProvider::class,
-    Pterodactyl\Providers\RouteServiceProvider::class,
-    Pterodactyl\Providers\RepositoryServiceProvider::class,
-    Pterodactyl\Providers\ServerOperationServiceProvider::class,
-    Pterodactyl\Providers\SubdomainServiceProvider::class,
-    Pterodactyl\Providers\ViewComposerServiceProvider::class,
-
-    /*
-     * Additional Dependencies
-     */
-    Prologue\Alerts\AlertsServiceProvider::class,
-  ],
-
-  /*
   |--------------------------------------------------------------------------
   | Class Aliases
   |--------------------------------------------------------------------------
@@ -225,15 +225,15 @@ return [
   |
   */
 
-  'aliases' => Facade::defaultAliases()->merge([
-    'Alert' => Prologue\Alerts\Facades\Alert::class,
-    'Carbon' => Carbon\Carbon::class,
-    'JavaScript' => Laracasts\Utilities\JavaScript\JavaScriptFacade::class,
-    'Theme' => Pterodactyl\Extensions\Facades\Theme::class,
+    'aliases' => Facade::defaultAliases()->merge([
+        'Alert' => Prologue\Alerts\Facades\Alert::class,
+        'Carbon' => Carbon\Carbon::class,
+        'JavaScript' => Laracasts\Utilities\JavaScript\JavaScriptFacade::class,
+        'Theme' => Pterodactyl\Extensions\Facades\Theme::class,
 
-    // Custom Facades
-    'Activity' => Pterodactyl\Facades\Activity::class,
-    'LogBatch' => Pterodactyl\Facades\LogBatch::class,
-    'LogTarget' => Pterodactyl\Facades\LogTarget::class,
-  ])->toArray(),
+        // Custom Facades
+        'Activity' => Pterodactyl\Facades\Activity::class,
+        'LogBatch' => Pterodactyl\Facades\LogBatch::class,
+        'LogTarget' => Pterodactyl\Facades\LogTarget::class,
+    ])->toArray(),
 ];

@@ -11,7 +11,7 @@ use Pterodactyl\Http\Requests\Api\Client\Account\StoreSSHKeyRequest;
 class SSHKeyController extends ClientApiController
 {
     /**
-     * List all SSH keys
+     * List all SSH keys.
      */
     public function index(ClientApiRequest $request): array
     {
@@ -21,7 +21,7 @@ class SSHKeyController extends ClientApiController
     }
 
     /**
-     * Add an SSH key
+     * Add an SSH key.
      */
     public function store(StoreSSHKeyRequest $request): array
     {
@@ -42,7 +42,7 @@ class SSHKeyController extends ClientApiController
     }
 
     /**
-     * Delete an SSH key
+     * Delete an SSH key.
      */
     public function delete(ClientApiRequest $request): JsonResponse
     {

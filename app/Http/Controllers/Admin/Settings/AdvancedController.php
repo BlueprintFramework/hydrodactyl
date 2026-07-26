@@ -14,41 +14,41 @@ use Pterodactyl\Http\Requests\Admin\Settings\AdvancedSettingsFormRequest;
 
 class AdvancedController extends Controller
 {
-  /**
-   * AdvancedController constructor.
-   */
-  public function __construct(
-    private AlertsMessageBag $alert,
-    private ConfigRepository $config,
-    private Kernel $kernel,
-    private SettingsRepositoryInterface $settings,
-    private ViewFactory $view,
-  ) {
-  }
-
-  /**
-   * Render advanced Panel settings UI.
-   */
-  public function index(): View
-  {
-    return $this->view->make('admin.settings.advanced');
-  }
-
-  /**
-   * Update advanced settings.
-   *
-   * @throws \Pterodactyl\Exceptions\Model\DataValidationException
-   * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
-   */
-  public function update(AdvancedSettingsFormRequest $request): RedirectResponse
-  {
-    foreach ($request->normalize() as $key => $value) {
-      $this->settings->set('settings::' . $key, $value);
+    /**
+     * AdvancedController constructor.
+     */
+    public function __construct(
+        private AlertsMessageBag $alert,
+        private ConfigRepository $config,
+        private Kernel $kernel,
+        private SettingsRepositoryInterface $settings,
+        private ViewFactory $view,
+    ) {
     }
 
-    $this->kernel->call('queue:restart');
-    $this->alert->success('Advanced settings have been updated successfully and the queue worker was restarted to apply these changes.')->flash();
+    /**
+     * Render advanced Panel settings UI.
+     */
+    public function index(): View
+    {
+        return $this->view->make('admin.settings.advanced');
+    }
 
-    return redirect()->route('admin.settings.advanced');
-  }
+    /**
+     * Update advanced settings.
+     *
+     * @throws \Pterodactyl\Exceptions\Model\DataValidationException
+     * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
+     */
+    public function update(AdvancedSettingsFormRequest $request): RedirectResponse
+    {
+        foreach ($request->normalize() as $key => $value) {
+            $this->settings->set('settings::' . $key, $value);
+        }
+
+        $this->kernel->call('queue:restart');
+        $this->alert->success('Advanced settings have been updated successfully and the queue worker was restarted to apply these changes.')->flash();
+
+        return redirect()->route('admin.settings.advanced');
+    }
 }

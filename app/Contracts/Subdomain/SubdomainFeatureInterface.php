@@ -17,6 +17,7 @@ interface SubdomainFeatureInterface
      * @param Server $server The server instance
      * @param string $subdomain The subdomain name
      * @param string $domain The domain name
+     *
      * @return array Array of DNS record configurations
      */
     public function getDnsRecords(Server $server, string $subdomain, string $domain): array;

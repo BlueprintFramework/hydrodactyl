@@ -5,8 +5,8 @@ namespace Pterodactyl\Models\Daemons;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\Node;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Encryption\Encrypter;
 use Pterodactyl\Contracts\Daemon\Daemon;
+use Illuminate\Contracts\Encryption\Encrypter;
 
 class Wings implements Daemon
 {
@@ -45,6 +45,6 @@ class Wings implements Daemon
     {
         $debugFlag = config('app.debug') ? ' --allow-insecure' : '';
 
-        return "cd /etc/pterodactyl && sudo wings configure --panel-url " . escapeshellarg(config('app.url')) . " --token " . escapeshellarg($token) . " --node " . escapeshellarg((string) $node->id) . $debugFlag . "";
+        return 'cd /etc/pterodactyl && sudo wings configure --panel-url ' . escapeshellarg(config('app.url')) . ' --token ' . escapeshellarg($token) . ' --node ' . escapeshellarg((string) $node->id) . $debugFlag . '';
     }
 }

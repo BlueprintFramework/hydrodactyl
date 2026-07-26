@@ -2,27 +2,26 @@
 
 namespace Pterodactyl\Jobs\Server;
 
-use Exception;
 use Carbon\Carbon;
 use Pterodactyl\Jobs\Job;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\User;
 use Pterodactyl\Models\Server;
-use Illuminate\Support\Facades\Log;
+use Pterodactyl\Facades\Activity;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
+use Pterodactyl\Models\ServerOperation;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Pterodactyl\Facades\Activity;
-use Pterodactyl\Models\ServerOperation;
-use Pterodactyl\Services\Servers\ReinstallServerService;
 use Pterodactyl\Services\Elytra\ElytraJobService;
-use Pterodactyl\Services\Servers\StartupModificationService;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
+use Pterodactyl\Services\Servers\ReinstallServerService;
+use Pterodactyl\Services\Servers\StartupModificationService;
+use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 use Pterodactyl\Exceptions\Service\Backup\BackupFailedException;
 use Pterodactyl\Services\ServerOperations\ServerOperationService;
-use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 
 /**
  * Queue job to apply server egg configuration changes.
@@ -50,7 +49,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
         public array $environment,
         public bool $shouldBackup,
         public bool $shouldWipe,
-        public string $operationId
+        public string $operationId,
     ) {
         $this->queue = 'standard';
         $this->timeout = config('server_operations.timeouts.egg_change', 1800);
@@ -65,7 +64,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
         StartupModificationService $startupModificationService,
         DaemonFileRepository $fileRepository,
         ServerOperationService $operationService,
-        SubdomainManagementService $subdomainService
+        SubdomainManagementService $subdomainService,
     ): void {
         $operation = null;
 
@@ -105,7 +104,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
             $this->logSuccessfulChange();
 
             $operation->markAsCompleted('Software configuration applied successfully. Server installation completed.');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->handleJobFailure($e, $operation);
             throw $e;
         }
@@ -183,6 +182,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
 
             if ($jobStatus['status'] === 'completed') {
                 $operation->updateProgress('Backup completed successfully');
+
                 return;
             }
 
@@ -241,7 +241,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
             } else {
                 $operation->updateProgress('No files found to wipe');
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to wipe files', [
                 'server_id' => $this->server->id,
                 'error' => $e->getMessage(),
@@ -268,7 +268,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
         StartupModificationService $startupModificationService,
         ReinstallServerService $reinstallServerService,
         ServerOperation $operation,
-        SubdomainManagementService $subdomainService
+        SubdomainManagementService $subdomainService,
     ): void {
         $operation->updateProgress('Applying software configuration...');
 
@@ -297,7 +297,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
                                 'to_egg' => $this->eggId,
                             ])
                             ->log();
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         Log::warning('Failed to delete subdomain during egg change', [
                             'server_id' => $this->server->id,
                             'subdomain' => $activeSubdomain->full_domain,

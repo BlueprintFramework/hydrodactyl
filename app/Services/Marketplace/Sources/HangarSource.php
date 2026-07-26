@@ -3,10 +3,10 @@
 namespace Pterodactyl\Services\Marketplace\Sources;
 
 use Illuminate\Support\Arr;
-use Pterodactyl\Services\Marketplace\AbstractMarketplaceSource;
-use Pterodactyl\Services\Marketplace\MarketplaceException;
 use Pterodactyl\Services\Marketplace\MarketplaceProject;
 use Pterodactyl\Services\Marketplace\MarketplaceVersion;
+use Pterodactyl\Services\Marketplace\MarketplaceException;
+use Pterodactyl\Services\Marketplace\AbstractMarketplaceSource;
 
 /**
  * Hangar (https://hangar.papermc.io) adapter — PaperMC's plugin platform.

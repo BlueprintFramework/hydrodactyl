@@ -3,8 +3,8 @@
 namespace Pterodactyl\Tests\Unit\Helpers;
 
 use Carbon\Carbon;
-use Pterodactyl\Helpers\Utilities;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Helpers\Utilities;
 
 class UtilitiesTest extends TestCase
 {

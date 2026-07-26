@@ -2,8 +2,8 @@
 
 namespace Pterodactyl\Services\Captcha\Providers;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Pterodactyl\Contracts\Captcha\CaptchaProviderInterface;
 
 class TurnstileProvider implements CaptchaProviderInterface
@@ -51,6 +51,7 @@ class TurnstileProvider implements CaptchaProviderInterface
                 'secret_key_empty' => empty($this->secretKey),
                 'response_empty' => empty($response),
             ]);
+
             return false;
         }
 
@@ -84,6 +85,7 @@ class TurnstileProvider implements CaptchaProviderInterface
                 Log::warning('Turnstile verification failed: HTTP ' . $httpResponse->status(), [
                     'response_body' => $httpResponse->body(),
                 ]);
+
                 return false;
             }
 
@@ -93,6 +95,7 @@ class TurnstileProvider implements CaptchaProviderInterface
                 Log::warning('Turnstile verification failed: Invalid response format', [
                     'result' => $result,
                 ]);
+
                 return false;
             }
 
@@ -114,6 +117,7 @@ class TurnstileProvider implements CaptchaProviderInterface
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return false;
         }
     }

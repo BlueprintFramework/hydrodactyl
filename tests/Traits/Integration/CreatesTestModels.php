@@ -81,7 +81,7 @@ trait CreatesTestModels
      *
      * @param string[] $permissions
      *
-     * @return array{\Pterodactyl\Models\User, \Pterodactyl\Models\Server}
+     * @return array{User, Server}
      */
     public function generateTestAccount(array $permissions = []): array
     {
@@ -110,7 +110,7 @@ trait CreatesTestModels
     protected function cloneEggAndVariables(Egg $egg): Egg
     {
         $model = $egg->replicate(['id', 'uuid']);
-        $model->uuid = Uuid::uuid4()->toString();
+        $model->uuid = Uuid::uuid7()->toString();
         $model->push();
 
         /** @var Egg $model */

@@ -3,13 +3,11 @@
 
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Controllers\Api\Client\Servers;
-use Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra;
 use Pterodactyl\Http\Middleware\Activity\ServerSubject;
+use Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra;
+use Pterodactyl\Http\Middleware\Api\Client\Server\CheckDaemonType;
 use Pterodactyl\Http\Middleware\Api\Client\Server\ResourceBelongsToServer;
 use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
-use Pterodactyl\Http\Middleware\Api\Client\Server\CheckDaemonType;
-
-
 
 /*
 |--------------------------------------------------------------------------

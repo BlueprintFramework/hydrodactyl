@@ -2,11 +2,10 @@
 
 namespace Pterodactyl\Services\ServerOperations;
 
-use Exception;
-use Illuminate\Support\Facades\Log;
 use Pterodactyl\Models\Egg;
-use Pterodactyl\Models\Server;
 use Pterodactyl\Models\User;
+use Pterodactyl\Models\Server;
+use Illuminate\Support\Facades\Log;
 use Pterodactyl\Jobs\Server\ApplyEggChangeJob;
 use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -22,8 +21,9 @@ class EggChangeService
     public function __construct(
         private ServerOperationService $operationService,
         private ServerStateValidationService $validationService,
-        private SubdomainManagementService $subdomainService
-    ) {}
+        private SubdomainManagementService $subdomainService,
+    ) {
+    }
 
     /**
      * Preview egg change information.
@@ -31,21 +31,21 @@ class EggChangeService
     public function previewEggChange(Server $server, int $eggId, int $nestId): array
     {
         $this->validationService->validateServerState($server);
-        
+
         $egg = Egg::query()
             ->with(['variables', 'nest'])
             ->findOrFail($eggId);
-        
+
         if ($egg->nest_id !== $nestId) {
             throw new BadRequestHttpException('The specified egg does not belong to the specified nest.');
         }
-        
+
         $variables = $egg->variables()->orderBy('name')->get();
         $dockerImages = $egg->docker_images ?? [];
-        
+
         // Check subdomain compatibility
         $subdomainWarning = $this->checkSubdomainCompatibility($server, $egg);
-        
+
         $result = [
             'egg' => [
                 'id' => $egg->id,
@@ -68,12 +68,12 @@ class EggChangeService
             'docker_images' => $dockerImages,
             'default_docker_image' => !empty($dockerImages) ? array_keys($dockerImages)[0] : null,
         ];
-        
+
         // Add subdomain warning if applicable
         if ($subdomainWarning) {
             $result['warnings'] = [$subdomainWarning];
         }
-        
+
         return $result;
     }
 
@@ -85,36 +85,36 @@ class EggChangeService
         int $eggId,
         int $nestId,
         ?string $dockerImage = null,
-        ?string $startupCommand = null
+        ?string $startupCommand = null,
     ): array {
         $this->validationService->validateCanAcceptOperation($server, 'egg_change');
-        
+
         $egg = Egg::query()
             ->with(['variables', 'nest'])
             ->findOrFail($eggId);
-        
+
         if ($egg->nest_id !== $nestId) {
             throw new BadRequestHttpException('The specified egg does not belong to the specified nest.');
         }
-        
+
         $startupCommand = $startupCommand ? trim($startupCommand) : null;
         $dockerImage = $dockerImage ? trim($dockerImage) : null;
-        
+
         if ($startupCommand && strlen($startupCommand) > 2048) {
             throw new BadRequestHttpException('Startup command is too long (max 2048 characters).');
         }
-        
+
         if ($dockerImage) {
             $allowedImages = array_values($egg->docker_images ?? []);
             if (!empty($allowedImages) && !in_array($dockerImage, $allowedImages)) {
                 throw new BadRequestHttpException('The specified Docker image is not allowed for this egg.');
             }
         }
-        
+
         if (!$dockerImage && !empty($egg->docker_images)) {
             $dockerImage = array_values($egg->docker_images)[0];
         }
-        
+
         return [
             'egg' => $egg,
             'docker_image' => $dockerImage,
@@ -134,7 +134,7 @@ class EggChangeService
         ?string $startupCommand = null,
         array $environment = [],
         bool $shouldBackup = false,
-        bool $shouldWipe = false
+        bool $shouldWipe = false,
     ): array {
         $validated = $this->validateEggChangeParameters(
             $server,
@@ -146,7 +146,7 @@ class EggChangeService
 
         $dockerImage = $validated['docker_image'];
         $startupCommand = $validated['startup_command'];
-        
+
         $operation = $this->operationService->createOperation(
             $server,
             $user,
@@ -163,7 +163,7 @@ class EggChangeService
                 'should_wipe' => $shouldWipe,
             ]
         );
-        
+
         try {
             ApplyEggChangeJob::dispatch(
                 $server,
@@ -177,18 +177,18 @@ class EggChangeService
                 $shouldWipe,
                 $operation->operation_id
             );
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $operation->delete();
-            
+
             Log::error('Failed to dispatch egg change job', [
                 'server_id' => $server->id,
                 'operation_id' => $operation->operation_id,
                 'error' => $e->getMessage(),
             ]);
-            
+
             throw new \RuntimeException('Failed to queue egg change operation. Please try again.');
         }
-        
+
         return [
             'message' => 'Egg change operation has been queued for processing.',
             'operation_id' => $operation->operation_id,
@@ -203,26 +203,26 @@ class EggChangeService
     {
         // Check if server currently has an active subdomain
         $activeSubdomain = $server->activeSubdomain;
-        
+
         if (!$activeSubdomain) {
             return null; // No subdomain to worry about
         }
-        
+
         // Check if the current egg supports subdomains
         $currentSupportsSubdomain = $server->supportsSubdomains();
-        
+
         if (!$currentSupportsSubdomain) {
             return null; // Current egg doesn't support subdomains anyway
         }
-        
+
         // Create a temporary server instance with the new egg to test compatibility
         $tempServer = clone $server;
         $tempServer->egg = $newEgg;
         $tempServer->egg_id = $newEgg->id;
-        
+
         // Check if the new egg supports subdomains
         $newSupportsSubdomain = $tempServer->supportsSubdomains();
-        
+
         if (!$newSupportsSubdomain) {
             return [
                 'type' => 'subdomain_incompatible',
@@ -230,7 +230,7 @@ class EggChangeService
                 'severity' => 'warning',
             ];
         }
-        
+
         return null; // New egg supports subdomains, no warning needed
     }
 }

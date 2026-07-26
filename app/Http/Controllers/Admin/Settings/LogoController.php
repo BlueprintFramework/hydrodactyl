@@ -7,8 +7,8 @@ use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\View\Factory as ViewFactory;
-use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Services\Admin\LogoService;
+use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Http\Requests\Admin\Settings\LogoFormRequest;
 
 class LogoController extends Controller
@@ -18,7 +18,8 @@ class LogoController extends Controller
         private Kernel $kernel,
         private LogoService $logoService,
         private ViewFactory $view,
-    ) {}
+    ) {
+    }
 
     public function index(): View
     {

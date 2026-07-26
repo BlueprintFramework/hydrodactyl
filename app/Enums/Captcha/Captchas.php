@@ -16,16 +16,15 @@ enum Captchas: string
         self::RECAPTCHA->value => 'Google ReCaptcha',
     ];
 
-
     public static function all(): array
     {
         $result = [];
         foreach (self::cases() as $case) {
             $result[$case->value] = self::DESCRIPTION_MAP[$case->value];
         }
+
         return $result;
     }
-
 
     public static function values(): array
     {

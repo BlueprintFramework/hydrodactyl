@@ -18,7 +18,7 @@ class NodeDeploymentController extends ApplicationApiController
     }
 
     /**
-     * Find deployable nodes
+     * Find deployable nodes.
      *
      * @throws \Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException
      */

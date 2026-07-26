@@ -50,7 +50,7 @@ class ServerTransformer extends BaseClientTransformer
             ],
             'sftp_alias' => [
                 'ip' => $server->node->SFTPAliasAddress,
-                'port' => $server->node->SFTPAliasPort
+                'port' => $server->node->SFTPAliasPort,
             ],
             'description' => $server->description,
             'limits' => [

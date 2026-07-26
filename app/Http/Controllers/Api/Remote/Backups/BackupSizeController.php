@@ -5,17 +5,15 @@ namespace Pterodactyl\Http\Controllers\Api\Remote\Backups;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Backup;
 use Pterodactyl\Models\Server;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Exceptions\Http\HttpForbiddenException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class BackupSizeController extends Controller
 {
     /**
-     * Update backup sizes after dedup
+     * Update backup sizes after dedup.
      */
     public function update(Request $request, string $uuid): JsonResponse
     {
@@ -57,7 +55,7 @@ class BackupSizeController extends Controller
             if (!$backup) {
                 $errors[] = [
                     'backup_uuid' => $backupData['backup_uuid'],
-                    'error' => 'Backup not found or does not belong to this server'
+                    'error' => 'Backup not found or does not belong to this server',
                 ];
                 continue;
             }
@@ -66,7 +64,7 @@ class BackupSizeController extends Controller
             if (!$backup->is_successful) {
                 $errors[] = [
                     'backup_uuid' => $backupData['backup_uuid'],
-                    'error' => 'Cannot update size of unsuccessful backup'
+                    'error' => 'Cannot update size of unsuccessful backup',
                 ];
                 continue;
             }
@@ -97,7 +95,7 @@ class BackupSizeController extends Controller
                     $newSize = $updateData['new_size'];
 
                     $backup->update(['bytes' => $newSize]);
-                    $updatedCount++;
+                    ++$updatedCount;
 
                     \Log::info('Updated backup size after deduplication recalculation', [
                         'backup_uuid' => $backup->uuid,
@@ -138,6 +136,7 @@ class BackupSizeController extends Controller
         }
 
         $statusCode = $updatedCount > 0 ? JsonResponse::HTTP_OK : JsonResponse::HTTP_BAD_REQUEST;
+
         return new JsonResponse($responseData, $statusCode);
     }
 }

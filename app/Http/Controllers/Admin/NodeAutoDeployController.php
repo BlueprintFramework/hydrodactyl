@@ -20,7 +20,8 @@ class NodeAutoDeployController extends Controller
         private ApiKeyRepository $repository,
         private Encrypter $encrypter,
         private KeyCreationService $keyCreationService,
-    ) {}
+    ) {
+    }
 
     /**
      * Generates a new API key for the logged-in user with only permission to read

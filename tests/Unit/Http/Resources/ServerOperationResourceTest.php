@@ -4,8 +4,8 @@ namespace Pterodactyl\Tests\Unit\Http\Resources;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Pterodactyl\Models\ServerOperation;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Models\ServerOperation;
 use Pterodactyl\Http\Resources\ServerOperationResource;
 
 class ServerOperationResourceTest extends TestCase

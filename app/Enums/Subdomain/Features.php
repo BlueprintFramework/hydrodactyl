@@ -2,23 +2,21 @@
 
 namespace Pterodactyl\Enums\Subdomain;
 
-use Pterodactyl\Services\Subdomain\Features\FactorioSubdomainFeature;
-use Pterodactyl\Services\Subdomain\Features\MinecraftSubdomainFeature;
 use Pterodactyl\Services\Subdomain\Features\RustSubdomainFeature;
 use Pterodactyl\Services\Subdomain\Features\ScpSlSubdomainFeature;
+use Pterodactyl\Services\Subdomain\Features\FactorioSubdomainFeature;
+use Pterodactyl\Services\Subdomain\Features\MinecraftSubdomainFeature;
 use Pterodactyl\Services\Subdomain\Features\TeamSpeakSubdomainFeature;
 use Pterodactyl\Services\Subdomain\Features\VintageStorySubdomainFeature;
 
-
 enum Features: string
 {
-
-    case FACTORIO = "subdomain_factorio";
-    case MINECRAFT = "subdomain_minecraft";
-    case RUST = "subdomain_rust";
-    case SCPSL = "subdomain_scpsl";
-    case TEAMSPEAK = "subdomain_teamspeak";
-    case VINTAGESTORY = "subdomain_vintagestory";
+    case FACTORIO = 'subdomain_factorio';
+    case MINECRAFT = 'subdomain_minecraft';
+    case RUST = 'subdomain_rust';
+    case SCPSL = 'subdomain_scpsl';
+    case TEAMSPEAK = 'subdomain_teamspeak';
+    case VINTAGESTORY = 'subdomain_vintagestory';
 
     private const CLASS_MAP = [
         self::FACTORIO->value => FactorioSubdomainFeature::class,
@@ -35,6 +33,7 @@ enum Features: string
         foreach (self::cases() as $case) {
             $result[$case->value] = $case->getClassName();
         }
+
         return $result;
     }
 

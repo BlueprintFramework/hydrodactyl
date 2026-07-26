@@ -4,11 +4,11 @@ namespace Pterodactyl\Tests\Unit\Services\Eggs;
 
 use Mockery\MockInterface;
 use Pterodactyl\Tests\TestCase;
-use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
-use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
 use Pterodactyl\Services\Eggs\EggDeletionService;
-use Pterodactyl\Exceptions\Service\HasActiveServersException;
+use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
 use Pterodactyl\Exceptions\Service\Egg\HasChildrenException;
+use Pterodactyl\Exceptions\Service\HasActiveServersException;
+use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
 
 class EggDeletionServiceTest extends TestCase
 {

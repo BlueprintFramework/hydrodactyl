@@ -5,14 +5,14 @@ namespace Pterodactyl\Http\Controllers\Admin\Settings;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
+use Pterodactyl\Enums\Captcha\Captchas;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\View\Factory as ViewFactory;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Services\Captcha\CaptchaManager;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Pterodactyl\Services\Captcha\CaptchaManager;
 use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 use Pterodactyl\Http\Requests\Admin\Settings\CaptchaSettingsFormRequest;
-use Pterodactyl\Enums\Captcha\Captchas;
 
 class CaptchaController extends Controller
 {
@@ -26,7 +26,8 @@ class CaptchaController extends Controller
         private Kernel $kernel,
         private SettingsRepositoryInterface $settings,
         private ViewFactory $view,
-    ) {}
+    ) {
+    }
 
     /**
      * Render captcha settings UI.

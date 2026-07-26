@@ -11,7 +11,7 @@ class SessionActivityObserver
      */
     public function creating(SessionActivity $sessionActivity): void
     {
-        //
+
     }
 
     /**
@@ -19,7 +19,7 @@ class SessionActivityObserver
      */
     public function created(SessionActivity $sessionActivity): void
     {
-        //
+
     }
 
     /**
@@ -27,7 +27,7 @@ class SessionActivityObserver
      */
     public function updating(SessionActivity $sessionActivity): void
     {
-        //
+
     }
 
     /**
@@ -35,7 +35,7 @@ class SessionActivityObserver
      */
     public function updated(SessionActivity $sessionActivity): void
     {
-        //
+
     }
 
     /**
@@ -43,7 +43,7 @@ class SessionActivityObserver
      */
     public function deleting(SessionActivity $sessionActivity): void
     {
-        //
+
     }
 
     /**
@@ -51,6 +51,6 @@ class SessionActivityObserver
      */
     public function deleted(SessionActivity $sessionActivity): void
     {
-        //
+
     }
 }

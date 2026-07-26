@@ -2,9 +2,8 @@
 
 namespace Pterodactyl\Services\Backups;
 
-use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Backup;
-use Illuminate\Support\Collection;
+use Pterodactyl\Models\Server;
 use Illuminate\Database\ConnectionInterface;
 
 class ServerStateService
@@ -87,19 +86,19 @@ class ServerStateService
         $this->connection->transaction(function () use ($server, $state) {
             // Update basic server configuration
             $serverUpdates = [];
-            
+
             if (isset($state['nest_id'])) {
                 $serverUpdates['nest_id'] = $state['nest_id'];
             }
-            
+
             if (isset($state['egg_id'])) {
                 $serverUpdates['egg_id'] = $state['egg_id'];
             }
-            
+
             if (isset($state['startup'])) {
                 $serverUpdates['startup'] = $state['startup'];
             }
-            
+
             if (isset($state['image'])) {
                 $serverUpdates['image'] = $state['image'];
             }
@@ -171,7 +170,7 @@ class ServerStateService
             $nestExists = $this->connection->table('nests')
                 ->where('id', $state['nest_id'])
                 ->exists();
-            
+
             if (!$nestExists) {
                 $nestName = $state['nest_info']['name'] ?? 'Unknown';
                 $errors[] = "Nest '{$nestName}' (ID: {$state['nest_id']}) no longer exists.";
@@ -183,7 +182,7 @@ class ServerStateService
             $eggExists = $this->connection->table('eggs')
                 ->where('id', $state['egg_id'])
                 ->exists();
-            
+
             if (!$eggExists) {
                 $eggName = $state['egg_info']['name'] ?? 'Unknown';
                 $errors[] = "Egg '{$eggName}' (ID: {$state['egg_id']}) no longer exists.";
@@ -193,20 +192,22 @@ class ServerStateService
         // Check for missing variables
         if (isset($state['variables']) && is_array($state['variables'])) {
             $missingVariables = [];
-            
+
             foreach ($state['variables'] as $variable) {
-                if (!isset($variable['env_variable'])) continue;
-                
+                if (!isset($variable['env_variable'])) {
+                    continue;
+                }
+
                 $exists = $this->connection->table('egg_variables')
                     ->where('egg_id', $state['egg_id'] ?? 0)
                     ->where('env_variable', $variable['env_variable'])
                     ->exists();
-                
+
                 if (!$exists) {
                     $missingVariables[] = $variable['name'] ?? $variable['env_variable'];
                 }
             }
-            
+
             if (!empty($missingVariables)) {
                 $warnings[] = 'Some variables from the backup no longer exist in the current egg: ' . implode(', ', $missingVariables);
             }
@@ -236,7 +237,7 @@ class ServerStateService
         }
 
         $state = $backup->server_state;
-        
+
         return [
             'nest_name' => $state['nest_info']['name'] ?? 'Unknown',
             'egg_name' => $state['egg_info']['name'] ?? 'Unknown',

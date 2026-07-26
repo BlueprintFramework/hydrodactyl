@@ -2,24 +2,24 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client;
 
-use Illuminate\Support\Facades\DB;
 use Pterodactyl\Models\Server;
+use Illuminate\Support\Facades\DB;
 use Pterodactyl\Models\Permission;
+use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
-use Pterodactyl\Models\Filters\MultiFieldServerFilter;
-use Pterodactyl\Models\Sorts\ServerOwnerNameSort;
-use Pterodactyl\Models\Sorts\ServerNestNameSort;
 use Pterodactyl\Models\Sorts\ServerEggNameSort;
+use Pterodactyl\Models\Sorts\ServerNestNameSort;
 use Pterodactyl\Models\Sorts\ServerNodeNameSort;
+use Pterodactyl\Models\Sorts\ServerOwnerNameSort;
+use Pterodactyl\Models\Filters\MultiFieldServerFilter;
 use Pterodactyl\Transformers\Api\Client\ServerTransformer;
 use Pterodactyl\Http\Requests\Api\Client\GetServersRequest;
 
 class ClientController extends ClientApiController
 {
     /**
-     * List all accessible servers
+     * List all accessible servers.
      */
     public function index(GetServersRequest $request): array
     {
@@ -97,7 +97,7 @@ class ClientController extends ClientApiController
     }
 
     /**
-     * Get server filter options
+     * Get server filter options.
      */
     public function filterOptions(GetServersRequest $request): array
     {
@@ -162,7 +162,7 @@ class ClientController extends ClientApiController
     }
 
     /**
-     * List all system permissions
+     * List all system permissions.
      */
     public function permissions(): array
     {

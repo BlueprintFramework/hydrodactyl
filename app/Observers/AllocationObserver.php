@@ -3,8 +3,8 @@
 namespace Pterodactyl\Observers;
 
 use Pterodactyl\Models\Allocation;
-use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 use Illuminate\Support\Facades\Log;
+use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 
 class AllocationObserver
 {
@@ -49,7 +49,7 @@ class AllocationObserver
         }
 
         $activeSubdomain = $allocation->server->activeSubdomain;
-        
+
         if (!$activeSubdomain) {
             return;
         }

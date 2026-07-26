@@ -3,9 +3,9 @@
 namespace Pterodactyl\Tests\Unit\Services\Servers;
 
 use Pterodactyl\Models\Server;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Models\Allocation;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Models\Allocation;
+use Pterodactyl\Models\EggVariable;
 use Pterodactyl\Services\Servers\StartupCommandService;
 
 class StartupCommandServiceTest extends TestCase

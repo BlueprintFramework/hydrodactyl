@@ -16,7 +16,8 @@ class CreateBucketController extends Controller
         private AlertsMessageBag $alert,
         private S3CreationService $creationService,
         private ViewFactory $view,
-    ) {}
+    ) {
+    }
 
     public function index(): View
     {

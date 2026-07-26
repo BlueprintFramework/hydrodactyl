@@ -65,7 +65,7 @@ class AuditLog extends Model
         }
 
         return (new self())->fill([
-            'uuid' => Uuid::uuid4()->toString(),
+            'uuid' => Uuid::uuid7()->toString(),
             'is_system' => $isSystem,
             'user_id' => ($request && $request->user()) ? $request->user()->id : null,
             'server_id' => null,

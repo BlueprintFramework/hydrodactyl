@@ -14,7 +14,7 @@ class ActivityLogBatchServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new ActivityLogBatchService();
+        $this->service = app(ActivityLogBatchService::class);
     }
 
     public function testUuidIsNullBeforeStart()

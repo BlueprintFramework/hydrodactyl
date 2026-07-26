@@ -11,7 +11,6 @@ use Pterodactyl\Models\DatabaseHost;
 use GuzzleHttp\Exception\BadResponseException;
 use Pterodactyl\Tests\Integration\IntegrationTestCase;
 use Pterodactyl\Services\Servers\ServerDeletionService;
-
 use Pterodactyl\Repositories\Wings\DaemonServerRepository;
 use Pterodactyl\Services\Databases\DatabaseManagementService;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
@@ -161,7 +160,7 @@ class ServerDeletionServiceTest extends IntegrationTestCase
     public function testServerBackupsAreDeletedDuringServerDeletion()
     {
         $server = $this->createServerModel();
-        
+
         /** @var Backup $backup1 */
         $backup1 = Backup::factory()->create(['server_id' => $server->id]);
         /** @var Backup $backup2 */
@@ -184,7 +183,7 @@ class ServerDeletionServiceTest extends IntegrationTestCase
     public function testServerDeletionContinuesWhenBackupDeletionFailsWithForce()
     {
         $server = $this->createServerModel();
-        
+
         /** @var Backup $backup */
         $backup = Backup::factory()->create(['server_id' => $server->id]);
 
@@ -204,7 +203,7 @@ class ServerDeletionServiceTest extends IntegrationTestCase
     public function testServerDeletionFailsWhenBackupDeletionFailsWithoutForce()
     {
         $server = $this->createServerModel();
-        
+
         /** @var Backup $backup */
         $backup = Backup::factory()->create(['server_id' => $server->id]);
 

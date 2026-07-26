@@ -2,7 +2,6 @@
 
 namespace Pterodactyl\Http\Middleware;
 
-use Closure;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\User;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class SetupRequired
 {
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, \Closure $next): Response
     {
         if (User::query()->exists()) {
             abort(404);

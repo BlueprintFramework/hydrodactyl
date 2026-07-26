@@ -5,11 +5,11 @@ namespace Pterodactyl\Tests\Unit\Services\S3;
 use Mockery\MockInterface;
 use Pterodactyl\Models\S3;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Exceptions\DisplayException;
+use Pterodactyl\Services\S3\S3DeletionService;
+use Illuminate\Contracts\Translation\Translator;
 use Pterodactyl\Contracts\Repository\S3RepositoryInterface;
 use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
-use Pterodactyl\Services\S3\S3DeletionService;
-use Pterodactyl\Exceptions\DisplayException;
-use Illuminate\Contracts\Translation\Translator;
 
 class S3DeletionServiceTest extends TestCase
 {

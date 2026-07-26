@@ -4,17 +4,14 @@ namespace Pterodactyl\Http\Controllers\Admin;
 
 use Exception;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Pterodactyl\Models\DatabaseHost;
 use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
 use Illuminate\View\Factory as ViewFactory;
 use Pterodactyl\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
-
-use PDO;
-use PDOException;
 use Pterodactyl\Services\Databases\Hosts\HostUpdateService;
 use Pterodactyl\Http\Requests\Admin\DatabaseHostFormRequest;
 use Pterodactyl\Services\Databases\Hosts\HostCreationService;
@@ -37,7 +34,8 @@ class DatabaseController extends Controller
         private HostUpdateService $updateService,
         private LocationRepositoryInterface $locationRepository,
         private ViewFactory $view,
-    ) {}
+    ) {
+    }
 
     /**
      * Display database host index.
@@ -80,9 +78,9 @@ class DatabaseController extends Controller
                 )->flash();
 
                 return redirect()->route('admin.databases')->withInput($request->validated());
-            } else {
-                throw $exception;
             }
+            throw $exception;
+
         }
 
         $this->alert->success('Successfully created a new database host on the system.')->flash();
@@ -111,9 +109,9 @@ class DatabaseController extends Controller
                 )->flash();
 
                 return $redirect->withInput($request->normalize());
-            } else {
-                throw $exception;
             }
+            throw $exception;
+
         }
 
         return $redirect;
@@ -145,26 +143,26 @@ class DatabaseController extends Controller
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
-        Log::error("TestConnection", [
+        Log::error('TestConnection', [
             "\nhost" => $request->host,
             "\nport" => $request->port,
             "\nusername" => $request->username,
-            "\npassword" => $request->password
+            "\npassword" => $request->password,
         ]);
 
         try {
             $dsn = "mysql:host={$request->input('host')};port={$request->input('port')};charset=utf8";
 
-            $pdo = new PDO($dsn, $request->input('username'), $request->input('password'), [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_TIMEOUT => 5, // 5 second timeout
+            $pdo = new \PDO($dsn, $request->input('username'), $request->input('password'), [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_TIMEOUT => 5, // 5 second timeout
             ]);
 
             // Test basic query
             $version = $pdo->query('SELECT VERSION() as version')->fetchColumn();
 
             // Test GRANT permissions (this is what Pterodactyl needs)
-            $grants = $pdo->query('SHOW GRANTS FOR CURRENT_USER()')->fetchAll(PDO::FETCH_COLUMN);
+            $grants = $pdo->query('SHOW GRANTS FOR CURRENT_USER()')->fetchAll(\PDO::FETCH_COLUMN);
 
             $hasGrantOption = false;
             foreach ($grants as $grant) {
@@ -176,24 +174,24 @@ class DatabaseController extends Controller
 
             $message = "Successfully connected to MySQL server (Version: {$version}).";
             if (!$hasGrantOption) {
-                $message .= " Warning: The user appears to lack GRANT OPTION permission which is required for creating databases and users.";
+                $message .= ' Warning: The user appears to lack GRANT OPTION permission which is required for creating databases and users.';
             }
 
             return response()->json([
                 'success' => true,
                 'message' => $message,
                 'version' => $version,
-                'has_grant_option' => $hasGrantOption
+                'has_grant_option' => $hasGrantOption,
             ]);
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Connection failed: ' . $e->getMessage()
+                'message' => 'Connection failed: ' . $e->getMessage(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage(),
             ], 422);
         }
     }

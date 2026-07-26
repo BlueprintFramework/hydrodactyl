@@ -8,8 +8,9 @@ use Pterodactyl\Contracts\Repository\S3RepositoryInterface;
 class S3CreationService
 {
     public function __construct(
-        private S3RepositoryInterface $repository
-    ) {}
+        private S3RepositoryInterface $repository,
+    ) {
+    }
 
     public function handle(array $data): S3
     {

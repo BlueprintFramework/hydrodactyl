@@ -3,9 +3,9 @@
 namespace Pterodactyl\Services\Marketplace\Sources;
 
 use Illuminate\Support\Arr;
-use Pterodactyl\Services\Marketplace\AbstractMarketplaceSource;
 use Pterodactyl\Services\Marketplace\MarketplaceProject;
 use Pterodactyl\Services\Marketplace\MarketplaceVersion;
+use Pterodactyl\Services\Marketplace\AbstractMarketplaceSource;
 
 /**
  * Spiget (https://spiget.org) adapter for Spigot resources. Plugin-only,
@@ -58,7 +58,7 @@ class SpigetSource extends AbstractMarketplaceSource
             if ($id === null) {
                 continue;
             }
-            $name = (string) (Arr::get($item, 'name', 'spiget-' . $id));
+            $name = (string) Arr::get($item, 'name', 'spiget-' . $id);
 
             $projects[] = new MarketplaceProject(
                 source: $this->key(),

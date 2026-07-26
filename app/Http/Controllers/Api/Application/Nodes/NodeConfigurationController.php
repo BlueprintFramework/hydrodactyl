@@ -10,7 +10,7 @@ use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
 class NodeConfigurationController extends ApplicationApiController
 {
     /**
-     * Get node configuration
+     * Get node configuration.
      */
     public function __invoke(GetNodeRequest $request, Node $node): JsonResponse
     {

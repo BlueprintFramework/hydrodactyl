@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class NodeFactory extends Factory
 {
-
     /**
      * The name of the factory's corresponding model.
      *
@@ -24,7 +23,7 @@ class NodeFactory extends Factory
     public function definition(): array
     {
         return [
-            'uuid' => Uuid::uuid4()->toString(),
+            'uuid' => Uuid::uuid7()->toString(),
             'public' => true,
             'name' => 'FactoryNode_' . Str::random(10),
             'fqdn' => $this->faker->unique()->ipv4,

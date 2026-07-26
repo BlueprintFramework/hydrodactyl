@@ -27,7 +27,7 @@ class SftpAuthenticationController extends Controller
     }
 
     /**
-     * Authenticate SFTP credentials
+     * Authenticate SFTP credentials.
      */
     public function __invoke(SftpAuthenticationFormRequest $request): JsonResponse
     {

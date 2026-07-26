@@ -11,8 +11,8 @@ use Pterodactyl\Transformers\Api\Client\EggVariableTransformer;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Startup\GetStartupRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Startup\UpdateStartupVariableRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Startup\UpdateStartupCommandRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Startup\UpdateStartupVariableRequest;
 
 class StartupController extends ClientApiController
 {
@@ -28,7 +28,7 @@ class StartupController extends ClientApiController
     }
 
     /**
-     * Get server startup config
+     * Get server startup config.
      */
     public function index(GetStartupRequest $request, Server $server): array
     {
@@ -47,7 +47,7 @@ class StartupController extends ClientApiController
     }
 
     /**
-     * Update startup variable
+     * Update startup variable.
      *
      * @throws \Illuminate\Validation\ValidationException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -101,7 +101,7 @@ class StartupController extends ClientApiController
     }
 
     /**
-     * Update startup command
+     * Update startup command.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      * @throws \Throwable
@@ -125,7 +125,7 @@ class StartupController extends ClientApiController
     }
 
     /**
-     * Get default startup command
+     * Get default startup command.
      */
     public function getDefaultCommand(GetStartupRequest $request, Server $server): array
     {
@@ -135,7 +135,7 @@ class StartupController extends ClientApiController
     }
 
     /**
-     * Preview startup command
+     * Preview startup command.
      */
     public function processCommand(GetStartupRequest $request, Server $server): array
     {

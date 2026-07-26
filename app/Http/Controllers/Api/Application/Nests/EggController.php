@@ -12,7 +12,7 @@ use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
 class EggController extends ApplicationApiController
 {
     /**
-     * List all eggs in a nest
+     * List all eggs in a nest.
      */
     public function index(GetEggsRequest $request, Nest $nest): array
     {
@@ -22,7 +22,7 @@ class EggController extends ApplicationApiController
     }
 
     /**
-     * View a single egg
+     * View a single egg.
      */
     public function view(GetEggRequest $request, Nest $nest, Egg $egg): array
     {

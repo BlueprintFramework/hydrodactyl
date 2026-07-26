@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +15,7 @@ use Illuminate\Support\Facades\Schema;
 | bundled into a server backup/archive.
 |
 */
-return new class extends Migration
-{
+return new class () extends Migration {
     public function up(): void
     {
         Schema::create('marketplace_installs', function (Blueprint $table) {

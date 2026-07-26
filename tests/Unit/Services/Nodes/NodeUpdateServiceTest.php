@@ -7,9 +7,9 @@ use Pterodactyl\Models\Node;
 use Pterodactyl\Tests\TestCase;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Pterodactyl\Services\Nodes\NodeUpdateService;
 use Pterodactyl\Repositories\Eloquent\NodeRepository;
 use Pterodactyl\Repositories\Wings\DaemonConfigurationRepository;
-use Pterodactyl\Services\Nodes\NodeUpdateService;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 class NodeUpdateServiceTest extends TestCase

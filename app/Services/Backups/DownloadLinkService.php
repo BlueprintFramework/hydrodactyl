@@ -3,10 +3,10 @@
 namespace Pterodactyl\Services\Backups;
 
 use Carbon\CarbonImmutable;
-use Pterodactyl\Enums\BackupAdapter;
-use Pterodactyl\Enums\Daemon\JwtScope;
 use Pterodactyl\Models\User;
 use Pterodactyl\Models\Backup;
+use Pterodactyl\Enums\BackupAdapter;
+use Pterodactyl\Enums\Daemon\JwtScope;
 use Pterodactyl\Services\Nodes\NodeJWTService;
 use Pterodactyl\Extensions\Backups\BackupManager;
 
@@ -15,7 +15,9 @@ class DownloadLinkService
     /**
      * DownloadLinkService constructor.
      */
-    public function __construct(private BackupManager $backupManager, private NodeJWTService $jwtService) {}
+    public function __construct(private BackupManager $backupManager, private NodeJWTService $jwtService)
+    {
+    }
 
     /**
      * Returns the URL that allows for a backup to be downloaded by an individual

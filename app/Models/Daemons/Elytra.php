@@ -5,9 +5,8 @@ namespace Pterodactyl\Models\Daemons;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\Node;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Encryption\Encrypter;
-
 use Pterodactyl\Contracts\Daemon\Daemon;
+use Illuminate\Contracts\Encryption\Encrypter;
 
 class Elytra implements Daemon
 {
@@ -50,6 +49,7 @@ class Elytra implements Daemon
         $localConfig = config('backups.disks.rustic_local', []);
         $s3Bucket = $node->s3Bucket;
         $s3Config = $s3Bucket ? $s3Bucket->toRusticS3Config() : [];
+
         return [
             // Path to rustic binary
             'binary_path' => $localConfig['binary_path'] ?? 'rustic',
@@ -89,6 +89,6 @@ class Elytra implements Daemon
     {
         $debugFlag = config('app.debug') ? ' --allow-insecure' : '';
 
-        return "cd /etc/elytra && sudo elytra configure --panel-url " . escapeshellarg(config('app.url')) . " --token " . escapeshellarg($token) . " --node " . escapeshellarg((string) $node->id) . $debugFlag . "";
+        return 'cd /etc/elytra && sudo elytra configure --panel-url ' . escapeshellarg(config('app.url')) . ' --token ' . escapeshellarg($token) . ' --node ' . escapeshellarg((string) $node->id) . $debugFlag . '';
     }
 }

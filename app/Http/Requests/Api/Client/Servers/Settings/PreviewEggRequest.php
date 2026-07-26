@@ -33,7 +33,7 @@ class PreviewEggRequest extends ClientApiRequest
                 $egg = Egg::where('id', $this->input('egg_id'))
                     ->where('nest_id', $this->input('nest_id'))
                     ->first();
-                
+
                 if (!$egg) {
                     $validator->errors()->add('egg_id', 'The selected egg does not belong to the specified nest.');
                 }

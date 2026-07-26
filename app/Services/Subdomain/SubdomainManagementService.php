@@ -4,14 +4,13 @@ namespace Pterodactyl\Services\Subdomain;
 
 use Pterodactyl\Models\Domain;
 use Pterodactyl\Models\Server;
-use Pterodactyl\Models\ServerSubdomain;
-use Pterodactyl\Contracts\Dns\DnsProviderInterface;
-use Pterodactyl\Contracts\Subdomain\SubdomainFeatureInterface;
-use Pterodactyl\Exceptions\Dns\DnsProviderException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Pterodactyl\Enums\Subdomain\Providers;
+use Pterodactyl\Models\ServerSubdomain;
 use Pterodactyl\Enums\Subdomain\Features;
+use Pterodactyl\Enums\Subdomain\Providers;
+use Pterodactyl\Contracts\Dns\DnsProviderInterface;
+use Pterodactyl\Contracts\Subdomain\SubdomainFeatureInterface;
 
 class SubdomainManagementService
 {
@@ -28,12 +27,8 @@ class SubdomainManagementService
     }
 
     /**
-     * Create a subdomain for a server
+     * Create a subdomain for a server.
      *
-     * @param Server $server
-     * @param Domain $domain
-     * @param string $subdomain
-     * @return ServerSubdomain
      * @throws \Exception
      */
     public function createSubdomain(Server $server, Domain $domain, string $subdomain): ?ServerSubdomain
@@ -125,10 +120,8 @@ class SubdomainManagementService
     }
 
     /**
-     * Update a subdomain's DNS records
+     * Update a subdomain's DNS records.
      *
-     * @param ServerSubdomain $serverSubdomain
-     * @return void
      * @throws \Exception
      */
     public function updateSubdomain(ServerSubdomain $serverSubdomain): void
@@ -208,10 +201,8 @@ class SubdomainManagementService
     }
 
     /**
-     * Delete a subdomain and its DNS records
+     * Delete a subdomain and its DNS records.
      *
-     * @param ServerSubdomain $serverSubdomain
-     * @return void
      * @throws \Exception
      */
     public function deleteSubdomain(ServerSubdomain $serverSubdomain): void
@@ -256,8 +247,6 @@ class SubdomainManagementService
     /**
      * Get available domains for subdomain creation.
      * Only returns safe data needed by the frontend.
-     *
-     * @return array
      */
     public function getAvailableDomains(): array
     {
@@ -278,10 +267,7 @@ class SubdomainManagementService
     /**
      * Check if a subdomain is available for use.
      *
-     * @param string $subdomain
-     * @param Domain $domain
      * @param Server|null $excludeServer Exclude this server's subdomain from availability check
-     * @return array
      */
     public function checkSubdomainAvailability(string $subdomain, Domain $domain, ?Server $excludeServer = null): array
     {
@@ -341,13 +327,11 @@ class SubdomainManagementService
 
     /**
      * Get the list of reserved subdomains.
-     *
-     * @return array
      */
     public function getReservedSubdomains(): array
     {
-        //? I used ChatGPT to generate this list based on common reserved subdomains
-        //? AND I AM PROUD - ellie
+        // ? I used ChatGPT to generate this list based on common reserved subdomains
+        // ? AND I AM PROUD - ellie
 
         return array_map('strtolower', [
             // Web & infra
@@ -424,7 +408,7 @@ class SubdomainManagementService
             'password',
 
             // APIs & developer endpoints
-            'v4',//covers api versions up to v4 (such as in cloudflare is v4)
+            'v4', // covers api versions up to v4 (such as in cloudflare is v4)
             'v3',
             'v2',
             'v1',
@@ -504,8 +488,6 @@ class SubdomainManagementService
 
     /**
      * Get the subdomain feature for a server.
-     *
-     * @return null|\Pterodactyl\Contracts\Subdomain\SubdomainFeatureInterface
      */
     public function getServerSubdomainFeature(Server $server): ?SubdomainFeatureInterface
     {
@@ -518,6 +500,7 @@ class SubdomainManagementService
             foreach ($server->egg->features as $featureName) {
                 if (isset($this->subdomainFeatures[$featureName])) {
                     $featureClass = $this->subdomainFeatures[$featureName];
+
                     return new $featureClass();
                 }
             }
@@ -528,6 +511,7 @@ class SubdomainManagementService
             foreach ($server->egg->inherit_features as $featureName) {
                 if (isset($this->subdomainFeatures[$featureName])) {
                     $featureClass = $this->subdomainFeatures[$featureName];
+
                     return new $featureClass();
                 }
             }
@@ -539,10 +523,6 @@ class SubdomainManagementService
     /**
      * Validate a subdomain name.
      *
-     * @param string $subdomain
-     * @param SubdomainFeatureInterface $feature
-     * @param Domain $domain
-     * @return void
      * @throws \Exception
      */
     private function validateSubdomain(string $subdomain, SubdomainFeatureInterface $feature, Domain $domain): void
@@ -557,8 +537,6 @@ class SubdomainManagementService
     /**
      * Get the DNS provider for a domain.
      *
-     * @param Domain $domain
-     * @return \Pterodactyl\Contracts\Dns\DnsProviderInterface
      * @throws \Exception
      */
     private function getDnsProvider(Domain $domain): DnsProviderInterface
@@ -570,16 +548,12 @@ class SubdomainManagementService
         }
 
         $providerClass = $this->dnsProviders[$providerName];
+
         return new $providerClass($domain->dns_config);
     }
 
     /**
      * Clean up DNS records in case of failure.
-     *
-     * @param DnsProviderInterface $dnsProvider
-     * @param string $domain
-     * @param array $recordIds
-     * @return void
      */
     private function cleanupDnsRecords(DnsProviderInterface $dnsProvider, string $domain, array $recordIds): void
     {
@@ -594,12 +568,6 @@ class SubdomainManagementService
 
     /**
      * Attempt to rollback DNS changes during update failures.
-     *
-     * @param DnsProviderInterface $dnsProvider
-     * @param string $domain
-     * @param array $rollbackData
-     * @param array $createdRecordIds
-     * @return void
      */
     private function rollbackDnsChanges(DnsProviderInterface $dnsProvider, string $domain, array $rollbackData, array $createdRecordIds): void
     {
@@ -623,12 +591,9 @@ class SubdomainManagementService
 
     /**
      * Normalize IP addresses in DNS records (convert localhost to 127.0.0.1).
-     * Or if using ip_aliases convert to the correct ip
-     *
-     * @param array $dnsRecords
-     * @return array
+     * Or if using ip_aliases convert to the correct ip.
      */
-    private function normalizeIpAddresses(array $dnsRecords, server $server): array
+    private function normalizeIpAddresses(array $dnsRecords, Server $server): array
     {
         $useAlias = (bool) $server->node->trust_alias;
         $allocationIp = $server->allocation->ip;

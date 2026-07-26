@@ -35,14 +35,14 @@ class VariableValidatorService
             $query = $query->where('user_editable', true)->where('user_viewable', true);
         }
 
-        /** @var \Pterodactyl\Models\EggVariable[] $variables */
+        /** @var EggVariable[] $variables */
         $variables = $query->orderBy('id')->get();
 
         $data = $rules = $customAttributes = [];
         foreach ($variables as $variable) {
             $value = Arr::get($fields, $variable->env_variable);
             $data['environment'][$variable->env_variable] = $value;
-            
+
             // Make rules nullable to handle empty environment variables, but don't duplicate if already nullable
             $rules_string = $variable->rules;
             if (!str_starts_with($rules_string, 'nullable')) {

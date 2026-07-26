@@ -42,8 +42,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $inherit_file_denylist
  * @property array|null $inherit_features
  * @property Nest $nest
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Server[] $servers
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\EggVariable[] $variables
+ * @property \Illuminate\Database\Eloquent\Collection|Server[] $servers
+ * @property \Illuminate\Database\Eloquent\Collection|EggVariable[] $variables
  * @property Egg|null $scriptFrom
  * @property Egg|null $configFrom
  */

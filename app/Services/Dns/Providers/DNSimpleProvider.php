@@ -38,6 +38,7 @@ class DNSimpleProvider implements DnsProviderInterface
 
         try {
             $this->getAccountId();
+
             return true;
         } catch (GuzzleException $e) {
             throw DnsProviderException::connectionFailed('dnsimple', $e->getMessage());
@@ -173,6 +174,7 @@ class DNSimpleProvider implements DnsProviderInterface
         if (empty($config['api_token'])) {
             throw DnsProviderException::invalidConfiguration('dnsimple', 'api_token');
         }
+
         return true;
     }
 
@@ -189,6 +191,7 @@ class DNSimpleProvider implements DnsProviderInterface
 
         if (!empty($this->config['account_id'])) {
             $this->accountId = $this->config['account_id'];
+
             return $this->accountId;
         }
 
@@ -200,6 +203,7 @@ class DNSimpleProvider implements DnsProviderInterface
         }
 
         $this->accountId = (string) $data['data']['account']['id'];
+
         return $this->accountId;
     }
 }

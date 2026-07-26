@@ -6,20 +6,19 @@ use Illuminate\Http\Request;
 use Pterodactyl\Models\Backup;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
+use PragmaRX\Google2FA\Google2FA;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Models\Permission;
-use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Auth\Access\AuthorizationException;
+use Pterodactyl\Enums\Daemon\Adapters;
 use Pterodactyl\Services\Elytra\ElytraJobService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Pterodactyl\Services\Backups\DownloadLinkService;
 use Pterodactyl\Transformers\Api\Client\BackupTransformer;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Backups\StoreBackupRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Backups\RestoreBackupRequest;
-
-use Pterodactyl\Enums\Daemon\Adapters;
 
 class BackupsController extends ClientApiController
 {
@@ -33,7 +32,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * List backups
+     * List backups.
      */
     public function index(Request $request, Server $server): array
     {
@@ -96,7 +95,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * Create a backup
+     * Create a backup.
      */
     public function store(StoreBackupRequest $request, Server $server): JsonResponse
     {
@@ -125,7 +124,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * View a backup
+     * View a backup.
      */
     public function show(Request $request, Server $server, Backup $backup): array
     {
@@ -139,7 +138,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * Delete a backup
+     * Delete a backup.
      */
     public function destroy(Request $request, Server $server, Backup $backup): JsonResponse
     {
@@ -189,7 +188,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * Restore a backup
+     * Restore a backup.
      */
     public function restore(RestoreBackupRequest $request, Server $server, Backup $backup): JsonResponse
     {
@@ -240,7 +239,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * Download a backup
+     * Download a backup.
      */
     public function download(Request $request, Server $server, Backup $backup): JsonResponse
     {
@@ -266,7 +265,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * Rename a backup
+     * Rename a backup.
      */
     public function rename(Request $request, Server $server, Backup $backup): JsonResponse
     {
@@ -295,7 +294,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * Toggle backup lock
+     * Toggle backup lock.
      */
     public function toggleLock(Request $request, Server $server, Backup $backup): JsonResponse
     {
@@ -320,7 +319,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * Delete all backups
+     * Delete all backups.
      */
     public function deleteAll(Request $request, Server $server): JsonResponse
     {
@@ -376,7 +375,7 @@ class BackupsController extends ClientApiController
     }
 
     /**
-     * Bulk delete backups
+     * Bulk delete backups.
      */
     public function bulkDelete(Request $request, Server $server): JsonResponse
     {

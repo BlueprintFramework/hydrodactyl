@@ -3,11 +3,11 @@
 namespace Pterodactyl\Tests\Unit\Services\Locations;
 
 use Mockery\MockInterface;
-use Pterodactyl\Models\Location;
 use Pterodactyl\Tests\TestCase;
-use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
-use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
+use Pterodactyl\Models\Location;
 use Pterodactyl\Services\Locations\LocationDeletionService;
+use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
+use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
 use Pterodactyl\Exceptions\Service\Location\HasActiveNodesException;
 
 class LocationDeletionServiceTest extends TestCase

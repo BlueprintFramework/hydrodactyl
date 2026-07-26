@@ -6,8 +6,8 @@ use Pterodactyl\Models\Node;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Location;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Pterodactyl\Tests\Integration\IntegrationTestCase;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Pterodactyl\Services\Deployment\FindViableNodesService;
 use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
 
@@ -33,7 +33,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
     // BASIC FUNCTIONALITY AND VALIDATION TESTS
     // =================================================================
 
-    public function test_requires_disk_parameter()
+    public function testRequiresDiskParameter()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Disk space must be an int, got NULL');
@@ -41,7 +41,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->service->handle();
     }
 
-    public function test_requires_memory_parameter()
+    public function testRequiresMemoryParameter()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Memory usage must be an int, got NULL');
@@ -49,7 +49,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->service->setDisk(1024)->handle();
     }
 
-    public function test_accepts_string_location_ids()
+    public function testAcceptsStringLocationIds()
     {
         // Should not throw exceptions
         $this->service->setLocations([1, 2, 3]);
@@ -60,10 +60,10 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->service->setLocations(['invalid']);
     }
 
-    public function test_throws_exception_when_no_viable_nodes_found()
+    public function testThrowsExceptionWhenNoViableNodesFound()
     {
         $this->expectException(NoViableNodeException::class);
-        
+
         $this->service
             ->setMemory(1024)
             ->setDisk(1024)
@@ -74,7 +74,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
     // TWO-PASS STRATEGY TESTS
     // =================================================================
 
-    public function test_prefers_physical_capacity_over_overallocation()
+    public function testPrefersPhysicalCapacityOverOverallocation()
     {
         $physicalNode = $this->createNode([
             'memory' => 2048,
@@ -101,7 +101,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->assertEquals($physicalNode->id, $result->first()->id);
     }
 
-    public function test_falls_back_to_overallocation_when_physical_capacity_insufficient()
+    public function testFallsBackToOverallocationWhenPhysicalCapacityInsufficient()
     {
         $node = $this->createNode([
             'memory' => 1024,
@@ -125,7 +125,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
     // ORDERING STRATEGY
     // =================================================================
 
-    public function test_physical_capacity_uses_best_fit_ordering()
+    public function testPhysicalCapacityUsesBestFitOrdering()
     {
         // Create nodes with different amounts of free capacity
         $smallNode = $this->createNode(['memory' => 1024, 'disk' => 10240]);
@@ -140,37 +140,37 @@ class FindViableNodesServiceTest extends IntegrationTestCase
             ->handle();
 
         $this->assertCount(3, $result);
-        
+
         // Should be ordered by least leftover capacity (best-fit)
         // Small: (1024-512) + (10240-5120) = 512 + 5120 = 5632 leftover
-        // Medium: (2048-512) + (20480-5120) = 1536 + 15360 = 16896 leftover  
+        // Medium: (2048-512) + (20480-5120) = 1536 + 15360 = 16896 leftover
         // Large: (4096-512) + (40960-5120) = 3584 + 35840 = 39424 leftover
         $this->assertEquals($smallNode->id, $result[0]->id);
         $this->assertEquals($mediumNode->id, $result[1]->id);
         $this->assertEquals($largeNode->id, $result[2]->id);
     }
 
-    public function test_overallocation_mode_uses_worst_fit_ordering()
+    public function testOverallocationModeUsesWorstFitOrdering()
     {
         // Create nodes where physical capacity is insufficient but overallocation works
         $smallNode = $this->createNode([
-            'memory' => 512, 
+            'memory' => 512,
             'disk' => 5120,
             'memory_overallocate' => 100, // 1024 total
             'disk_overallocate' => 100,   // 10240 total
         ]);
-        
+
         $mediumNode = $this->createNode([
             'memory' => 512,
-            'disk' => 5120, 
+            'disk' => 5120,
             'memory_overallocate' => 300, // 2048 total
             'disk_overallocate' => 300,   // 20480 total
         ]);
-        
+
         $largeNode = $this->createNode([
             'memory' => 512,
             'disk' => 5120,
-            'memory_overallocate' => 700, // 4096 total  
+            'memory_overallocate' => 700, // 4096 total
             'disk_overallocate' => 700,   // 40960 total
         ]);
 
@@ -182,7 +182,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
             ->handle();
 
         $this->assertCount(3, $result);
-        
+
         // Should be ordered by most leftover capacity (worst-fit)
         // Small: (1024-600) + (10240-6000) = 424 + 4240 = 4664 leftover
         // Medium: (2048-600) + (20480-6000) = 1448 + 14480 = 15928 leftover
@@ -192,7 +192,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->assertEquals($smallNode->id, $result[2]->id);
     }
 
-    public function test_ordering_with_existing_server_allocations()
+    public function testOrderingWithExistingServerAllocations()
     {
         $node1 = $this->createNode(['memory' => 4096, 'disk' => 40960]);
         $node2 = $this->createNode(['memory' => 4096, 'disk' => 40960]);
@@ -218,7 +218,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
     // CAPACITY CALCULATION TESTS
     // =================================================================
 
-    public function test_physical_capacity_calculations()
+    public function testPhysicalCapacityCalculations()
     {
         $node = $this->createNode([
             'memory' => 1024,
@@ -238,7 +238,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->assertEquals($node->id, $result->first()->id);
     }
 
-    public function test_overallocation_capacity_calculations()
+    public function testOverallocationCapacityCalculations()
     {
         $node = $this->createNode([
             'memory' => 1024,
@@ -266,7 +266,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
             ->handle();
     }
 
-    public function test_capacity_with_existing_servers()
+    public function testCapacityWithExistingServers()
     {
         $node = $this->createNode([
             'memory' => 2048,
@@ -291,10 +291,10 @@ class FindViableNodesServiceTest extends IntegrationTestCase
     // FILTERING TESTS
     // =================================================================
 
-    public function test_location_filtering()
+    public function testLocationFiltering()
     {
         $location2 = Location::factory()->create();
-        
+
         $node1 = $this->createNode(['memory' => 2048, 'disk' => 20480], $this->location);
         $node2 = $this->createNode(['memory' => 2048, 'disk' => 20480], $location2);
 
@@ -308,10 +308,10 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->assertEquals($node1->id, $result->first()->id);
     }
 
-    public function test_empty_location_filter_returns_all_nodes()
+    public function testEmptyLocationFilterReturnsAllNodes()
     {
         $location2 = Location::factory()->create();
-        
+
         $this->createNode(['memory' => 2048, 'disk' => 20480], $this->location);
         $this->createNode(['memory' => 2048, 'disk' => 20480], $location2);
 
@@ -324,7 +324,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->assertCount(2, $result);
     }
 
-    public function test_only_public_nodes_returned()
+    public function testOnlyPublicNodesReturned()
     {
         $publicNode = $this->createNode(['memory' => 2048, 'disk' => 20480, 'public' => true]);
         $this->createNode(['memory' => 4096, 'disk' => 40960, 'public' => false]);
@@ -344,7 +344,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
     // PAGINATION TESTS
     // =================================================================
 
-    public function test_pagination_behavior()
+    public function testPaginationBehavior()
     {
         // Create multiple nodes
         Node::factory()->count(5)->create([
@@ -366,7 +366,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->assertCount(2, $result->items());
     }
 
-    public function test_default_pagination_size()
+    public function testDefaultPaginationSize()
     {
         Node::factory()->count(60)->create([
             'location_id' => $this->location->id,
@@ -386,7 +386,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->assertCount(50, $result->items());
     }
 
-    public function test_returns_collection_when_not_paginating()
+    public function testReturnsCollectionWhenNotPaginating()
     {
         Node::factory()->count(3)->create([
             'location_id' => $this->location->id,
@@ -408,10 +408,10 @@ class FindViableNodesServiceTest extends IntegrationTestCase
     // EDGE CASES AND INTEGRATION TESTS
     // =================================================================
 
-    public function test_zero_resource_requirements()
+    public function testZeroResourceRequirements()
     {
         $node = $this->createNode(['memory' => 1024, 'disk' => 10240]);
-        
+
         // Use all memory with existing server
         $this->createServer(['node_id' => $node->id, 'memory' => 1024, 'disk' => 0]);
 
@@ -425,7 +425,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->assertCount(1, $result);
     }
 
-    public function test_helper_columns_are_hidden()
+    public function testHelperColumnsAreHidden()
     {
         $node = $this->createNode(['memory' => 2048, 'disk' => 20480]);
 
@@ -442,7 +442,7 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         $this->assertArrayNotHasKey('free_disk', $nodeResult->toArray());
     }
 
-    public function test_complex_multi_node_scenario()
+    public function testComplexMultiNodeScenario()
     {
         // High memory, low disk
         $memoryNode = $this->createNode([

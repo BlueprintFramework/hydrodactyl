@@ -2,10 +2,8 @@
 
 namespace Pterodactyl\Services\Captcha\Providers;
 
-use Pterodactyl\Contracts\Captcha\CaptchaProviderInterface;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Pterodactyl\Contracts\Captcha\CaptchaProviderInterface;
 
 class RecaptchaProvider implements CaptchaProviderInterface
 {
@@ -108,4 +106,3 @@ class RecaptchaProvider implements CaptchaProviderInterface
         return !empty($this->siteKey) && !empty($this->secretKey);
     }
 }
-

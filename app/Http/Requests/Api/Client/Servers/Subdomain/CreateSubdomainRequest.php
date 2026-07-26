@@ -2,9 +2,9 @@
 
 namespace Pterodactyl\Http\Requests\Api\Client\Servers\Subdomain;
 
-use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
 use Pterodactyl\Models\Domain;
 use Pterodactyl\Models\ServerSubdomain;
+use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
 
 class CreateSubdomainRequest extends ClientApiRequest
 {
@@ -23,14 +23,16 @@ class CreateSubdomainRequest extends ClientApiRequest
                 function ($attribute, $value, $fail) {
                     if (preg_match('/[<>"\']/', $value)) {
                         $fail('Subdomain contains invalid characters.');
+
                         return;
                     }
-                    
-                    $reserved = ['www', 'mail', 'ftp', 'api', 'admin', 'root', 'panel', 
-                                'localhost', 'wildcard', 'ns1', 'ns2', 'dns', 'smtp', 'pop', 
-                                'imap', 'webmail', 'cpanel', 'whm', 'autodiscover', 'autoconfig'];
+
+                    $reserved = ['www', 'mail', 'ftp', 'api', 'admin', 'root', 'panel',
+                        'localhost', 'wildcard', 'ns1', 'ns2', 'dns', 'smtp', 'pop',
+                        'imap', 'webmail', 'cpanel', 'whm', 'autodiscover', 'autoconfig'];
                     if (in_array(strtolower($value), $reserved)) {
                         $fail('This subdomain is reserved and cannot be used.');
+
                         return;
                     }
 
@@ -40,7 +42,7 @@ class CreateSubdomainRequest extends ClientApiRequest
                             ->where('subdomain', strtolower($value))
                             ->where('is_active', true)
                             ->exists();
-                        
+
                         if ($exists) {
                             $fail('This subdomain is already taken.');
                         }
@@ -78,7 +80,7 @@ class CreateSubdomainRequest extends ClientApiRequest
             $subdomain = preg_replace('/-+/', '-', $subdomain);
             // Remove leading/trailing hyphens
             $subdomain = trim($subdomain, '-');
-            
+
             $this->merge([
                 'subdomain' => $subdomain,
             ]);

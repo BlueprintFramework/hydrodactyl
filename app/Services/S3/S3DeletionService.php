@@ -3,10 +3,10 @@
 namespace Pterodactyl\Services\S3;
 
 use Pterodactyl\Models\S3;
-use Pterodactyl\Contracts\Repository\S3RepositoryInterface;
-use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
 use Pterodactyl\Exceptions\DisplayException;
 use Illuminate\Contracts\Translation\Translator;
+use Pterodactyl\Contracts\Repository\S3RepositoryInterface;
+use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
 
 class S3DeletionService
 {
@@ -14,7 +14,8 @@ class S3DeletionService
         protected S3RepositoryInterface $repository,
         protected ServerRepositoryInterface $serverRepository,
         protected Translator $translator,
-    ) {}
+    ) {
+    }
 
     public function handle(S3|int $s3): bool
     {

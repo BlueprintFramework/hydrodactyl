@@ -4,9 +4,9 @@ namespace Pterodactyl\Tests\Unit\Traits\Services;
 
 use Mockery\MockInterface;
 use Pterodactyl\Tests\TestCase;
-use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Pterodactyl\Traits\Services\ValidatesValidationRules;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Pterodactyl\Exceptions\Service\Egg\Variable\BadValidationRuleException;
 
 class ValidatesValidationRulesTest extends TestCase

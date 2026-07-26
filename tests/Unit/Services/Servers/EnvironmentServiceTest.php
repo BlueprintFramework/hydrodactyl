@@ -3,9 +3,9 @@
 namespace Pterodactyl\Tests\Unit\Services\Servers;
 
 use Pterodactyl\Models\Server;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Models\Location;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Models\Location;
+use Pterodactyl\Models\EggVariable;
 use Pterodactyl\Services\Servers\EnvironmentService;
 
 class EnvironmentServiceTest extends TestCase
@@ -146,8 +146,12 @@ class EnvironmentServiceTest extends TestCase
 
     public function testGetEnvironmentKeysReturnsSetKeys()
     {
-        $this->service->setEnvironmentKey('KEY1', function () { return 'val1'; });
-        $this->service->setEnvironmentKey('KEY2', function () { return 'val2'; });
+        $this->service->setEnvironmentKey('KEY1', function () {
+            return 'val1';
+        });
+        $this->service->setEnvironmentKey('KEY2', function () {
+            return 'val2';
+        });
 
         $keys = $this->service->getEnvironmentKeys();
         $this->assertCount(2, $keys);

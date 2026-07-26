@@ -2,14 +2,14 @@
 
 namespace Pterodactyl\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Pterodactyl\Enums\BackupAdapter;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * Backup model
+ * Backup model.
  *
  * @property int $id
  * @property int $server_id
@@ -20,7 +20,7 @@ use Pterodactyl\Enums\BackupAdapter;
  * @property string $name
  * @property string[] $ignored_files
  * @property array|null $server_state
- * @property \Pterodactyl\Enums\BackupAdapter $disk
+ * @property BackupAdapter $disk
  * @property string|null $checksum
  * @property int $bytes
  * @property string|null $upload_id
@@ -30,8 +30,8 @@ use Pterodactyl\Enums\BackupAdapter;
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
  * @property Server $server
- * @property \Pterodactyl\Models\ElytraJob[] $elytraJobs
- * @property \Pterodactyl\Models\AuditLog[] $audits
+ * @property ElytraJob[] $elytraJobs
+ * @property AuditLog[] $audits
  */
 class Backup extends Model
 {
@@ -78,7 +78,6 @@ class Backup extends Model
         return $this->disk instanceof BackupAdapter && $this->disk->isRustic();
     }
 
-
     /**
      * Check if this backup is stored locally (not in cloud storage).
      */
@@ -104,7 +103,7 @@ class Backup extends Model
     }
 
     /**
-     * Get the size in gigabytes for display
+     * Get the size in gigabytes for display.
      */
     public function getSizeGbAttribute(): float
     {
@@ -133,7 +132,7 @@ class Backup extends Model
     }
 
     /**
-     * Get all Elytra jobs related to this backup
+     * Get all Elytra jobs related to this backup.
      */
     public function elytraJobs(): HasMany
     {
@@ -142,7 +141,7 @@ class Backup extends Model
     }
 
     /**
-     * Get the latest Elytra job for this backup
+     * Get the latest Elytra job for this backup.
      */
     public function latestElytraJob()
     {
@@ -150,7 +149,7 @@ class Backup extends Model
     }
 
     /**
-     * Get the adapter type formatted for Elytra API
+     * Get the adapter type formatted for Elytra API.
      */
     public function getElytraAdapterType(): string
     {
@@ -158,7 +157,7 @@ class Backup extends Model
     }
 
     /**
-     * Scope to get successful backups
+     * Scope to get successful backups.
      */
     public function scopeSuccessful($query)
     {
@@ -166,7 +165,7 @@ class Backup extends Model
     }
 
     /**
-     * Scope to get failed backups
+     * Scope to get failed backups.
      */
     public function scopeFailed($query)
     {
@@ -174,7 +173,7 @@ class Backup extends Model
     }
 
     /**
-     * Scope to get locked backups
+     * Scope to get locked backups.
      */
     public function scopeLocked($query)
     {
@@ -182,13 +181,12 @@ class Backup extends Model
     }
 
     /**
-     * Scope to get automatic backups
+     * Scope to get automatic backups.
      */
     public function scopeAutomatic($query)
     {
         return $query->where('is_automatic', true);
     }
-
 
     /**
      * Get the route key for the model.

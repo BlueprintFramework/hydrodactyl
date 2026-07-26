@@ -2,12 +2,16 @@
 
 namespace Pterodactyl\Services\Activity;
 
-use Ramsey\Uuid\Uuid;
+use Pterodactyl\Services\UuidService;
 
 class ActivityLogBatchService
 {
     protected int $transaction = 0;
     protected ?string $uuid = null;
+
+    public function __construct(private UuidService $uuidService)
+    {
+    }
 
     /**
      * Returns the UUID of the batch, or null if there is not a batch currently
@@ -25,7 +29,7 @@ class ActivityLogBatchService
     public function start(): void
     {
         if ($this->transaction === 0) {
-            $this->uuid = Uuid::uuid4()->toString();
+            $this->uuid = $this->uuidService->uuid();
         }
 
         ++$this->transaction;

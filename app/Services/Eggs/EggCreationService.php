@@ -2,8 +2,8 @@
 
 namespace Pterodactyl\Services\Eggs;
 
-use Ramsey\Uuid\Uuid;
 use Pterodactyl\Models\Egg;
+use Pterodactyl\Services\UuidService;
 use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Pterodactyl\Exceptions\Service\Egg\NoParentConfigurationFoundException;
@@ -14,7 +14,7 @@ class EggCreationService
     /**
      * EggCreationService constructor.
      */
-    public function __construct(private ConfigRepository $config, private EggRepositoryInterface $repository)
+    public function __construct(private ConfigRepository $config, private EggRepositoryInterface $repository, private UuidService $uuidService)
     {
     }
 
@@ -39,7 +39,7 @@ class EggCreationService
         }
 
         return $this->repository->create(array_merge($data, [
-            'uuid' => Uuid::uuid4()->toString(),
+            'uuid' => $this->uuidService->uuid(),
             'author' => $this->config->get('pterodactyl.service.author'),
         ]), true, true);
     }

@@ -29,7 +29,7 @@ class UserController extends ApplicationApiController
     }
 
     /**
-     * List all users
+     * List all users.
      */
     public function index(GetUsersRequest $request): array
     {
@@ -44,7 +44,7 @@ class UserController extends ApplicationApiController
     }
 
     /**
-     * View a single user
+     * View a single user.
      */
     public function view(GetUsersRequest $request, User $user): array
     {
@@ -54,7 +54,7 @@ class UserController extends ApplicationApiController
     }
 
     /**
-     * Update a user
+     * Update a user.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
@@ -71,7 +71,7 @@ class UserController extends ApplicationApiController
     }
 
     /**
-     * Create a new user
+     * Create a new user.
      *
      * @throws \Exception
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -91,7 +91,7 @@ class UserController extends ApplicationApiController
     }
 
     /**
-     * Delete a user
+     * Delete a user.
      *
      * @throws \Pterodactyl\Exceptions\DisplayException
      */

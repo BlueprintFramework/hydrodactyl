@@ -4,9 +4,9 @@ namespace Pterodactyl\Services\Dns\Providers;
 
 use Aws\Route53\Route53Client;
 use Aws\Exception\AwsException;
+use Illuminate\Support\Facades\Log;
 use Pterodactyl\Contracts\Dns\DnsProviderInterface;
 use Pterodactyl\Exceptions\Dns\DnsProviderException;
-use Illuminate\Support\Facades\Log;
 
 class Route53Provider implements DnsProviderInterface
 {
@@ -40,6 +40,7 @@ class Route53Provider implements DnsProviderInterface
 
         try {
             $this->client->listHostedZones(['MaxItems' => '1']);
+
             return true;
         } catch (AwsException $e) {
             throw DnsProviderException::connectionFailed('route53', $e->getAwsErrorMessage());
@@ -52,7 +53,7 @@ class Route53Provider implements DnsProviderInterface
     public function createRecord(string $domain, string $name, string $type, $content, int $ttl = 300): string
     {
         $zoneId = $this->getZoneId($domain);
-        $name = explode(".", $name)[0];
+        $name = explode('.', $name)[0];
 
         try {
             /* Log::info('Creating Route53 record\n', [ */
@@ -64,7 +65,7 @@ class Route53Provider implements DnsProviderInterface
             /* ]); */
 
             if (strtoupper($type) === 'SRV' && is_array($content)) {
-                $name = $name . "." . $content['proto'] . "." . explode(".", $content['name'])[0];
+                $name = $name . '.' . $content['proto'] . '.' . explode('.', $content['name'])[0];
                 $recordValue = sprintf(
                     '%d %d %d %s',
                     $content['priority'] ?? 0,
@@ -84,16 +85,16 @@ class Route53Provider implements DnsProviderInterface
                         [
                             'Action' => 'CREATE',
                             'ResourceRecordSet' => [
-                                'Name' => $name . "." . $domain,
+                                'Name' => $name . '.' . $domain,
                                 'Type' => strtoupper($type),
                                 'TTL' => $ttl,
                                 'ResourceRecords' => [
-                                    ['Value' => $recordValue]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+                                    ['Value' => $recordValue],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ];
 
             /* Log::debug('Route53 API request params', $params); */
@@ -104,27 +105,25 @@ class Route53Provider implements DnsProviderInterface
             /* Log::info('Route53 record created successfully', ['change_id' => $changeId]); */
 
             /* return $changeId; */
-            return $name . "." . $domain;
+            return $name . '.' . $domain;
         } catch (AwsException $e) {
             Log::error('Route53 API error', [
                 'error' => $e->getAwsErrorMessage(),
                 'code' => $e->getAwsErrorCode(),
                 'request_id' => $e->getAwsRequestId(),
                 'domain' => $domain,
-                'name' => $name
+                'name' => $name,
             ]);
             throw DnsProviderException::recordCreationFailed($domain, $name, $e->getAwsErrorMessage());
         } catch (\Exception $e) {
             Log::error('Unexpected error in Route53', [
                 'error' => $e->getMessage(),
                 'domain' => $domain,
-                'name' => $name
+                'name' => $name,
             ]);
             throw DnsProviderException::recordCreationFailed($domain, $name, 'DNS service temporarily unavailable.');
         }
     }
-
-
 
     /**
      * Update a DNS record.
@@ -143,20 +142,21 @@ class Route53Provider implements DnsProviderInterface
                     'Changes' => [
                         [
                             'Action' => 'DELETE',
-                            'ResourceRecordSet' => $record
+                            'ResourceRecordSet' => $record,
                         ],
                         [
                             'Action' => 'CREATE',
                             'ResourceRecordSet' => array_merge($record, [
                                 'ResourceRecords' => [['Value' => $content]],
-                                'TTL' => $ttl ?? $record['TTL']
-                            ])
-                        ]
-                    ]
-                ]
+                                'TTL' => $ttl ?? $record['TTL'],
+                            ]),
+                        ],
+                    ],
+                ],
             ];
 
             $this->client->changeResourceRecordSets($params);
+
             return true;
         } catch (AwsException $e) {
             throw DnsProviderException::recordUpdateFailed($domain, $recordId, $e->getAwsErrorMessage());
@@ -173,6 +173,7 @@ class Route53Provider implements DnsProviderInterface
 
         if (!$record) {
             Log::info("DNS record already deleted or never existed: {$recordName}");
+
             return;
         }
 
@@ -180,7 +181,7 @@ class Route53Provider implements DnsProviderInterface
         $rrset = ['Name' => $record['Name'], 'Type' => $record['Type']];
         if (strtoupper($record['Type']) === 'SRV') {
             $rrset = ['Name' => $record['Name'], 'Type' => $record['Type']];
-        };
+        }
 
 
         if (isset($record['ResourceRecords'])) {
@@ -204,8 +205,6 @@ class Route53Provider implements DnsProviderInterface
 
         /* Log::info("Successfully deleted DNS record: {$recordName}"); */
     }
-
-
 
     /**
      * Get a specific DNS record.
@@ -239,6 +238,7 @@ class Route53Provider implements DnsProviderInterface
             }
 
             $result = $this->client->listResourceRecordSets($params);
+
             return $result->get('ResourceRecordSets');
         } catch (AwsException $e) {
             throw DnsProviderException::connectionFailed('route53', $e->getAwsErrorMessage());
@@ -345,7 +345,6 @@ class Route53Provider implements DnsProviderInterface
 
         return null;
     }
-
 
     /**
      * Format SRV record content for Route53.

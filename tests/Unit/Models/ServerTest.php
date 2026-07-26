@@ -2,12 +2,11 @@
 
 namespace Pterodactyl\Tests\Unit\Models;
 
-use Mockery\MockInterface;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\Node;
 use Pterodactyl\Models\Server;
-use Pterodactyl\Models\ServerTransfer;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Models\ServerTransfer;
 use Pterodactyl\Exceptions\Http\Server\ServerStateConflictException;
 
 class ServerTest extends TestCase

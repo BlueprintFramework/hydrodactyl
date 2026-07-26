@@ -13,9 +13,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class BackupDeleteController extends Controller
 {
-
     /**
-     * Delete a backup from daemon
+     * Delete a backup from daemon.
      *
      * @throws \Throwable
      */

@@ -3,7 +3,7 @@
 namespace Pterodactyl\Services\Admin;
 
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Str;
+use Pterodactyl\Services\UuidService;
 use Illuminate\Support\Facades\Storage;
 use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 
@@ -16,22 +16,27 @@ class LogoService
 
     public function __construct(
         private SettingsRepositoryInterface $settings,
-    ) {}
+        private UuidService $uuidService,
+    ) {
+    }
 
     public function handle(array $data): void
     {
         if (!empty($data['remove'])) {
             $this->remove();
+
             return;
         }
 
         if (!empty($data['rewind'])) {
             $this->rewind((int) $data['rewind']);
+
             return;
         }
 
         if (!empty($data['logo_url'])) {
             $this->storeLink($data['logo_url']);
+
             return;
         }
 
@@ -45,11 +50,11 @@ class LogoService
         $mime = $file->getMimeType();
 
         if ($mime === 'image/svg+xml') {
-            $filename = Str::uuid() . '.svg';
+            $filename = $this->uuidService->uuid() . '.svg';
             $file->storeAs(self::LOGO_DIR, $filename, 'public');
             $value = self::LOGO_DIR . '/' . $filename;
         } else {
-            $filename = Str::uuid() . '.avif';
+            $filename = $this->uuidService->uuid() . '.avif';
             $tempPath = $file->getRealPath();
 
             $image = match ($mime) {
@@ -135,8 +140,9 @@ class LogoService
 
     private function dedupPrepend(array $history, string $type, string $value): array
     {
-        $history = array_filter($history, fn($h) => !($h['type'] === $type && $h['value'] === $value));
+        $history = array_filter($history, fn ($h) => !($h['type'] === $type && $h['value'] === $value));
         array_unshift($history, ['type' => $type, 'value' => $value]);
+
         return array_values($history);
     }
 
@@ -148,6 +154,7 @@ class LogoService
         $entry = $history[$index];
         unset($history[$index]);
         array_unshift($history, $entry);
+
         return array_values($history);
     }
 
@@ -177,6 +184,7 @@ class LogoService
             if ($entry['type'] === 'upload') {
                 return Storage::disk('public')->exists($entry['value']);
             }
+
             return true;
         }));
     }

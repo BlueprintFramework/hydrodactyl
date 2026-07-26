@@ -32,7 +32,7 @@ class ScheduleTaskController extends ClientApiController
     }
 
     /**
-     * Create a schedule task
+     * Create a schedule task.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      * @throws ServiceLimitExceededException
@@ -93,7 +93,7 @@ class ScheduleTaskController extends ClientApiController
     }
 
     /**
-     * Update a schedule task
+     * Update a schedule task.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
@@ -148,7 +148,7 @@ class ScheduleTaskController extends ClientApiController
     }
 
     /**
-     * Delete a schedule task
+     * Delete a schedule task.
      *
      * @throws \Exception
      */

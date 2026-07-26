@@ -4,21 +4,22 @@ namespace Pterodactyl\Http\Controllers\Admin\Settings;
 
 use Illuminate\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use Pterodactyl\Models\Domain;
+use Illuminate\Http\RedirectResponse;
+use Pterodactyl\Enums\Subdomain\Providers;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 use Pterodactyl\Exceptions\Dns\DnsProviderException;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 use Pterodactyl\Http\Requests\Admin\Settings\DomainFormRequest;
-use Pterodactyl\Enums\Subdomain\Providers;
 
 class DomainsController extends Controller
 {
     public function __construct(
         private ViewFactory $view,
         private SubdomainManagementService $subdomainService,
-    ) {}
+    ) {
+    }
 
     /**
      * Display the domains management page.

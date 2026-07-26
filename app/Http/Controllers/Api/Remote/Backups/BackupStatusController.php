@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use Pterodactyl\Models\Backup;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
+use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Extensions\Backups\BackupManager;
 use Pterodactyl\Extensions\Filesystem\S3Filesystem;
 use Pterodactyl\Exceptions\Http\HttpForbiddenException;
@@ -26,7 +26,7 @@ class BackupStatusController extends Controller
     }
 
     /**
-     * Report backup status
+     * Report backup status.
      *
      * @throws \Throwable
      */
@@ -86,7 +86,7 @@ class BackupStatusController extends Controller
     }
 
     /**
-     * Report backup restore result
+     * Report backup restore result.
      *
      * @throws \Throwable
      */
@@ -134,7 +134,7 @@ class BackupStatusController extends Controller
         ];
 
         $client = $adapter->getClient();
-        
+
         if (!$successful) {
             try {
                 $client->execute($client->getCommand('AbortMultipartUpload', $params));
@@ -149,6 +149,7 @@ class BackupStatusController extends Controller
                     'error' => $e->getMessage(),
                 ]);
             }
+
             return;
         }
 
@@ -167,7 +168,7 @@ class BackupStatusController extends Controller
                     if (!isset($part['etag']) || !isset($part['part_number'])) {
                         throw new DisplayException('Invalid part data provided for multipart upload completion.');
                     }
-                    
+
                     $params['MultipartUpload']['Parts'][] = [
                         'ETag' => $part['etag'],
                         'PartNumber' => (int) $part['part_number'],
@@ -181,20 +182,20 @@ class BackupStatusController extends Controller
             }
 
             $client->execute($client->getCommand('CompleteMultipartUpload', $params));
-            
+
             \Log::info('Successfully completed multipart upload', [
                 'backup_uuid' => $backup->uuid,
                 'upload_id' => $backup->upload_id,
                 'parts_count' => count($params['MultipartUpload']['Parts']),
             ]);
-            
+
         } catch (\Exception $e) {
             \Log::error('Failed to complete multipart upload', [
                 'backup_uuid' => $backup->uuid,
                 'upload_id' => $backup->upload_id,
                 'error' => $e->getMessage(),
             ]);
-            
+
             // Try to abort the upload to clean up
             try {
                 $client->execute($client->getCommand('AbortMultipartUpload', $params));
@@ -205,9 +206,8 @@ class BackupStatusController extends Controller
                     'abort_error' => $abortException->getMessage(),
                 ]);
             }
-            
+
             throw $e;
         }
     }
-
 }

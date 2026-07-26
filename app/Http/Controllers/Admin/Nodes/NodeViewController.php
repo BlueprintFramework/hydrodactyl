@@ -3,10 +3,14 @@
 namespace Pterodactyl\Http\Controllers\Admin\Nodes;
 
 use Illuminate\View\View;
+use Pterodactyl\Models\S3;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Pterodactyl\Models\Allocation;
+use Pterodactyl\Enums\Daemon\Adapters;
+use Pterodactyl\Enums\Daemon\DaemonType;
 use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Pterodactyl\Repositories\Eloquent\NodeRepository;
@@ -15,10 +19,6 @@ use Pterodactyl\Traits\Controllers\JavascriptInjection;
 use Pterodactyl\Services\Helpers\SoftwareVersionService;
 use Pterodactyl\Repositories\Eloquent\LocationRepository;
 use Pterodactyl\Repositories\Eloquent\AllocationRepository;
-use Illuminate\Support\Facades\DB;
-use Pterodactyl\Enums\Daemon\DaemonType;
-use Pterodactyl\Enums\Daemon\Adapters;
-use Pterodactyl\Models\S3;
 
 class NodeViewController extends Controller
 {
@@ -34,7 +34,8 @@ class NodeViewController extends Controller
         private ServerRepository $serverRepository,
         private SoftwareVersionService $versionService,
         private ViewFactory $view,
-    ) {}
+    ) {
+    }
 
     /**
      * Returns index view for a specific node on the system.

@@ -5,9 +5,9 @@ namespace Pterodactyl\Tests\Unit\Services\Nests;
 use Mockery\MockInterface;
 use Pterodactyl\Models\Nest;
 use Pterodactyl\Tests\TestCase;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
 use Pterodactyl\Services\Nests\NestCreationService;
+use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 
 class NestCreationServiceTest extends TestCase
 {

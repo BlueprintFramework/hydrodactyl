@@ -2,8 +2,8 @@
 
 namespace Pterodactyl\Tests\Unit\Models;
 
-use Pterodactyl\Models\EggVariable;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Models\EggVariable;
 
 class EggVariableTest extends TestCase
 {

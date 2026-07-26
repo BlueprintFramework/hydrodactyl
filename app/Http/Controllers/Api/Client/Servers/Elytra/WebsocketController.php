@@ -5,8 +5,8 @@ namespace Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra;
 use Carbon\CarbonImmutable;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Enums\Daemon\JwtScope;
 use Pterodactyl\Models\Permission;
+use Pterodactyl\Enums\Daemon\JwtScope;
 use Pterodactyl\Services\Nodes\NodeJWTService;
 use Pterodactyl\Exceptions\Http\HttpForbiddenException;
 use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
@@ -26,7 +26,7 @@ class WebsocketController extends ClientApiController
     }
 
     /**
-     * Get websocket token
+     * Get websocket token.
      */
     public function __invoke(ClientApiRequest $request, Server $server): JsonResponse
     {

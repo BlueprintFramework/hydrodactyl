@@ -2,23 +2,23 @@
 
 namespace Pterodactyl\Http\Controllers\Admin;
 
+use Aws\S3\S3Client;
 use Illuminate\View\View;
-use Illuminate\Http\Request;
 use Pterodactyl\Models\S3;
+use Illuminate\Http\Request;
+use Aws\Exception\AwsException;
 use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\View\Factory as ViewFactory;
 use Pterodactyl\Http\Controllers\Controller;
-use Illuminate\Contracts\Translation\Translator;
+use Pterodactyl\Services\S3\S3UpdateService;
 use Pterodactyl\Services\S3\S3CreationService;
 use Pterodactyl\Services\S3\S3DeletionService;
-use Pterodactyl\Services\S3\S3UpdateService;
-use Pterodactyl\Contracts\Repository\S3RepositoryInterface;
+use Illuminate\Contracts\Translation\Translator;
 use Pterodactyl\Http\Requests\Admin\S3FormRequest;
 use Pterodactyl\Http\Requests\Admin\NewS3FormRequest;
-use Aws\S3\S3Client;
-use Aws\Exception\AwsException;
+use Pterodactyl\Contracts\Repository\S3RepositoryInterface;
 
 class S3Controller extends Controller
 {
@@ -30,7 +30,8 @@ class S3Controller extends Controller
         protected S3UpdateService $updateService,
         protected S3RepositoryInterface $repository,
         protected ViewFactory $view,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request): View
     {
@@ -77,6 +78,7 @@ class S3Controller extends Controller
         // Optional: check if in use
         if ($s3->servers()->exists()) {
             $this->alert->error('Cannot delete: bucket is used by servers.')->flash();
+
             return redirect()->route('admin.buckets.view', $s3->id);
         }
 
@@ -136,7 +138,7 @@ class S3Controller extends Controller
             $bucket = $request->input('bucket_name');
             $key = '_hydrodactyl_test_' . time();
 
-            $message = "This is an upload test, If your reading this, it succeeded, happy Servering";
+            $message = 'This is an upload test, If your reading this, it succeeded, happy Servering';
             $content = str_repeat($message . "\n", (int) (10 * 1024 * 1024 / (strlen($message) + 1)));
 
             $client->putObject([
@@ -152,6 +154,7 @@ class S3Controller extends Controller
             ]);
         } catch (AwsException $e) {
             $error = $e->getAwsErrorMessage() ?: $e->getMessage();
+
             return response()->json([
                 'success' => false,
                 'message' => 'S3 error: ' . $error,

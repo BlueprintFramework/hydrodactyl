@@ -2,8 +2,8 @@
 
 namespace Pterodactyl\Services\Captcha\Providers;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Pterodactyl\Contracts\Captcha\CaptchaProviderInterface;
 
 class HCaptchaProvider implements CaptchaProviderInterface
@@ -58,6 +58,7 @@ class HCaptchaProvider implements CaptchaProviderInterface
 
             if (!$httpResponse->successful()) {
                 Log::warning('hCaptcha verification failed: HTTP ' . $httpResponse->status());
+
                 return false;
             }
 
@@ -65,6 +66,7 @@ class HCaptchaProvider implements CaptchaProviderInterface
 
             if (!isset($result['success'])) {
                 Log::warning('hCaptcha verification failed: Invalid response format');
+
                 return false;
             }
 
@@ -80,6 +82,7 @@ class HCaptchaProvider implements CaptchaProviderInterface
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
+
             return false;
         }
     }

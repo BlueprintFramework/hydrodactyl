@@ -7,9 +7,9 @@ use Pterodactyl\Models\User;
 use Pterodactyl\Tests\TestCase;
 use Pterodactyl\Exceptions\DisplayException;
 use Illuminate\Contracts\Translation\Translator;
+use Pterodactyl\Services\Users\UserDeletionService;
 use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
 use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
-use Pterodactyl\Services\Users\UserDeletionService;
 
 class UserDeletionServiceTest extends TestCase
 {

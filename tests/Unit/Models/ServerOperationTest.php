@@ -3,8 +3,8 @@
 namespace Pterodactyl\Tests\Unit\Models;
 
 use Carbon\Carbon;
-use Pterodactyl\Models\ServerOperation;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Models\ServerOperation;
 
 class ServerOperationTest extends TestCase
 {

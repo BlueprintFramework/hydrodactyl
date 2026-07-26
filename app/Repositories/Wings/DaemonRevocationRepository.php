@@ -14,7 +14,6 @@ class DaemonRevocationRepository extends DaemonRepository
      *
      * @param string[] $servers
      */
-
     public function deauthorize(string $user, array $servers = []): void
     {
         try {

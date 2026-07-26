@@ -4,8 +4,8 @@ namespace Pterodactyl\Tests\Unit\Services\ServerOperations;
 
 use Pterodactyl\Models\Server;
 use Pterodactyl\Tests\TestCase;
-use Pterodactyl\Services\ServerOperations\ServerStateValidationService;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Pterodactyl\Services\ServerOperations\ServerStateValidationService;
 
 class ServerStateValidationServiceTest extends TestCase
 {

@@ -2,13 +2,13 @@
 
 namespace Pterodactyl\Services\Deployment;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection;
-use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
 use Pterodactyl\Models\Node;
 use Webmozart\Assert\Assert;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Pterodactyl\Exceptions\Service\Deployment\NoViableNodeException;
 
 /**
  * Finds nodes that can host a new server, always preferring *physical* capacity
@@ -24,7 +24,6 @@ use Webmozart\Assert\Assert;
  *      includes each node's configured overallocation allowances. Uses
  *      worst-fit ordering (most leftover capacity first) to spread load
  *      across nodes when overallocation is involved.
- *
  */
 class FindViableNodesService
 {
@@ -52,6 +51,7 @@ class FindViableNodesService
     public function setMemory(int $memory): self
     {
         $this->memory = $memory;
+
         return $this;
     }
 
@@ -59,6 +59,7 @@ class FindViableNodesService
     public function setDisk(int $disk): self
     {
         $this->disk = $disk;
+
         return $this;
     }
 
@@ -69,8 +70,8 @@ class FindViableNodesService
      */
     public function handle(?int $perPage = null, ?int $page = null): LengthAwarePaginator|Collection
     {
-        Assert::integer($this->disk,  'Disk space must be an int, got NULL');
-        Assert::integer($this->memory,'Memory usage must be an int, got NULL');
+        Assert::integer($this->disk, 'Disk space must be an int, got NULL');
+        Assert::integer($this->memory, 'Memory usage must be an int, got NULL');
 
         $perPage = $perPage ?? self::DEFAULT_PER_PAGE;
 
@@ -92,15 +93,15 @@ class FindViableNodesService
     /**
      * Build and execute a query.
      *
-     * @param bool      $allowOverallocation  Treat overallocate percentage as
-     *                                        extra capacity when true.
-     * @param int|null  $perPage              Paginator size (null = no paging).
-     * @param int|null  $page                 Page number when paginating.
+     * @param bool $allowOverallocation treat overallocate percentage as
+     *                                  extra capacity when true
+     * @param int|null $perPage paginator size (null = no paging)
+     * @param int|null $page page number when paginating
      */
     private function runQuery(
         bool $allowOverallocation,
         ?int $perPage,
-        ?int $page
+        ?int $page,
     ): LengthAwarePaginator|Collection {
         $memCap  = $allowOverallocation
             ? '(nodes.memory * (1 + nodes.memory_overallocate / 100.0))'
@@ -141,8 +142,8 @@ class FindViableNodesService
 
         // Execute and strip helper columns
         $results = $page !== null
-            ? /** @var LengthAwarePaginator $paginator */ $query->paginate($perPage, ['*'], 'page', $page)
-            : /** @var EloquentCollection $collection */ $query->get();
+            ? /* @var LengthAwarePaginator $paginator */ $query->paginate($perPage, ['*'], 'page', $page)
+            : /* @var EloquentCollection $collection */ $query->get();
 
         $strip = static fn (Node $node) => $node->setHidden(['free_memory', 'free_disk']);
 

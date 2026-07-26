@@ -33,7 +33,7 @@ class ScheduleController extends ClientApiController
     }
 
     /**
-     * List schedules
+     * List schedules.
      */
     public function index(ViewScheduleRequest $request, Server $server): array
     {
@@ -45,7 +45,7 @@ class ScheduleController extends ClientApiController
     }
 
     /**
-     * Create a schedule
+     * Create a schedule.
      *
      * @throws DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -77,7 +77,7 @@ class ScheduleController extends ClientApiController
     }
 
     /**
-     * View a schedule
+     * View a schedule.
      */
     public function view(ViewScheduleRequest $request, Server $server, Schedule $schedule): array
     {
@@ -93,7 +93,7 @@ class ScheduleController extends ClientApiController
     }
 
     /**
-     * Update a schedule
+     * Update a schedule.
      *
      * @throws DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -136,7 +136,7 @@ class ScheduleController extends ClientApiController
     }
 
     /**
-     * Execute a schedule
+     * Execute a schedule.
      *
      * @throws \Throwable
      */
@@ -150,7 +150,7 @@ class ScheduleController extends ClientApiController
     }
 
     /**
-     * Delete a schedule
+     * Delete a schedule.
      */
     public function delete(DeleteScheduleRequest $request, Server $server, Schedule $schedule): JsonResponse
     {

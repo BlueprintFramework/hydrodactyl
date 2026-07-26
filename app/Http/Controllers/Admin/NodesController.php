@@ -3,6 +3,7 @@
 namespace Pterodactyl\Http\Controllers\Admin;
 
 use Illuminate\View\View;
+use Pterodactyl\Models\S3;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
 use Illuminate\Http\Response;
@@ -11,7 +12,6 @@ use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
 use Pterodactyl\Enums\Daemon\Adapters;
 use Pterodactyl\Enums\Daemon\DaemonType;
-use Pterodactyl\Models\S3;
 use Illuminate\View\Factory as ViewFactory;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Services\Nodes\NodeUpdateService;
@@ -48,7 +48,8 @@ class NodesController extends Controller
         protected NodeUpdateService $updateService,
         protected SoftwareVersionService $versionService,
         protected ViewFactory $view,
-    ) {}
+    ) {
+    }
 
     /**
      * Displays create new node page.

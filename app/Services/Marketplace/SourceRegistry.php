@@ -3,8 +3,8 @@
 namespace Pterodactyl\Services\Marketplace;
 
 use Pterodactyl\Services\Marketplace\Sources\HangarSource;
-use Pterodactyl\Services\Marketplace\Sources\ModrinthSource;
 use Pterodactyl\Services\Marketplace\Sources\SpigetSource;
+use Pterodactyl\Services\Marketplace\Sources\ModrinthSource;
 
 /**
  * Resolves which marketplace sources are enabled for this installation. Sources

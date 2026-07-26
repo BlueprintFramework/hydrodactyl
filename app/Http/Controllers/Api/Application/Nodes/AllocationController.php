@@ -29,7 +29,7 @@ class AllocationController extends ApplicationApiController
     }
 
     /**
-     * List all allocations for a node
+     * List all allocations for a node.
      */
     public function index(GetAllocationsRequest $request, Node $node): array
     {
@@ -54,7 +54,7 @@ class AllocationController extends ApplicationApiController
     }
 
     /**
-     * Create allocations for a node
+     * Create allocations for a node.
      *
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Service\Allocation\CidrOutOfRangeException
@@ -70,7 +70,7 @@ class AllocationController extends ApplicationApiController
     }
 
     /**
-     * Delete an allocation
+     * Delete an allocation.
      *
      * @throws \Pterodactyl\Exceptions\Service\Allocation\ServerUsingAllocationException
      */

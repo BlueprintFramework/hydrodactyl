@@ -1,0 +1,5 @@
+[tools]
+php = "8.4"
+node = "lts"
+pnpm = "latest"
+docker-compose = "latest"

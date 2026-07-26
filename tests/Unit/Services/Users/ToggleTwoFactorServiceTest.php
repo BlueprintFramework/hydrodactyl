@@ -2,16 +2,16 @@
 
 namespace Pterodactyl\Tests\Unit\Services\Users;
 
-use Mockery\MockInterface;
 use Carbon\Carbon;
+use Mockery\MockInterface;
 use Pterodactyl\Models\User;
-use PragmaRX\Google2FA\Google2FA;
 use Pterodactyl\Tests\TestCase;
+use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter;
+use Pterodactyl\Services\Users\ToggleTwoFactorService;
 use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
 use Pterodactyl\Repositories\Eloquent\RecoveryTokenRepository;
-use Pterodactyl\Services\Users\ToggleTwoFactorService;
 use Pterodactyl\Exceptions\Service\User\TwoFactorAuthenticationTokenInvalid;
 
 class ToggleTwoFactorServiceTest extends TestCase

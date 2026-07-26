@@ -10,7 +10,7 @@ use Pterodactyl\Http\Requests\Api\Application\Users\GetExternalUserRequest;
 class ExternalUserController extends ApplicationApiController
 {
     /**
-     * Get user by external ID
+     * Get user by external ID.
      */
     public function index(GetExternalUserRequest $request, string $external_id): array
     {

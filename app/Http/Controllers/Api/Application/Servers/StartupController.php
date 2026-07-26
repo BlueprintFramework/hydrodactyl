@@ -20,7 +20,7 @@ class StartupController extends ApplicationApiController
     }
 
     /**
-     * Update server startup configuration
+     * Update server startup configuration.
      *
      * @throws \Illuminate\Validation\ValidationException
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException

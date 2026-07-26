@@ -44,8 +44,9 @@ if (!function_exists('humanizeSize')) {
         $i = 0;
         while ($bytes >= 1024 && $i < count($units) - 1) {
             $bytes /= 1024;
-            $i++;
+            ++$i;
         }
+
         return round($bytes, 2) . ' ' . $units[$i];
     }
 }

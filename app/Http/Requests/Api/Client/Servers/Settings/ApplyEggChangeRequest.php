@@ -3,7 +3,6 @@
 namespace Pterodactyl\Http\Requests\Api\Client\Servers\Settings;
 
 use Pterodactyl\Models\Egg;
-use Illuminate\Validation\Rule;
 use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
 
 /**
@@ -40,9 +39,10 @@ class ApplyEggChangeRequest extends ClientApiRequest
                 $egg = Egg::where('id', $this->input('egg_id'))
                     ->where('nest_id', $this->input('nest_id'))
                     ->first();
-                
+
                 if (!$egg) {
                     $validator->errors()->add('egg_id', 'The selected egg does not belong to the specified nest.');
+
                     return;
                 }
 

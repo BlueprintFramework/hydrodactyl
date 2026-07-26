@@ -2,8 +2,8 @@
 
 namespace Pterodactyl\Services\ServerOperations;
 
-use Illuminate\Support\Facades\Log;
 use Pterodactyl\Models\Server;
+use Illuminate\Support\Facades\Log;
 use Pterodactyl\Models\ServerOperation;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -24,26 +24,26 @@ class ServerStateValidationService
             if ($server->status === Server::STATUS_INSTALLING) {
                 throw new ConflictHttpException('Server is currently being installed and cannot be modified.');
             }
-            
+
             if ($server->status === Server::STATUS_SUSPENDED) {
                 throw new ConflictHttpException('Server is suspended and cannot be modified.');
             }
-            
+
             if ($server->transfer) {
                 throw new ConflictHttpException('Server is currently being transferred and cannot be modified.');
             }
-            
+
             $server->refresh();
         } catch (\Exception $e) {
             Log::error('Failed to validate server state', [
                 'server_id' => $server->id,
                 'error' => $e->getMessage(),
             ]);
-            
+
             if ($e instanceof ConflictHttpException) {
                 throw $e;
             }
-            
+
             Log::warning('Server state validation failed, allowing request to proceed', [
                 'server_id' => $server->id,
                 'error' => $e->getMessage(),

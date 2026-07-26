@@ -123,7 +123,7 @@ class NestSeeder extends Seeder
         }
     }
 
-     /**
+    /**
      * Create the Vintage Story nest to be used later on.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
@@ -137,5 +137,4 @@ class NestSeeder extends Seeder
             ], 'support@pterodactyl.io');
         }
     }
-
 }

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import { v4 } from 'uuid';
+import { v7 } from 'uuid';
 
 import Input from '@/components/elements/Input';
 import Label from '@/components/elements/Label';
@@ -49,7 +49,7 @@ export interface SwitchProps {
 }
 
 const Switch = ({ name, label, description, defaultChecked, readOnly, onChange, children }: SwitchProps) => {
-    const uuid = useMemo(() => v4(), []);
+    const uuid = useMemo(() => v7(), []);
 
     return (
         <div className={`flex items-center`}>

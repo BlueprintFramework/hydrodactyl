@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Models;
 
+use Ramsey\Uuid\Uuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -43,6 +44,11 @@ class ElytraJob extends Model
     public function uniqueIds(): array
     {
         return ['uuid'];
+    }
+
+    public function newUuid(): string
+    {
+        return Uuid::uuid7()->toString();
     }
 
     public function server(): BelongsTo

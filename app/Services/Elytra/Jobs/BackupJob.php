@@ -2,19 +2,20 @@
 
 namespace Pterodactyl\Services\Elytra\Jobs;
 
+use Ramsey\Uuid\Uuid;
 use Carbon\CarbonImmutable;
-use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Models\Backup;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\ElytraJob;
 use Pterodactyl\Models\Permission;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Contracts\Elytra\Job;
-use Pterodactyl\Repositories\Elytra\ElytraRepository;
-use Pterodactyl\Services\Backups\ServerStateService;
-use Pterodactyl\Services\Backups\DownloadLinkService;
+use Illuminate\Support\Facades\Validator;
 use Pterodactyl\Extensions\Backups\BackupManager;
+use Pterodactyl\Services\Backups\ServerStateService;
+use Pterodactyl\Repositories\Elytra\ElytraRepository;
+use Pterodactyl\Services\Backups\DownloadLinkService;
 use Pterodactyl\Transformers\Api\Client\BackupTransformer;
 
 class BackupJob implements Job
@@ -24,7 +25,8 @@ class BackupJob implements Job
         private BackupTransformer $backupTransformer,
         private DownloadLinkService $downloadLinkService,
         private BackupManager $backupManager,
-    ) {}
+    ) {
+    }
 
     public static function getSupportedJobTypes(): array
     {
@@ -112,7 +114,7 @@ class BackupJob implements Job
         $jobType = $statusData['job_type'] ?? '';
         $operation = $this->getOperationFromJobType($jobType);
 
-        Log::debug("processStatusUpdate called", [
+        Log::debug('processStatusUpdate called', [
             'job_id' => $job->id,
             'job_type' => $jobType,
             'operation' => $operation,
@@ -192,7 +194,7 @@ class BackupJob implements Job
             'adapter_type' => $jobData['adapter'] ?? 'elytra',
         ];
 
-        Log::info("Submitting backup creation job to Elytra", [
+        Log::info('Submitting backup creation job to Elytra', [
             'server_id' => $server->id,
             'backup_uuid' => $backupUuid,
             'job_data' => $elytraJobData,
@@ -264,7 +266,8 @@ class BackupJob implements Job
         $backupUuid = $jobData['backup_uuid'] ?? null;
 
         if (!$backupUuid) {
-            Log::error("No backup UUID in job data for completed backup job", ['job_id' => $job->id]);
+            Log::error('No backup UUID in job data for completed backup job', ['job_id' => $job->id]);
+
             return;
         }
 
@@ -293,7 +296,7 @@ class BackupJob implements Job
             try {
                 $serverState = $this->serverStateService->captureServerState($server);
             } catch (\Exception $e) {
-                Log::warning("Could not capture server state for backup", [
+                Log::warning('Could not capture server state for backup', [
                     'backup_uuid' => $backupUuid,
                     'error' => $e->getMessage(),
                 ]);
@@ -308,14 +311,14 @@ class BackupJob implements Job
             if ($isRusticBackup && isset($statusData['repository_size'])) {
                 $server->update(['repository_backup_bytes' => $statusData['repository_size']]);
 
-                Log::info("Backup record created successfully (rustic)", [
+                Log::info('Backup record created successfully (rustic)', [
                     'backup_id' => $backup->id,
                     'backup_uuid' => $backup->uuid,
                     'disk' => $backup->disk,
                     'repository_size_mb' => round($statusData['repository_size'] / 1024 / 1024, 2),
                 ]);
             } else {
-                Log::info("Backup record created successfully", [
+                Log::info('Backup record created successfully', [
                     'backup_id' => $backup->id,
                     'backup_uuid' => $backup->uuid,
                     'disk' => $backup->disk,
@@ -327,7 +330,7 @@ class BackupJob implements Job
                 $this->pruneOldAutomaticBackups($server);
             }
         } else {
-            Log::error("Backup job failed", [
+            Log::error('Backup job failed', [
                 'backup_uuid' => $backupUuid,
                 'error' => $statusData['error_message'] ?? 'Unknown error',
                 'job_id' => $job->id,
@@ -337,7 +340,7 @@ class BackupJob implements Job
 
     private function handleDeleteCompletion(ElytraJob $job, array $statusData): void
     {
-        Log::debug("handleDeleteCompletion called", [
+        Log::debug('handleDeleteCompletion called', [
             'job_id' => $job->id,
             'statusData' => $statusData,
         ]);
@@ -350,7 +353,7 @@ class BackupJob implements Job
                 $server = $backup->server;
                 $isRusticBackup = $backup->disk instanceof BackupAdapter && $backup->disk->isRustic();
 
-                Log::debug("Backup found for deletion", [
+                Log::debug('Backup found for deletion', [
                     'backup_uuid' => $backup->uuid,
                     'disk' => $backup->disk,
                     'is_rustic' => $isRusticBackup,
@@ -363,7 +366,7 @@ class BackupJob implements Job
                 if ($isRusticBackup && isset($statusData['repository_size'])) {
                     $server->update(['repository_backup_bytes' => $statusData['repository_size']]);
 
-                    Log::info("Updated repository size after backup deletion", [
+                    Log::info('Updated repository size after backup deletion', [
                         'server_uuid' => $server->uuid,
                         'repository_size_mb' => round($statusData['repository_size'] / 1024 / 1024, 2),
                         'adapter_type' => $backup->disk,
@@ -373,9 +376,13 @@ class BackupJob implements Job
         }
     }
 
-    private function handleRestoreCompletion(ElytraJob $job, array $statusData): void {}
+    private function handleRestoreCompletion(ElytraJob $job, array $statusData): void
+    {
+    }
 
-    private function handleDownloadCompletion(ElytraJob $job, array $statusData): void {}
+    private function handleDownloadCompletion(ElytraJob $job, array $statusData): void
+    {
+    }
 
     private function submitDeleteAllJob(Server $server, ElytraJob $job, ElytraRepository $elytraRepository): string
     {
@@ -407,7 +414,7 @@ class BackupJob implements Job
             $deletedCount = $server->backups()->delete();
             $server->update(['repository_backup_bytes' => 0]);
 
-            Log::info("All backups deleted successfully", [
+            Log::info('All backups deleted successfully', [
                 'server_uuid' => $server->uuid,
                 'deleted_count' => $deletedCount,
             ]);
@@ -428,7 +435,7 @@ class BackupJob implements Job
 
     private function generateBackupUuid(): string
     {
-        return (string) \Illuminate\Support\Str::uuid();
+        return Uuid::uuid7()->toString();
     }
 
     private function generateBackupName(): string
@@ -456,14 +463,14 @@ class BackupJob implements Job
 
         $files = array_filter(
             array_map('trim', explode("\n", $ignored)),
-            fn($line) => !empty($line)
+            fn ($line) => !empty($line)
         );
 
         return array_values($files);
     }
 
     /**
-     * Generate a presigned S3 download URL for backup restoration
+     * Generate a presigned S3 download URL for backup restoration.
      */
     private function generateS3DownloadUrl(Backup $backup): string
     {
@@ -524,7 +531,7 @@ class BackupJob implements Job
             return;
         }
 
-        $elytraRepository = app(\Pterodactyl\Repositories\Elytra\ElytraRepository::class);
+        $elytraRepository = app(ElytraRepository::class);
         $deletedCount = 0;
 
         foreach ($oldBackups as $backup) {
@@ -536,15 +543,15 @@ class BackupJob implements Job
                     'adapter_type' => $backup->getElytraAdapterType(),
                 ]);
 
-                $deletedCount++;
+                ++$deletedCount;
 
-                Log::info("Queued automatic backup for deletion due to limit", [
+                Log::info('Queued automatic backup for deletion due to limit', [
                     'server_id' => $server->id,
                     'backup_uuid' => $backup->uuid,
                     'backup_name' => $backup->name,
                 ]);
             } catch (\Exception $e) {
-                Log::error("Failed to queue automatic backup deletion", [
+                Log::error('Failed to queue automatic backup deletion', [
                     'server_id' => $server->id,
                     'backup_uuid' => $backup->uuid,
                     'error' => $e->getMessage(),
@@ -558,7 +565,7 @@ class BackupJob implements Job
             ->where('is_locked', true)
             ->count();
 
-        Log::info("Automatic backup pruning completed", [
+        Log::info('Automatic backup pruning completed', [
             'server_id' => $server->id,
             'unlocked_automatic_backup_count' => $unlockedAutomaticBackupCount,
             'locked_automatic_backup_count' => $lockedCount,
@@ -572,6 +579,7 @@ class BackupJob implements Job
      * Never expose raw errors from backup systems as they may contain credentials or paths.
      *
      * @param string $errorMessage The raw error message from the backup system
+     *
      * @return string Generic error message safe for frontend display
      */
     private function sanitizeBackupError(string $errorMessage): string
@@ -579,4 +587,3 @@ class BackupJob implements Job
         return 'Backup operation failed. Please contact an administrator for details.'; // todo: better sanitization - elllie
     }
 }
-

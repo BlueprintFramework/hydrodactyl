@@ -19,7 +19,9 @@ class BackupRemoteUploadController extends Controller
     /**
      * BackupRemoteUploadController constructor.
      */
-    public function __construct(private BackupManager $backupManager) {}
+    public function __construct(private BackupManager $backupManager)
+    {
+    }
 
     /**
      * Returns the required presigned urls to upload a backup to S3 cloud storage.
@@ -30,7 +32,7 @@ class BackupRemoteUploadController extends Controller
      */
     public function __invoke(Request $request, string $backup): JsonResponse
     {
-    // Get the node associated with the request.
+        // Get the node associated with the request.
         /** @var \Pterodactyl\Models\Node $node */
         $node = $request->attributes->get('node');
 
@@ -45,8 +47,8 @@ class BackupRemoteUploadController extends Controller
             ->where('uuid', $backup)
             ->firstOrFail();
 
-    // Check that the backup is "owned" by the node making the request. This avoids other nodes
-    // from messing with backups that they don't own.
+        // Check that the backup is "owned" by the node making the request. This avoids other nodes
+        // from messing with backups that they don't own.
         /** @var \Pterodactyl\Models\Server $server */
         $server = $model->server;
         if ($server->node_id !== $node->id) {

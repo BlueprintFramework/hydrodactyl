@@ -3,14 +3,12 @@
 namespace Pterodactyl\Services\Dns\Providers;
 
 use GuzzleHttp\Client;
+use Pterodactyl\Services\Dns;
+use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Pterodactyl\Contracts\Dns\DnsProviderInterface;
 use Pterodactyl\Exceptions\Dns\DnsProviderException;
-use Illuminate\Support\Facades\Log;
-
-use Pterodactyl\Services\Dns;
-
 
 class CloudflareProvider implements DnsProviderInterface
 {
@@ -87,7 +85,7 @@ class CloudflareProvider implements DnsProviderInterface
             }
 
             $response = $this->client->post("zones/{$zoneId}/dns_records", [
-                'json' => $payload
+                'json' => $payload,
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true);
@@ -106,11 +104,7 @@ class CloudflareProvider implements DnsProviderInterface
 
             return $data['result']['id'];
         } catch (RequestException $e) {
-            throw DnsProviderException::recordCreationFailed(
-                $domain,
-                $displayName,
-                $this->getRequestExceptionMessage($e)
-            );
+            throw DnsProviderException::recordCreationFailed($domain, $displayName, $this->getRequestExceptionMessage($e));
         } catch (GuzzleException $e) {
             throw DnsProviderException::recordCreationFailed($domain, $displayName, 'DNS service temporarily unavailable.');
         }
@@ -143,7 +137,7 @@ class CloudflareProvider implements DnsProviderInterface
             }
 
             $response = $this->client->patch("zones/{$zoneId}/dns_records/{$recordId}", [
-                'json' => $payload
+                'json' => $payload,
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true);
@@ -189,7 +183,7 @@ class CloudflareProvider implements DnsProviderInterface
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (!$data['success']) {
-                throw new \Exception("DNS record not found or inaccessible.");
+                throw new \Exception('DNS record not found or inaccessible.');
             }
 
             return $data['result'];
@@ -215,7 +209,7 @@ class CloudflareProvider implements DnsProviderInterface
             }
 
             $response = $this->client->get("zones/{$zoneId}/dns_records", [
-                'query' => $params
+                'query' => $params,
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true);
@@ -322,13 +316,13 @@ class CloudflareProvider implements DnsProviderInterface
         // Fall back to auto-discovery
         try {
             $response = $this->client->get('zones', [
-                'query' => ['name' => $domain]
+                'query' => ['name' => $domain],
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (!$data['success'] || empty($data['result'])) {
-                throw new \Exception("Domain zone not found or inaccessible.");
+                throw new \Exception('Domain zone not found or inaccessible.');
             }
 
             return $data['result'][0]['id'];

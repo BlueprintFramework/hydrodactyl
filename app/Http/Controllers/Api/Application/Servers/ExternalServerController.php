@@ -10,7 +10,7 @@ use Pterodactyl\Http\Requests\Api\Application\Servers\GetExternalServerRequest;
 class ExternalServerController extends ApplicationApiController
 {
     /**
-     * Get server by external ID
+     * Get server by external ID.
      */
     public function index(GetExternalServerRequest $request, string $external_id): array
     {

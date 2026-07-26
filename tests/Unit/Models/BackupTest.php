@@ -3,8 +3,8 @@
 namespace Pterodactyl\Tests\Unit\Models;
 
 use Pterodactyl\Models\Backup;
-use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Enums\BackupAdapter;
 
 class BackupTest extends TestCase
 {

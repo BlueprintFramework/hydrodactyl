@@ -2,28 +2,27 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra;
 
-use Exception;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 use Pterodactyl\Facades\Activity;
+use Illuminate\Support\Facades\Log;
 use Pterodactyl\Repositories\Eloquent\ServerRepository;
 use Pterodactyl\Services\Servers\ReinstallServerService;
+use Pterodactyl\Repositories\Elytra\DaemonFileRepository;
+use Pterodactyl\Services\ServerOperations\EggChangeService;
+use Pterodactyl\Services\Servers\StartupModificationService;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Pterodactyl\Services\ServerOperations\ServerOperationService;
-use Pterodactyl\Services\ServerOperations\ServerStateValidationService;
-use Pterodactyl\Services\ServerOperations\EggChangeService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\RenameServerRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\SetDockerImageRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\RevertDockerImageRequest;
+use Pterodactyl\Services\ServerOperations\ServerStateValidationService;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\SetEggRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\PreviewEggRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\RenameServerRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\ApplyEggChangeRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\SetDockerImageRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\ReinstallServerRequest;
-use Pterodactyl\Services\Servers\StartupModificationService;
-use Pterodactyl\Repositories\Elytra\DaemonFileRepository;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\RevertDockerImageRequest;
 
 class SettingsController extends ClientApiController
 {
@@ -40,7 +39,7 @@ class SettingsController extends ClientApiController
     }
 
     /**
-     * Rename server
+     * Rename server.
      */
     public function rename(RenameServerRequest $request, Server $server): JsonResponse
     {
@@ -67,17 +66,18 @@ class SettingsController extends ClientApiController
     }
 
     /**
-     * Reinstall server
+     * Reinstall server.
      */
     public function reinstall(ReinstallServerRequest $request, Server $server): JsonResponse
     {
         $this->reinstallServerService->handle($server);
         Activity::event('server:reinstall')->log();
+
         return new JsonResponse([], Response::HTTP_ACCEPTED);
     }
 
     /**
-     * Change Docker image
+     * Change Docker image.
      */
     public function dockerImage(SetDockerImageRequest $request, Server $server): JsonResponse
     {
@@ -98,7 +98,7 @@ class SettingsController extends ClientApiController
     }
 
     /**
-     * Revert Docker image
+     * Revert Docker image.
      */
     public function revertDockerImage(RevertDockerImageRequest $request, Server $server): JsonResponse
     {
@@ -128,11 +128,12 @@ class SettingsController extends ClientApiController
     {
         $server->startup = $server->egg->startup;
         $server->save();
+
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
 
     /**
-     * Change server egg
+     * Change server egg.
      */
     public function changeEgg(SetEggRequest $request, Server $server): JsonResponse
     {
@@ -155,8 +156,9 @@ class SettingsController extends ClientApiController
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
+
     /**
-     * Preview egg change
+     * Preview egg change.
      */
     public function previewEggChange(PreviewEggRequest $request, Server $server): JsonResponse
     {
@@ -176,7 +178,7 @@ class SettingsController extends ClientApiController
                 ->log();
 
             return new JsonResponse($previewData);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to preview egg change', [
                 'server_id' => $server->id,
                 'egg_id' => $request->input('egg_id'),
@@ -189,7 +191,7 @@ class SettingsController extends ClientApiController
     }
 
     /**
-     * Apply egg change
+     * Apply egg change.
      *
      * @throws \Throwable
      */
@@ -227,7 +229,7 @@ class SettingsController extends ClientApiController
                 ->log();
 
             return new JsonResponse($result, Response::HTTP_ACCEPTED);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to apply egg change', [
                 'server_id' => $server->id,
                 'error' => $e->getMessage(),
@@ -238,20 +240,22 @@ class SettingsController extends ClientApiController
     }
 
     /**
-     * Get operation status
+     * Get operation status.
      */
     public function getOperationStatus(Server $server, string $operationId): JsonResponse
     {
         $operation = $this->operationService->getOperation($server, $operationId);
+
         return new JsonResponse($this->operationService->formatOperationResponse($operation));
     }
 
     /**
-     * List server operations
+     * List server operations.
      */
     public function getServerOperations(Server $server): JsonResponse
     {
         $operations = $this->operationService->getServerOperations($server);
+
         return new JsonResponse(['operations' => $operations]);
     }
 }

@@ -76,6 +76,7 @@ abstract class ClientApiIntegrationTestCase extends IntegrationTestCase
             default:
                 throw new \InvalidArgumentException('Unknown model type: ' . get_class($model));
         }
+
         return $link . ($append ? '/' . ltrim($append, '/') : '');
     }
 

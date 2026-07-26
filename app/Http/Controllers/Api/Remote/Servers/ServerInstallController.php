@@ -23,7 +23,7 @@ class ServerInstallController extends Controller
     }
 
     /**
-     * Get server install info
+     * Get server install info.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
      */
@@ -40,7 +40,7 @@ class ServerInstallController extends Controller
     }
 
     /**
-     * Report server install result
+     * Report server install result.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException

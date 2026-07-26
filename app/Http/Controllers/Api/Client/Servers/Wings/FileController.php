@@ -6,8 +6,8 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Enums\Daemon\JwtScope;
 use Pterodactyl\Facades\Activity;
+use Pterodactyl\Enums\Daemon\JwtScope;
 use Pterodactyl\Services\Nodes\NodeJWTService;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 use Pterodactyl\Transformers\Api\Client\FileObjectTransformer;
@@ -37,7 +37,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * List files in directory
+     * List files in directory.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
@@ -53,7 +53,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Get file contents
+     * Get file contents.
      *
      * @throws \Throwable
      */
@@ -70,7 +70,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Download file
+     * Download file.
      *
      * @throws \Throwable
      */
@@ -101,7 +101,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Write file contents
+     * Write file contents.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
@@ -115,7 +115,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Create folder
+     * Create folder.
      *
      * @throws \Throwable
      */
@@ -134,7 +134,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Rename file
+     * Rename file.
      *
      * @throws \Throwable
      */
@@ -153,7 +153,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Copy file
+     * Copy file.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
@@ -169,7 +169,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Compress files
+     * Compress files.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
@@ -191,7 +191,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Decompress files
+     * Decompress files.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
@@ -213,7 +213,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Delete files
+     * Delete files.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
@@ -233,7 +233,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Update file permissions
+     * Update file permissions.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
@@ -248,7 +248,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Pull file from URL
+     * Pull file from URL.
      *
      * @throws \Throwable
      */

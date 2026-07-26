@@ -2,12 +2,11 @@
 
 namespace Pterodactyl\Services\Captcha;
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Manager;
-use Pterodactyl\Services\Captcha\Providers\TurnstileProvider;
+use Pterodactyl\Services\Captcha\Providers\NullProvider;
 use Pterodactyl\Services\Captcha\Providers\HCaptchaProvider;
 use Pterodactyl\Services\Captcha\Providers\RecaptchaProvider;
-use Pterodactyl\Services\Captcha\Providers\NullProvider;
+use Pterodactyl\Services\Captcha\Providers\TurnstileProvider;
 use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 
 class CaptchaManager extends Manager

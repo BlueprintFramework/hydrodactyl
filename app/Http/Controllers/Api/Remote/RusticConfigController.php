@@ -2,16 +2,15 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Remote;
 
-use Pterodactyl\Models\Server;
-use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Crypt;
+use Pterodactyl\Http\Controllers\Controller;
 
 class RusticConfigController extends Controller
 {
     /**
-     * Get rustic backup config
+     * Get rustic backup config.
      */
     public function show(Request $request, string $uuid): JsonResponse
     {
@@ -58,6 +57,7 @@ class RusticConfigController extends Controller
     {
         if ($type === 'local') {
             $basePath = config('backups.disks.rustic_local.repository_base_path', '/var/lib/pterodactyl/rustic-repos');
+
             return rtrim($basePath, '/') . '/' . $server->uuid;
         }
 
@@ -72,7 +72,6 @@ class RusticConfigController extends Controller
 
         return sprintf('%s/%s/%s', $config['bucket'], $prefix, $server->uuid);
     }
-
 
     /**
      * Get S3 credentials for rustic S3 backups from the server's node bucket.

@@ -27,7 +27,7 @@ class ServerTransferController extends Controller
     }
 
     /**
-     * Notify transfer failure
+     * Notify transfer failure.
      *
      * @throws \Throwable
      */
@@ -43,7 +43,7 @@ class ServerTransferController extends Controller
     }
 
     /**
-     * Notify transfer success
+     * Notify transfer success.
      *
      * @throws \Throwable
      */

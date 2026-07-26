@@ -2,9 +2,8 @@
 
 namespace Pterodactyl\Console\Commands\Maintenance;
 
-use Illuminate\Console\Command;
 use Pterodactyl\Models\Backup;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Console\Command;
 
 class DeleteOrphanedBackupsCommand extends Command
 {
@@ -24,7 +23,7 @@ class DeleteOrphanedBackupsCommand extends Command
     {
         $isDryRun = $this->option('dry-run');
 
-        // Find backups that reference non-existent servers including 
+        // Find backups that reference non-existent servers including
         // soft-deleted backups since they might be orphaned too
         $orphanedBackups = Backup::withTrashed()
             ->whereDoesntHave('server')
@@ -32,15 +31,16 @@ class DeleteOrphanedBackupsCommand extends Command
 
         if ($orphanedBackups->isEmpty()) {
             $this->info('No orphaned backups found.');
+
             return;
         }
 
         $count = $orphanedBackups->count();
         $totalSize = $orphanedBackups->sum('bytes');
-        
+
         if ($isDryRun) {
             $this->warn("Found {$count} orphaned backup(s) that would be deleted (Total size: {$this->formatBytes($totalSize)}):");
-            
+
             $this->table(
                 ['ID', 'UUID', 'Name', 'Server ID', 'Disk', 'Size', 'Status', 'Created At'],
                 $orphanedBackups->map(function (Backup $backup) {
@@ -56,13 +56,15 @@ class DeleteOrphanedBackupsCommand extends Command
                     ];
                 })->toArray()
             );
-            
+
             $this->info('Run without --dry-run to actually delete these backups.');
+
             return;
         }
 
         if (!$this->confirm("Are you sure you want to delete {$count} orphaned backup(s) ({$this->formatBytes($totalSize)})? This action cannot be undone.")) {
             $this->info('Operation cancelled.');
+
             return;
         }
 
@@ -76,18 +78,18 @@ class DeleteOrphanedBackupsCommand extends Command
                 // If backup is already soft-deleted, force delete it completely
                 if ($backup->trashed()) {
                     $backup->forceDelete();
-                    $deletedCount++;
+                    ++$deletedCount;
                     $this->info("Force deleted soft-deleted backup: {$backup->uuid} ({$backup->name}) - {$this->formatBytes($backup->bytes)}");
                 } else {
                     // Delete the orphaned backup from the database
                     $backup->forceDelete();
-                    $deletedCount++;
+                    ++$deletedCount;
                     $this->info("Deleted backup: {$backup->uuid} ({$backup->name}) - {$this->formatBytes($backup->bytes)}");
                 }
             } catch (\Exception $exception) {
-                $failedCount++;
+                ++$failedCount;
                 $this->error("Failed to delete backup {$backup->uuid}: {$exception->getMessage()}");
-                
+
                 // If we can't delete from storage, at least remove the database record
                 try {
                     if ($backup->trashed()) {

@@ -36,22 +36,20 @@ class FindAssignableAllocationService
 
         // Validate that the server has a valid primary allocation IP
         if (!$server->allocation) {
-            throw new \Pterodactyl\Exceptions\DisplayException("Server has no primary allocation");
+            throw new \Pterodactyl\Exceptions\DisplayException('Server has no primary allocation');
         }
-        
+
         $allocationIp = $server->allocation->ip;
-        
+
         // If it's not a valid IP, try to resolve it as a hostname
         if (!filter_var($allocationIp, FILTER_VALIDATE_IP)) {
             $resolvedIp = gethostbyname($allocationIp);
-            
+
             // If gethostbyname fails, it returns the original hostname
             if ($resolvedIp === $allocationIp || !filter_var($resolvedIp, FILTER_VALIDATE_IP)) {
-                throw new \Pterodactyl\Exceptions\DisplayException(
-                    "Cannot resolve allocation IP/hostname '{$allocationIp}' to a valid IP address"
-                );
+                throw new \Pterodactyl\Exceptions\DisplayException("Cannot resolve allocation IP/hostname '{$allocationIp}' to a valid IP address");
             }
-            
+
             // Use the resolved IP for allocation operations
             $allocationIp = $resolvedIp;
         }

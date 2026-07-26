@@ -4,12 +4,12 @@ namespace Pterodactyl\Tests\Integration\Services\Backups;
 
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Models\Backup;
+use Pterodactyl\Enums\BackupAdapter;
 use GuzzleHttp\Exception\ClientException;
-use Pterodactyl\Services\Backups\Wings\DeleteBackupService;
 use Pterodactyl\Tests\Integration\IntegrationTestCase;
 use Pterodactyl\Repositories\Wings\DaemonBackupRepository;
+use Pterodactyl\Services\Backups\Wings\DeleteBackupService;
 use Pterodactyl\Exceptions\Service\Backup\BackupLockedException;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 

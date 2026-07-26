@@ -4,7 +4,6 @@ namespace Pterodactyl\Tests\Unit\Services\Servers;
 
 use Mockery\MockInterface;
 use Pterodactyl\Models\Server;
-use Pterodactyl\Models\User;
 use Pterodactyl\Tests\TestCase;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Repositories\Wings\DaemonServerRepository;

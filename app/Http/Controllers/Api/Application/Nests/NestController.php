@@ -19,7 +19,7 @@ class NestController extends ApplicationApiController
     }
 
     /**
-     * List all nests
+     * List all nests.
      */
     public function index(GetNestsRequest $request): array
     {
@@ -31,7 +31,7 @@ class NestController extends ApplicationApiController
     }
 
     /**
-     * View a single nest
+     * View a single nest.
      */
     public function view(GetNestsRequest $request, Nest $nest): array
     {

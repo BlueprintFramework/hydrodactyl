@@ -5,8 +5,8 @@ namespace Pterodactyl\Tests\Unit\Services\Nodes;
 use Mockery\MockInterface;
 use Pterodactyl\Models\Node;
 use Pterodactyl\Tests\TestCase;
-use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
 use Pterodactyl\Services\Nodes\NodeCreationService;
+use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
 
 class NodeCreationServiceTest extends TestCase
 {

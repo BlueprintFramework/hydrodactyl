@@ -22,7 +22,7 @@ class RustSubdomainFeature implements SubdomainFeatureInterface
     {
         $ip = $server->allocation->ip;
         $port = $server->allocation->port;
-        $subdomain_split = explode(".", $subdomain);
+        $subdomain_split = explode('.', $subdomain);
         $fullDomain = $subdomain_split[0] . '.' . $domain;
 
         $records = [];
@@ -55,4 +55,3 @@ class RustSubdomainFeature implements SubdomainFeatureInterface
         return $records;
     }
 }
-

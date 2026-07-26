@@ -6,10 +6,10 @@ use Mockery\MockInterface;
 use Pterodactyl\Models\Node;
 use Pterodactyl\Tests\TestCase;
 use Illuminate\Contracts\Translation\Translator;
-use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
-use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
 use Pterodactyl\Services\Nodes\NodeDeletionService;
+use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
 use Pterodactyl\Exceptions\Service\HasActiveServersException;
+use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
 
 class NodeDeletionServiceTest extends TestCase
 {

@@ -21,7 +21,7 @@ class ResourceUtilizationController extends ClientApiController
     }
 
     /**
-     * Get server resource usage
+     * Get server resource usage.
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */

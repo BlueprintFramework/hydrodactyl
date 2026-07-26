@@ -11,7 +11,7 @@ class EggObserver
      */
     public function creating(Egg $egg): void
     {
-        //
+
     }
 
     /**
@@ -19,7 +19,7 @@ class EggObserver
      */
     public function created(Egg $egg): void
     {
-        //
+
     }
 
     /**
@@ -27,7 +27,7 @@ class EggObserver
      */
     public function updating(Egg $egg): void
     {
-        //
+
     }
 
     /**
@@ -35,7 +35,7 @@ class EggObserver
      */
     public function updated(Egg $egg): void
     {
-        //
+
     }
 
     /**
@@ -43,7 +43,7 @@ class EggObserver
      */
     public function deleting(Egg $egg): void
     {
-        //
+
     }
 
     /**
@@ -51,6 +51,6 @@ class EggObserver
      */
     public function deleted(Egg $egg): void
     {
-        //
+
     }
 }

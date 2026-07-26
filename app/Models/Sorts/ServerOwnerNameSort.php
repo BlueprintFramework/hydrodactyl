@@ -2,8 +2,8 @@
 
 namespace Pterodactyl\Models\Sorts;
 
-use Illuminate\Database\Eloquent\Builder;
 use Spatie\QueryBuilder\Sorts\Sort;
+use Illuminate\Database\Eloquent\Builder;
 
 class ServerOwnerNameSort implements Sort
 {

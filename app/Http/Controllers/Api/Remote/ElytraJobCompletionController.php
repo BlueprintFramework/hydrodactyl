@@ -11,10 +11,11 @@ class ElytraJobCompletionController extends Controller
 {
     public function __construct(
         private ElytraJobService $elytraJobService,
-    ) {}
+    ) {
+    }
 
     /**
-     * Report job completion status
+     * Report job completion status.
      */
     public function update(ElytraJobCompleteRequest $request, string $jobId): JsonResponse
     {

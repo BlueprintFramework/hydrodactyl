@@ -3,8 +3,8 @@
 namespace Pterodactyl\Services\Backups\Wings;
 
 use Illuminate\Http\Response;
-use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Models\Backup;
+use Pterodactyl\Enums\BackupAdapter;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Extensions\Backups\BackupManager;
@@ -18,7 +18,8 @@ class DeleteBackupService
         private ConnectionInterface $connection,
         private BackupManager $manager,
         private DaemonBackupRepository $daemonBackupRepository,
-    ) {}
+    ) {
+    }
 
     /**
      * Deletes a backup from the system. If the backup is stored in S3 a request
@@ -76,6 +77,7 @@ class DeleteBackupService
                     'backup_uuid' => $backup->uuid,
                     'node_id' => $backup->server->node_id,
                 ]);
+
                 return;
             }
 

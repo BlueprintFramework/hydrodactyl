@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Pterodactyl\Models\S3
+ * Pterodactyl\Models\S3.
  *
  * @property int $id
  * @property string $name
@@ -20,9 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property bool $enabled
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- *
- * @property-read \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Server[] $servers
- * @property-read int|null $servers_count
+ * @property \Illuminate\Database\Eloquent\Collection|Server[] $servers
+ * @property int|null $servers_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder|S3 newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|S3 newQuery()
@@ -90,6 +89,7 @@ class S3 extends Model
     {
         return $this->hasMany(Node::class, 'bucket');
     }
+
     /**
      * Build a config array compatible with BackupManager::createS3Adapter().
      */

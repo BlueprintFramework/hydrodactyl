@@ -2,11 +2,8 @@
 
 namespace Pterodactyl\Enums\Daemon;
 
-use Pterodactyl\Enums\BackupAdapter;
-
 enum Adapters: string
 {
-
     case ADAPTER_WINGS = 'wings';
     case ADAPTER_WINGS_S3 = 's3';
     case ADAPTER_ELYTRA = 'elytra';
@@ -34,15 +31,14 @@ enum Adapters: string
         return ['elytra' => self::all_elytra(), 'wings' => self::all_wings()];
     }
 
-
     public static function all_elytra(): array
     {
-        return array_column(self::ELYTRA, "value");
+        return array_column(self::ELYTRA, 'value');
     }
 
     public static function all_wings(): array
     {
-        return array_column(self::WINGS, "value");
+        return array_column(self::WINGS, 'value');
     }
 
     public static function values(): array

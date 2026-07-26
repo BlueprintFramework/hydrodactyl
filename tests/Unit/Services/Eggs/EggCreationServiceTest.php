@@ -5,8 +5,8 @@ namespace Pterodactyl\Tests\Unit\Services\Eggs;
 use Mockery\MockInterface;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Tests\TestCase;
-use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
 use Pterodactyl\Services\Eggs\EggCreationService;
+use Pterodactyl\Contracts\Repository\EggRepositoryInterface;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 
 class EggCreationServiceTest extends TestCase

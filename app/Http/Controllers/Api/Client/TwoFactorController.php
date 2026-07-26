@@ -26,7 +26,7 @@ class TwoFactorController extends ClientApiController
     }
 
     /**
-     * Get two-factor setup credentials
+     * Get two-factor setup credentials.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
@@ -43,7 +43,7 @@ class TwoFactorController extends ClientApiController
     }
 
     /**
-     * Enable two-factor authentication
+     * Enable two-factor authentication.
      *
      * @throws \Throwable
      * @throws \Illuminate\Validation\ValidationException
@@ -73,7 +73,7 @@ class TwoFactorController extends ClientApiController
     }
 
     /**
-     * Disable two-factor authentication
+     * Disable two-factor authentication.
      *
      * @throws \Throwable
      */

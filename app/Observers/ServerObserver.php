@@ -4,16 +4,16 @@ namespace Pterodactyl\Observers;
 
 use Pterodactyl\Models\Domain;
 use Pterodactyl\Models\Server;
-use Pterodactyl\Models\ServerSubdomain;
-use Pterodactyl\Services\Subdomain\SubdomainManagementService;
-use Pterodactyl\Services\Subdomain\SubdomainGeneratorService;
 use Illuminate\Support\Facades\Log;
+use Pterodactyl\Models\ServerSubdomain;
+use Pterodactyl\Services\Subdomain\SubdomainGeneratorService;
+use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 
 class ServerObserver
 {
     public function __construct(
         private SubdomainManagementService $subdomainService,
-        private SubdomainGeneratorService $subdomainGenerator
+        private SubdomainGeneratorService $subdomainGenerator,
     ) {
     }
 
@@ -26,18 +26,21 @@ class ServerObserver
         $feature = $this->subdomainService->getServerSubdomainFeature($server);
         if (!$feature) {
             Log::info("Server {$server->id} does not support subdomains. Features: " . json_encode($server->egg->features));
+
             return;
         }
 
         // Get default domain
         $domain = Domain::getDefault();
         if (!$domain) {
-            Log::warning("No default domain available for subdomain creation. Please set a default domain in the admin panel.");
+            Log::warning('No default domain available for subdomain creation. Please set a default domain in the admin panel.');
+
             return;
         }
 
         if (!$domain->is_active) {
             Log::warning("Default domain {$domain->name} is not active");
+
             return;
         }
 
@@ -81,7 +84,7 @@ class ServerObserver
     {
         // Delete all subdomains when server is deleted
         $subdomains = $server->subdomains()->where('is_active', true)->get();
-        
+
         foreach ($subdomains as $subdomain) {
             try {
                 $this->subdomainService->deleteSubdomain($subdomain);
@@ -97,7 +100,7 @@ class ServerObserver
     private function syncSubdomainRecords(Server $server): void
     {
         $activeSubdomain = $server->activeSubdomain;
-        
+
         if (!$activeSubdomain) {
             return;
         }
@@ -116,14 +119,14 @@ class ServerObserver
     private function handleServerSoftwareChange(Server $server): void
     {
         $activeSubdomain = $server->activeSubdomain;
-        
+
         if (!$activeSubdomain) {
             return;
         }
 
         // Check if the new egg supports subdomains
         $feature = $this->subdomainService->getServerSubdomainFeature($server);
-        
+
         if (!$feature) {
             // New software doesn't support subdomains, delete the subdomain
             try {

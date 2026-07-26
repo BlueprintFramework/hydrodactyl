@@ -16,7 +16,7 @@ use Pterodactyl\Http\Requests\Api\Remote\ActivityEventRequest;
 class ActivityProcessingController extends Controller
 {
     /**
-     * Process server activity events
+     * Process server activity events.
      */
     public function __invoke(ActivityEventRequest $request)
     {

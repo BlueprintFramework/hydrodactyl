@@ -3,8 +3,8 @@
 namespace Pterodactyl\Http\Resources;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Pterodactyl\Models\ServerOperation;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Resource for transforming server operations for API responses.

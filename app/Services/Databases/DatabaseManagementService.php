@@ -20,7 +20,7 @@ class DatabaseManagementService
      * The regex used to validate that the database name passed through to the function is
      * in the expected format.
      *
-     * @see \Pterodactyl\Services\Databases\DatabaseManagementService::generateUniqueDatabaseName()
+     * @see DatabaseManagementService::generateUniqueDatabaseName()
      */
     private const MATCH_NAME_REGEX = '/^(s[\d]+_)(.*)$/';
 
@@ -37,7 +37,8 @@ class DatabaseManagementService
         protected DynamicDatabaseConnection $dynamic,
         protected Encrypter $encrypter,
         protected DatabaseRepository $repository,
-    ) {}
+    ) {
+    }
 
     /**
      * Generates a unique database name for the given server. This name should be passed through when

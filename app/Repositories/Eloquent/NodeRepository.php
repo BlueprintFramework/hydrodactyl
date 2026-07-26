@@ -4,9 +4,8 @@ namespace Pterodactyl\Repositories\Eloquent;
 
 use Pterodactyl\Models\Node;
 use Illuminate\Support\Collection;
-use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
 use Illuminate\Support\Facades\DB;
-
+use Pterodactyl\Contracts\Repository\NodeRepositoryInterface;
 
 class NodeRepository extends EloquentRepository implements NodeRepositoryInterface
 {
@@ -132,6 +131,7 @@ class NodeRepository extends EloquentRepository implements NodeRepositoryInterfa
                 );
                 break;
         }
+
         return $node;
     }
 

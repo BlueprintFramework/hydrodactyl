@@ -19,7 +19,7 @@ class ServerController extends ClientApiController
     }
 
     /**
-     * Get server details
+     * Get server details.
      */
     public function index(GetServerRequest $request, Server $server): array
     {

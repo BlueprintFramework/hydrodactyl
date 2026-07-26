@@ -8,15 +8,15 @@ use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Subuser;
 use Pterodactyl\Models\Allocation;
 use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Models\SessionActivity;
 use Pterodactyl\Observers\EggObserver;
+use Illuminate\Support\ServiceProvider;
+use Pterodactyl\Models\SessionActivity;
 use Pterodactyl\Observers\UserObserver;
 use Pterodactyl\Observers\ServerObserver;
 use Pterodactyl\Observers\SubuserObserver;
 use Pterodactyl\Observers\AllocationObserver;
 use Pterodactyl\Observers\EggVariableObserver;
 use Pterodactyl\Observers\SessionActivityObserver;
-use Illuminate\Support\ServiceProvider;
 
 class ObserverServiceProvider extends ServiceProvider
 {
@@ -25,7 +25,7 @@ class ObserverServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+
     }
 
     /**

@@ -3,21 +3,21 @@
 namespace Pterodactyl\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Container\Container;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Contracts\View\View;
-use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Validation\ValidationException;
-use Pterodactyl\Facades\Activity;
 use Pterodactyl\Models\User;
 use Pterodactyl\Rules\Username;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Http\JsonResponse;
+use Pterodactyl\Facades\Activity;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Pterodactyl\Events\Auth\DirectLogin;
 use Pterodactyl\Http\Controllers\Controller;
+use Illuminate\Validation\ValidationException;
 use Pterodactyl\Services\Users\UserCreationService;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 
 class SetupController extends Controller
 {
@@ -44,7 +44,7 @@ class SetupController extends Controller
     /**
      * Create the first administrator account and sign the user in.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      * @throws \Exception
      */

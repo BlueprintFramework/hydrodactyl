@@ -3,15 +3,15 @@
 namespace Pterodactyl\Http\Controllers\Admin\Buckets;
 
 use Illuminate\View\View;
+use Pterodactyl\Models\S3;
 use Illuminate\Http\Request;
+use Pterodactyl\Models\Backup;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
-use Pterodactyl\Models\S3;
-use Pterodactyl\Models\Backup;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Repositories\Eloquent\ServerRepository;
 use Pterodactyl\Repositories\Eloquent\S3Repository;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use Pterodactyl\Repositories\Eloquent\ServerRepository;
 
 class BucketViewController extends Controller
 {
@@ -19,13 +19,14 @@ class BucketViewController extends Controller
         private S3Repository $repository,
         private ServerRepository $serverRepository,
         private ViewFactory $view,
-    ) {}
+    ) {
+    }
 
     public function index(Request $request, S3 $s3): View
     {
         $s3->loadCount('servers');
-        $storageUsed = Cache::remember("s3_storage_{$s3->id}", 60, function() use($s3) {
-            return Backup::whereHas('server', function($q) use($s3) {
+        $storageUsed = Cache::remember("s3_storage_{$s3->id}", 60, function () use ($s3) {
+            return Backup::whereHas('server', function ($q) use ($s3) {
                 $q->where('bucket', $s3->id);
             })->where('is_successful', true)->sum('bytes');
         });

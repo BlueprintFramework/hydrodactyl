@@ -3,10 +3,10 @@
 namespace Pterodactyl\Http\Controllers\Api\Client\Nests;
 
 use Pterodactyl\Models\Nest;
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
 use Pterodactyl\Transformers\Api\Client\NestTransformer;
-use Pterodactyl\Http\Requests\Api\Application\Nests\GetNestsRequest;
+use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Pterodactyl\Http\Requests\Api\Application\Nests\GetNestsRequest;
 
 class NestController extends ClientApiController
 {
@@ -19,7 +19,7 @@ class NestController extends ClientApiController
     }
 
     /**
-     * List all nests
+     * List all nests.
      */
     public function index(): array
     {
@@ -31,7 +31,7 @@ class NestController extends ClientApiController
     }
 
     /**
-     * View a single nest
+     * View a single nest.
      */
     public function view(GetNestsRequest $request, Nest $nest): array
     {

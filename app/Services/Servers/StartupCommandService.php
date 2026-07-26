@@ -17,16 +17,16 @@ class StartupCommandService
             '{{SERVER_PORT}}',
             '{{SERVER_UUID}}',
             '{{SERVER_NAME}}',
-            '{{SERVER_CPU}}'
+            '{{SERVER_CPU}}',
         ];
-        
+
         $replace = [
             $server->memory,
             $server->allocation->ip,
             $server->allocation->port,
             $server->uuid,
             $server->name,
-            $server->cpu
+            $server->cpu,
         ];
 
         foreach ($server->variables as $variable) {

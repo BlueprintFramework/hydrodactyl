@@ -28,7 +28,7 @@ use Pterodactyl\Contracts\Extensions\HashidsInterface;
  * @property \Carbon\Carbon $updated_at
  * @property string $hashid
  * @property Server $server
- * @property \Pterodactyl\Models\Task[]|\Illuminate\Support\Collection $tasks
+ * @property Task[]|\Illuminate\Support\Collection $tasks
  */
 class Schedule extends Model
 {

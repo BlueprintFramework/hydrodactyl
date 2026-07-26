@@ -2,10 +2,10 @@
 
 namespace Pterodactyl\Services\Marketplace;
 
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Client\ConnectionException;
 
 /**
  * Shared HTTP + caching plumbing for marketplace adapters. Concrete sources
@@ -63,10 +63,7 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
             }
 
             if ($response->failed()) {
-                throw MarketplaceException::upstream(
-                    $this->key(),
-                    sprintf('Provider responded with HTTP %d.', $response->status()),
-                );
+                throw MarketplaceException::upstream($this->key(), sprintf('Provider responded with HTTP %d.', $response->status()));
             }
 
             return $response->json() ?? [];
@@ -102,10 +99,7 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
             }
 
             if ($response->failed()) {
-                throw MarketplaceException::upstream(
-                    $this->key(),
-                    sprintf('Provider responded with HTTP %d.', $response->status()),
-                );
+                throw MarketplaceException::upstream($this->key(), sprintf('Provider responded with HTTP %d.', $response->status()));
             }
 
             return $response->json() ?? [];
@@ -183,7 +177,7 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
         $headers = ['User-Agent' => $this->userAgent(), 'Accept' => '*/*'];
         $current = $url;
 
-        for ($i = 0; $i < $maxHops; $i++) {
+        for ($i = 0; $i < $maxHops; ++$i) {
             try {
                 $response = Http::withHeaders($headers)
                     ->timeout($this->timeout())
@@ -242,10 +236,7 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
         $path = (string) (parse_url($final, PHP_URL_PATH) ?? '');
         $basename = basename(urldecode($path));
         if ($basename === '' || !str_ends_with(strtolower($basename), '.jar')) {
-            throw MarketplaceException::upstream(
-                $this->key(),
-                'This resource is externally hosted and cannot be auto-installed. Please download it manually from the provider.',
-            );
+            throw MarketplaceException::upstream($this->key(), 'This resource is externally hosted and cannot be auto-installed. Please download it manually from the provider.');
         }
 
         // The redirect target host is not predictable, so we relax the host
@@ -297,7 +288,7 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
     }
 
     /**
-     * Returns a list of Minecraft game versions fetched via the modrinth api
+     * Returns a list of Minecraft game versions fetched via the modrinth api.
      *
      * @return array<string, string[]>
      */

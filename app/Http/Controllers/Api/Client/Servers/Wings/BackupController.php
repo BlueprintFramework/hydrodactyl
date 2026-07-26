@@ -3,19 +3,19 @@
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers\Wings;
 
 use Illuminate\Http\Request;
-use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Models\Backup;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Models\Permission;
+use Pterodactyl\Enums\BackupAdapter;
 use Illuminate\Auth\Access\AuthorizationException;
-use Pterodactyl\Services\Backups\Wings\DeleteBackupService;
-use Pterodactyl\Services\Backups\Wings\DownloadLinkService;
 use Pterodactyl\Repositories\Eloquent\BackupRepository;
-use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
 use Pterodactyl\Repositories\Wings\DaemonBackupRepository;
 use Pterodactyl\Transformers\Api\Client\BackupTransformer;
+use Pterodactyl\Services\Backups\Wings\DeleteBackupService;
+use Pterodactyl\Services\Backups\Wings\DownloadLinkService;
+use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Backups\StoreBackupRequest;
@@ -37,7 +37,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * List backups
+     * List backups.
      *
      * @throws AuthorizationException
      */
@@ -58,7 +58,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Create a backup
+     * Create a backup.
      *
      * @throws \Spatie\Fractalistic\Exceptions\InvalidTransformation
      * @throws \Spatie\Fractalistic\Exceptions\NoTransformerSpecified
@@ -90,7 +90,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Toggle backup lock
+     * Toggle backup lock.
      *
      * @throws \Throwable
      * @throws AuthorizationException
@@ -113,7 +113,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * View a backup
+     * View a backup.
      *
      * @throws AuthorizationException
      */
@@ -129,7 +129,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Delete a backup
+     * Delete a backup.
      *
      * @throws \Throwable
      */
@@ -150,7 +150,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Download a backup
+     * Download a backup.
      *
      * @throws \Throwable
      * @throws AuthorizationException
@@ -176,7 +176,7 @@ class BackupController extends ClientApiController
     }
 
     /**
-     * Restore a backup
+     * Restore a backup.
      *
      * @throws \Throwable
      */

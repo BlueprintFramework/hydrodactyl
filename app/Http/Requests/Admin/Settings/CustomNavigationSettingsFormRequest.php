@@ -2,7 +2,6 @@
 
 namespace Pterodactyl\Http\Requests\Admin\Settings;
 
-use Closure;
 use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
 
 class CustomNavigationSettingsFormRequest extends AdminFormRequest
@@ -16,7 +15,7 @@ class CustomNavigationSettingsFormRequest extends AdminFormRequest
                 'nullable',
                 'string',
                 'max:2048',
-                function (string $attribute, mixed $value, Closure $fail): void {
+                function (string $attribute, mixed $value, \Closure $fail): void {
                     if (!is_string($value) || $value === '') {
                         return;
                     }
@@ -24,8 +23,8 @@ class CustomNavigationSettingsFormRequest extends AdminFormRequest
                     $scheme = parse_url($value, PHP_URL_SCHEME);
 
                     if (
-                        str_starts_with($value, '/') ||
-                        (in_array($scheme, ['http', 'https'], true) && filter_var($value, FILTER_VALIDATE_URL) !== false)
+                        str_starts_with($value, '/')
+                        || (in_array($scheme, ['http', 'https'], true) && filter_var($value, FILTER_VALIDATE_URL) !== false)
                     ) {
                         return;
                     }

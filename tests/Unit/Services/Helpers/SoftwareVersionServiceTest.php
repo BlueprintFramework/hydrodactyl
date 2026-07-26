@@ -2,12 +2,11 @@
 
 namespace Pterodactyl\Tests\Unit\Services\Helpers;
 
-use Mockery\MockInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
+use Mockery\MockInterface;
 use Pterodactyl\Tests\TestCase;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Pterodactyl\Services\Helpers\SoftwareVersionService;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
 class SoftwareVersionServiceTest extends TestCase
 {

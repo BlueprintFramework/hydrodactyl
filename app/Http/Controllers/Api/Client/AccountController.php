@@ -23,7 +23,7 @@ class AccountController extends ClientApiController
     }
 
     /**
-     * Get the authenticated account
+     * Get the authenticated account.
      */
     public function index(Request $request): array
     {
@@ -33,7 +33,7 @@ class AccountController extends ClientApiController
     }
 
     /**
-     * Update account email
+     * Update account email.
      */
     public function updateEmail(UpdateEmailRequest $request): JsonResponse
     {
@@ -50,7 +50,7 @@ class AccountController extends ClientApiController
     }
 
     /**
-     * Update account password
+     * Update account password.
      *
      * @throws \Throwable
      */

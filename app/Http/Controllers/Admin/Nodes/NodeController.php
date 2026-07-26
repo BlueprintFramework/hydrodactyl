@@ -8,15 +8,15 @@ use Pterodactyl\Models\Node;
 use Spatie\QueryBuilder\QueryBuilder;
 use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Contracts\View\Factory as ViewFactory;
-use Pterodactyl\Repositories\Eloquent\NodeRepository;
-use Illuminate\Support\Facades\Log;
 
 class NodeController extends Controller
 {
     /**
      * NodeController constructor.
      */
-    public function __construct(private ViewFactory $view) {}
+    public function __construct(private ViewFactory $view)
+    {
+    }
 
     /**
      * Returns a listing of nodes on the system.

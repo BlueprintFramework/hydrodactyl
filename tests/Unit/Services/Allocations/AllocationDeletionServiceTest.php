@@ -3,10 +3,10 @@
 namespace Pterodactyl\Tests\Unit\Services\Allocations;
 
 use Mockery\MockInterface;
-use Pterodactyl\Models\Allocation;
 use Pterodactyl\Tests\TestCase;
-use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
+use Pterodactyl\Models\Allocation;
 use Pterodactyl\Services\Allocations\AllocationDeletionService;
+use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
 use Pterodactyl\Exceptions\Service\Allocation\ServerUsingAllocationException;
 
 class AllocationDeletionServiceTest extends TestCase

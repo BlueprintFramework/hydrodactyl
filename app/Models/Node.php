@@ -4,16 +4,14 @@ namespace Pterodactyl\Models;
 
 use Symfony\Component\Yaml\Yaml;
 use Illuminate\Container\Container;
-use Illuminate\Support\Facades\Log;
-use Pterodactyl\Enums\Daemon\DaemonType;
 use Illuminate\Notifications\Notifiable;
+use Pterodactyl\Enums\Daemon\DaemonType;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Pterodactyl\Contracts\Daemon\Daemon as DaemonInterface;
-use Pterodactyl\Http\Controllers\Admin\NodeAutoDeployController;
 
 /**
  * @property int $id
@@ -45,11 +43,10 @@ use Pterodactyl\Http\Controllers\Admin\NodeAutoDeployController;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property Location $location
- * @property \Pterodactyl\Models\Mount[]|\Illuminate\Database\Eloquent\Collection $mounts
- * @property \Pterodactyl\Models\Server[]|\Illuminate\Database\Eloquent\Collection $servers
- * @property \Pterodactyl\Models\Allocation[]|\Illuminate\Database\Eloquent\Collection $allocations
+ * @property Mount[]|\Illuminate\Database\Eloquent\Collection $mounts
+ * @property Server[]|\Illuminate\Database\Eloquent\Collection $servers
+ * @property Allocation[]|\Illuminate\Database\Eloquent\Collection $allocations
  */
-
 class Node extends Model
 {
     /** @use HasFactory<\Database\Factories\NodeFactory> */
@@ -145,7 +142,7 @@ class Node extends Model
         'upload_size' => 'int|between:1,1024',
         'daemonType' => 'nullable|string',
         'backupDisk' => 'nullable|string',
-        'bucket' => 'nullable|numeric|exists:s3,id'
+        'bucket' => 'nullable|numeric|exists:s3,id',
     ];
 
     /**
@@ -166,7 +163,6 @@ class Node extends Model
         'backupDisk' => 'local',
     ];
 
-
     private function getDaemonImplementation(): DaemonInterface
     {
         $implementations = DaemonType::allClass();
@@ -175,13 +171,13 @@ class Node extends Model
 
         if (!isset($implementations[$daemonType])) {
 
-            return new \Pterodactyl\Models\Daemons\Elytra();
+            return new Daemons\Elytra();
         }
 
         $implementationClass = $implementations[$daemonType];
+
         return new $implementationClass();
     }
-
 
     /**
      * Get the connection address to use when making calls to this node.
@@ -191,6 +187,7 @@ class Node extends Model
     public function getConnectionAddress(): string
     {
         $fqdn = $this->getInternalFqdn();
+
         return sprintf('%s://%s:%s', $this->scheme, $fqdn, $this->daemonListen);
     }
 
@@ -222,6 +219,7 @@ class Node extends Model
     public function getConfiguration(): array
     {
         $daemon = $this->getDaemonImplementation();
+
         return $daemon->getConfiguration($this);
     }
 
@@ -231,6 +229,7 @@ class Node extends Model
     public function getAutoDeploy(string $token): string
     {
         $daemon = $this->getDaemonImplementation();
+
         return $daemon->getAutoDeploy($this, $token);
     }
 

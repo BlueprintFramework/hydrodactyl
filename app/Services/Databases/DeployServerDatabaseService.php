@@ -30,13 +30,13 @@ class DeployServerDatabaseService
         $hosts = DatabaseHost::query()->get()->toBase();
         if ($hosts->isEmpty()) {
             throw new NoSuitableDatabaseHostException();
-        } else {
-            $nodeHosts = $hosts->where('node_id', $server->node_id)->toBase();
-
-            if ($nodeHosts->isEmpty() && !config('pterodactyl.client_features.databases.allow_random')) {
-                throw new NoSuitableDatabaseHostException();
-            }
         }
+        $nodeHosts = $hosts->where('node_id', $server->node_id)->toBase();
+
+        if ($nodeHosts->isEmpty() && !config('pterodactyl.client_features.databases.allow_random')) {
+            throw new NoSuitableDatabaseHostException();
+        }
+
 
         return $this->managementService->create($server, [
             'database_host_id' => $nodeHosts->isEmpty()

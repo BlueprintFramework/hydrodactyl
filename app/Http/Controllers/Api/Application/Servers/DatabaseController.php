@@ -28,7 +28,7 @@ class DatabaseController extends ApplicationApiController
     }
 
     /**
-     * List all databases for a server
+     * List all databases for a server.
      */
     public function index(GetServerDatabasesRequest $request, Server $server): array
     {
@@ -38,7 +38,7 @@ class DatabaseController extends ApplicationApiController
     }
 
     /**
-     * View a single server database
+     * View a single server database.
      */
     public function view(GetServerDatabaseRequest $request, Server $server, Database $database): array
     {
@@ -48,7 +48,7 @@ class DatabaseController extends ApplicationApiController
     }
 
     /**
-     * Reset a database password
+     * Reset a database password.
      *
      * @throws \Throwable
      */
@@ -60,7 +60,7 @@ class DatabaseController extends ApplicationApiController
     }
 
     /**
-     * Create a server database
+     * Create a server database.
      *
      * @throws \Throwable
      */
@@ -82,7 +82,7 @@ class DatabaseController extends ApplicationApiController
     }
 
     /**
-     * Delete a server database
+     * Delete a server database.
      */
     public function delete(ServerDatabaseWriteRequest $request, Server $server, Database $database): Response
     {

@@ -5,20 +5,20 @@ namespace Pterodactyl\Http\Controllers\Api\Client\Servers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\DestroyInstallRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\GameVersionsRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\GetProjectRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\ListInstallsRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\LoadersRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\ResolveInstallRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\SearchMarketplaceRequest;
-use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\StoreInstallRequest;
 use Pterodactyl\Models\MarketplaceInstall;
+use Pterodactyl\Services\Marketplace\SourceRegistry;
+use Pterodactyl\Services\Marketplace\MarketplaceSource;
 use Pterodactyl\Services\Marketplace\DestinationResolver;
 use Pterodactyl\Services\Marketplace\MarketplaceException;
-use Pterodactyl\Services\Marketplace\MarketplaceSource;
-use Pterodactyl\Services\Marketplace\SourceRegistry;
+use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\LoadersRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\GetProjectRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\GameVersionsRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\ListInstallsRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\StoreInstallRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\DestroyInstallRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\ResolveInstallRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\SearchMarketplaceRequest;
 
 /**
  * Daemon-agnostic marketplace controller powering the plugin/mod installer.
@@ -37,7 +37,7 @@ class MarketplaceController extends ClientApiController
     }
 
     /**
-     * Search marketplace
+     * Search marketplace.
      */
     public function search(SearchMarketplaceRequest $request): JsonResponse
     {
@@ -62,7 +62,7 @@ class MarketplaceController extends ClientApiController
                 : $this->singleSourceSearch((string) $sourceKey, $type, $filters);
 
             return response()->json([
-                'results' => collect($projects)->map(fn($p) => $p->toArray())->values()->all(),
+                'results' => collect($projects)->map(fn ($p) => $p->toArray())->values()->all(),
                 'sources' => $this->availableSources($type),
             ]);
         });
@@ -108,13 +108,13 @@ class MarketplaceController extends ClientApiController
             }
         }
 
-        usort($merged, fn($a, $b) => $b->downloads <=> $a->downloads);
+        usort($merged, fn ($a, $b) => $b->downloads <=> $a->downloads);
 
         return $merged;
     }
 
     /**
-     * Get project versions
+     * Get project versions.
      */
     public function project(GetProjectRequest $request): JsonResponse
     {
@@ -134,13 +134,13 @@ class MarketplaceController extends ClientApiController
             ]);
 
             return response()->json([
-                'versions' => collect($versions)->map(fn($v) => $v->toArray())->values()->all(),
+                'versions' => collect($versions)->map(fn ($v) => $v->toArray())->values()->all(),
             ]);
         });
     }
 
     /**
-     * Resolve a version download
+     * Resolve a version download.
      */
     public function resolve(ResolveInstallRequest $request): JsonResponse
     {
@@ -167,7 +167,7 @@ class MarketplaceController extends ClientApiController
     }
 
     /**
-     * List installed projects
+     * List installed projects.
      */
     public function installed(ListInstallsRequest $request): JsonResponse
     {
@@ -180,12 +180,12 @@ class MarketplaceController extends ClientApiController
             ->get();
 
         return response()->json([
-            'installs' => $installs->map(fn(MarketplaceInstall $i) => $this->serializeInstall($i))->values()->all(),
+            'installs' => $installs->map(fn (MarketplaceInstall $i) => $this->serializeInstall($i))->values()->all(),
         ]);
     }
 
     /**
-     * Record an install
+     * Record an install.
      */
     public function store(StoreInstallRequest $request): JsonResponse
     {
@@ -212,7 +212,7 @@ class MarketplaceController extends ClientApiController
     }
 
     /**
-     * Remove an install record
+     * Remove an install record.
      */
     public function destroy(DestroyInstallRequest $request): JsonResponse
     {
@@ -247,7 +247,7 @@ class MarketplaceController extends ClientApiController
     }
 
     /**
-     * List available loaders
+     * List available loaders.
      */
     public function loaders(LoadersRequest $request): JsonResponse
     {
@@ -257,7 +257,7 @@ class MarketplaceController extends ClientApiController
     }
 
     /**
-     * List supported game versions
+     * List supported game versions.
      */
     public function gameVersions(GameVersionsRequest $request): JsonResponse
     {
@@ -293,8 +293,8 @@ class MarketplaceController extends ClientApiController
     protected function availableSources(string $type): array
     {
         return Collection::make($this->sources->all())
-            ->filter(fn(MarketplaceSource $source) => $source->supports($type))
-            ->map(fn(MarketplaceSource $source) => ['key' => $source->key(), 'label' => $source->label()])
+            ->filter(fn (MarketplaceSource $source) => $source->supports($type))
+            ->map(fn (MarketplaceSource $source) => ['key' => $source->key(), 'label' => $source->label()])
             ->values()
             ->all();
     }

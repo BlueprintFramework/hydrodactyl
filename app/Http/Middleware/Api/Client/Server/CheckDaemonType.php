@@ -2,13 +2,11 @@
 
 namespace Pterodactyl\Http\Middleware\Api\Client\Server;
 
-use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class CheckDaemonType
 {
-    public function handle(Request $request, Closure $next, string $daemon)
+    public function handle(Request $request, \Closure $next, string $daemon)
     {
         $server = $request->attributes->get('server');
         $daemonType = $server->node->daemonType;

@@ -3,8 +3,8 @@
 namespace Pterodactyl\Console\Commands\Maintenance;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Console\Command;
 use Pterodactyl\Models\Backup;
+use Illuminate\Console\Command;
 
 class PruneOrphanedBackupsCommand extends Command
 {

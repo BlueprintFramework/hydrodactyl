@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Pterodactyl\Http\Controllers\Auth\SetupController;
 use Pterodactyl\Http\Middleware\SetupRequired;
+use Pterodactyl\Http\Controllers\Auth\SetupController;
 
 /*
 |--------------------------------------------------------------------------

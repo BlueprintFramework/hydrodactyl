@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
-use Illuminate\Auth\Access\AuthorizationException;
 use Pterodactyl\Services\Elytra\ElytraJobService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 
 class ElytraJobsController extends ClientApiController
@@ -19,7 +19,7 @@ class ElytraJobsController extends ClientApiController
     }
 
     /**
-     * List jobs
+     * List jobs.
      */
     public function index(Request $request, Server $server): JsonResponse
     {
@@ -49,7 +49,7 @@ class ElytraJobsController extends ClientApiController
     }
 
     /**
-     * Create a job
+     * Create a job.
      */
     public function create(Request $request, Server $server): JsonResponse
     {
@@ -81,7 +81,7 @@ class ElytraJobsController extends ClientApiController
     }
 
     /**
-     * View a job
+     * View a job.
      */
     public function show(Request $request, Server $server, string $jobId): JsonResponse
     {
@@ -107,7 +107,7 @@ class ElytraJobsController extends ClientApiController
     }
 
     /**
-     * Cancel a job
+     * Cancel a job.
      */
     public function cancel(Request $request, Server $server, string $jobId): JsonResponse
     {
@@ -136,4 +136,3 @@ class ElytraJobsController extends ClientApiController
         return new JsonResponse($result);
     }
 }
-

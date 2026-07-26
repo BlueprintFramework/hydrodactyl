@@ -4,17 +4,17 @@ namespace Pterodactyl\Tests\Unit\Services\Backups;
 
 use Mockery\MockInterface;
 use Carbon\CarbonImmutable;
+use Pterodactyl\Models\Node;
+use Pterodactyl\Models\User;
 use Lcobucci\JWT\Token\Plain;
+use Pterodactyl\Models\Backup;
 use Lcobucci\JWT\Token\DataSet;
+use Pterodactyl\Tests\TestCase;
 use Lcobucci\JWT\Token\Signature;
 use Pterodactyl\Enums\BackupAdapter;
-use Pterodactyl\Models\Backup;
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Node;
-use Pterodactyl\Tests\TestCase;
 use Pterodactyl\Services\Nodes\NodeJWTService;
-use Pterodactyl\Services\Backups\DownloadLinkService;
 use Pterodactyl\Extensions\Backups\BackupManager;
+use Pterodactyl\Services\Backups\DownloadLinkService;
 
 class DownloadLinkServiceTest extends TestCase
 {

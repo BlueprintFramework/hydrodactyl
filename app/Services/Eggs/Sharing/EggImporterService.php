@@ -2,18 +2,18 @@
 
 namespace Pterodactyl\Services\Eggs\Sharing;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Arr;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\Nest;
 use Illuminate\Http\UploadedFile;
 use Pterodactyl\Models\EggVariable;
+use Pterodactyl\Services\UuidService;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Services\Eggs\EggParserService;
 
 class EggImporterService
 {
-    public function __construct(protected ConnectionInterface $connection, protected EggParserService $parser)
+    public function __construct(protected ConnectionInterface $connection, protected EggParserService $parser, protected UuidService $uuidService)
     {
     }
 
@@ -31,7 +31,7 @@ class EggImporterService
 
         return $this->connection->transaction(function () use ($nest, $parsed) {
             $egg = (new Egg())->forceFill([
-                'uuid' => Uuid::uuid4()->toString(),
+                'uuid' => $this->uuidService->uuid(),
                 'nest_id' => $nest->id,
                 'author' => Arr::get($parsed, 'author'),
                 'copy_script_from' => null,
@@ -68,7 +68,7 @@ class EggImporterService
 
         return $this->connection->transaction(function () use ($nest, $parsed) {
             $egg = (new Egg())->forceFill([
-                'uuid' => Uuid::uuid4()->toString(),
+                'uuid' => $this->uuidService->uuid(),
                 'nest_id' => $nest->id,
                 'author' => Arr::get($parsed, 'author'),
                 'copy_script_from' => null,

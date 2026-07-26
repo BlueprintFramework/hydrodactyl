@@ -2,10 +2,9 @@
 
 namespace Pterodactyl\Http\Middleware\Api\Client\Server;
 
-use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Pterodactyl\Models\Server;
+use Illuminate\Support\Facades\Log;
 use Pterodactyl\Models\ServerOperation;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
@@ -20,7 +19,7 @@ class ServerOperationRateLimit
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next, string $operationType = 'general')
+    public function handle(Request $request, \Closure $next, string $operationType = 'general')
     {
         /** @var Server $server */
         $server = $request->route('server');
@@ -45,10 +44,7 @@ class ServerOperationRateLimit
             $activeOperations = ServerOperation::forServer($server)->active()->count();
 
             if ($activeOperations > 0) {
-                throw new TooManyRequestsHttpException(
-                    300,
-                    'Another operation is currently in progress for this server. Please wait for it to complete.'
-                );
+                throw new TooManyRequestsHttpException(300, 'Another operation is currently in progress for this server. Please wait for it to complete.');
             }
         } catch (\Exception $e) {
             Log::warning('Failed to check for active operations', [
@@ -70,6 +66,7 @@ class ServerOperationRateLimit
                 'table' => $tableName,
                 'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }

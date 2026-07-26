@@ -8,8 +8,8 @@ use Pterodactyl\Tests\TestCase;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\PasswordBroker;
-use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
 use Pterodactyl\Services\Users\UserCreationService;
+use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
 
 class UserCreationServiceTest extends TestCase
 {

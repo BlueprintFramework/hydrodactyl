@@ -73,7 +73,7 @@ return [
     |
     */
     'configuration' => [
-        /** A string to use one of the color presets */
+        /* A string to use one of the color presets */
         'theme' =>
         // 'alternate',
         // 'bluePlanet',
@@ -88,48 +88,48 @@ return [
         // 'solarized',
         // 'none',
 
-        /** The layout to use for the references */
+        /* The layout to use for the references */
         'layout' => 'modern',
 
-        /** URL to a request proxy for the API client */
+        /* URL to a request proxy for the API client */
         'proxyUrl' => 'https://proxy.scalar.com',
 
-        /** Whether to show the sidebar */
+        /* Whether to show the sidebar */
         'showSidebar' => true,
 
-        /**
+        /*
          * Whether to show models in the sidebar, search, and content.
          */
         'hideModels' => false,
 
-        /**
+        /*
          * Whether to show the “Download OpenAPI Document” button
          */
         'hideDownloadButton' => false,
 
-        /**
+        /*
          * Whether to show the “Test Request” button
          */
         'hideTestRequestButton' => false,
 
-        /**
+        /*
          * Whether to show the sidebar search bar
          */
         'hideSearch' => false,
 
-        /** Whether dark mode is on or off initially (light mode) */
+        /* Whether dark mode is on or off initially (light mode) */
         'darkMode' => true,
 
-        /** forceDarkModeState makes it always this state no matter what*/
+        /* forceDarkModeState makes it always this state no matter what */
         'forceDarkModeState' => 'dark',
 
-        /** Whether to show the dark mode toggle */
+        /* Whether to show the dark mode toggle */
         'hideDarkModeToggle' => true,
 
-        /** Key used with CTRL/CMD to open the search modal (defaults to 'k' e.g. CMD+k) */
+        /* Key used with CTRL/CMD to open the search modal (defaults to 'k' e.g. CMD+k) */
         'searchHotKey' => 'k',
 
-        /**
+        /*
          * If used, passed data will be added to the HTML header
          *
          * @see https://unhead.unjs.io/usage/composables/use-seo-meta
@@ -138,41 +138,41 @@ return [
             'title' => config('app.name') . ' API Reference',
         ],
 
-        /**
+        /*
          * Path to a favicon image
          *
          * @example '/favicon.svg'
          */
         'favicon' => '',
 
-        /**
+        /*
          * List of httpsnippet clients to hide from the clients menu
          * By default hides Unirest, pass `[]` to show all clients
          */
         'hiddenClients' => [],
 
-        /** Determine the HTTP client that’s selected by default */
+        /* Determine the HTTP client that’s selected by default */
         'defaultHttpClient' => [
             'targetId' => 'shell',
             'clientKey' => 'curl',
         ],
 
-        /** Custom CSS to be added to the page */
+        /* Custom CSS to be added to the page */
         // 'customCss' => '',
 
-        /** Prefill authentication */
+        /* Prefill authentication */
         // 'authentication' => [
         //     // TODO
         // ],
 
-        /**
+        /*
          * The baseServerURL is used when the spec servers are relative paths and we are using SSR.
          * On the client we can grab the window.location.origin but on the server we need
          * to use this prop.
          */
         // 'baseServerURL' => '',
 
-        /**
+        /*
          * List of servers to override the openapi spec servers
          */
         // 'servers' => [
@@ -182,12 +182,12 @@ return [
         //     ],
         // ],
 
-        /**
+        /*
          * We’re using Inter and JetBrains Mono as the default fonts. If you want to use your own fonts, set this to false.
          */
         'withDefaultFonts' => true,
 
-        /**
+        /*
          * By default we only open the relevant tag based on the url, however if you want all the tags open by default then set this configuration option :)
          */
         'defaultOpenAllTags' => false,

@@ -23,7 +23,7 @@ class FileUploadController extends ClientApiController
     }
 
     /**
-     * Get upload URL
+     * Get upload URL.
      */
     public function __invoke(UploadFileRequest $request, Server $server): JsonResponse
     {

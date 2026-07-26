@@ -10,7 +10,6 @@ use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Services\Servers\EnvironmentService;
 use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Support\Facades\Log;
 use Pterodactyl\Repositories\Eloquent\NestRepository;
 use Pterodactyl\Repositories\Eloquent\NodeRepository;
 use Pterodactyl\Repositories\Eloquent\MountRepository;
@@ -35,7 +34,8 @@ class ServerViewController extends Controller
         private ServerRepository $repository,
         private EnvironmentService $environmentService,
         private ViewFactory $view,
-    ) {}
+    ) {
+    }
 
     /**
      * Returns the index view for a server.

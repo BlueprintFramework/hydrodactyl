@@ -23,7 +23,7 @@ class ElytraJobService
     private function discoverHandlers(): void
     {
         $handlerClasses = [
-            \Pterodactyl\Services\Elytra\Jobs\BackupJob::class,
+            Jobs\BackupJob::class,
         ];
 
         foreach ($handlerClasses as $handlerClass) {
@@ -199,6 +199,7 @@ class ElytraJobService
             Log::warning('Received status update for unknown job', [
                 'elytra_job_id' => $elytraJobId,
             ]);
+
             return;
         }
 
@@ -232,7 +233,6 @@ class ElytraJobService
             'progress' => $statusData['progress'] ?? 0,
         ]);
     }
-
 
     private function fireJobStatusEvent(ElytraJob $job, array $statusData): void
     {

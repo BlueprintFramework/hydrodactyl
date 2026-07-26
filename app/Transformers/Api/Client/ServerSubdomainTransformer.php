@@ -3,7 +3,6 @@
 namespace Pterodactyl\Transformers\Api\Client;
 
 use Pterodactyl\Models\ServerSubdomain;
-use Pterodactyl\Transformers\Api\Client\BaseClientTransformer;
 
 class ServerSubdomainTransformer extends BaseClientTransformer
 {

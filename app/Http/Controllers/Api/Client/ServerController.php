@@ -2,13 +2,11 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client;
 
-use Illuminate\Support\Facades\Log;
 use Pterodactyl\Models\Server;
+use Pterodactyl\Enums\Daemon\DaemonType;
 use Pterodactyl\Transformers\Api\Client\ServerTransformer;
 use Pterodactyl\Services\Servers\GetUserPermissionsService;
-use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Pterodactyl\Http\Requests\Api\Client\Servers\GetServerRequest;
-use Pterodactyl\Enums\Daemon\DaemonType;
 
 class ServerController extends ClientApiController
 {
@@ -21,13 +19,14 @@ class ServerController extends ClientApiController
     }
 
     /**
-     * Get a single server
+     * Get a single server.
      */
     public function index(GetServerRequest $request, Server $server): array
     {
         $server->loadMissing('node');
 
         $daemonType = $server->node?->daemonType;
+
         return $this->fractal->item($server)
             ->transformWith($this->getTransformer(ServerTransformer::class))
             ->addMeta([
@@ -39,7 +38,7 @@ class ServerController extends ClientApiController
     }
 
     /**
-     * Get server resources
+     * Get server resources.
      */
     public function resources(GetServerRequest $request, Server $server): array
     {
@@ -50,6 +49,7 @@ class ServerController extends ClientApiController
         $controllerClass = $controllers[$daemonType];
 
         $controller = app($controllerClass);
+
         return $controller->__invoke($request, $server);
     }
 }

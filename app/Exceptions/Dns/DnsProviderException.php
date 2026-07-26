@@ -4,12 +4,12 @@ namespace Pterodactyl\Exceptions\Dns;
 
 use Exception;
 
-class DnsProviderException extends Exception
+class DnsProviderException extends \Exception
 {
     /**
      * Create a new DNS provider exception.
      */
-    public function __construct(string $message = '', int $code = 0, ?Exception $previous = null)
+    public function __construct(string $message = '', int $code = 0, ?\Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
@@ -23,7 +23,7 @@ class DnsProviderException extends Exception
         if ($reason) {
             $message .= ": {$reason}";
         }
-        
+
         return new self($message);
     }
 
@@ -52,7 +52,7 @@ class DnsProviderException extends Exception
         if ($reason) {
             $message .= ": {$reason}";
         }
-        
+
         return new self($message);
     }
 
@@ -66,7 +66,7 @@ class DnsProviderException extends Exception
         if ($reason) {
             $message .= ": {$reason}";
         }
-        
+
         return new self($message);
     }
 
@@ -80,7 +80,7 @@ class DnsProviderException extends Exception
         if ($reason) {
             $message .= ": {$reason}";
         }
-        
+
         return new self($message);
     }
 

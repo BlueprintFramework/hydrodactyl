@@ -27,7 +27,7 @@ class ServerDetailsController extends Controller
     }
 
     /**
-     * Get server details for Wings
+     * Get server details for Wings.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
      */
@@ -42,7 +42,7 @@ class ServerDetailsController extends Controller
     }
 
     /**
-     * List all servers for a node
+     * List all servers for a node.
      */
     public function list(Request $request): ServerConfigurationCollection
     {
@@ -61,7 +61,7 @@ class ServerDetailsController extends Controller
     }
 
     /**
-     * Reset all server states on node
+     * Reset all server states on node.
      *
      * @throws \Throwable
      */

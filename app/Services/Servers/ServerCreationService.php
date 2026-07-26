@@ -2,7 +2,6 @@
 
 namespace Pterodactyl\Services\Servers;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Arr;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\User;
@@ -10,6 +9,7 @@ use Webmozart\Assert\Assert;
 use Pterodactyl\Models\Server;
 use Illuminate\Support\Collection;
 use Pterodactyl\Models\Allocation;
+use Pterodactyl\Services\UuidService;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Models\Objects\DeploymentObject;
 use Pterodactyl\Repositories\Eloquent\ServerRepository;
@@ -32,6 +32,7 @@ class ServerCreationService
         private ServerRepository $repository,
         private ServerDeletionService $serverDeletionService,
         private ServerVariableRepository $serverVariableRepository,
+        private UuidService $uuidService,
         private VariableValidatorService $validatorService,
     ) {
     }
@@ -134,13 +135,13 @@ class ServerCreationService
      */
     private function createModel(array $data): Server
     {
-        $uuid = $this->generateUniqueUuidCombo();
+        [$uuid, $short] = $this->generateUniqueUuidCombo();
 
         /** @var Server $model */
         $model = $this->repository->create([
             'external_id' => Arr::get($data, 'external_id'),
             'uuid' => $uuid,
-            'uuidShort' => substr($uuid, 0, 8),
+            'uuidShort' => $short,
             'node_id' => Arr::get($data, 'node_id'),
             'name' => Arr::get($data, 'name'),
             'description' => Arr::get($data, 'description') ?? '',
@@ -206,14 +207,15 @@ class ServerCreationService
     /**
      * Create a unique UUID and UUID-Short combo for a server.
      */
-    private function generateUniqueUuidCombo(): string
+    private function generateUniqueUuidCombo(): array
     {
-        $uuid = Uuid::uuid4()->toString();
+        $uuid = $this->uuidService->uuid();
+        $short = $this->uuidService->uuidShort();
 
-        if (!$this->repository->isUniqueUuidCombo($uuid, substr($uuid, 0, 8))) {
+        if (!$this->repository->isUniqueUuidCombo($uuid, $short)) {
             return $this->generateUniqueUuidCombo();
         }
 
-        return $uuid;
+        return [$uuid, $short];
     }
 }

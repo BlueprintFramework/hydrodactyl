@@ -28,7 +28,7 @@ class SessionActivity extends Model
      */
     protected $fillable = [
         'user_id',
-        'ip_address', 
+        'ip_address',
         'user_agent',
         'payload',
         'last_activity',

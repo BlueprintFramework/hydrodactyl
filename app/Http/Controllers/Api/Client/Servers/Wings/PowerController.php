@@ -20,7 +20,7 @@ class PowerController extends ClientApiController
     }
 
     /**
-     * Send power action
+     * Send power action.
      */
     public function index(SendPowerRequest $request, Server $server): Response
     {

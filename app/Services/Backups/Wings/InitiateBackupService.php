@@ -2,11 +2,11 @@
 
 namespace Pterodactyl\Services\Backups\Wings;
 
-use Ramsey\Uuid\Uuid;
 use Carbon\CarbonImmutable;
 use Webmozart\Assert\Assert;
 use Pterodactyl\Models\Backup;
 use Pterodactyl\Models\Server;
+use Pterodactyl\Services\UuidService;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Extensions\Backups\BackupManager;
 use Pterodactyl\Repositories\Eloquent\BackupRepository;
@@ -29,7 +29,9 @@ class InitiateBackupService
         private DaemonBackupRepository $daemonBackupRepository,
         private DeleteBackupService $deleteBackupService,
         private BackupManager $backupManager,
-    ) {}
+        private UuidService $uuidService,
+    ) {
+    }
 
     /**
      * Set if the backup should be locked once it is created which will prevent
@@ -90,12 +92,12 @@ class InitiateBackupService
         $successful = $this->repository->getNonFailedBackups($server);
         if ($server->backup_limit == null) {
             $server->backup_limit = $successful->count() + 1;
-        };
+        }
         if (!$server->backup_limit || $successful->count() >= $server->backup_limit) {
             // Do not allow the user to continue if this server is already at its limit and can't override.
             if ($server->backup_limit == null) {
                 $server->backup_limit = 12;
-            };
+            }
 
             if (!$override || $server->backup_limit <= 0) {
                 throw new TooManyBackupsException($server->backup_limit);
@@ -117,7 +119,7 @@ class InitiateBackupService
             /** @var Backup $backup */
             $backup = $this->repository->create([
                 'server_id' => $server->id,
-                'uuid' => Uuid::uuid4()->toString(),
+                'uuid' => $this->uuidService->uuid(),
                 'name' => trim($name) ?: sprintf('Backup at %s', CarbonImmutable::now()->toDateTimeString()),
                 'ignored_files' => array_values($this->ignoredFiles ?? []),
                 'disk' => $server->node->backupDisk,

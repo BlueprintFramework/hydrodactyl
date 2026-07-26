@@ -2,7 +2,6 @@
 
 namespace Pterodactyl\Http\Controllers\Admin;
 
-use Ramsey\Uuid\Uuid;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Nest;
@@ -11,6 +10,7 @@ use Pterodactyl\Models\Mount;
 use Pterodactyl\Models\Location;
 use Illuminate\Http\RedirectResponse;
 use Prologue\Alerts\AlertsMessageBag;
+use Pterodactyl\Services\UuidService;
 use Illuminate\View\Factory as ViewFactory;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Http\Requests\Admin\MountFormRequest;
@@ -28,6 +28,7 @@ class MountController extends Controller
         protected NestRepositoryInterface $nestRepository,
         protected LocationRepositoryInterface $locationRepository,
         protected MountRepository $repository,
+        protected UuidService $uuidService,
         protected ViewFactory $view,
     ) {
     }
@@ -67,7 +68,7 @@ class MountController extends Controller
     public function create(MountFormRequest $request): RedirectResponse
     {
         $model = (new Mount())->fill($request->validated());
-        $model->forceFill(['uuid' => Uuid::uuid4()->toString()]);
+        $model->forceFill(['uuid' => $this->uuidService->uuid()]);
 
         $model->saveOrFail();
         $mount = $model->fresh();

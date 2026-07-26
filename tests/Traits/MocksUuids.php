@@ -19,8 +19,9 @@ trait MocksUuids
     public function setKnownUuidFactory(): void
     {
         $uuid = Uuid::fromString($this->getKnownUuid());
-        $factoryMock = m::mock(UuidFactory::class . '[uuid4]', [
+        $factoryMock = m::mock(UuidFactory::class . '[uuid4,uuid7]', [
             'uuid4' => $uuid,
+            'uuid7' => $uuid,
         ]);
 
         Uuid::setFactory($factoryMock);

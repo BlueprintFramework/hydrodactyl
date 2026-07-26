@@ -25,6 +25,6 @@ class CaptchaServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+
     }
 }

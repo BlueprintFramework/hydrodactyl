@@ -24,7 +24,7 @@ class NodeFormRequest extends AdminFormRequest
         $data = Node::getRules();
         $data['fqdn'][] = Fqdn::make('scheme');
         $data['internal_fqdn'] = ['nullable', 'string', Fqdn::make('scheme')];
-        log::info("rules", [$data]);
+        Log::info('rules', [$data]);
 
         return $data;
     }

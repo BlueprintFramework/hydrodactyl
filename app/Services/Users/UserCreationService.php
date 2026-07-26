@@ -2,8 +2,8 @@
 
 namespace Pterodactyl\Services\Users;
 
-use Ramsey\Uuid\Uuid;
 use Pterodactyl\Models\User;
+use Pterodactyl\Services\UuidService;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\PasswordBroker;
@@ -20,6 +20,7 @@ class UserCreationService
         private Hasher $hasher,
         private PasswordBroker $passwordBroker,
         private UserRepositoryInterface $repository,
+        private UuidService $uuidService,
     ) {
     }
 
@@ -43,7 +44,7 @@ class UserCreationService
 
         /** @var User $user */
         $user = $this->repository->create(array_merge($data, [
-            'uuid' => Uuid::uuid4()->toString(),
+            'uuid' => $this->uuidService->uuid(),
         ]), true, true);
 
         if (isset($generateResetToken)) {

@@ -22,7 +22,7 @@ class ServerManagementController extends ApplicationApiController
     }
 
     /**
-     * Suspend a server
+     * Suspend a server.
      *
      * @throws \Throwable
      */
@@ -34,7 +34,7 @@ class ServerManagementController extends ApplicationApiController
     }
 
     /**
-     * Unsuspend a server
+     * Unsuspend a server.
      *
      * @throws \Throwable
      */
@@ -46,7 +46,7 @@ class ServerManagementController extends ApplicationApiController
     }
 
     /**
-     * Reinstall a server
+     * Reinstall a server.
      *
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException

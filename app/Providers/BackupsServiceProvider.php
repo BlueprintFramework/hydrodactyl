@@ -2,9 +2,9 @@
 
 namespace Pterodactyl\Providers;
 
+use Pterodactyl\Models\S3;
 use Illuminate\Support\ServiceProvider;
 use Pterodactyl\Extensions\Backups\BackupManager;
-use Pterodactyl\Models\S3;
 
 class BackupsServiceProvider extends ServiceProvider
 {

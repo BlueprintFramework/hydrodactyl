@@ -17,7 +17,7 @@ use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 class ActivityLogController extends ClientApiController
 {
     /**
-     * List server activity logs
+     * List server activity logs.
      */
     public function __invoke(ClientApiRequest $request, Server $server): array
     {

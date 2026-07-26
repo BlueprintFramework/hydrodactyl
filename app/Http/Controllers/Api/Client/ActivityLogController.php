@@ -11,7 +11,7 @@ use Pterodactyl\Transformers\Api\Client\ActivityLogTransformer;
 class ActivityLogController extends ClientApiController
 {
     /**
-     * List account activity logs
+     * List account activity logs.
      */
     public function __invoke(ClientApiRequest $request): array
     {

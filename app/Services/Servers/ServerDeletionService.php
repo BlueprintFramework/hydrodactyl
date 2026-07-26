@@ -9,7 +9,6 @@ use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Repositories\Wings\DaemonServerRepository;
 use Pterodactyl\Services\Databases\DatabaseManagementService;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
-use Pterodactyl\Exceptions\Service\Backup\BackupLockedException;
 
 class ServerDeletionService
 {
@@ -22,7 +21,8 @@ class ServerDeletionService
         private ConnectionInterface $connection,
         private DaemonServerRepository $daemonServerRepository,
         private DatabaseManagementService $databaseManagementService,
-    ) {}
+    ) {
+    }
 
     /**
      * Set if the server should be forcibly deleted from the panel (ignoring daemon errors) or not.

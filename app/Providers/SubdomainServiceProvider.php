@@ -22,6 +22,6 @@ class SubdomainServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+
     }
 }

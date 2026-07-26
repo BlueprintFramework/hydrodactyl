@@ -3,8 +3,8 @@
 namespace Pterodactyl\Extensions\Laravel\Sanctum;
 
 use Pterodactyl\Models\ApiKey;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
 class NewAccessToken implements Arrayable, Jsonable
 {

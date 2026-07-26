@@ -4,10 +4,10 @@ namespace Pterodactyl\Tests\Unit\Services\Nests;
 
 use Mockery\MockInterface;
 use Pterodactyl\Tests\TestCase;
-use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
-use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
 use Pterodactyl\Services\Nests\NestDeletionService;
+use Pterodactyl\Contracts\Repository\NestRepositoryInterface;
 use Pterodactyl\Exceptions\Service\HasActiveServersException;
+use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
 
 class NestDeletionServiceTest extends TestCase
 {

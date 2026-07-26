@@ -2,9 +2,9 @@
 
 namespace Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace;
 
+use Pterodactyl\Models\Permission;
 use Pterodactyl\Contracts\Http\ClientPermissionsRequest;
 use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
-use Pterodactyl\Models\Permission;
 
 class LoadersRequest extends ClientApiRequest implements ClientPermissionsRequest
 {

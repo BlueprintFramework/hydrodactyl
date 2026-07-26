@@ -3,14 +3,14 @@
 namespace Pterodactyl\Tests\Unit\Services\Eggs\Variables;
 
 use Mockery\MockInterface;
-use Pterodactyl\Models\EggVariable;
 use Pterodactyl\Tests\TestCase;
-use Illuminate\Contracts\Validation\Factory as ValidationFactory;
-use Illuminate\Contracts\Validation\Validator;
-use Pterodactyl\Contracts\Repository\EggVariableRepositoryInterface;
-use Pterodactyl\Services\Eggs\Variables\VariableUpdateService;
-use Pterodactyl\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
+use Pterodactyl\Models\EggVariable;
 use Pterodactyl\Exceptions\DisplayException;
+use Illuminate\Contracts\Validation\Validator;
+use Pterodactyl\Services\Eggs\Variables\VariableUpdateService;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Pterodactyl\Contracts\Repository\EggVariableRepositoryInterface;
+use Pterodactyl\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
 
 class VariableUpdateServiceTest extends TestCase
 {

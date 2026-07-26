@@ -31,7 +31,7 @@ class LocationController extends ApplicationApiController
     }
 
     /**
-     * List all locations
+     * List all locations.
      */
     public function index(GetLocationsRequest $request): array
     {
@@ -46,7 +46,7 @@ class LocationController extends ApplicationApiController
     }
 
     /**
-     * View a single location
+     * View a single location.
      */
     public function view(GetLocationRequest $request, Location $location): array
     {
@@ -56,7 +56,7 @@ class LocationController extends ApplicationApiController
     }
 
     /**
-     * Create a new location
+     * Create a new location.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
@@ -75,7 +75,7 @@ class LocationController extends ApplicationApiController
     }
 
     /**
-     * Update a location
+     * Update a location.
      *
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
@@ -90,7 +90,7 @@ class LocationController extends ApplicationApiController
     }
 
     /**
-     * Delete a location
+     * Delete a location.
      *
      * @throws \Pterodactyl\Exceptions\Service\Location\HasActiveNodesException
      */

@@ -64,19 +64,19 @@ class HetznerProvider implements DnsProviderInterface
                 'name' => $name,
                 'type' => strtoupper($type),
                 'ttl' => $ttl,
-                'records' => []
+                'records' => [],
             ];
 
             if (is_array($content)) {
                 // If 'content' key exists, use it and always remove the prefix before the first space ("TXT", "SRV", etc.)
                 if (isset($content['content'])) {
-                    $value = (string)$content['content'];
+                    $value = (string) $content['content'];
                     $spacePos = strpos($value, ' ');
                     if ($spacePos !== false) {
                         $value = substr($value, $spacePos + 1);
                     }
                 } elseif (isset($content['value'])) {
-                    $value = (string)$content['value'];
+                    $value = (string) $content['value'];
                     $spacePos = strpos($value, ' ');
                     if ($spacePos !== false) {
                         $value = substr($value, $spacePos + 1);
@@ -85,12 +85,12 @@ class HetznerProvider implements DnsProviderInterface
                     $value = json_encode($content);
                 }
             } else {
-                $value = (string)$content;
+                $value = (string) $content;
             }
             $payload['records'][] = ['value' => $value];
 
             $response = $this->client->post("zones/{$zoneId}/rrsets", [
-                'json' => $payload
+                'json' => $payload,
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true);
@@ -112,24 +112,24 @@ class HetznerProvider implements DnsProviderInterface
     {
         $zoneId = $this->getZoneId($domain);
 
-        [$recordName, $recordType] = explode("/", $recordId);
+        [$recordName, $recordType] = explode('/', $recordId);
 
         try {
             $payload = [
                 'ttl' => $ttl,
-                'records' => []
+                'records' => [],
             ];
 
             if (is_array($content)) {
                 // If 'content' key exists, use it and always remove the prefix before the first space ("TXT", "SRV", etc.)
                 if (isset($content['content'])) {
-                    $value = (string)$content['content'];
+                    $value = (string) $content['content'];
                     $spacePos = strpos($value, ' ');
                     if ($spacePos !== false) {
                         $value = substr($value, $spacePos + 1);
                     }
                 } elseif (isset($content['value'])) {
-                    $value = (string)$content['value'];
+                    $value = (string) $content['value'];
                     $spacePos = strpos($value, ' ');
                     if ($spacePos !== false) {
                         $value = substr($value, $spacePos + 1);
@@ -138,12 +138,12 @@ class HetznerProvider implements DnsProviderInterface
                     $value = json_encode($content);
                 }
             } else {
-                $value = (string)$content;
+                $value = (string) $content;
             }
             $payload['records'][] = ['value' => $value];
 
             $response = $this->client->put("zones/{$zoneId}/rrsets/{$recordName}/{$recordType}", [
-                'json' => $payload
+                'json' => $payload,
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true);
@@ -166,7 +166,7 @@ class HetznerProvider implements DnsProviderInterface
 
         $zoneId = $this->getZoneId($domain);
 
-        [$name, $type] = explode("/", $recordId);
+        [$name, $type] = explode('/', $recordId);
 
         try {
             $response = $this->client->delete("zones/{$zoneId}/rrsets/{$name}/{$type}");
@@ -187,14 +187,14 @@ class HetznerProvider implements DnsProviderInterface
     {
         $zoneId = $this->getZoneId($domain);
 
-        [$name, $type] = explode("/", $recordId);
+        [$name, $type] = explode('/', $recordId);
 
         try {
             $response = $this->client->get("zones/{$zoneId}/rrsets/{$name}/{$type}");
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (!$data['rrset']) {
-                throw new \Exception("DNS record not found or inaccessible.");
+                throw new \Exception('DNS record not found or inaccessible.');
             }
 
             return $data['result'];
@@ -230,7 +230,7 @@ class HetznerProvider implements DnsProviderInterface
                 }
 
                 $response = $this->client->get('zones/{$zoneId}/rrsets', [
-                    'query' => $params
+                    'query' => $params,
                 ]);
 
                 $data = json_decode($response->getBody()->getContents(), true);
@@ -243,7 +243,7 @@ class HetznerProvider implements DnsProviderInterface
 
                 $hasMorePages = isset($data['meta']['pagination']['next_page']) && $data['meta']['pagination']['next_page'] !== null;
 
-                $page++;
+                ++$page;
             } while ($hasMorePages);
 
             return $allRecords;
@@ -294,13 +294,13 @@ class HetznerProvider implements DnsProviderInterface
     {
         try {
             $response = $this->client->get('zones', [
-                'query' => ['name' => $domain]
+                'query' => ['name' => $domain],
             ]);
 
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (empty($data['zones'])) {
-                throw new \Exception("Domain zone not found or inaccessible.");
+                throw new \Exception('Domain zone not found or inaccessible.');
             }
 
             return $data['zones'][0]['id'];

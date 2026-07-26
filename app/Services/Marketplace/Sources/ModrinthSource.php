@@ -2,14 +2,14 @@
 
 namespace Pterodactyl\Services\Marketplace\Sources;
 
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
-use Pterodactyl\Services\Marketplace\AbstractMarketplaceSource;
-use Pterodactyl\Services\Marketplace\MarketplaceException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Client\ConnectionException;
 use Pterodactyl\Services\Marketplace\MarketplaceProject;
 use Pterodactyl\Services\Marketplace\MarketplaceVersion;
+use Pterodactyl\Services\Marketplace\MarketplaceException;
+use Pterodactyl\Services\Marketplace\AbstractMarketplaceSource;
 
 /**
  * Modrinth (https://modrinth.com) adapter. Modrinth hosts both Minecraft mods
@@ -266,7 +266,7 @@ class ModrinthSource extends AbstractMarketplaceSource
      */
     private function pickPrimaryFile(array $files): ?array
     {
-        $files = array_values(array_filter($files, fn($f) => is_array($f)));
+        $files = array_values(array_filter($files, fn ($f) => is_array($f)));
         if ($files === []) {
             return null;
         }

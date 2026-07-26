@@ -26,7 +26,7 @@ class VintageStorySubdomainFeature implements SubdomainFeatureInterface
         $ip = $server->allocation->ip;
         $port = $server->allocation->port;
         // This logic seems specific to how your Pterodactyl setup calculates the target domain
-        $subdomain_split = explode(".", $subdomain);
+        $subdomain_split = explode('.', $subdomain);
         $fullDomain = $subdomain_split[0] . '.' . $domain;
 
         $records = [];

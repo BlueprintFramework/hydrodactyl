@@ -2,12 +2,11 @@
 
 namespace Pterodactyl\Services\ServerOperations;
 
-use Exception;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Pterodactyl\Models\Server;
-use Pterodactyl\Models\ServerOperation;
 use Pterodactyl\Models\User;
+use Pterodactyl\Models\Server;
+use Illuminate\Support\Facades\Log;
+use Pterodactyl\Services\UuidService;
+use Pterodactyl\Models\ServerOperation;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
@@ -18,6 +17,10 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  */
 class ServerOperationService
 {
+    public function __construct(private UuidService $uuidService)
+    {
+    }
+
     /**
      * Check if server can accept new operations.
      */
@@ -25,13 +28,14 @@ class ServerOperationService
     {
         try {
             $activeOperations = ServerOperation::forServer($server)->active()->count();
+
             return $activeOperations === 0;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::warning('Failed to check server operation capacity', [
                 'server_id' => $server->id,
                 'error' => $e->getMessage(),
             ]);
-            
+
             return true;
         }
     }
@@ -44,13 +48,13 @@ class ServerOperationService
         User $user,
         string $type,
         array $parameters = [],
-        ?string $message = null
+        ?string $message = null,
     ): ServerOperation {
         if (!$this->canAcceptOperation($server)) {
             throw new ConflictHttpException('Server cannot accept new operations at this time.');
         }
 
-        $operationId = Str::uuid()->toString();
+        $operationId = $this->uuidService->uuid();
 
         return ServerOperation::create([
             'operation_id' => $operationId,
@@ -103,18 +107,18 @@ class ServerOperationService
     {
         try {
             $timedOutOperations = ServerOperation::forServer($server)->timedOut()->get();
-            
+
             foreach ($timedOutOperations as $operation) {
                 $operation->markAsFailed('Operation timed out');
             }
 
             return $timedOutOperations->count();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::warning('Failed to update timed out operations', [
                 'server_id' => $server->id,
                 'error' => $e->getMessage(),
             ]);
-            
+
             return 0;
         }
     }
@@ -143,29 +147,29 @@ class ServerOperationService
     /**
      * Clean up old completed operations.
      */
-    public function cleanupOldOperations(int $daysOld = null): int
+    public function cleanupOldOperations(?int $daysOld = null): int
     {
         $daysOld = $daysOld ?? config('server_operations.cleanup.retain_days', 30);
         $chunkSize = config('server_operations.cleanup.chunk_size', 100);
 
         try {
             $deletedCount = 0;
-            
+
             ServerOperation::forCleanup($daysOld)
                 ->chunk($chunkSize, function ($operations) use (&$deletedCount) {
                     foreach ($operations as $operation) {
                         $operation->delete();
-                        $deletedCount++;
+                        ++$deletedCount;
                     }
                 });
 
             return $deletedCount;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Failed to cleanup old server operations', [
                 'error' => $e->getMessage(),
                 'days_old' => $daysOld,
             ]);
-            
+
             return 0;
         }
     }

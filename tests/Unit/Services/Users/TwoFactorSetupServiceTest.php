@@ -6,9 +6,9 @@ use Mockery\MockInterface;
 use Pterodactyl\Models\User;
 use Pterodactyl\Tests\TestCase;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
 use Pterodactyl\Services\Users\TwoFactorSetupService;
+use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 
 class TwoFactorSetupServiceTest extends TestCase
 {

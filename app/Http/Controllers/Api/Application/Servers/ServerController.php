@@ -14,7 +14,6 @@ use Pterodactyl\Http\Requests\Api\Application\Servers\GetServersRequest;
 use Pterodactyl\Http\Requests\Api\Application\Servers\ServerWriteRequest;
 use Pterodactyl\Http\Requests\Api\Application\Servers\StoreServerRequest;
 use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
-use Illuminate\Support\Facades\Log;
 
 class ServerController extends ApplicationApiController
 {
@@ -29,7 +28,7 @@ class ServerController extends ApplicationApiController
     }
 
     /**
-     * List all servers
+     * List all servers.
      */
     public function index(GetServersRequest $request): array
     {
@@ -44,7 +43,7 @@ class ServerController extends ApplicationApiController
     }
 
     /**
-     * Create a new server
+     * Create a new server.
      *
      * @throws \Throwable
      * @throws \Illuminate\Validation\ValidationException
@@ -64,7 +63,7 @@ class ServerController extends ApplicationApiController
     }
 
     /**
-     * View a single server
+     * View a single server.
      */
     public function view(GetServerRequest $request, Server $server): array
     {
@@ -74,7 +73,7 @@ class ServerController extends ApplicationApiController
     }
 
     /**
-     * Delete a server
+     * Delete a server.
      *
      * @throws \Pterodactyl\Exceptions\DisplayException
      */

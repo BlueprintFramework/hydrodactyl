@@ -5,16 +5,14 @@ namespace Pterodactyl\Repositories\Elytra;
 use GuzzleHttp\Client;
 use Pterodactyl\Models\Node;
 use Webmozart\Assert\Assert;
-use Pterodactyl\Models\Backup;
 use Pterodactyl\Models\Server;
-use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\TransferException;
 use Illuminate\Contracts\Foundation\Application;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 /**
  * Repository for communicating with the Elytra daemon
- * Replaces the Wings DaemonBackupRepository functionality
+ * Replaces the Wings DaemonBackupRepository functionality.
  */
 class ElytraRepository
 {
@@ -67,7 +65,7 @@ class ElytraRepository
     }
 
     /**
-     * Create a new job on Elytra
+     * Create a new job on Elytra.
      *
      * @throws DaemonConnectionException
      */
@@ -93,7 +91,7 @@ class ElytraRepository
     }
 
     /**
-     * Gets the current status of a job from Elytra
+     * Gets the current status of a job from Elytra.
      *
      * @throws DaemonConnectionException
      */
@@ -113,7 +111,7 @@ class ElytraRepository
     }
 
     /**
-     * Cancels a running job on Elytra
+     * Cancels a running job on Elytra.
      *
      * @throws DaemonConnectionException
      */
@@ -133,11 +131,11 @@ class ElytraRepository
     }
 
     /**
-     * Update job status on Elytra
+     * Update job status on Elytra.
      *
      * @throws DaemonConnectionException
      */
-    public function updateJob(string $jobId, string $status, int $progress = 0, string $message = '', array $result = null): array
+    public function updateJob(string $jobId, string $status, int $progress = 0, string $message = '', ?array $result = null): array
     {
         Assert::isInstanceOf($this->server, Server::class);
 

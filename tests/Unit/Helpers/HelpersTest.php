@@ -2,7 +2,6 @@
 
 namespace Pterodactyl\Tests\Unit\Helpers;
 
-use stdClass;
 use Pterodactyl\Tests\TestCase;
 
 class HelpersTest extends TestCase
@@ -35,10 +34,10 @@ class HelpersTest extends TestCase
      */
     public function testObjectGetStrictReturnsNestedValue()
     {
-        $inner = new stdClass();
+        $inner = new \stdClass();
         $inner->value = 'test';
 
-        $outer = new stdClass();
+        $outer = new \stdClass();
         $outer->nested = $inner;
 
         $this->assertSame('test', object_get_strict($outer, 'nested.value'));
@@ -49,7 +48,7 @@ class HelpersTest extends TestCase
      */
     public function testObjectGetStrictReturnsObjectWithNullKey()
     {
-        $object = new stdClass();
+        $object = new \stdClass();
         $object->name = 'test';
 
         $this->assertSame($object, object_get_strict($object, null));
@@ -60,7 +59,7 @@ class HelpersTest extends TestCase
      */
     public function testObjectGetStrictReturnsObjectWithEmptyKey()
     {
-        $object = new stdClass();
+        $object = new \stdClass();
         $object->name = 'test';
 
         $this->assertSame($object, object_get_strict($object, ''));
@@ -71,7 +70,7 @@ class HelpersTest extends TestCase
      */
     public function testObjectGetStrictReturnsNullForMissingKey()
     {
-        $object = new stdClass();
+        $object = new \stdClass();
 
         $this->assertNull(object_get_strict($object, 'nonexistent'));
     }
@@ -81,7 +80,7 @@ class HelpersTest extends TestCase
      */
     public function testObjectGetStrictReturnsDefaultForMissingKey()
     {
-        $object = new stdClass();
+        $object = new \stdClass();
 
         $this->assertSame('default', object_get_strict($object, 'nonexistent', 'default'));
     }
@@ -91,8 +90,8 @@ class HelpersTest extends TestCase
      */
     public function testObjectGetStrictReturnsNullForNestedMissingKey()
     {
-        $inner = new stdClass();
-        $outer = new stdClass();
+        $inner = new \stdClass();
+        $outer = new \stdClass();
         $outer->nested = $inner;
 
         $this->assertNull(object_get_strict($outer, 'nested.nonexistent'));
@@ -103,8 +102,8 @@ class HelpersTest extends TestCase
      */
     public function testObjectGetStrictReturnsDefaultForNestedMissingKey()
     {
-        $inner = new stdClass();
-        $outer = new stdClass();
+        $inner = new \stdClass();
+        $outer = new \stdClass();
         $outer->nested = $inner;
 
         $this->assertSame('fallback', object_get_strict($outer, 'nested.nonexistent', 'fallback'));

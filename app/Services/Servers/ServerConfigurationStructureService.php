@@ -12,7 +12,7 @@ class ServerConfigurationStructureService
      */
     public function __construct(
         private EnvironmentService $environment,
-        private StartupCommandService $startupCommandService
+        private StartupCommandService $startupCommandService,
     ) {
     }
 

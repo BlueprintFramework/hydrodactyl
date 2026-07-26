@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { v4 } from 'uuid';
+import { v7 } from 'uuid';
 
 import CopyOnClick from './CopyOnClick';
 
@@ -26,7 +26,7 @@ const ItemContainer = ({
     divClasses,
     copyDescription,
 }: ContainerProps) => {
-    const uuid = useMemo(() => v4(), []);
+    const uuid = useMemo(() => v7(), []);
 
     return (
         <div
