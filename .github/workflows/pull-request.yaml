@@ -4,7 +4,7 @@ on:
   pull_request:
 jobs:
   quality:
-    runs-on:  blacksmith-2vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     permissions:
       contents: write
     steps:
@@ -13,11 +13,13 @@ jobs:
         with:
           persist-credentials: true
 
-      - name: Setup Biome
-        uses: biomejs/setup-biome@v2
+      - name: Install mise
+        uses: jdx/mise-action@v2
         with:
-          version: latest
+          install: true
+
+      - name: Install just
+        uses: extractions/setup-just@v2
 
       - name: Run Biome
-        run: biome check .
-
+        run: just check-frontend

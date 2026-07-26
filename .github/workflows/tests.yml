@@ -9,10 +9,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [8.4, 8.5]
+        php: ['8.4', '8.5']
         db: [mysql, mariadb, pgsql]
 
-    runs-on:  blacksmith-2vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     services:
       mysql:
@@ -56,12 +56,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Install mise
+        uses: jdx/mise-action@v2
         with:
-          php-version: ${{ matrix.php }}
-          extensions: bcmath, gd, pdo, ${{ matrix.db == 'pgsql' && 'pdo_pgsql' || 'pdo_mysql' }}, zip
-          tools: composer
+          install: false
+
+      - name: Set PHP version
+        run: mise use --install php@${{ matrix.php }}
+
+      - name: Install PHP extensions
+        run: |
+          EXTENSIONS="bcmath,gd,pdo,zip"
+          if [ "${{ matrix.db }}" = "pgsql" ]; then
+            EXTENSIONS="$EXTENSIONS,pdo_pgsql"
+          else
+            EXTENSIONS="$EXTENSIONS,pdo_mysql"
+          fi
+          mise install php:${{ matrix.php }} --with "extensions=$EXTENSIONS"
 
       - name: Get composer cache directory
         id: composer-cache
@@ -76,6 +87,9 @@ jobs:
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
+
+      - name: Install just
+        uses: extractions/setup-just@v2
 
       - name: Prepare environment (${{ matrix.db }})
         run: |
@@ -92,12 +106,12 @@ jobs:
           fi
 
       - name: Run tests
-        run: php vendor/bin/phpunit
+        run: just test
 
   build-dev:
     if: github.event_name == 'push'
     needs: tests
-    runs-on:  blacksmith-2vcpu-ubuntu-2404
+    runs-on: blacksmith-2vcpu-ubuntu-2404
 
     steps:
       - uses: actions/checkout@v4

@@ -53,11 +53,11 @@ Hydrodactyl uses [mise](https://mise.jdx.dev) for tool version management and [j
 
 ### Prerequisites
 
-| Tool | Purpose |
-|------|---------|
-| [Docker](https://docs.docker.com/get-docker/) | Container runtime for the dev stack |
-| [mise](https://mise.jdx.dev) | Manages PHP, Node, pnpm, and docker-compose versions |
-| [just](https://just.systems) | Command runner (like Make, but simpler) |
+| Tool                                          | Purpose                                              |
+| --------------------------------------------- | ---------------------------------------------------- |
+| [Docker](https://docs.docker.com/get-docker/) | Container runtime for the dev stack                  |
+| [mise](https://mise.jdx.dev)                  | Manages PHP, Node, pnpm, and docker-compose versions |
+| [just](https://just.systems)                  | Command runner (like Make, but simpler)              |
 
 ### Getting started
 
@@ -78,25 +78,25 @@ The panel will be available at `http://localhost:3000`.
 
 Run `just` to see all available recipes:
 
-| Command | Description |
-|---------|-------------|
-| `just dev` | Start the development stack |
-| `just dev-build` | Rebuild and start the stack |
-| `just dev-down` | Stop the development stack |
-| `just dev-logs` | View container logs |
-| `just lint` | Run Biome linter with auto-fix |
-| `just check-frontend` | Check frontend formatting |
-| `just build` | Build frontend assets |
-| `just phpstan` | Run PHPStan static analysis |
-| `just cs-fix` | Fix PHP code style |
-| `just cs-check` | Check PHP code style |
-| `just test` | Run all tests |
-| `just test-unit` | Run unit tests only |
-| `just test-integration` | Run integration tests only |
-| `just check` | Run full quality pipeline (lint + format + phpstan + tests) |
-| `just clear` | Clear Laravel caches |
-| `just migrate` | Run database migrations |
-| `just seed` | Seed the database |
+| Command                 | Description                                                 |
+| ----------------------- | ----------------------------------------------------------- |
+| `just dev`              | Start the development stack                                 |
+| `just dev-build`        | Rebuild and start the stack                                 |
+| `just dev-down`         | Stop the development stack                                  |
+| `just dev-logs`         | View container logs                                         |
+| `just lint`             | Run Biome linter with auto-fix                              |
+| `just check-frontend`   | Check frontend formatting                                   |
+| `just build`            | Build frontend assets                                       |
+| `just phpstan`          | Run PHPStan static analysis                                 |
+| `just cs-fix`           | Fix PHP code style                                          |
+| `just cs-check`         | Check PHP code style                                        |
+| `just test`             | Run all tests                                               |
+| `just test-unit`        | Run unit tests only                                         |
+| `just test-integration` | Run integration tests only                                  |
+| `just check`            | Run full quality pipeline (lint + format + phpstan + tests) |
+| `just clear`            | Clear Laravel caches                                        |
+| `just migrate`          | Run database migrations                                     |
+| `just seed`             | Seed the database                                           |
 
 ### Tech stack
 
