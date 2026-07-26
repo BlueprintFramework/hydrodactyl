@@ -37,33 +37,47 @@ const BottomNav = memo(({ items }: BottomNavProps) => {
         >
             <ul className='flex h-14 items-stretch gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
                 {items.map((item) => {
-                    const active = isActive(item.to, item.end);
+                    const external = /^https?:\/\//i.test(item.to);
+                    const active = !external && isActive(item.to, item.end);
                     const label = item.minimizedText ?? item.text;
+                    const className =
+                        'group flex w-full flex-col items-center justify-center gap-1 py-2 touch-manipulation';
+                    const content = (
+                        <>
+                            <HugeiconsIcon
+                                className={cn(
+                                    'size-5 transition-colors',
+                                    active ? 'text-brand' : 'text-white/55 group-hover:text-white',
+                                )}
+                                strokeWidth={2}
+                                icon={item.icon}
+                            />
+                            <span
+                                className={cn(
+                                    'max-w-full truncate text-[10px] leading-none transition-colors',
+                                    active ? 'font-semibold text-brand' : 'text-white/55 group-hover:text-white',
+                                )}
+                            >
+                                {label}
+                            </span>
+                        </>
+                    );
                     const itemEl = (
                         <li key={item.to} className='flex min-w-[72px] flex-1 items-stretch'>
-                            <NavLink
-                                to={item.to}
-                                end={item.end}
-                                aria-current={active ? 'page' : undefined}
-                                className='group flex w-full flex-col items-center justify-center gap-1 py-2 touch-manipulation'
-                            >
-                                <HugeiconsIcon
-                                    className={cn(
-                                        'size-5 transition-colors',
-                                        active ? 'text-brand' : 'text-white/55 group-hover:text-white',
-                                    )}
-                                    strokeWidth={2}
-                                    icon={item.icon}
-                                />
-                                <span
-                                    className={cn(
-                                        'max-w-full truncate text-[10px] leading-none transition-colors',
-                                        active ? 'font-semibold text-brand' : 'text-white/55 group-hover:text-white',
-                                    )}
+                            {external ? (
+                                <a href={item.to} className={className} target='_blank' rel='noreferrer'>
+                                    {content}
+                                </a>
+                            ) : (
+                                <NavLink
+                                    to={item.to}
+                                    end={item.end}
+                                    aria-current={active ? 'page' : undefined}
+                                    className={className}
                                 >
-                                    {label}
-                                </span>
-                            </NavLink>
+                                    {content}
+                                </NavLink>
+                            )}
                         </li>
                     );
 

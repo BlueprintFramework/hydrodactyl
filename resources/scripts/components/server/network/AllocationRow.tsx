@@ -1,6 +1,7 @@
 import { AntennaSignal, Check, CrownDiamond, TrashBin, Xmark } from '@gravity-ui/icons';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
+import { toast } from 'sonner';
 import type { Allocation } from '@/api/server/getServer';
 import deleteServerAllocation from '@/api/server/network/deleteServerAllocation';
 import setPrimaryServerAllocation from '@/api/server/network/setPrimaryServerAllocation';
@@ -75,10 +76,12 @@ const AllocationRow = ({ allocation }: Props) => {
         clearFlashes();
         mutate((data) => data?.map((a) => ({ ...a, isDefault: a.id === allocation.id })), false);
 
-        setPrimaryServerAllocation(uuid, allocation.id).catch((error) => {
-            clearAndAddHttpError(error);
-            mutate();
-        });
+        setPrimaryServerAllocation(uuid, allocation.id)
+            .then(() => toast.success('Allocation set as primary.'))
+            .catch((error) => {
+                clearAndAddHttpError(error);
+                mutate();
+            });
     };
 
     const deleteAllocation = () => {

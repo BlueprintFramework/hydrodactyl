@@ -82,8 +82,10 @@ body[data-sidebar-minimized="false"] .sidebar-logo-name {
 
 .sidebar-indicator {
     height: var(--indicator-height);
+    opacity: 0;
     width: var(--indicator-width);
     transition:
+        opacity var(--sidebar-transition-indicator),
         top var(--sidebar-transition-indicator),
         height var(--sidebar-transition-indicator),
         width var(--sidebar-transition-indicator);

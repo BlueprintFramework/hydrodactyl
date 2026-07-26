@@ -24,79 +24,100 @@ interface NavItemData {
 
 interface MobileSidebarProps {
     navItems: NavItemData[];
+    bottomNavItems?: NavItemData[];
 }
 
-const MobileSidebarPanel = memo<{ navItems: NavItemData[] }>(({ navItems }) => {
-    const { setMobileOpen, isMobileOpen } = useSidebar();
-    const location = useLocation();
+const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavItemData[] }>(
+    ({ navItems, bottomNavItems }) => {
+        const { setMobileOpen, isMobileOpen } = useSidebar();
+        const location = useLocation();
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: close menu on route change; setMobileOpen is stable
-    useEffect(() => {
-        setMobileOpen(false);
-    }, [location.pathname, setMobileOpen]);
+        // biome-ignore lint/correctness/useExhaustiveDependencies: close menu on route change; setMobileOpen is stable
+        useEffect(() => {
+            setMobileOpen(false);
+        }, [location.pathname, setMobileOpen]);
 
-    useEffect(() => {
-        if (!isMobileOpen) return;
+        useEffect(() => {
+            if (!isMobileOpen) return;
 
-        const previousOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
+            const previousOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
 
-        return () => {
-            document.body.style.overflow = previousOverflow;
-        };
-    }, [isMobileOpen]);
+            return () => {
+                document.body.style.overflow = previousOverflow;
+            };
+        }, [isMobileOpen]);
 
-    if (!isMobileOpen) return null;
+        if (!isMobileOpen) return null;
 
-    return (
-        <div className='lg:hidden fixed inset-0 z-[9999]'>
-            <button
-                type='button'
-                className='absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default'
-                onClick={() => setMobileOpen(false)}
-                aria-label='Close menu'
-                aria-hidden='true'
-                tabIndex={-1}
-            />
+        return (
+            <div className='lg:hidden fixed inset-0 z-[9999]'>
+                <button
+                    type='button'
+                    className='absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default'
+                    onClick={() => setMobileOpen(false)}
+                    aria-label='Close menu'
+                    aria-hidden='true'
+                    tabIndex={-1}
+                />
 
-            <div
-                className={cn(
-                    'sidebar-container absolute top-0 left-0 h-full w-[300px] max-w-[85vw] shrink-0',
-                    'flex flex-col bg-bg-lowered border-r border-mocha-400',
-                    'rounded-none overflow-y-auto overflow-x-hidden',
-                )}
-                data-sidebar-minimized='false'
-            >
-                <div className='mobile-sidebar-logo h-16 flex items-center flex-none'>
-                    <NavLink
-                        to='/'
-                        className='flex h-8 w-fit shrink-0 items-center hydrodactyl-logo'
-                        aria-label='Hydrodactyl home page'
-                    >
-                        <Logo className='h-8 w-8 shrink-0 object-contain' />
-                    </NavLink>
+                <div
+                    className={cn(
+                        'sidebar-container absolute top-0 left-0 h-full w-[300px] max-w-[85vw] shrink-0',
+                        'flex flex-col bg-bg-lowered border-r border-mocha-400',
+                        'rounded-none overflow-y-auto overflow-x-hidden',
+                    )}
+                    data-sidebar-minimized='false'
+                >
+                    <div className='mobile-sidebar-logo h-16 flex items-center flex-none'>
+                        <NavLink
+                            to='/'
+                            className='flex h-8 w-fit shrink-0 items-center hydrodactyl-logo'
+                            aria-label='Hydrodactyl home page'
+                        >
+                            <Logo className='h-8 w-8 shrink-0 object-contain' />
+                        </NavLink>
+                    </div>
+
+                    <ul className='flex flex-col text-sm'>
+                        {navItems.map((item, index) => (
+                            <li key={item.tabName} data-tab={item.tabName}>
+                                <NavItem
+                                    to={item.to}
+                                    icon={item.icon}
+                                    text={item.text}
+                                    itemRef={item.ref}
+                                    end={item.end}
+                                    lastItem={index === navItems.length - 1}
+                                    permission={item.permission}
+                                    onNavClick={() => setMobileOpen(false)}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                    {bottomNavItems.length > 0 && (
+                        <ul className='mt-auto flex flex-col pt-4 text-sm'>
+                            {bottomNavItems.map((item, index) => (
+                                <li key={item.tabName} data-tab={item.tabName}>
+                                    <NavItem
+                                        to={item.to}
+                                        icon={item.icon}
+                                        text={item.text}
+                                        itemRef={item.ref}
+                                        end={item.end}
+                                        lastItem={index === bottomNavItems.length - 1}
+                                        permission={item.permission}
+                                        onNavClick={() => setMobileOpen(false)}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
-
-                <ul className='flex flex-col text-sm'>
-                    {navItems.map((item, index) => (
-                        <li key={item.tabName} data-tab={item.tabName}>
-                            <NavItem
-                                to={item.to}
-                                icon={item.icon}
-                                text={item.text}
-                                itemRef={item.ref}
-                                end={item.end}
-                                lastItem={index === navItems.length - 1}
-                                permission={item.permission}
-                                onNavClick={() => setMobileOpen(false)}
-                            />
-                        </li>
-                    ))}
-                </ul>
             </div>
-        </div>
-    );
-});
+        );
+    },
+);
 
 MobileSidebarPanel.displayName = 'MobileSidebarPanel';
 
@@ -117,8 +138,8 @@ const MobileSidebarToggle = memo(() => {
 
 MobileSidebarToggle.displayName = 'MobileSidebarToggle';
 
-export default function MobileSidebar({ navItems }: MobileSidebarProps) {
-    return <MobileSidebarPanel navItems={navItems} />;
+export default function MobileSidebar({ navItems, bottomNavItems = [] }: MobileSidebarProps) {
+    return <MobileSidebarPanel navItems={navItems} bottomNavItems={bottomNavItems} />;
 }
 
 export { MobileSidebarToggle };

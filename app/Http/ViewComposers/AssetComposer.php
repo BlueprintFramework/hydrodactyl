@@ -38,6 +38,7 @@ class AssetComposer
       'locale' => config('app.locale') ?? 'en',
       'timezone' => config('app.timezone') ?? '',
       'logo' => $logoUrl,
+      'customNavItems' => $this->getCustomNavItems(),
       'captcha' => [
         'enabled' => $this->captcha->getDefaultDriver() !== 'none',
         'provider' => $this->captcha->getDefaultDriver(),
@@ -68,5 +69,35 @@ class AssetComposer
     }
 
     return '';
+  }
+
+  private function getCustomNavItems(): array
+  {
+    $items = json_decode((string) config('app.custom_nav_items', '[]'), true);
+
+    if (!is_array($items)) {
+      return [];
+    }
+
+    return collect($items)
+      ->take(3)
+      ->map(function (array $item): ?array {
+        $label = trim((string) ($item['label'] ?? ''));
+        $url = trim((string) ($item['url'] ?? ''));
+        $icon = trim((string) ($item['icon'] ?? 'link'));
+
+        if ($label === '' || $url === '') {
+          return null;
+        }
+
+        return [
+          'label' => $label,
+          'url' => $url,
+          'icon' => $icon !== '' ? $icon : 'link',
+        ];
+      })
+      ->filter()
+      ->values()
+      ->toArray();
   }
 }

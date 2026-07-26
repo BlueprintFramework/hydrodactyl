@@ -171,9 +171,36 @@ const Console = () => {
         }
     }, []);
 
+    const handleCopy = useCallback(
+        (e: ClipboardEvent) => {
+            const activeElement = document.activeElement;
+            const isInputSelection =
+                (activeElement instanceof HTMLInputElement || activeElement instanceof HTMLTextAreaElement) &&
+                activeElement.selectionStart !== activeElement.selectionEnd;
+
+            if (isInputSelection || window.getSelection()?.toString()) {
+                return;
+            }
+
+            const selection = terminal.getSelection();
+            if (!selection) {
+                return;
+            }
+
+            if (!e.clipboardData) {
+                return;
+            }
+
+            e.clipboardData.setData('text/plain', selection);
+            e.preventDefault();
+        },
+        [terminal],
+    );
+
     useEffect(() => {
         // Add global keydown listener
         document.addEventListener('keydown', handleGlobalKeyDown);
+        document.addEventListener('copy', handleCopy);
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible' && connected && instance) {
@@ -185,9 +212,10 @@ const Console = () => {
 
         return () => {
             document.removeEventListener('keydown', handleGlobalKeyDown);
+            document.removeEventListener('copy', handleCopy);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, [handleGlobalKeyDown, connected, instance, terminal]);
+    }, [handleGlobalKeyDown, handleCopy, connected, instance, terminal]);
 
     // Auto-focus input on component mount
     useEffect(() => {
@@ -225,22 +253,6 @@ const Console = () => {
                     terminal.textarea.tabIndex = -1;
                     terminal.textarea.disabled = true;
                 }
-
-                // Add support for capturing keys
-                terminal.attachCustomKeyEventHandler((e: KeyboardEvent) => {
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-                        document.execCommand('copy');
-                        return false;
-                    }
-                    // } else if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
-                    //     e.preventDefault();
-                    //     searchBar.show();
-                    //     return false;
-                    // } else if (e.key === 'Escape') {
-                    //     searchBar.hidden();
-                    // }
-                    return true;
-                });
 
                 // Set up ResizeObserver to watch for container size changes
                 resizeObserverRef.current = new ResizeObserver(debouncedFit);

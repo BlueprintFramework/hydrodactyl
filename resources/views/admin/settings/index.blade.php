@@ -60,6 +60,7 @@
                 <p class="text-muted small" style="margin-top:4px;">Accounts in the selected group must have 2FA enabled to use the panel.</p>
               </div>
             </div>
+
           </div>
           <div class="box-footer">
             {!! csrf_field() !!}

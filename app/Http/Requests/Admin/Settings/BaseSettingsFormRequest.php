@@ -19,6 +19,17 @@ class BaseSettingsFormRequest extends AdminFormRequest
         ];
     }
 
+    public function normalize(?array $only = null): array
+    {
+        $values = parent::normalize([
+            'app:name',
+            'pterodactyl:auth:2fa_required',
+            'app:locale',
+        ]);
+
+        return $values;
+    }
+
     public function attributes(): array
     {
         return [

@@ -1,20 +1,30 @@
 import {
     Activity02Icon,
+    BookOpen01Icon,
     Cardiogram01Icon,
     ClockIcon,
     CloudUploadIcon,
     ComputerTerminal01Icon,
     ConnectIcon,
     Database02Icon,
+    DiscordIcon,
+    DocumentCodeIcon,
     Download04Icon,
     FolderIcon,
     GameControllerIcon,
+    GlobeIcon,
+    HelpCircleIcon,
+    Home01Icon,
+    Link01Icon,
     NoteIcon,
+    RocketIcon,
     ServerStack02Icon,
     Settings02Icon,
     Settings04Icon,
+    Store01Icon,
     UserMultiple02Icon,
 } from '@hugeicons/core-free-icons';
+import type { IconSvgElement } from '@hugeicons/react';
 import { useStoreState } from 'easy-peasy';
 import { Fragment, Suspense, useEffect, useRef, useState } from 'react';
 import { Route, Routes, useLocation, useParams } from 'react-router-dom';
@@ -66,6 +76,19 @@ interface Nest {
     };
 }
 
+const customNavIconMap: Record<string, IconSvgElement> = {
+    link: Link01Icon,
+    book: BookOpen01Icon,
+    globe: GlobeIcon,
+    help: HelpCircleIcon,
+    home: Home01Icon,
+    store: Store01Icon,
+    discord: DiscordIcon,
+    document: DocumentCodeIcon,
+    terminal: ComputerTerminal01Icon,
+    rocket: RocketIcon,
+};
+
 const UnifiedRouter = () => {
     const _params = useParams<'id'>();
     const location = useLocation();
@@ -76,6 +99,7 @@ const UnifiedRouter = () => {
     const serverId = serverIdFromPath;
 
     const rootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
+    const customNavItemsConfig = useStoreState((state) => state.settings.data?.customNavItems);
     const [error, setError] = useState('');
     const [nests, setNests] = useState<Nest[]>();
 
@@ -162,6 +186,22 @@ const UnifiedRouter = () => {
     const NavigationActivity = useRef(null);
     const NavigationShell = useRef(null);
     const NavigationInstaller = useRef(null);
+    const CustomNavigationOne = useRef<HTMLAnchorElement>(null);
+    const CustomNavigationTwo = useRef<HTMLAnchorElement>(null);
+    const CustomNavigationThree = useRef<HTMLAnchorElement>(null);
+    const customNavigationRefs = [CustomNavigationOne, CustomNavigationTwo, CustomNavigationThree];
+
+    const customNavItems = (customNavItemsConfig ?? [])
+        .slice(0, 3)
+        .filter((item) => item.label.trim() !== '' && item.url.trim() !== '')
+        .map((item, index) => ({
+            to: item.url,
+            icon: customNavIconMap[item.icon] ?? customNavIconMap.link,
+            text: item.label,
+            tabName: `custom-nav-${index}`,
+            ref: customNavigationRefs[index] ?? CustomNavigationOne,
+            end: true,
+        }));
 
     // generate navigation items based on current route
     const navItems = isServerRoute
@@ -322,6 +362,7 @@ const UnifiedRouter = () => {
                   end: true,
               },
           ];
+    const bottomNavItems = customNavItems;
 
     return (
         <SidebarProvider>
@@ -331,8 +372,8 @@ const UnifiedRouter = () => {
                         <AppHeader serverId={isServerRoute ? serverInternalId?.toString() : undefined} />
 
                         <div className='flex flex-col lg:flex-row h-full w-full overflow-hidden relative'>
-                            <Sidebar navItems={navItems} className='hidden lg:flex' />
-                            <MobileSidebar navItems={navItems} />
+                            <Sidebar navItems={navItems} bottomNavItems={bottomNavItems} className='hidden lg:flex' />
+                            <MobileSidebar navItems={navItems} bottomNavItems={bottomNavItems} />
                             <BottomNav items={navItems} />
 
                             {/* server-specific components - only render when we have server data */}

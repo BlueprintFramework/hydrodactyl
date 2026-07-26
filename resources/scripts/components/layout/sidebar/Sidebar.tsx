@@ -21,12 +21,14 @@ interface NavItem {
 
 interface SidebarProps {
     navItems: NavItem[];
+    bottomNavItems?: NavItem[];
     className?: string;
     onNavClick?: () => void;
 }
 
-export default memo(function Sidebar({ navItems, className, onNavClick }: SidebarProps) {
+export default memo(function Sidebar({ navItems, bottomNavItems = [], className, onNavClick }: SidebarProps) {
     const location = useLocation();
+    const allNavItems = useMemo(() => [...navItems, ...bottomNavItems], [navItems, bottomNavItems]);
 
     // dynamic CSS for hover and active states on mount
     useEffect(() => {
@@ -43,7 +45,8 @@ export default memo(function Sidebar({ navItems, className, onNavClick }: Sideba
         // hover effects for indicator positioning
         for (let i = 1; i <= maxItems; i++) {
             css += `
-                .sidebar-container:has(li:nth-child(${i}):hover) .sidebar-indicator {
+                .sidebar-container:has(.sidebar-nav-main > li:nth-child(${i}):hover) .sidebar-indicator {
+                    opacity: 1;
                     top: calc(var(--sidebar-initial-top) + (var(--nav-item-height) + var(--nav-item-spacing)) * ${i - 1}) !important;
                 }
             `;
@@ -52,7 +55,8 @@ export default memo(function Sidebar({ navItems, className, onNavClick }: Sideba
         // active indicator positions
         for (let i = 1; i <= maxItems; i++) {
             css += `
-                .sidebar-container:not(:has(li:hover)):has(li[data-active='true']:nth-child(${i})) .sidebar-indicator {
+                .sidebar-container:not(:has(li:hover)):has(.sidebar-nav-main > li[data-active='true']:nth-child(${i})) .sidebar-indicator {
+                    opacity: 1;
                     top: calc(var(--sidebar-initial-top) + (var(--nav-item-height) + var(--nav-item-spacing)) * ${i - 1}) !important;
                 }
             `;
@@ -75,7 +79,7 @@ export default memo(function Sidebar({ navItems, className, onNavClick }: Sideba
 
     // stable path to tab mapping
     const pathToTabMapping = useMemo(() => {
-        return navItems.map((item) => ({
+        return allNavItems.map((item) => ({
             pattern: (path: string) => {
                 if (item.end) {
                     return path === item.to;
@@ -85,7 +89,7 @@ export default memo(function Sidebar({ navItems, className, onNavClick }: Sideba
             tabName: item.tabName,
             ref: item.ref,
         }));
-    }, [navItems]);
+    }, [allNavItems]);
 
     // current active tab
     const currentActiveTab = useMemo(() => {
@@ -101,12 +105,12 @@ export default memo(function Sidebar({ navItems, className, onNavClick }: Sideba
     return (
         <div
             className={cn(
-                'sidebar-container flex-col shrink-0 rounded-lg px-8 select-none overflow-y-auto relative',
+                'sidebar-container flex-col shrink-0 rounded-lg px-8 select-none overflow-y-auto relative [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
                 className,
             )}
         >
             <div className='sidebar-indicator absolute bg-mocha-400 border border-mocha-300 left-8 rounded-xl pointer-events-none' />
-            <ul className='flex flex-col text-sm'>
+            <ul className='sidebar-nav-main flex flex-col text-sm'>
                 {navItems.map((item, index) => {
                     const isActive = currentActiveTab === item.tabName;
                     return (
@@ -125,6 +129,27 @@ export default memo(function Sidebar({ navItems, className, onNavClick }: Sideba
                     );
                 })}
             </ul>
+            {bottomNavItems.length > 0 && (
+                <ul className='mt-auto flex flex-col pt-4 text-sm'>
+                    {bottomNavItems.map((item, index) => {
+                        const isActive = currentActiveTab === item.tabName;
+                        return (
+                            <li key={item.tabName} data-tab={item.tabName} data-active={isActive}>
+                                <NavItem
+                                    to={item.to}
+                                    icon={item.icon}
+                                    text={item.text}
+                                    itemRef={item.ref}
+                                    end={item.end}
+                                    lastItem={index === bottomNavItems.length - 1}
+                                    permission={item.permission}
+                                    onNavClick={handleNavClick}
+                                />
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
         </div>
     );
 });

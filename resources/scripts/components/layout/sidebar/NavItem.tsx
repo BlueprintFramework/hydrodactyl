@@ -16,17 +16,29 @@ interface RenderedNavItem {
 }
 
 const NavItem = memo(({ to, icon, text, itemRef, end, permission, onNavClick }: RenderedNavItem) => {
-    const navLink = (
-        <NavLink
-            to={to}
-            end={end}
-            className='nav-item flex items-center duration-200 select-none font-medium relative opacity-40 '
+    const isExternal = /^https?:\/\//i.test(to);
+    const className = 'nav-item flex items-center duration-200 select-none font-medium relative opacity-40 ';
+    const content = (
+        <>
+            <HugeiconsIcon className='nav-icon size-5 shrink-0 transition-transform' strokeWidth={2} icon={icon} />
+            <p className='nav-text text-sm text-nowrap transition-transform'>{text}</p>
+        </>
+    );
+    const navLink = isExternal ? (
+        <a
+            href={to}
+            className={className}
             ref={itemRef}
             draggable={false}
             onClick={onNavClick}
+            target='_blank'
+            rel='noreferrer'
         >
-            <HugeiconsIcon className='nav-icon size-5 shrink-0 transition-transform' strokeWidth={2} icon={icon} />
-            <p className='nav-text text-sm text-nowrap transition-transform'>{text}</p>
+            {content}
+        </a>
+    ) : (
+        <NavLink to={to} end={end} className={className} ref={itemRef} draggable={false} onClick={onNavClick}>
+            {content}
         </NavLink>
     );
 
