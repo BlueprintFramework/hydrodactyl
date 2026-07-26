@@ -12,10 +12,9 @@ use Pterodactyl\Models\Schedule;
 use Illuminate\Support\Facades\Bus;
 use Pterodactyl\Jobs\Schedule\RunTaskJob;
 use GuzzleHttp\Exception\BadResponseException;
-use Pterodactyl\Services\Elytra\ElytraJobService;
+use Pterodactyl\Services\Backups\BackupCoordinator;
 use Pterodactyl\Tests\Integration\IntegrationTestCase;
 use Pterodactyl\Repositories\Wings\DaemonPowerRepository;
-use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 class RunTaskJobTest extends IntegrationTestCase
@@ -173,7 +172,7 @@ class RunTaskJobTest extends IntegrationTestCase
         $this->assertTrue(Carbon::now()->isSameAs(\DateTimeInterface::ATOM, $schedule->last_run_at));
     }
 
-    public function testScheduledBackupUsesWingsBackupServiceForWingsNode(): void
+    public function testScheduledBackupUsesBackupCoordinator(): void
     {
         $server = $this->createServerModel(['backup_limit' => 5]);
         $server->node->update(['daemonType' => 'wings']);
@@ -185,16 +184,20 @@ class RunTaskJobTest extends IntegrationTestCase
             'is_queued' => true,
         ]);
 
-        $backupService = \Mockery::mock(InitiateBackupService::class);
-        $this->instance(InitiateBackupService::class, $backupService);
-        $backupService->expects('setIgnoredFiles')->with(['cache', 'temp'])->andReturnSelf();
-        $backupService->expects('handle')
-            ->with(\Mockery::on(fn (Server $value) => $value->is($server)), null, true)
-            ->once();
-
-        $elytraJobService = \Mockery::mock(ElytraJobService::class);
-        $this->instance(ElytraJobService::class, $elytraJobService);
-        $elytraJobService->shouldNotReceive('submitJob');
+        $coordinator = \Mockery::mock(BackupCoordinator::class);
+        $this->instance(BackupCoordinator::class, $coordinator);
+        $coordinator->expects('create')
+            ->with(
+                \Mockery::on(fn (Server $value) => $value->is($server)),
+                \Mockery::on(fn ($user) => $user->is($server->user)),
+                \Mockery::type('string'),
+                "cache\ntemp",
+                false,
+                true,
+                true,
+            )
+            ->once()
+            ->andReturn(\Mockery::mock(\Pterodactyl\Models\Backup::class));
 
         Bus::dispatchSync(new RunTaskJob($task));
 
@@ -203,7 +206,7 @@ class RunTaskJobTest extends IntegrationTestCase
         $this->assertFalse($schedule->fresh()->is_processing);
     }
 
-    public function testScheduledBackupUsesElytraJobServiceForElytraNode(): void
+    public function testScheduledBackupUsesBackupCoordinatorForElytraNode(): void
     {
         $server = $this->createServerModel(['backup_limit' => 5]);
         $server->node->update(['daemonType' => 'elytra']);
@@ -215,23 +218,20 @@ class RunTaskJobTest extends IntegrationTestCase
             'is_queued' => true,
         ]);
 
-        $backupService = \Mockery::mock(InitiateBackupService::class);
-        $this->instance(InitiateBackupService::class, $backupService);
-        $backupService->shouldNotReceive('setIgnoredFiles');
-
-        $elytraJobService = \Mockery::mock(ElytraJobService::class);
-        $this->instance(ElytraJobService::class, $elytraJobService);
-        $elytraJobService->expects('submitJob')
+        $coordinator = \Mockery::mock(BackupCoordinator::class);
+        $this->instance(BackupCoordinator::class, $coordinator);
+        $coordinator->expects('create')
             ->with(
                 \Mockery::on(fn (Server $value) => $value->is($server)),
-                'backup_create',
-                \Mockery::on(fn (array $data) => $data['operation'] === 'create'
-                    && $data['ignored'] === ''
-                    && $data['is_automatic'] === true),
-                \Mockery::on(fn ($user) => $user->is($server->user))
+                \Mockery::on(fn ($user) => $user->is($server->user)),
+                \Mockery::type('string'),
+                '',
+                false,
+                true,
+                true,
             )
             ->once()
-            ->andReturn([]);
+            ->andReturn(\Mockery::mock(\Pterodactyl\Models\Backup::class));
 
         Bus::dispatchSync(new RunTaskJob($task));
 

@@ -80,6 +80,12 @@ class BackupTest extends TestCase
         $this->assertFalse($backup->hasSnapshotId());
     }
 
+    public function testGetDaemonAdapterTypeMapsElytraToWings()
+    {
+        $backup = new Backup(['disk' => BackupAdapter::Elytra]);
+        $this->assertSame('wings', $backup->getDaemonAdapterType());
+    }
+
     public function testGetSizeGbAttribute()
     {
         $backup = new Backup(['bytes' => 1073741824]);

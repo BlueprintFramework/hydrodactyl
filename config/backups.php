@@ -7,7 +7,8 @@ return [
     // The backup driver to use for this Panel instance. All client generated server backups
     // will be stored in this location by default. It is possible to change this once backups
     // have been made, without losing data.
-    // Options: elytra, wings (legacy), s3, rustic_local, rustic_s3
+    // Options: wings, s3, rustic_local, rustic_s3
+    // Legacy value "elytra" is accepted and treated as wings.
     'default' => env('APP_BACKUP_DRIVER', BackupAdapter::Wings->value),
 
     // Configuration for each backup disk adapter. These can be overridden at runtime

@@ -11,10 +11,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Pterodactyl\Services\Elytra\ElytraJobService;
+use Pterodactyl\Services\Backups\BackupCoordinator;
 use Pterodactyl\Repositories\Wings\DaemonPowerRepository;
 use Pterodactyl\Repositories\Wings\DaemonCommandRepository;
-use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
 use Pterodactyl\Exceptions\Service\Backup\BackupFailedException;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
@@ -36,8 +35,7 @@ class RunTaskJob extends Job implements ShouldQueue
      */
     public function handle(
         DaemonCommandRepository $commandRepository,
-        ElytraJobService $elytraJobService,
-        InitiateBackupService $backupService,
+        BackupCoordinator $backupCoordinator,
         DaemonPowerRepository $powerRepository,
     ) {
         // Do not process a task that is not set to active, unless it's been manually triggered.
@@ -69,8 +67,6 @@ class RunTaskJob extends Job implements ShouldQueue
                     $commandRepository->setServer($server)->send($this->task->payload);
                     break;
                 case Task::ACTION_BACKUP:
-                    // A pre-check stage has been added because transactions are sent directly to Elytra without verification.
-                    // This can be considered a temporary solution for now. In future processes, offering Elytra with better integration will play a role in removing this pre-check stage, and such transactions will be better controlled before they go to the server.
                     if ($server->hasBackupCountLimit() && $server->backup_limit < ($server->backups_count + 1)) {
                         Log::warning('Scheduled backup blocked due to backup limit', [
                             'task_id' => $this->task->id,
@@ -78,8 +74,6 @@ class RunTaskJob extends Job implements ShouldQueue
                             'server_id' => $server->id,
                         ]);
 
-                        // TooManyBackupsException is currently scoped to daemon-level backup services,
-                        // therefore BackupFailedException is used here to properly fail the scheduled task.
                         throw new BackupFailedException('The permitted backup limit has been exceeded.');
                     }
 
@@ -97,26 +91,17 @@ class RunTaskJob extends Job implements ShouldQueue
                     }
 
                     try {
-                        $ignoredFiles = !empty($this->task->payload) ? explode(PHP_EOL, $this->task->payload) : [];
+                        $ignored = !empty($this->task->payload) ? $this->task->payload : '';
 
-                        if (strtolower($server->node->daemonType) === 'wings') {
-                            $backupService
-                                ->setIgnoredFiles($ignoredFiles)
-                                ->handle($server, null, true);
-                        } else {
-                            $elytraJobService->submitJob(
-                                $server,
-                                'backup_create',
-                                [
-                                    'operation' => 'create',
-                                    'adapter' => config('backups.default', 'elytra'),
-                                    'ignored' => implode("\n", $ignoredFiles),
-                                    'name' => 'Scheduled Backup - ' . now()->format('Y-m-d H:i'),
-                                    'is_automatic' => true,
-                                ],
-                                auth()->user() ?? $server->user
-                            );
-                        }
+                        $backupCoordinator->create(
+                            $server,
+                            auth()->user() ?? $server->user,
+                            'Scheduled Backup - ' . now()->format('Y-m-d H:i'),
+                            $ignored,
+                            false,
+                            true,
+                            true,
+                        );
                     } finally {
                         $this->markBackupTaskNotProcessing();
                         $this->task->schedule->touch();

@@ -66,7 +66,9 @@ class DaemonBackupRepository extends DaemonRepository
                 sprintf('/api/servers/%s/backup/%s/restore', $this->server->uuid, $backup->uuid),
                 [
                     'json' => [
-                        'adapter' => $backup->disk,
+                        'adapter' => $backup->disk instanceof \BackedEnum
+                            ? $backup->disk->value
+                            : ($this->adapter ?? $backup->disk ?? config('backups.default')),
                         'truncate_directory' => $truncate,
                         'download_url' => $url ?? '',
                     ],

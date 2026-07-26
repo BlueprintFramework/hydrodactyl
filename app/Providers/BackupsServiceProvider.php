@@ -5,6 +5,8 @@ namespace Pterodactyl\Providers;
 use Illuminate\Support\ServiceProvider;
 use Pterodactyl\Extensions\Backups\BackupManager;
 use Pterodactyl\Models\S3;
+use Pterodactyl\Services\Backups\BackupCoordinator;
+use Pterodactyl\Services\Backups\BackupDriverManager;
 
 class BackupsServiceProvider extends ServiceProvider
 {
@@ -16,6 +18,12 @@ class BackupsServiceProvider extends ServiceProvider
         $this->app->singleton(BackupManager::class, function ($app) {
             return new BackupManager($app);
         });
+
+        $this->app->singleton(BackupDriverManager::class, function ($app) {
+            return new BackupDriverManager($app);
+        });
+
+        $this->app->singleton(BackupCoordinator::class);
     }
 
     /**

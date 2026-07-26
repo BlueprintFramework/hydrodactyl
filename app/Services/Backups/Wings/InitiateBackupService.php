@@ -5,10 +5,11 @@ namespace Pterodactyl\Services\Backups\Wings;
 use Ramsey\Uuid\Uuid;
 use Carbon\CarbonImmutable;
 use Webmozart\Assert\Assert;
+use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Models\Backup;
 use Pterodactyl\Models\Server;
 use Illuminate\Database\ConnectionInterface;
-use Pterodactyl\Extensions\Backups\BackupManager;
+use Pterodactyl\Services\Backups\BackupDriverManager;
 use Pterodactyl\Repositories\Eloquent\BackupRepository;
 use Pterodactyl\Repositories\Wings\DaemonBackupRepository;
 use Pterodactyl\Exceptions\Service\Backup\TooManyBackupsException;
@@ -28,7 +29,7 @@ class InitiateBackupService
         private ConnectionInterface $connection,
         private DaemonBackupRepository $daemonBackupRepository,
         private DeleteBackupService $deleteBackupService,
-        private BackupManager $backupManager,
+        private BackupDriverManager $driverManager,
     ) {}
 
     /**
@@ -114,21 +115,38 @@ class InitiateBackupService
         }
 
         return $this->connection->transaction(function () use ($server, $name) {
+            $adapter = $this->resolveBackupAdapter($server);
+
             /** @var Backup $backup */
             $backup = $this->repository->create([
                 'server_id' => $server->id,
                 'uuid' => Uuid::uuid4()->toString(),
-                'name' => trim($name) ?: sprintf('Backup at %s', CarbonImmutable::now()->toDateTimeString()),
+                'name' => trim($name ?? '') ?: sprintf('Backup at %s', CarbonImmutable::now()->toDateTimeString()),
                 'ignored_files' => array_values($this->ignoredFiles ?? []),
-                'disk' => $server->node->backupDisk,
+                'disk' => $adapter,
                 'is_locked' => $this->isLocked,
             ], true, true);
 
             $this->daemonBackupRepository->setServer($server)
-                ->setBackupAdapter($server->node->backupDisk)
+                ->setBackupAdapter($adapter)
                 ->backup($backup);
 
             return $backup;
         });
+    }
+
+    /**
+     * Resolve the storage adapter from APP_BACKUP_DRIVER, falling back to the node's backupDisk.
+     */
+    protected function resolveBackupAdapter(Server $server): string
+    {
+        $configured = config('backups.default');
+        $nodeDisk = $server->node->backupDisk;
+
+        $adapter = !empty($configured)
+            ? $configured
+            : (!empty($nodeDisk) ? $nodeDisk : BackupAdapter::Wings->value);
+
+        return $this->driverManager->normalizeAdapter((string) $adapter);
     }
 }

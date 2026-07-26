@@ -12,6 +12,7 @@ use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Extensions\Backups\BackupManager;
 use Pterodactyl\Extensions\Filesystem\S3Filesystem;
+use Pterodactyl\Services\Backups\BackupCoordinator;
 use Pterodactyl\Exceptions\Http\HttpForbiddenException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Pterodactyl\Http\Requests\Api\Remote\ReportBackupCompleteRequest;
@@ -21,8 +22,10 @@ class BackupStatusController extends Controller
     /**
      * BackupStatusController constructor.
      */
-    public function __construct(private BackupManager $backupManager)
-    {
+    public function __construct(
+        private BackupManager $backupManager,
+        private BackupCoordinator $backupCoordinator,
+    ) {
     }
 
     /**
@@ -79,6 +82,10 @@ class BackupStatusController extends Controller
                     $adapter = $this->backupManager->createS3Adapter($s3Bucket->toS3Config());
                     $this->completeMultipartUpload($model, $adapter, $successful, $request->input('parts'));
                 }
+            }
+
+            if ($successful && $model->is_automatic) {
+                $this->backupCoordinator->pruneOldAutomaticBackups($model->server);
             }
         });
 

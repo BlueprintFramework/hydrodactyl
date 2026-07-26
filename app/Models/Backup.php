@@ -150,11 +150,21 @@ class Backup extends Model
     }
 
     /**
-     * Get the adapter type formatted for Elytra API
+     * Adapter type for the daemon backup API.
+     */
+    public function getDaemonAdapterType(): string
+    {
+        return $this->disk instanceof BackupAdapter
+            ? $this->disk->getDaemonAdapterType()
+            : (string) $this->disk;
+    }
+
+    /**
+     * @deprecated Use getDaemonAdapterType() instead.
      */
     public function getElytraAdapterType(): string
     {
-        return $this->disk instanceof BackupAdapter ? $this->disk->getElytraAdapterType() : $this->disk;
+        return $this->getDaemonAdapterType();
     }
 
     /**
