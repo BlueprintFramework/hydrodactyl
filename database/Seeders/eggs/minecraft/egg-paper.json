@@ -13,6 +13,7 @@
         "Java 25": "ghcr.io\/ptero-eggs\/yolks:java_25",
         "Java 22": "ghcr.io\/ptero-eggs\/yolks:java_22",
         "Java 21": "ghcr.io\/ptero-eggs\/yolks:java_21",
+        "Java 18": "ghcr.io\/ptero-eggs\/yolks:java_18",
         "Java 17": "ghcr.io\/ptero-eggs\/yolks:java_17",
         "Java 16": "ghcr.io\/ptero-eggs\/yolks:java_16",
         "Java 11": "ghcr.io\/ptero-eggs\/yolks:java_11",
