@@ -8,7 +8,7 @@
     "name": "Paper",
     "author": "parker@pterodactyl.io",
     "description": "High performance Spigot fork that aims to fix gameplay and mechanics inconsistencies.",
-    "features": ["eula", "java_version", "pid_limit", "plugin/purpur", "mclogs", "subdomain_minecraft"],
+    "features": ["eula", "java_version", "pid_limit", "plugin/paper", "mclogs", "subdomain_minecraft"],
     "docker_images": {
         "Java 25": "ghcr.io\/ptero-eggs\/yolks:java_25",
         "Java 22": "ghcr.io\/ptero-eggs\/yolks:java_22",
