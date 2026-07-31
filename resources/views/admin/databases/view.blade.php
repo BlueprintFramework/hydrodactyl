@@ -27,14 +27,22 @@
                         <input type="text" id="pName" name="name" class="form-control" value="{{ old('name', $host->name) }}" />
                     </div>
                     <div class="form-group">
+                        <label for="pType" class="form-label">Database Type</label>
+                        <select name="type" id="pType" class="form-control">
+                            @foreach(\Pterodactyl\Models\DatabaseHost::typeLabels() as $value => $label)
+                                <option value="{{ $value }}" {{ old('type', $host->type) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="pHost" class="form-label">Host</label>
                         <input type="text" id="pHost" name="host" class="form-control" value="{{ old('host', $host->host) }}" />
-                        <p class="text-muted small">The IP address or FQDN that should be used when attempting to connect to this MySQL host <em>from the panel</em> to add new databases.</p>
+                        <p class="text-muted small">The IP address or FQDN that should be used when attempting to connect to this database host <em>from the panel</em>.</p>
                     </div>
                     <div class="form-group">
                         <label for="pPort" class="form-label">Port</label>
                         <input type="text" id="pPort" name="port" class="form-control" value="{{ old('port', $host->port) }}" />
-                        <p class="text-muted small">The port that MySQL is running on for this host.</p>
+                        <p class="text-muted small">The port used by this database host.</p>
                     </div>
                     <div class="form-group">
                         <label for="pNodeId" class="form-label">Linked Node</label>
@@ -62,7 +70,7 @@
                     <div class="form-group">
                         <label for="pUsername" class="form-label">Username</label>
                         <input type="text" name="username" id="pUsername" class="form-control" value="{{ old('username', $host->username) }}" />
-                        <p class="text-muted small">The username of an account that has enough permissions to create new users and databases on the system.</p>
+                        <p class="text-muted small">The username of an account that has enough permissions to provision databases or credentials on this host.</p>
                     </div>
                     <div class="form-group">
                         <label for="pPassword" class="form-label">Password</label>
@@ -70,7 +78,7 @@
                         <p class="text-muted small">The password to the account defined. Leave blank to continue using the assigned password.</p>
                     </div>
                     <hr />
-                    <p class="text-danger small text-left">The account defined for this database host <strong>must</strong> have the <code>WITH GRANT OPTION</code> permission. If the defined account does not have this permission requests to create databases <em>will</em> fail. <strong>Do not use the same account details for MySQL that you have defined for this panel.</strong></p>
+                    <p class="text-danger small text-left">Use a database administration account with enough privileges to create and remove databases or users for the selected engine. Do not reuse the same credentials as the panel database.</p>
                 </div>
                 <div class="box-footer">
                     {!! csrf_field() !!}
@@ -91,6 +99,7 @@
                 <table class="table table-hover">
                     <tr>
                         <th>Server</th>
+                        <th>Type</th>
                         <th>Database Name</th>
                         <th>Username</th>
                         <th>Connections From</th>
@@ -100,6 +109,7 @@
                     @foreach($databases as $database)
                         <tr>
                             <td class="middle"><a href="{{ route('admin.servers.view', $database->getRelation('server')->id) }}">{{ $database->getRelation('server')->name }}</a></td>
+                            <td class="middle">{{ \Pterodactyl\Models\DatabaseHost::typeLabels()[$database->type] ?? $database->type }}</td>
                             <td class="middle">{{ $database->database }}</td>
                             <td class="middle">{{ $database->username }}</td>
                             <td class="middle">{{ $database->remote }}</td>

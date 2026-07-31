@@ -6,7 +6,7 @@ use Pterodactyl\Models\DatabaseHost;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Pterodactyl\Extensions\DynamicDatabaseConnection;
+use Pterodactyl\Services\Databases\Drivers\DatabaseDriverManager;
 use Pterodactyl\Contracts\Repository\DatabaseHostRepositoryInterface;
 
 class HostUpdateService
@@ -16,9 +16,8 @@ class HostUpdateService
      */
     public function __construct(
         private ConnectionInterface $connection,
-        private DatabaseManager $databaseManager,
-        private DynamicDatabaseConnection $dynamic,
         private Encrypter $encrypter,
+        private DatabaseDriverManager $drivers,
         private DatabaseHostRepositoryInterface $repository,
     ) {
     }
@@ -38,8 +37,7 @@ class HostUpdateService
 
         return $this->connection->transaction(function () use ($data, $hostId) {
             $host = $this->repository->update($hostId, $data);
-            $this->dynamic->set('dynamic', $host);
-            $this->databaseManager->connection('dynamic')->select('SELECT 1 FROM dual');
+            $this->drivers->driverFor($host)->testConnection($host);
 
             return $host;
         });

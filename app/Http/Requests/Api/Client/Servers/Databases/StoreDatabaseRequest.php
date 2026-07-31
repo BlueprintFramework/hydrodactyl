@@ -6,6 +6,7 @@ use Webmozart\Assert\Assert;
 use Pterodactyl\Models\Server;
 use Illuminate\Validation\Rule;
 use Pterodactyl\Models\Database;
+use Pterodactyl\Models\DatabaseHost;
 use Pterodactyl\Models\Permission;
 use Illuminate\Database\Query\Builder;
 use Pterodactyl\Contracts\Http\ClientPermissionsRequest;
@@ -40,6 +41,7 @@ class StoreDatabaseRequest extends ClientApiRequest implements ClientPermissions
                 }),
             ],
             'remote' => Database::getRulesForField('remote'),
+            'database_type' => ['required', 'string', Rule::in(array_keys(DatabaseHost::typeLabels()))],
         ];
     }
 

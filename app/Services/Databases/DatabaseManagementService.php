@@ -5,12 +5,12 @@ namespace Pterodactyl\Services\Databases;
 use Exception;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Database;
+use Pterodactyl\Models\DatabaseHost;
 use Pterodactyl\Helpers\Utilities;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Encryption\Encrypter;
-use Pterodactyl\Extensions\DynamicDatabaseConnection;
-use Pterodactyl\Repositories\Eloquent\DatabaseRepository;
 use Pterodactyl\Exceptions\Repository\DuplicateDatabaseNameException;
+use Pterodactyl\Services\Databases\Drivers\DatabaseDriverManager;
 use Pterodactyl\Exceptions\Service\Database\TooManyDatabasesException;
 use Pterodactyl\Exceptions\Service\Database\DatabaseClientFeatureNotEnabledException;
 
@@ -34,9 +34,8 @@ class DatabaseManagementService
 
     public function __construct(
         protected ConnectionInterface $connection,
-        protected DynamicDatabaseConnection $dynamic,
         protected Encrypter $encrypter,
-        protected DatabaseRepository $repository,
+        protected DatabaseDriverManager $drivers,
     ) {}
 
     /**
@@ -91,40 +90,38 @@ class DatabaseManagementService
             throw new \InvalidArgumentException('The database name passed to DatabaseManagementService::handle MUST be prefixed with "s{server_id}_".');
         }
 
+        /** @var DatabaseHost $host */
+        $host = DatabaseHost::query()->findOrFail($data['database_host_id']);
+
         $data = array_merge($data, [
             'server_id' => $server->id,
             'username' => sprintf('u%d_%s', $server->id, str_random(10)),
             'password' => $this->encrypter->encrypt(
                 Utilities::randomStringWithSpecialCharacters(24)
             ),
+            'type' => $host->type,
+            'connection_details' => null,
         ]);
 
         $database = null;
+        $plainPassword = $this->encrypter->decrypt($data['password']);
+        $driver = $this->drivers->driverFor($host);
 
         try {
-            return $this->connection->transaction(function () use ($data, &$database) {
+            return $this->connection->transaction(function () use ($data, $driver, $host, $plainPassword, &$database) {
                 $database = $this->createModel($data);
+                $connectionDetails = $driver->create($host, $database, $plainPassword);
 
-                $this->dynamic->set('dynamic', $data['database_host_id']);
-
-                $this->repository->createDatabase($database->database);
-                $this->repository->createUser(
-                    $database->username,
-                    $database->remote,
-                    $this->encrypter->decrypt($database->password),
-                    $database->max_connections
-                );
-                $this->repository->assignUserToDatabase($database->database, $database->username, $database->remote);
-                $this->repository->flush();
+                if ($connectionDetails !== []) {
+                    $database->forceFill(['connection_details' => $connectionDetails])->saveOrFail();
+                }
 
                 return $database;
             });
         } catch (\Exception $exception) {
             try {
                 if ($database instanceof Database) {
-                    $this->repository->dropDatabase($database->database);
-                    $this->repository->dropUser($database->username, $database->remote);
-                    $this->repository->flush();
+                    $driver->delete($host, $database);
                 }
             } catch (\Exception $deletionException) {
                 // Do nothing here. We've already encountered an issue before this point so no
@@ -142,11 +139,8 @@ class DatabaseManagementService
      */
     public function delete(Database $database): ?bool
     {
-        $this->dynamic->set('dynamic', $database->database_host_id);
-
-        $this->repository->dropDatabase($database->database);
-        $this->repository->dropUser($database->username, $database->remote);
-        $this->repository->flush();
+        $database->loadMissing('host');
+        $this->drivers->driverFor($database->host)->delete($database->host, $database);
 
         return $database->delete();
     }

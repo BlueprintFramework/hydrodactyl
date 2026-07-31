@@ -39,7 +39,20 @@ const DatabaseRow = ({ database }: Props) => {
     const appendDatabase = ServerContext.useStoreActions((actions) => actions.databases.appendDatabase);
     const removeDatabase = ServerContext.useStoreActions((actions) => actions.databases.removeDatabase);
 
-    const jdbcConnectionString = `jdbc:mysql://${database.username}${database.password ? `:${encodeURIComponent(database.password)}` : ''}@${database.connectionString}/${database.name}`;
+    const connectionUri = (() => {
+        const password = database.password ? `:${encodeURIComponent(database.password)}` : '';
+
+        switch (database.type) {
+            case 'postgresql':
+                return `postgresql://${database.username}${password}@${database.connectionString}/${database.name}`;
+            case 'mongodb':
+                return `mongodb://${database.username}${password}@${database.connectionString}/${database.name}?authSource=${database.name}`;
+            case 'redis':
+                return `redis://${database.username}${password}@${database.connectionString}`;
+            default:
+                return `mysql://${database.username}${password}@${database.connectionString}/${database.name}`;
+        }
+    })();
 
     const schema = object().shape({
         confirm: string()
@@ -120,17 +133,23 @@ const DatabaseRow = ({ database }: Props) => {
                 <div className='flex flex-col min-w-full gap-4'>
                     <div className='grid gap-4 sm:grid-cols-2 min-w-full'>
                         <div className='flex flex-col'>
+                            <Label>Database Type</Label>
+                            <Input type={'text'} readOnly value={database.type} />
+                        </div>
+                        <div className='flex flex-col'>
                             <Label>Endpoint</Label>
                             <CopyOnClick text={database.connectionString}>
                                 <Input type={'text'} readOnly value={database.connectionString} />
                             </CopyOnClick>
                         </div>
-                        <div className='flex flex-col'>
+                        {database.type === 'mysql' && (
+                            <div className='flex flex-col'>
                             <Label>Connections from</Label>
                             <CopyOnClick text={database.allowConnectionsFrom}>
                                 <Input type={'text'} readOnly value={database.allowConnectionsFrom} />
                             </CopyOnClick>
-                        </div>
+                            </div>
+                        )}
                         <div className='flex flex-col'>
                             <Label>Username</Label>
                             <CopyOnClick text={database.username}>
@@ -158,12 +177,20 @@ const DatabaseRow = ({ database }: Props) => {
                     </div>
                     <div className='flex flex-col'>
                         <div className='flex flex-row gap-2 align-middle items-center'>
-                            <Label>JDBC Connection String</Label>
+                            <Label>Connection URI</Label>
                         </div>
-                        <CopyOnClick text={jdbcConnectionString} showInNotification={false}>
-                            <Input type={'password'} readOnly value={jdbcConnectionString} />
+                        <CopyOnClick text={connectionUri} showInNotification={false}>
+                            <Input type={'password'} readOnly value={connectionUri} />
                         </CopyOnClick>
                     </div>
+                    {database.type === 'redis' && database.connectionDetails?.key_prefix && (
+                        <div className='flex flex-col'>
+                            <Label>Redis Key Prefix</Label>
+                            <CopyOnClick text={database.connectionDetails.key_prefix}>
+                                <Input type={'text'} readOnly value={database.connectionDetails.key_prefix} />
+                            </CopyOnClick>
+                        </div>
+                    )}
                 </div>
             </Modal>
 
@@ -183,23 +210,37 @@ const DatabaseRow = ({ database }: Props) => {
 
                         <div className='grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm'>
                             <div>
+                                <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>Type</p>
+                                <p className='text-zinc-300 truncate'>{database.type}</p>
+                            </div>
+                            <div>
                                 <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>Endpoint</p>
                                 <CopyOnClick text={database.connectionString}>
                                     <p className='text-zinc-300 font-mono truncate'>{database.connectionString}</p>
                                 </CopyOnClick>
                             </div>
-                            <div>
+                            {database.type === 'mysql' && (
+                                <div>
                                 <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>From</p>
                                 <CopyOnClick text={database.allowConnectionsFrom}>
                                     <p className='text-zinc-300 font-mono truncate'>{database.allowConnectionsFrom}</p>
                                 </CopyOnClick>
-                            </div>
+                                </div>
+                            )}
                             <div>
                                 <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>Username</p>
                                 <CopyOnClick text={database.username}>
                                     <p className='text-zinc-300 font-mono truncate'>{database.username}</p>
                                 </CopyOnClick>
                             </div>
+                            {database.type === 'redis' && database.connectionDetails?.key_prefix && (
+                                <div>
+                                    <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>Key Prefix</p>
+                                    <CopyOnClick text={database.connectionDetails.key_prefix}>
+                                        <p className='text-zinc-300 font-mono truncate'>{database.connectionDetails.key_prefix}</p>
+                                    </CopyOnClick>
+                                </div>
+                            )}
                         </div>
                     </div>
 

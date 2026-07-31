@@ -26,6 +26,7 @@ class DatabaseHostFactory extends Factory
       'port' => 3306,
       'username' => $this->faker->colorName,
       'password' => Crypt::encrypt($this->faker->word),
+      'type' => DatabaseHost::TYPE_MYSQL,
     ];
   }
 }
