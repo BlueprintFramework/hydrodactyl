@@ -6,6 +6,7 @@ enum BackupAdapter: string
 {
     case Wings = 'wings';
     case S3 = 's3';
+    /** @deprecated Legacy adapter; treated as Wings for operations. */
     case Elytra = 'elytra';
     case RusticLocal = 'rustic_local';
     case RusticS3 = 'rustic_s3';
@@ -34,15 +35,23 @@ enum BackupAdapter: string
         };
     }
 
-    public function getElytraAdapterType(): string
+    /**
+     * Adapter string sent to the Wings daemon API.
+     */
+    public function getDaemonAdapterType(): string
     {
         return match ($this) {
-            self::Elytra => 'elytra',
-            self::S3 => 's3',
-            self::RusticLocal => 'rustic_local',
-            self::RusticS3 => 'rustic_s3',
+            self::Elytra => self::Wings->value,
             default => $this->value,
         };
+    }
+
+    /**
+     * @deprecated Use getDaemonAdapterType() instead.
+     */
+    public function getElytraAdapterType(): string
+    {
+        return $this->getDaemonAdapterType();
     }
 
     public static function values(): array

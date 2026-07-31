@@ -22,9 +22,9 @@ class ElytraJobService
 
     private function discoverHandlers(): void
     {
-        $handlerClasses = [
-            \Pterodactyl\Services\Elytra\Jobs\BackupJob::class,
-        ];
+        // Backup operations are handled by BackupCoordinator / BackupDriverManager
+        // and no longer register as Elytra job handlers.
+        $handlerClasses = [];
 
         foreach ($handlerClasses as $handlerClass) {
             if (class_exists($handlerClass)) {

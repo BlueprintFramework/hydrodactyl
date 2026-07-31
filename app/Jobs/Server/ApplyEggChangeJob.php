@@ -16,8 +16,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Models\ServerOperation;
+use Pterodactyl\Models\Backup;
 use Pterodactyl\Services\Servers\ReinstallServerService;
-use Pterodactyl\Services\Elytra\ElytraJobService;
+use Pterodactyl\Services\Backups\BackupCoordinator;
 use Pterodactyl\Services\Servers\StartupModificationService;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 use Pterodactyl\Exceptions\Service\Backup\BackupFailedException;
@@ -60,7 +61,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
      * Execute the egg change job.
      */
     public function handle(
-        ElytraJobService $elytraJobService,
+        BackupCoordinator $backupCoordinator,
         ReinstallServerService $reinstallServerService,
         StartupModificationService $startupModificationService,
         DaemonFileRepository $fileRepository,
@@ -87,15 +88,15 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
                 ->with(['variables', 'nest'])
                 ->findOrFail($this->eggId);
 
-            $backupJobId = null;
+            $backupUuid = null;
             if ($this->shouldBackup) {
-                $backupJobId = $this->createBackup($elytraJobService, $operation);
+                $backupUuid = $this->createBackup($backupCoordinator, $operation);
             }
 
             if ($this->shouldWipe) {
                 // If we created a backup, wait for it to complete before wiping
-                if ($backupJobId) {
-                    $this->waitForJobCompletion($elytraJobService, $backupJobId, $operation);
+                if ($backupUuid) {
+                    $this->waitForBackupCompletion($backupUuid, $operation);
                 }
                 $this->wipeServerFiles($fileRepository, $operation);
             }
@@ -114,7 +115,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
     /**
      * Create backup before proceeding with changes.
      */
-    private function createBackup(ElytraJobService $elytraJobService, ServerOperation $operation): string
+    private function createBackup(BackupCoordinator $backupCoordinator, ServerOperation $operation): string
     {
         $operation->updateProgress('Creating backup before proceeding...');
 
@@ -133,67 +134,62 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
         }
 
         try {
-            $result = $elytraJobService->submitJob(
+            $backup = $backupCoordinator->create(
                 $this->server,
-                'backup_create',
-                [
-                    'operation' => 'create',
-                    'adapter' => config('backups.default', 'elytra'),
-                    'ignored' => '',
-                    'name' => $backupName,
-                ],
-                $this->user
+                $this->user,
+                $backupName,
             );
 
             Activity::actor($this->user)->event('server:backup.software-change')
                 ->property([
                     'backup_name' => $backupName,
-                    'backup_job_id' => $result['job_id'],
+                    'backup_uuid' => $backup->uuid,
                     'operation_id' => $this->operationId,
                     'from_egg' => $this->server->egg_id,
                     'to_egg' => $this->eggId,
                 ])
                 ->log();
 
-            $operation->updateProgress('Backup job submitted successfully');
+            $operation->updateProgress('Backup started successfully');
 
-            return $result['job_id'];
+            return $backup->uuid;
         } catch (\Exception $e) {
             throw new BackupFailedException('Failed to create backup before egg change: ' . $e->getMessage());
         }
     }
 
     /**
-     * Wait for an Elytra job to complete.
+     * Wait for a Wings backup to complete (via remote status callback).
      */
-    private function waitForJobCompletion(ElytraJobService $elytraJobService, string $jobId, ServerOperation $operation, int $timeoutMinutes = 30): void
+    private function waitForBackupCompletion(string $backupUuid, ServerOperation $operation, int $timeoutMinutes = 30): void
     {
         $operation->updateProgress('Waiting for backup to complete before continuing...');
 
         $startTime = Carbon::now();
-        $timeout = $startTime->addMinutes($timeoutMinutes);
+        $timeout = $startTime->copy()->addMinutes($timeoutMinutes);
         $lastProgressUpdate = 0;
 
         while (Carbon::now()->lt($timeout)) {
-            $jobStatus = $elytraJobService->getJobStatus($this->server, $jobId);
+            $backup = Backup::where('uuid', $backupUuid)
+                ->where('server_id', $this->server->id)
+                ->first();
 
-            if (!$jobStatus) {
-                throw new BackupFailedException('Backup job not found');
+            if (!$backup) {
+                throw new BackupFailedException('Backup not found');
             }
 
-            if ($jobStatus['status'] === 'completed') {
-                $operation->updateProgress('Backup completed successfully');
-                return;
-            }
+            if (!is_null($backup->completed_at)) {
+                if ($backup->is_successful) {
+                    $operation->updateProgress('Backup completed successfully');
+                    return;
+                }
 
-            if (in_array($jobStatus['status'], ['failed', 'cancelled'])) {
-                throw new BackupFailedException('Backup failed: ' . ($jobStatus['error'] ?? 'Unknown error'));
+                throw new BackupFailedException('Backup failed');
             }
 
             $elapsed = Carbon::now()->diffInSeconds($startTime);
             if ($elapsed - $lastProgressUpdate >= 30) {
-                $progress = $jobStatus['progress'] ?? 0;
-                $operation->updateProgress("Backup in progress... {$progress}%");
+                $operation->updateProgress('Backup in progress...');
                 $lastProgressUpdate = $elapsed;
             }
 
