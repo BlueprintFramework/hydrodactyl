@@ -641,6 +641,11 @@ class SubdomainManagementService
 
             if ($useAlias) {
                 $record['content'] = !empty($allocationAlias) ? $allocationAlias : $allocationIp;
+
+                if (!filter_var($record['content'], FILTER_VALIDATE_IP)) {
+                    $record['type'] = 'CNAME';
+                }
+
                 continue;
             }
 
