@@ -12,7 +12,7 @@ jobs:
         php: [8.4, 8.5]
         db: [mysql, mariadb, pgsql]
 
-    runs-on:  blacksmith-2vcpu-ubuntu-2404
+    runs-on:  ubuntu-latest
 
     services:
       mysql:
@@ -97,7 +97,7 @@ jobs:
   build-dev:
     if: github.event_name == 'push'
     needs: tests
-    runs-on:  blacksmith-2vcpu-ubuntu-2404
+    runs-on:  ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
