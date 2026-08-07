@@ -1,6 +1,4 @@
-import { CloudDownload, CloudUpload } from '@carbon/icons-react';
-import { useEffect, useRef, useState } from 'react';
-import { Line } from 'react-chartjs-2';
+import { getSubdomainInfo, type SubdomainInfo } from '@/api/server/network/subdomain';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import ChartBlock from '@/components/server/console/ChartBlock';
 import { useChart, useChartTickLabel } from '@/components/server/console/chart';
@@ -10,7 +8,9 @@ import { bytesToString, ip } from '@/lib/formatters';
 import { hexToRgba } from '@/lib/helpers';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { ServerContext } from '@/state/server';
-
+import { CloudDownload, CloudUpload } from '@carbon/icons-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Line } from 'react-chartjs-2';
 import formatUptime from '../UptimeDuration';
 
 interface StatsData {
@@ -26,7 +26,22 @@ interface StatsData {
 const StatGraphs = () => {
     const status = ServerContext.useStoreState((state) => state.status.value);
     const limits = ServerContext.useStoreState((state) => state.server.data?.limits);
+    const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const previous = useRef<Record<'tx' | 'rx', number>>({ tx: -1, rx: -1 });
+    const [subdomainInfo, setSubdomainInfo] = useState<SubdomainInfo | null>(null);
+
+    const loadSubdomainInfo = useCallback(async () => {
+        try {
+            const data = await getSubdomainInfo(uuid);
+            setSubdomainInfo(data);
+        } catch (error) {
+            console.error('Failed to load subdomain info:', error);
+        }
+    }, [uuid]);
+
+    useEffect(() => {
+        loadSubdomainInfo();
+    }, [loadSubdomainInfo]);
 
     const cpu = useChartTickLabel('CPU', limits.cpu, '%', 2);
     const [uptime, setUptime] = useState(0);
@@ -106,8 +121,10 @@ const StatGraphs = () => {
                 <div>
                     <div className='group p-4 justify-between relative rounded-xl border border-[#ffffff11] bg-[#110f0d] flex gap-4 text-sm'>
                         <h3 className='font-extrabold'>IP Address</h3>
-                        <CopyOnClick text={allocation}>
-                            <div className='font-medium'>{allocation}</div>
+                        <CopyOnClick text={subdomainInfo?.current_subdomain?.attributes.full_domain || allocation}>
+                            <div className='font-medium'>
+                                {subdomainInfo?.current_subdomain?.attributes.full_domain || allocation}
+                            </div>
                         </CopyOnClick>
                     </div>
                 </div>
