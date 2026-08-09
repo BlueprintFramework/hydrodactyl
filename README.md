@@ -21,6 +21,9 @@
   <a href="https://github.com/BlueprintFramework/hydrodactyl/actions/workflows/dev-build.yaml">
     <img src="https://shieldcn.dev/badge/Build-Passing-success.svg?logo=githubactions" alt="Build">
   </a>
+  <a href="https://github.com/BlueprintFramework/hydrodactyl/releases">
+    <img src="https://shieldcn.dev/badge/Release-v6.3.0-181717.svg?logo=github" alt="Latest release: v6.3.0">
+  </a>
   <img src="https://shieldcn.dev/badge/Formatted%20with-Biome-93c5fd.svg?logo=biome" alt="Formatted with Biome">
   <img src="https://shieldcn.dev/badge/Linted%20with-Biome-93c5fd.svg?logo=biome" alt="Linted with Biome">
 </p>
@@ -29,10 +32,21 @@
 
 Hydrodactyl is a modern, performance-focused game server management panel forked from Pterodactyl. It delivers smaller bundles, faster builds, and an accessible, reimagined interface.
 
+## Features
+
+- **Reimagined client panel** — a redesigned interface for console, files, databases, backups, network, users, startup, schedules, activity, and software.
+- **Marketplace** — a native plugin and mod installer for Minecraft servers backed by Modrinth, Hangar, and Spiget.
+- **Setup wizard** — guided first-run configuration for new installations.
+- **Logo customization** — custom branding for your panel from the admin dashboard.
+- **S3-compatible backups** — per-node backup storage with any S3-compatible provider.
+- **PostgreSQL support** — run the panel on MySQL, MariaDB, or PostgreSQL.
+- **OpenAPI documentation** — API reference powered by Scalar.
+- **Modern stack** — Laravel 13, React 19, TypeScript, and Tailwind CSS, formatted and linted with Biome.
+
 > [!WARNING]
 > **Pre-release Software:** Hydrodactyl is currently under active development. Some UI elements may appear broken and bugs may exist.
-> 
-> **Incompatibility Notice:** Hydrodactyl is an all-in-one panel and is **not compatible** with Blueprint framework extensions. Logo customization is also experimental and subject to change.
+>
+> **Incompatibility Notice:** Hydrodactyl is an all-in-one panel and is **not compatible** with Blueprint framework extensions.
 
 > [!NOTE]
 > Please review the official documentation at [hydrodactyl.dev](https://hydrodactyl.dev/docs/hydrodactyl) before installing.
@@ -44,9 +58,10 @@ Built by the maintainer of the original Pyrodactyl project and funded by Bluepri
 ## Quick start
 
 ```bash
-git clone [https://github.com/BlueprintFramework/hydrodactyl.git](https://github.com/BlueprintFramework/hydrodactyl.git)
+git clone https://github.com/BlueprintFramework/hydrodactyl.git
 cd hydrodactyl
 cp .env.example .env
+cp docker-compose.example.yml docker-compose.yml
 docker compose up -d
 ```
 
