@@ -1,96 +1,133 @@
-# Todolist
+<h1 align="center">Todolist</h1>
 
-- [ ] Wings Automation
-  - [ ] Fully automate Wings configuration
-    - [ ] Automate debug mode configuration
-    - [ ] Automate machine-id configuration
+<br/>
 
-- [x] Auth Pages
-  - [x] Login Page
-  - [x] Password Reset Page
-  - [x] 2FA Page
+A living roadmap of the features and improvements planned for Hydrodactyl. Checked items reflect the current state of the `main` branch.
 
-- [ ] Homepage
-  - [ ] Search Bar
-    - [x] Design layout
-    - [x] Keyboard shortcut integration
-    - [ ] Search functionality
-  - [x] Servers Page (Server list)
-  - [x] API Keys Page
-  - [x] SSH Keys Page
-  - [x] Settings Page
-  - [x] Sidebar Navigation
+> [!NOTE]
+> Hydrodactyl is under active development. This list is not exhaustive — check [DEV.md](./DEV.md) and the open issues on GitHub for the latest status.
 
-- [ ] Server Pages
-  - [x] Sidebar Navigation
-  - [ ] Console Page
-    - [x] Console view
-    - [ ] System resource graphs
-    - [x] Power actions
-    - [ ] Server Features
-      - [ ] Minecraft EULA prompt
-      - [ ] Java version selector
-      - [ ] McLogs integration
-      - [ ] Hytale feature support
-      - [ ] Steam disk space meter
-  - [ ] Files
-    - [ ] Rework File Explorer System
-      - [ ] Shift + Click range selection
-      - [ ] Improved path change handling
-      - [ ] Context action menu
-      - [ ] File MIME-type icons
-    - [ ] File Editor
-      - [ ] Reduce editor bundle size
-  - [ ] Databases
-    - [ ] Implement new database model
-    - [ ] Redesign database display UI
-    - [ ] Add PostgreSQL support
-  - [ ] Backups
-    - [ ] Redesign less cluttered backup list UI
-    - [ ] Add admin panel setting for backup creation limits per time period
-    - [ ] Shift + Click range selection for backups
-  - [ ] Network
-    - [x] General UI fixes and color scheme updates
-    - [ ] Dropdown menu for Subdomain Management
-  - [ ] Users
-    - [ ] Permission Groups
-    - [ ] Permission Presets
-    - [ ] Clean up / de-clutter interface
-  - [ ] Startup
-    - [ ] One-click copy for Environment Variables
-    - [ ] Redesigned "Startup Command" field
-    - [ ] Improved Docker Image Selector
-  - [ ] Schedules
-    - [x] De-clutter "Create New Schedule" modal
-    - [ ] Custom Actions system (Admins & Users)
-      - [ ] Send HTTP Request action
-      - [ ] Interact with another owned server
-        - [ ] Add "Actions Interactable" user permission
-    - [ ] Failure Alert Notifications
-      - [ ] Email alerts
-      - [ ] Discord webhooks
-      - [ ] Slack integration
-      - [ ] Mattermost integration
-  - [ ] Activity
-    - [ ] Redo & Fix Filter System
-      - [ ] Fix search restricted to current page (enable global search)
-      - [ ] Improve search/filter UX & overall feel
-  - [ ] Software
-    - [ ] Redesign page with verbose configuration options
-    - [ ] Modularize code (split 1300+ line file into ~200–400 line components)
-    - [ ] Simplify overall component logic
-    - [ ] Optimize page performance
+## Wings Automation
+
+- [ ] Fully automate Wings configuration
+  - [ ] Automate debug mode configuration
+  - [ ] Automate machine-id configuration
+
+## Auth Pages
+
+- [x] Login Page
+- [x] Password Reset Page
+- [x] 2FA Page
+
+## Homepage
+
+- [x] Search Bar (server search, sorting & filtering)
+  - [x] Design layout
+  - [x] Keyboard shortcut integration (`Cmd + K`)
+  - [x] Search functionality
+- [x] Servers Page (server list)
+- [x] API Keys Page
+- [x] SSH Keys Page
+- [x] Settings Page
+- [x] Sidebar Navigation
+
+## Server Pages
+
+- [x] Sidebar Navigation
+
+### Console
+
+- [x] Console view
+- [x] System resource graphs
+- [x] Power actions
+- [x] Server Features
+  - [x] Minecraft EULA prompt
+  - [x] Java version selector
+  - [x] McLogs integration
+  - [x] Hytale feature support
+  - [x] Steam disk space meter
+
+### Files
+
+- [x] File Explorer System
+  - [ ] Shift + Click range selection
+  - [x] Improved path change handling (breadcrumbs)
+  - [x] Context action menu
+  - [x] File MIME-type icons
+- [ ] File Editor
+  - [ ] Reduce editor bundle size
+
+### Databases
+
+- [x] New database model
+- [x] Redesigned database display UI
+- [x] PostgreSQL support
+
+### Backups
+
+- [x] Redesigned, less cluttered backup list UI
+- [ ] Admin panel setting for backup creation limits per time period
+- [ ] Shift + Click range selection for backups
+
+### Network
+
+- [x] General UI fixes and color scheme updates
+- [x] Subdomain Management (Cloudflare, Bunny.net, and more)
+
+### Users
+
+- [ ] Permission Groups
+- [ ] Permission Presets
+- [ ] Clean up / de-clutter interface
+
+### Startup
+
+- [x] One-click copy for environment variables
+- [x] Redesigned "Startup Command" field
+- [x] Improved Docker Image Selector
+
+### Schedules
+
+- [x] De-clutter "Create New Schedule" modal
+- [ ] Custom Actions system (Admins & Users)
+  - [ ] Send HTTP Request action
+  - [ ] Interact with another owned server
+    - [ ] Add "Actions Interactable" user permission
+- [ ] Failure Alert Notifications
+  - [ ] Email alerts
+  - [ ] Discord webhooks
+  - [ ] Slack integration
+  - [ ] Mattermost integration
+
+### Activity
+
+- [x] Filter system
+- [ ] Fix search restricted to current page (enable global search)
+- [ ] Improve search/filter UX & overall feel
+
+### Software
+
+- [x] Redesigned page with verbose configuration options
+- [x] Modularized code (split into ~200–400 line components)
+- [x] Simplified component logic
+- [ ] Optimize page performance
+
+## Marketplace
+
+- [x] Native plugin/mod installer (Modrinth, Hangar, Spiget)
+- [x] Install history and management
+- [x] Marketplace client API
 
 ## General Changes
 
-- [ ] Redesigned Dropdown Menu across pages
-  - [ ] Backups Page
-  - [ ] Files Page
-  - [ ] Software / Shell Page
-  - [ ] Startup Page
+- [x] Redesigned dropdown menus across pages
+- [x] Backups Page
+- [x] Files Page
+- [x] Software / Shell Page
+- [x] Startup Page
 
 ## In Progress
 
-- [/] Admin Panel Redesign (Work in Progress)
-  - [/] Convert Admin Panel to React using Inertia
-  - [/] Redesign UI to match Client-side styling
+- [ ] Admin Panel Redesign
+  - [ ] Convert Admin Panel pages to React (dashboard overview is done)
+  - [x] Redesign UI to match Client-side styling
