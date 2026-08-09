@@ -17,4 +17,4 @@ If you've found what you believe is a security issue please email `naterfute@blu
 You can find us in a couple places online. First and foremost, we're active right here on GitHub. If you encounter a
 bug or other problems, open an issue on here for us to take a look at it. We also accept feature requests here as well.
 
-You can also find us on [Discord](https://discord.gg/fxeRFRbhQh?utm_source=github&utm_medium=contributinggithub&utm_campaign=githubOSS&utm_id=githubOSS).
+You can also find us on [Discord](https://discord.gg/sK686yHdaK).
