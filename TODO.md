@@ -130,4 +130,4 @@ A living roadmap of the features and improvements planned for Hydrodactyl. Check
 
 - [ ] Admin Panel Redesign
   - [ ] Convert Admin Panel pages to React (dashboard overview is done)
-  - [x] Redesign UI to match Client-side styling
+  - [ ] Redesign UI to match Client-side styling
