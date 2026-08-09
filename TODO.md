@@ -1,95 +1,96 @@
-# Just a list of To-do's for the Hydrodactyl Redesign
+# Todolist
 
-- [ ] Wings needs to be fully automated, right now you have to change multiple settings
-  - [ ] debug
-  - [ ] machine-id
+- [ ] Wings Automation
+  - [ ] Fully automate Wings configuration
+    - [ ] Automate debug mode configuration
+    - [ ] Automate machine-id configuration
 
 - [x] Auth Pages
   - [x] Login Page
-  - [x] Password Reset
-  - [x] 2fa
+  - [x] Password Reset Page
+  - [x] 2FA Page
+
 - [ ] Homepage
   - [ ] Search Bar
-    - [x] Design
-    - [x] Keyboard Shortcut
-    - [ ] Search Functionality
-  - [x] Servers Page(Server list)
-  - [x] Api Keys Page
+    - [x] Design layout
+    - [x] Keyboard shortcut integration
+    - [ ] Search functionality
+  - [x] Servers Page (Server list)
+  - [x] API Keys Page
   - [x] SSH Keys Page
   - [x] Settings Page
-  - [x] Sidebar
+  - [x] Sidebar Navigation
+
 - [ ] Server Pages
-  - [x] Sidebar
+  - [x] Sidebar Navigation
   - [ ] Console Page
-    - [x] Console
-    - [ ] Graphs
-    - [x] Power Actions
-    - [ ] Features
-      - [ ] Minecraft Eula
-      - [ ] Java Version
-      - [ ] McLogs Feature
-      - [ ] Hytale Feature
-      - [ ] Steam Disk Space
+    - [x] Console view
+    - [ ] System resource graphs
+    - [x] Power actions
+    - [ ] Server Features
+      - [ ] Minecraft EULA prompt
+      - [ ] Java version selector
+      - [ ] McLogs integration
+      - [ ] Hytale feature support
+      - [ ] Steam disk space meter
   - [ ] Files
-    - [ ] Actual Explorer(Rework the entire file explorer system)
-      - [ ] Shift + Click to select a range of files
-      - [ ] Better handeling of path changes
-      - [ ] Context button for ease of use of Actions
-      - [ ] More icons for file Mime Data
+    - [ ] Rework File Explorer System
+      - [ ] Shift + Click range selection
+      - [ ] Improved path change handling
+      - [ ] Context action menu
+      - [ ] File MIME-type icons
     - [ ] File Editor
-    - [ ] Decrease Editor Bundle Size
-  - [ ] Database
-    - [ ] New Database Model
-    - [ ] Better Display of databases
-    - [ ] Postgres Support
+      - [ ] Reduce editor bundle size
+  - [ ] Databases
+    - [ ] Implement new database model
+    - [ ] Redesign database display UI
+    - [ ] Add PostgreSQL support
   - [ ] Backups
-   - [ ] New less cluttered way to show backups
-   - [ ] Option in admin panel to Change how many backups are allowed to be made in a set period
-   - [ ] Shift + Click to select a range of backups
+    - [ ] Redesign less cluttered backup list UI
+    - [ ] Add admin panel setting for backup creation limits per time period
+    - [ ] Shift + Click range selection for backups
   - [ ] Network
-    - [x] I've got nothing tbh, just needs to have color changes and the range of fixes I do to pages
-    - [ ] Dropdown for Subdomain Management
+    - [x] General UI fixes and color scheme updates
+    - [ ] Dropdown menu for Subdomain Management
   - [ ] Users
     - [ ] Permission Groups
-    - [ ] Permission "Presets"
-    - [ ] Less Cluttered Design
+    - [ ] Permission Presets
+    - [ ] Clean up / de-clutter interface
   - [ ] Startup
-    - [ ] Copy Env Variables with a click
-    - [ ] Redesigned "Startup Command" Field
-    - [ ] Better Docker Image Selector
+    - [ ] One-click copy for Environment Variables
+    - [ ] Redesigned "Startup Command" field
+    - [ ] Improved Docker Image Selector
   - [ ] Schedules
-    - [x] Less Cluttered "Create New Schedule" Modal
-    - [ ] Option for admins and Users to create **Custom Actions** that are able to be used
-      - [ ] Send http Request
-      - [ ] Interact with another Owned Server
-        - [ ] New user Permission called **"Actions Interactable"** or smth
-    - [ ] New Actions to help user
-      - [ ] Alert on Failure
-        - [ ] Email
-        - [ ] Discord
-        - [ ] Slack
-        - [ ] Mattermost
+    - [x] De-clutter "Create New Schedule" modal
+    - [ ] Custom Actions system (Admins & Users)
+      - [ ] Send HTTP Request action
+      - [ ] Interact with another owned server
+        - [ ] Add "Actions Interactable" user permission
+    - [ ] Failure Alert Notifications
+      - [ ] Email alerts
+      - [ ] Discord webhooks
+      - [ ] Slack integration
+      - [ ] Mattermost integration
   - [ ] Activity
-    - [ ] Redone and Fixed Filters
-      - [ ] Currently only searches the current page
-      - [ ] Just doesn't feel good
-    - [ ] Better Filters
+    - [ ] Redo & Fix Filter System
+      - [ ] Fix search restricted to current page (enable global search)
+      - [ ] Improve search/filter UX & overall feel
   - [ ] Software
-    - [ ] Redone page with more "Verbose" options and WAY more splitting
-    - [ ] Reduce File size from ~1300 lines to multiple files with ~200-400 lines each
-    - [ ] Simplified Logic
-    - [ ] More Performant
+    - [ ] Redesign page with verbose configuration options
+    - [ ] Modularize code (split 1300+ line file into ~200–400 line components)
+    - [ ] Simplify overall component logic
+    - [ ] Optimize page performance
 
-## General Changes that need to be made
+## General Changes
 
-- [ ] Redesigned Dropdown Menu
+- [ ] Redesigned Dropdown Menu across pages
   - [ ] Backups Page
   - [ ] Files Page
-  - [ ] Software/Shell page
+  - [ ] Software / Shell Page
   - [ ] Startup Page
 
-## Future Plans
+## In Progress
 
-- [ ] Admin panel Redesign
-  - [ ] Convert Admin panel to React using Interia
-  - [ ] Redesign admin panel to match Client side Better
+- [/] Admin Panel Redesign (Work in Progress)
+  - [/] Convert Admin Panel to React using Inertia
+  - [/] Redesign UI to match Client-side styling
