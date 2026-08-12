@@ -13,6 +13,7 @@ jobs:
         db: [mysql, mariadb, pgsql]
 
     runs-on:  blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 15
 
     services:
       mysql:

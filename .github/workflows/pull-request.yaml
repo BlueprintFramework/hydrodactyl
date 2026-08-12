@@ -5,6 +5,7 @@ on:
 jobs:
   quality:
     runs-on:  blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 15
     permissions:
       contents: write
     steps:
