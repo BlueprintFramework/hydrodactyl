@@ -55,15 +55,21 @@ export default defineConfig({
 
         outDir: 'public/build',
 
-        rollupOptions: {
+        rolldownOptions: {
             input: [path.resolve('resources/scripts/index.tsx'), path.resolve('resources/scripts/admin/index.tsx')],
             output: {
-                // @ts-expect-error It won't fail lol
-                manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                        // @ts-expect-error It won't fail lol
-                        return id.toString().split('node_modules/')[1].split('/')[0].toString();
-                    }
+                codeSplitting: {
+                    groups: [
+                        {
+                            name: (moduleId) => {
+                                if (!moduleId.includes('node_modules')) {
+                                    return null;
+                                }
+
+                                return moduleId.split('node_modules/')[1].split('/')[0];
+                            },
+                        },
+                    ],
                 },
             },
         },
