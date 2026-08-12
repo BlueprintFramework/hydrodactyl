@@ -3,8 +3,8 @@
 namespace Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra;
 
 use Illuminate\Http\Response;
-use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Database;
+use Pterodactyl\Models\Server;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Services\Databases\DatabasePasswordService;
 use Pterodactyl\Transformers\Api\Client\DatabaseTransformer;
@@ -36,6 +36,9 @@ class DatabaseController extends ClientApiController
     {
         return $this->fractal->collection($server->databases)
             ->transformWith($this->getTransformer(DatabaseTransformer::class))
+            ->addMeta([
+                'available_database_types' => $this->deployDatabaseService->availableTypeMetadata($server)->all(),
+            ])
             ->toArray();
     }
 

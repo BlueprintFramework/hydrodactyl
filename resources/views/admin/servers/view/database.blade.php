@@ -28,6 +28,7 @@
             <div class="box-body table-responsible no-padding">
                 <table class="table table-hover">
                     <tr>
+                        <th>Type</th>
                         <th>Database</th>
                         <th>Username</th>
                         <th>Connections From</th>
@@ -37,6 +38,7 @@
                     </tr>
                     @foreach($server->databases as $database)
                         <tr>
+                            <td>{{ \Pterodactyl\Models\DatabaseHost::typeLabels()[$database->type] ?? $database->type }}</td>
                             <td>{{ $database->database }}</td>
                             <td>{{ $database->username }}</td>
                             <td>{{ $database->remote }}</td>
@@ -64,10 +66,19 @@
             <form action="{{ route('admin.servers.view.database', $server->id) }}" method="POST">
                 <div class="box-body">
                     <div class="form-group">
+                        <label for="pDatabaseType" class="control-label">Database Type</label>
+                        <select id="pDatabaseType" class="form-control">
+                            @foreach($hosts->pluck('type')->unique() as $type)
+                                <option value="{{ $type }}">{{ \Pterodactyl\Models\DatabaseHost::typeLabels()[$type] ?? $type }}</option>
+                            @endforeach
+                        </select>
+                        <p class="text-muted small">Select the type of database to create for this server.</p>
+                    </div>
+                    <div class="form-group">
                         <label for="pDatabaseHostId" class="control-label">Database Host</label>
                         <select id="pDatabaseHostId" name="database_host_id" class="form-control">
                             @foreach($hosts as $host)
-                                <option value="{{ $host->id }}">{{ $host->name }}</option>
+                                <option value="{{ $host->id }}" data-type="{{ $host->type }}">{{ $host->name }} ({{ \Pterodactyl\Models\DatabaseHost::typeLabels()[$host->type] ?? $host->type }})</option>
                             @endforeach
                         </select>
                         <p class="text-muted small">Select the host database server that this database should be created on.</p>
@@ -79,7 +90,7 @@
                             <input id="pDatabaseName" type="text" name="database" class="form-control" placeholder="database" />
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" data-role="connections-group">
                         <label for="pRemote" class="control-label">Connections</label>
                         <input id="pRemote" type="text" name="remote" class="form-control" value="%" />
                         <p class="text-muted small">This should reflect the IP address that connections are allowed from. Uses standard MySQL notation. If unsure leave as <code>%</code>.</p>
@@ -104,7 +115,30 @@
 @section('footer-scripts')
     @parent
     <script>
-    $('#pDatabaseHost').select2();
+    $('#pDatabaseHostId').select2();
+    $('#pDatabaseType').select2({ minimumResultsForSearch: Infinity });
+
+    function updateHostOptions() {
+        var type = $('#pDatabaseType').val();
+        $('#pDatabaseHostId option').each(function () {
+            var visible = $(this).data('type') === type;
+            $(this).prop('hidden', !visible);
+            $(this).prop('disabled', !visible);
+        });
+
+        var firstVisible = $('#pDatabaseHostId option').filter(function () {
+            return !$(this).prop('hidden');
+        }).first();
+
+        if (firstVisible.length) {
+            $('#pDatabaseHostId').val(firstVisible.val()).trigger('change.select2');
+        }
+
+        $('[data-role="connections-group"]').toggle(type === 'mysql');
+    }
+
+    $('#pDatabaseType').on('change', updateHostOptions);
+    updateHostOptions();
     $('[data-action="remove"]').click(function (event) {
         event.preventDefault();
         var self = $(this);

@@ -28,6 +28,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
+                            <th>Type</th>
                             <th>Host</th>
                             <th>Port</th>
                             <th>Username</th>
@@ -38,6 +39,7 @@
                             <tr>
                                 <td><code>{{ $host->id }}</code></td>
                                 <td><a href="{{ route('admin.databases.view', $host->id) }}">{{ $host->name }}</a></td>
+                                <td>{{ \Pterodactyl\Models\DatabaseHost::typeLabels()[$host->type] ?? $host->type }}</td>
                                 <td><code>{{ $host->host }}</code></td>
                                 <td><code>{{ $host->port }}</code></td>
                                 <td>{{ $host->username }}</td>
@@ -74,23 +76,32 @@
                         <input type="text" name="name" id="pName" class="form-control" value="{{ old('name') }}" />
                         <p class="text-muted small">A short identifier used to distinguish this location from others. Must be between 1 and 60 characters, for example, <code>us.nyc.lvl3</code>.</p>
                     </div>
+                    <div class="form-group">
+                        <label for="pType" class="form-label">Database Type</label>
+                        <select name="type" id="pType" class="form-control">
+                            @foreach(\Pterodactyl\Models\DatabaseHost::typeLabels() as $value => $label)
+                                <option value="{{ $value }}" {{ old('type', \Pterodactyl\Models\DatabaseHost::TYPE_MYSQL) === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
                             <label for="pHost" class="form-label">Host</label>
                             <input type="text" name="host" id="pHost" class="form-control" value="{{ old('host') }}" />
                             <p class="text-muted small">The IP address or FQDN that should be used when attempting to connect to this MySQL host <em>from the panel</em> to add new databases.</p>
+                            <p class="text-muted small" data-role="host-help"></p>
                         </div>
                         <div class="col-md-6">
                             <label for="pPort" class="form-label">Port</label>
                             <input type="text" name="port" id="pPort" class="form-control" value="{{ old('port', '3306') }}"/>
-                            <p class="text-muted small">The port that MySQL is running on for this host.</p>
+                            <p class="text-muted small" data-role="port-help">The port used by this database host.</p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <label for="pUsername" class="form-label">Username</label>
                             <input type="text" name="username" id="pUsername" class="form-control" value="{{ old('username') }}" />
-                            <p class="text-muted small">The username of an account that has enough permissions to create new users and databases on the system.</p>
+                            <p class="text-muted small" data-role="username-help">The username of an account that has enough permissions to provision databases or credentials on the system.</p>
                         </div>
                         <div class="col-md-6">
                             <label for="pPassword" class="form-label">Password</label>
@@ -114,7 +125,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <p class="text-danger small text-left">The account defined for this database host <strong>must</strong> have the <code>WITH GRANT OPTION</code> permission. If the defined account does not have this permission requests to create databases <em>will</em> fail. <strong>Do not use the same account details for MySQL that you have defined for this panel.</strong></p>
+                    <p class="text-danger small text-left" data-role="footer-help">Use a database administration account with enough privileges to create and remove databases or users for the selected engine. Do not reuse the same credentials as the panel database.</p>
                     {!! csrf_field() !!}
                     <button type="button" class="btn btn-default btn-sm pull-left" data-dismiss="modal">Cancel</button>
                     <button type="button" id="testDatabaseBtn" class="btn btn-primary btn-sm">Test Database</button>
@@ -147,6 +158,7 @@
                 port: $('#pPort').val(),
                 username: $('#pUsername').val(),
                 password: $('#pPassword').val(),
+                type: $('#pType').val(),
                 _token: '{{ csrf_token() }}'
             };
 
@@ -188,6 +200,46 @@
         $('#newHostModal').on('show.bs.modal', function() {
             $('#testResult').hide().empty();
         });
+
+        const typeHelp = {
+            mysql: {
+                host: 'The IP address or FQDN that should be used when attempting to connect to this MariaDB/MySQL host from the panel.',
+                port: 'MariaDB/MySQL commonly uses port 3306.',
+                username: 'Use an account with CREATE USER, CREATE DATABASE, GRANT OPTION, and DROP privileges.',
+                footer: 'The MariaDB/MySQL account must have WITH GRANT OPTION permission or database creation will fail.',
+            },
+            postgresql: {
+                host: 'The IP address or FQDN of the PostgreSQL server that the panel should connect to.',
+                port: 'PostgreSQL commonly uses port 5432.',
+                username: 'Use a PostgreSQL role that can create databases and manage roles.',
+                footer: 'The PostgreSQL role must be able to CREATE ROLE, CREATE DATABASE, ALTER ROLE, and DROP ROLE.',
+            },
+            redis: {
+                host: 'The IP address or FQDN of the Redis server that the panel should connect to.',
+                port: 'Redis commonly uses port 6379.',
+                username: 'Use a Redis ACL user with permission to manage other ACL users.',
+                footer: 'Redis support provisions per-server ACL users and key prefixes rather than standalone SQL-style databases.',
+            },
+            mongodb: {
+                host: 'The IP address or FQDN of the MongoDB server that the panel should connect to.',
+                port: 'MongoDB commonly uses port 27017.',
+                username: 'Use a MongoDB user with permission to create users and manage databases.',
+                footer: 'MongoDB support assumes the administrative account authenticates against the admin database.',
+            },
+        };
+
+        const updateTypeHelp = function () {
+            const type = $('#pType').val();
+            const help = typeHelp[type] || typeHelp.mysql;
+
+            $('[data-role="host-help"]').text(help.host);
+            $('[data-role="port-help"]').text(help.port);
+            $('[data-role="username-help"]').text(help.username);
+            $('[data-role="footer-help"]').text(help.footer);
+        };
+
+        $('#pType').on('change', updateTypeHelp);
+        updateTypeHelp();
 
         // Re-open modal if there are old inputs (form was submitted but had errors)
         @if($errors->any())
