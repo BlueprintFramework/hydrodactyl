@@ -184,12 +184,14 @@ class BackupJob implements Job
             'job_data' => array_merge($jobData, ['backup_uuid' => $backupUuid]),
         ]);
 
+        $adapter = BackupAdapter::tryFrom($jobData['adapter'] ?? '') ?? BackupAdapter::RusticLocal;
+
         $elytraJobData = [
             'server_id' => $server->uuid,
             'backup_uuid' => $backupUuid,
             'name' => $jobData['name'] ?? $this->generateBackupName(),
             'ignore' => $jobData['ignored'] ?? '',
-            'adapter_type' => $jobData['adapter'] ?? 'elytra',
+            'adapter_type' => $adapter->value,
         ];
 
         Log::info("Submitting backup creation job to Elytra", [

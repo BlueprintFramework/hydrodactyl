@@ -109,7 +109,7 @@ class RunTaskJob extends Job implements ShouldQueue
                                 'backup_create',
                                 [
                                     'operation' => 'create',
-                                    'adapter' => config('backups.default', 'elytra'),
+                                    'adapter' => $server->node->backupDisk,
                                     'ignored' => implode("\n", $ignoredFiles),
                                     'name' => 'Scheduled Backup - ' . now()->format('Y-m-d H:i'),
                                     'is_automatic' => true,
