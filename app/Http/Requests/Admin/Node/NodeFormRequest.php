@@ -4,7 +4,6 @@ namespace Pterodactyl\Http\Requests\Admin\Node;
 
 use Pterodactyl\Rules\Fqdn;
 use Pterodactyl\Models\Node;
-use Illuminate\Support\Facades\Log;
 use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
 
 class NodeFormRequest extends AdminFormRequest
@@ -24,7 +23,6 @@ class NodeFormRequest extends AdminFormRequest
         $data = Node::getRules();
         $data['fqdn'][] = Fqdn::make('scheme');
         $data['internal_fqdn'] = ['nullable', 'string', Fqdn::make('scheme')];
-        log::info("rules", [$data]);
 
         return $data;
     }

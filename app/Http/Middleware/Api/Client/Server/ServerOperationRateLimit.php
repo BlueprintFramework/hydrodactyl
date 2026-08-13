@@ -24,10 +24,8 @@ class ServerOperationRateLimit
     {
         /** @var Server $server */
         $server = $request->route('server');
-        $user = $request->user();
 
         $this->checkActiveOperations($server);
-        $this->logOperationAttempt($server, $user, $operationType);
 
         return $next($request);
     }
@@ -72,19 +70,5 @@ class ServerOperationRateLimit
             ]);
             return false;
         }
-    }
-
-    /**
-     * Log operation attempt for monitoring.
-     */
-    private function logOperationAttempt(Server $server, $user, string $operationType): void
-    {
-        Log::info('Server operation attempt', [
-            'server_id' => $server->id,
-            'server_uuid' => $server->uuid,
-            'user_id' => $user->id,
-            'operation_type' => $operationType,
-            'timestamp' => now()->toISOString(),
-        ]);
     }
 }

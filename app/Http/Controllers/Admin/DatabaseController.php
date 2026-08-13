@@ -11,7 +11,6 @@ use Illuminate\View\Factory as ViewFactory;
 use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 
 use PDO;
 use PDOException;
@@ -144,12 +143,6 @@ class DatabaseController extends Controller
             'port' => 'required|integer|min:1|max:65535',
             'username' => 'required|string',
             'password' => 'required|string',
-        ]);
-        Log::error("TestConnection", [
-            "\nhost" => $request->host,
-            "\nport" => $request->port,
-            "\nusername" => $request->username,
-            "\npassword" => $request->password
         ]);
 
         try {

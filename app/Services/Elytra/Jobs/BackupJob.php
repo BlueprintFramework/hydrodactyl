@@ -112,14 +112,6 @@ class BackupJob implements Job
         $jobType = $statusData['job_type'] ?? '';
         $operation = $this->getOperationFromJobType($jobType);
 
-        Log::debug("processStatusUpdate called", [
-            'job_id' => $job->id,
-            'job_type' => $jobType,
-            'operation' => $operation,
-            'successful' => $successful,
-            'has_repository_size' => isset($statusData['repository_size']),
-        ]);
-
         $errorMessage = $successful ? null : ($statusData['error_message'] ?? 'Unknown error');
         if ($errorMessage) {
             $errorMessage = $this->sanitizeBackupError($errorMessage);
@@ -193,12 +185,6 @@ class BackupJob implements Job
             'ignore' => $jobData['ignored'] ?? '',
             'adapter_type' => $adapter->value,
         ];
-
-        Log::info("Submitting backup creation job to Elytra", [
-            'server_id' => $server->id,
-            'backup_uuid' => $backupUuid,
-            'job_data' => $elytraJobData,
-        ]);
 
         $response = $elytraRepository->setServer($server)->createJob('backup_create', $elytraJobData);
 
@@ -339,11 +325,6 @@ class BackupJob implements Job
 
     private function handleDeleteCompletion(ElytraJob $job, array $statusData): void
     {
-        Log::debug("handleDeleteCompletion called", [
-            'job_id' => $job->id,
-            'statusData' => $statusData,
-        ]);
-
         if ($statusData['successful']) {
             $jobData = $job->job_data;
             $backup = Backup::where('uuid', $jobData['backup_uuid'])->first();
@@ -351,13 +332,6 @@ class BackupJob implements Job
             if ($backup) {
                 $server = $backup->server;
                 $isRusticBackup = $backup->disk instanceof BackupAdapter && $backup->disk->isRustic();
-
-                Log::debug("Backup found for deletion", [
-                    'backup_uuid' => $backup->uuid,
-                    'disk' => $backup->disk,
-                    'is_rustic' => $isRusticBackup,
-                    'has_repository_size' => isset($statusData['repository_size']),
-                ]);
 
                 $backup->delete();
 
