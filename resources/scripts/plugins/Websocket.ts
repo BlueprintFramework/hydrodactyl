@@ -11,6 +11,10 @@ export class Websocket extends EventEmitter {
     // The socket instance being tracked.
     private socket: Sockette | null = null;
 
+    // Whether the underlying socket is currently open. Tracks Sockette's own
+    // lifecycle via onopen/onclose/onerror rather than a network ping.
+    private connected = false;
+
     // The URL being connected to for the socket.
     private url: string | null = null;
 
@@ -43,6 +47,7 @@ export class Websocket extends EventEmitter {
                 if (this.timer) clearTimeout(this.timer);
                 this.backoff = 5000;
 
+                this.connected = true;
                 this.emit('SOCKET_OPEN');
                 this.authenticate();
             },
@@ -50,8 +55,14 @@ export class Websocket extends EventEmitter {
                 this.emit('SOCKET_RECONNECT');
                 this.authenticate();
             },
-            onclose: () => this.emit('SOCKET_CLOSE'),
-            onerror: (error) => this.emit('SOCKET_ERROR', error),
+            onclose: () => {
+                this.connected = false;
+                this.emit('SOCKET_CLOSE');
+            },
+            onerror: (error) => {
+                this.connected = false;
+                this.emit('SOCKET_ERROR', error);
+            },
         });
 
         this.timer = setTimeout(() => {
@@ -87,6 +98,7 @@ export class Websocket extends EventEmitter {
     close(code?: number, reason?: string) {
         this.url = null;
         this.token = '';
+        this.connected = false;
         if (this.socket) this.socket.close(code, reason);
     }
 
@@ -95,7 +107,16 @@ export class Websocket extends EventEmitter {
     }
 
     reconnect() {
+        this.connected = false;
         if (this.socket) this.socket.reconnect();
+    }
+
+    // Whether the socket is actually open right now. More reliable than the
+    // store's `connected` flag, which can go stale: on mobile the tab gets
+    // frozen and the socket killed without a clean close event, leaving
+    // `connected` stuck true while the socket is long dead.
+    isConnected(): boolean {
+        return this.connected;
     }
 
     send(event: string, payload?: string | string[]) {
