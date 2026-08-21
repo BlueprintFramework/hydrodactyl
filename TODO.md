@@ -1,5 +1,29 @@
 # Just a list of To-do's for the Hydrodactyl Redesign
 
+## ADMIN REDESIGN
+
+- [ ] Admin panel Redesign
+  - [ ] Overview
+  - [ ] Settings
+    - [ ] General
+    - [ ] Mail
+    - [ ] Captcha
+    - [ ] Domains
+    - [ ] Custom Navigation
+    - [ ] Branding
+    - [ ] Advanced
+  - [ ] Application API
+  - [ ] Databases
+  - [ ] S3 Buckets
+  - [ ] Locations
+  - [ ] Nodes
+  - [ ] Servers
+  - [ ] Users
+  - [ ] Mounts
+  - [ ] Nests
+
+---
+
 - [ ] Wings needs to be fully automated, right now you have to change multiple settings
   - [ ] debug
   - [ ] machine-id
@@ -88,8 +112,4 @@
   - [ ] Software/Shell page
   - [ ] Startup Page
 
-## Future Plans
 
-- [ ] Admin panel Redesign
-  - [ ] Convert Admin panel to React using Interia
-  - [ ] Redesign admin panel to match Client side Better
