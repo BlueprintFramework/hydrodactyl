@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Collection;
 use Pterodactyl\Exceptions\Http\Server\ServerStateConflictException;
 use Pterodactyl\Models\ServerSubdomain;
 
@@ -72,6 +74,8 @@ use Pterodactyl\Models\ServerSubdomain;
  * @property User $user
  * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\EggVariable[] $variables
  * @property int|null $variables_count
+ * @property string|null $webhook_type
+ * @property string|null $webhook_url
  *
  * @method static \Database\Factories\ServerFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|Server newModelQuery()
@@ -179,6 +183,8 @@ class Server extends Model
         'allocation_limit' => 'nullable|integer|min:0',
         'backup_limit' => 'nullable|integer|min:0',
         'backup_storage_limit' => 'nullable|integer|min:0',
+        'webhook_type' => 'nullable|string|min:1|max:64',
+        'webhook_url' => 'nullable|string|min:1|max:191',
     ];
 
     /**
@@ -207,6 +213,8 @@ class Server extends Model
         self::UPDATED_AT => 'datetime',
         'deleted_at' => 'datetime',
         'installed_at' => 'datetime',
+        'webhook_type' => 'string',
+        'webhook_url' => 'string'
     ];
 
     /**
@@ -578,6 +586,18 @@ class Server extends Model
             || !is_null($this->transfer)
         ) {
             throw new ServerStateConflictException($this);
+        }
+    }
+
+    /**
+     * Logs an activity log event to the server webhook
+     */
+    public function logWebhookEvent(string $event, Collection|null $properties)
+    {
+        if ($this->webhook_type == "discord" && $this->webhook_url) {
+            $response = Http::post($this->webhook_url, [
+                'content' => $event
+            ]);
         }
     }
 }

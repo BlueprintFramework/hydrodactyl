@@ -10,6 +10,7 @@ use Pterodactyl\Models\ActivityLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Request;
 use Pterodactyl\Models\ActivityLogSubject;
+use Pterodactyl\Models\Server;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 
@@ -24,8 +25,7 @@ class ActivityLogService
         protected ActivityLogBatchService $batch,
         protected ActivityLogTargetableService $targetable,
         protected ConnectionInterface $connection,
-    ) {
-    }
+    ) {}
 
     /**
      * Sets the activity logger as having been caused by an anonymous
@@ -138,9 +138,24 @@ class ActivityLogService
             $activity->description = $description;
         }
 
+        $servers = array_filter($this->subjects, fn($val) => $val instanceof Server);
+
+        foreach ($servers as $server) {
+            try {
+                $server->logWebhookEvent($this->getActivity()->event, $this->getActivity()->properties);
+            } catch (\Throwable | \Exception $exception) {
+                if (config('app.env') !== 'production') {
+                    /* @noinspection PhpUnhandledExceptionInspection */
+                    throw $exception;
+                }
+
+                Log::error($exception);
+            }
+        }
+
         try {
             return $this->save();
-        } catch (\Throwable|\Exception $exception) {
+        } catch (\Throwable | \Exception $exception) {
             if (config('app.env') !== 'production') {
                 /* @noinspection PhpUnhandledExceptionInspection */
                 throw $exception;
@@ -232,7 +247,7 @@ class ActivityLogService
             $this->activity->save();
 
             $subjects = Collection::make($this->subjects)
-                ->map(fn (Model $subject) => [
+                ->map(fn(Model $subject) => [
                     'activity_log_id' => $this->activity->id,
                     'subject_id' => $subject->getKey(),
                     'subject_type' => $subject->getMorphClass(),
