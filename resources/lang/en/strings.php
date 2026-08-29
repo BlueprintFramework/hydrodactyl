@@ -36,7 +36,7 @@ return [
     'created' => 'Created',
     'expires' => 'Expires',
     'public_key' => 'Token',
-    'api_access' => 'Api Access',
+    'api_access' => 'API Access',
     'never' => 'never',
     'sign_out' => 'Sign out',
     'admin_control' => 'Admin Control',
