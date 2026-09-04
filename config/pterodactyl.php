@@ -66,6 +66,11 @@ return [
             'site_key' => env('RECAPTCHA_SITE_KEY', ''),
             'secret_key' => env('RECAPTCHA_SECRET_KEY', ''),
         ],
+        'cap' => [
+            'site_key' => env('CAP_SITE_KEY', ''),
+            'secret_key' => env('CAP_SECRET_KEY', ''),
+            'server_url' => env('CAP_SERVER_URL', 'https://cap.example.com'),
+        ],
         'forms' => [
             'login' => env('CAPTCHA_LOGIN', false),
             'forgot_password' => env('CAPTCHA_FORGOT_PASSWORD', false),
