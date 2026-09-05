@@ -38,6 +38,9 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:captcha:hcaptcha:secret_key',
     'pterodactyl:captcha:recaptcha:site_key',
     'pterodactyl:captcha:recaptcha:secret_key',
+    'pterodactyl:captcha:cap:site_key',
+    'pterodactyl:captcha:cap:secret_key',
+    'pterodactyl:captcha:cap:server_url',
   ];
 
 
@@ -64,6 +67,7 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:captcha:turnstile:secret_key',
     'pterodactyl:captcha:hcaptcha:secret_key',
     'pterodactyl:captcha:recaptcha:secret_key',
+    'pterodactyl:captcha:cap:secret_key',
   ];
 
   /**
