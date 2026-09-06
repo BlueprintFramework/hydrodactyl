@@ -45,17 +45,6 @@ body[data-sidebar-minimized="true"] .sidebar-logo-container {
 .sidebar-container {
     transition: width var(--sidebar-transition-sidebar);
 }
-.sidebar-logo-link {
-    left: calc(var(--sidebar-width) / 2);
-    max-width: calc(var(--sidebar-width) - calc(var(--sidebar-padding) * 2));
-    overflow: hidden;
-    position: absolute;
-    transform: translateX(-50%);
-    transition:
-        left var(--sidebar-transition-sidebar),
-        max-width var(--sidebar-transition-sidebar),
-        transform var(--sidebar-transition-sidebar);
-}
 
 body[data-sidebar-minimized="false"] .sidebar-logo-link {
     left: var(--sidebar-padding);

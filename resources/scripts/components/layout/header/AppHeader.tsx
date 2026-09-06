@@ -46,7 +46,7 @@ const LogoSection = memo(() => {
     return (
         <NavLink
             to={'/'}
-            className='sidebar-logo-link flex items-center shrink-0 h-8 min-w-0 gap-3 hydrodactyl-logo'
+            className='flex shrink-0 h-8 min-w-0 gap-3 hydrodactyl'
             aria-label={`${siteName} home page`}
         >
             <Logo className='flex h-8 w-8 shrink-0 object-contain' />
