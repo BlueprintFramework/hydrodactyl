@@ -81,6 +81,10 @@ class ServerTransformer extends BaseClientTransformer
             'is_transferring' => !is_null($server->transfer),
             'daemon_type' => $server->node->daemonType,
             'backup_disk' => $server->node->backupDisk,
+            'groups' => $server->group ? [
+                'id' => $server->group->id,
+                'name' => $server->group->name,
+            ] : null,
         ];
     }
 

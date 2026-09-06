@@ -13,6 +13,7 @@ interface QueryParams {
     sort?: string;
     filterField?: string;
     filterValue?: string | number;
+    groupId?: number;
 }
 
 export default ({
@@ -21,6 +22,7 @@ export default ({
     filterField,
     filterValue,
     type,
+    groupId,
     ...params
 }: QueryParams): Promise<PaginatedResult<Server>> => {
     const sorts: Record<string, 'asc' | 'desc'> = {};
@@ -46,6 +48,7 @@ export default ({
                     filters: Object.keys(filters).length > 0 ? filters : undefined,
                 }),
                 type,
+                group_id: groupId,
             },
         })
             .then(({ data }) =>

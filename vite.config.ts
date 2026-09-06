@@ -66,7 +66,16 @@ export default defineConfig({
                                     return null;
                                 }
 
-                                return moduleId.split('node_modules/')[1].split('/')[0];
+                                // Extract the real package name from either an npm layout
+                                // (node_modules/<pkg>) or a pnpm layout
+                                // (node_modules/.pnpm/<pkg>@<ver>/node_modules/<pkg>), including
+                                // scoped packages such as @hugeicons/core-free-icons.
+                                const match =
+                                    /node_modules\/(?:\.pnpm\/[^/]+\/node_modules\/)?((?:@[^/]+\/)?[^/]+)/.exec(
+                                        moduleId,
+                                    );
+
+                                return match ? match[1] : null;
                             },
                         },
                     ],

@@ -48,13 +48,16 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
             };
         }, [isMobileOpen]);
 
-        if (!isMobileOpen) return null;
-
         return (
-            <div className='lg:hidden fixed inset-0 z-[9999]'>
+            <div
+                className={cn(
+                    'lg:hidden fixed inset-0 z-[9999] transition-opacity duration-300',
+                    isMobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                )}
+            >
                 <button
                     type='button'
-                    className='absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default'
+                    className='absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default transition-opacity duration-300'
                     onClick={() => setMobileOpen(false)}
                     aria-label='Close menu'
                     aria-hidden='true'
@@ -66,6 +69,8 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                         'sidebar-container absolute top-0 left-0 h-full w-[300px] max-w-[85vw] shrink-0',
                         'flex flex-col bg-bg-lowered border-r border-mocha-400',
                         'rounded-none overflow-y-auto overflow-x-hidden',
+                        'transition-transform duration-300 ease-out',
+                        isMobileOpen ? 'translate-x-0' : '-translate-x-full',
                     )}
                     data-sidebar-minimized='false'
                 >

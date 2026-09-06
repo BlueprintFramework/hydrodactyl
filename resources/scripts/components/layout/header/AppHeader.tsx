@@ -86,29 +86,59 @@ const SidebarLogo = memo(() => {
 SidebarLogo.displayName = 'SidebarLogo';
 
 const StaticButtons = memo<{ serverId?: string }>(({ serverId }) => {
-    return (
-        <>
-            {/* <Button size={'sm'} variant={'secondary'} className='px-3 gap-1 rounded-full'>
-        <div className='flex flex-row items-center gap-1.5'>
-          <HugeiconsIcon size={16} strokeWidth={2} icon={AiSearch02Icon} className='size-4' />
-          Search
-        </div>
-      </Button> */}
-            <UserDropdown serverId={serverId} />
-        </>
-    );
+    return <UserDropdown serverId={serverId} />;
 });
 
 StaticButtons.displayName = 'StaticButtons';
 
+const SlotActions = memo<{ actions: React.ReactNode }>(({ actions }) => {
+    if (!actions) return null;
+
+    if (Array.isArray(actions)) {
+        return (
+            <>
+                {actions.map((action, index) => (
+                    <Fragment key={index}>{action}</Fragment>
+                ))}
+            </>
+        );
+    }
+
+    return <>{actions}</>;
+});
+SlotActions.displayName = 'SlotActions';
+
 const AppHeader = ({ serverId }: AppHeaderProps) => {
+    const { leftActions, centerActions, rightActions } = useHeader();
+
+    const hasSlottedLayout = leftActions || centerActions || rightActions;
+
+    if (hasSlottedLayout) {
+        return (
+            <div className='h-16 w-full py-4 px-2 sm:px-4 flex items-center'>
+                <div className='flex items-center gap-1.5 sm:gap-2 shrink-0'>
+                    <MobileSidebarToggle />
+                    <SidebarLogo />
+                    <SlotActions actions={leftActions} />
+                </div>
+                <div className='flex-1 flex items-center justify-center min-w-0 px-2 sm:px-4'>
+                    <SlotActions actions={centerActions} />
+                </div>
+                <div className='flex items-center gap-1.5 sm:gap-2 shrink-0'>
+                    <SlotActions actions={rightActions} />
+                    <StaticButtons serverId={serverId} />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className='h-16 w-full py-4 pr-2 flex align-middle items-center justify-between'>
             <div className='flex items-center gap-2'>
                 <MobileSidebarToggle />
                 <SidebarLogo />
             </div>
-            <div className='flex items-center gap-1.5 sm:gap-2 h-full w-full justify-end min-w-0'>
+            <div className='flex items-center gap-1.5 sm:gap-2 h-full justify-end min-w-0 overflow-hidden'>
                 <HeaderActions />
                 <StaticButtons serverId={serverId} />
             </div>

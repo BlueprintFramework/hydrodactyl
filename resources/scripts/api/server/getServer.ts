@@ -15,6 +15,11 @@ export interface Allocation {
     isDefault: boolean;
 }
 
+export interface ServerGroupMembership {
+    id: number;
+    name: string;
+}
+
 export interface Server {
     id: string;
     internalId: number | string;
@@ -50,6 +55,7 @@ export interface Server {
     allocations: Allocation[];
     egg: string;
     daemonType: string;
+    group: ServerGroupMembership | null;
 }
 
 export const rawDataToServerObject = ({ attributes: data }: FractalResponseData): Server => ({
@@ -79,6 +85,7 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
     ),
     egg: data.egg,
     daemonType: data.daemonType,
+    group: data.groups ? { id: data.groups.id, name: data.groups.name } : null,
 });
 
 export default async (uuid: string): Promise<[Server, string[]]> => {

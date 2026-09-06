@@ -63,7 +63,7 @@ position: relative;
     }
 `;
 
-const ServerRow = ({ server, className }: { server: Server; className?: string }) => {
+const ServerRow = ({ server, className, hideGroup }: { server: Server; className?: string; hideGroup?: boolean }) => {
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [isInstalling, setIsInstalling] = useState(server.status === 'installing');
     const [stats, setStats] = useState<ServerStats | null>(null);
@@ -119,15 +119,22 @@ const ServerRow = ({ server, className }: { server: Server; className?: string }
                         </p>{' '}
                         <div className={'status-bar'} />
                     </div>
-                    <p className={`text-sm text-[#ffffff66] truncate`}>
-                        {server.allocations
-                            .filter((alloc) => alloc.isDefault)
-                            .map((allocation) => (
-                                <Fragment key={allocation.ip + allocation.port.toString()}>
-                                    {allocation.alias || ip(allocation.ip)}:{allocation.port}
-                                </Fragment>
-                            ))}
-                    </p>
+                    <div className='flex items-center gap-2 min-w-0'>
+                        <p className={`text-sm text-[#ffffff66] truncate`}>
+                            {server.allocations
+                                .filter((alloc) => alloc.isDefault)
+                                .map((allocation) => (
+                                    <Fragment key={allocation.ip + allocation.port.toString()}>
+                                        {allocation.alias || ip(allocation.ip)}:{allocation.port}
+                                    </Fragment>
+                                ))}
+                        </p>
+                        {server.group && !hideGroup && (
+                            <span className='inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-accent/10 text-accent border border-accent/20'>
+                                {server.group.name}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
             <div

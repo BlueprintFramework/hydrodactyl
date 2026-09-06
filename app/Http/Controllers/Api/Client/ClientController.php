@@ -5,6 +5,7 @@ namespace Pterodactyl\Http\Controllers\Api\Client;
 use Illuminate\Support\Facades\DB;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Permission;
+use Pterodactyl\Models\ServerGroup;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
@@ -13,6 +14,7 @@ use Pterodactyl\Models\Sorts\ServerOwnerNameSort;
 use Pterodactyl\Models\Sorts\ServerNestNameSort;
 use Pterodactyl\Models\Sorts\ServerEggNameSort;
 use Pterodactyl\Models\Sorts\ServerNodeNameSort;
+use Pterodactyl\Models\Sorts\ServerGroupNameSort;
 use Pterodactyl\Transformers\Api\Client\ServerTransformer;
 use Pterodactyl\Http\Requests\Api\Client\GetServersRequest;
 
@@ -28,7 +30,10 @@ class ClientController extends ClientApiController
 
         // Start the query builder and ensure we eager load any requested relationships from the request.
         $builder = QueryBuilder::for(
-            Server::query()->with($this->getIncludesForTransformer($transformer, ['node']))
+            Server::query()->with(array_merge(
+                $this->getIncludesForTransformer($transformer, ['node']),
+                ['group']
+            ))
         )->allowedFilters([
             'uuid',
             'name',
@@ -63,6 +68,7 @@ class ClientController extends ClientApiController
             AllowedSort::custom('nest_name', new ServerNestNameSort()),
             AllowedSort::custom('egg_name', new ServerEggNameSort()),
             AllowedSort::custom('node_name', new ServerNodeNameSort()),
+            AllowedSort::custom('group_name', new ServerGroupNameSort()),
         ]);
 
         $type = $request->input('type');
@@ -89,6 +95,12 @@ class ClientController extends ClientApiController
         } else {
             // Default + 'all': every server the user can access (owned + subuser on).
             $builder = $builder->whereIn('servers.id', $user->accessibleServers()->pluck('id')->all());
+        }
+
+        // Filter by group if specified
+        $groupId = $request->query('group_id');
+        if ($groupId) {
+            $builder->where('servers.group_id', $groupId);
         }
 
         $servers = $builder->paginate(min($request->query('per_page', 50), 1000))->appends($request->query());
@@ -150,6 +162,11 @@ class ClientController extends ClientApiController
             ->orderBy('label')
             ->get();
 
+        $groups = ServerGroup::where('user_id', $user->id)
+            ->select('id as value', 'name as label')
+            ->orderBy('name')
+            ->get();
+
         return [
             'object' => 'server_filter_options',
             'attributes' => [
@@ -157,6 +174,8 @@ class ClientController extends ClientApiController
                 'nests' => $nests,
                 'eggs' => $eggs,
                 'nodes' => $nodes,
+                'groups' => $groups,
+                'groups_enabled' => config('pterodactyl.client_features.groups.enabled', true),
             ],
         ];
     }

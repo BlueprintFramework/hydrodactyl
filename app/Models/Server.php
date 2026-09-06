@@ -8,6 +8,7 @@ use Znck\Eloquent\Traits\BelongsToThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -203,6 +204,7 @@ class Server extends Model
         'allocation_limit' => 'integer',
         'backup_limit' => 'integer',
         'backup_storage_limit' => 'integer',
+        'group_id' => 'integer',
         self::CREATED_AT => 'datetime',
         self::UPDATED_AT => 'datetime',
         'deleted_at' => 'datetime',
@@ -462,6 +464,14 @@ class Server extends Model
     public function activeSubdomain(): HasOne
     {
         return $this->hasOne(ServerSubdomain::class)->where('is_active', true);
+    }
+
+    /**
+     * Get the group this server belongs to.
+     */
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(ServerGroup::class, 'group_id');
     }
 
     /**

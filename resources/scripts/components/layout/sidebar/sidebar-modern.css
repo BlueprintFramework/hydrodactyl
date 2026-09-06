@@ -38,6 +38,9 @@ body[data-sidebar-minimized] {
     padding-left: var(--sidebar-padding);
     width: calc(var(--sidebar-width) + 2.5rem);
 }
+body[data-sidebar-minimized="true"] .sidebar-logo-container {
+    width: var(--sidebar-width);
+}
 .sidebar-logo-container,
 .sidebar-container {
     transition: width var(--sidebar-transition-sidebar);
@@ -58,6 +61,21 @@ body[data-sidebar-minimized="false"] .sidebar-logo-link {
     left: var(--sidebar-padding);
     max-width: calc(var(--sidebar-width) - calc(var(--sidebar-padding) * 2) - 3rem);
     transform: none;
+}
+
+/* When minimized, the logo icon is flex-centered in the space left of the
+   toggle (instead of the brittle absolute left/translateX trick that pushed
+   it right of the toggle). Must follow the base .sidebar-logo-link rule so
+   specificity stays ascending. */
+body[data-sidebar-minimized="true"] .sidebar-logo-link {
+    position: static;
+    left: auto;
+    transform: none;
+    max-width: none;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .sidebar-logo-name {

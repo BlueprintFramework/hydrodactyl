@@ -31,6 +31,7 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:client_features:allocations:enabled',
     'pterodactyl:client_features:allocations:range_start',
     'pterodactyl:client_features:allocations:range_end',
+    'pterodactyl:client_features:groups:enabled',
     'pterodactyl:captcha:provider',
     'pterodactyl:captcha:turnstile:site_key',
     'pterodactyl:captcha:turnstile:secret_key',

@@ -139,6 +139,10 @@ return [
             'range_start' => env('PTERODACTYL_CLIENT_ALLOCATIONS_RANGE_START'),
             'range_end' => env('PTERODACTYL_CLIENT_ALLOCATIONS_RANGE_END'),
         ],
+
+        'groups' => [
+            'enabled' => env('PTERODACTYL_CLIENT_GROUPS_ENABLED', true),
+        ],
     ],
 
     /*

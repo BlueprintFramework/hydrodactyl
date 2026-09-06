@@ -48,8 +48,24 @@
     --color-brand-grad: radial-gradient(109.26% 109.26% at 49.83% 13.37%, #ff343c 0%, #f06f53 100%);
     --color-brand: #fa4e49;
 
+    --color-accent: var(--color-cream-400);
+    --color-accent-foreground: var(--color-mocha-500);
+
     --transition-duration-250: 250ms;
+
+    --animate-group-fly-in: groupFlyIn 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 
     --font-schibsted: "Schibsted Grotesk", sans-serif;
     --font-manrope: "Manrope", serif;
+}
+
+@keyframes groupFlyIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

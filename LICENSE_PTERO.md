@@ -1,4 +1,4 @@
-# The MIT License (MIT)
+# Pterodactyl License (MIT)
 
 ```
 Pterodactyl®

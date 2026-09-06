@@ -9,6 +9,7 @@ interface SystemMetrics {
         uptime: number;
         memory: { total: number; used: number; free: number };
         cpu: number;
+        cpu_cores: number;
         disk: { total: number; free: number; used: number };
     };
     system: {
@@ -36,14 +37,26 @@ function formatUptime(seconds: number): string {
 
 const COLORS = { used: '#52A9FF', free: '#2D5A8A', bg: '#1E3A5A' };
 
-function UsageBar({ used, total, label, unit }: { used: number; total: number; label: string; unit?: string }) {
+function UsageBar({
+    used,
+    total,
+    label,
+    unit,
+    title,
+}: {
+    used: number;
+    total: number;
+    label: string;
+    unit?: string;
+    title?: string;
+}) {
     const pct = total > 0 ? (used / total) * 100 : 0;
     const data = [{ name: label, used, free: total - used }];
     const isPercent = unit === '%';
     const fmt = (v: number) => (isPercent ? `${v.toFixed(1)}%` : formatBytes(v));
 
     return (
-        <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: 16 }} title={title}>
             <div
                 style={{
                     display: 'flex',
@@ -119,6 +132,7 @@ function AdminDashboard() {
     }
 
     const { metrics, system } = data;
+    const cpuCores = metrics.cpu_cores || 1;
 
     return (
         <div>
@@ -135,7 +149,10 @@ function AdminDashboard() {
                             overflow: 'hidden',
                         }}
                     >
-                        <UsageBar used={metrics.cpu} total={100} label='CPU' unit='%' />
+                        <div style={{ textAlign: 'center', paddingTop: 40 }}>
+                            <div style={{ fontSize: 28, fontWeight: 700, color: '#eee' }}>{cpuCores}</div>
+                            <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>CPU Cores</div>
+                        </div>
                     </div>
                 </div>
                 <div className='col-md-3 col-sm-6 col-xs-12'>
