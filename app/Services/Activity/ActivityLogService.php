@@ -142,7 +142,7 @@ class ActivityLogService
 
         foreach ($servers as $server) {
             try {
-                $server->logWebhookEvent($this->getActivity()->event, $this->getActivity()->properties);
+                $server->logWebhookEvent($this->getActivity());
             } catch (\Throwable | \Exception $exception) {
                 if (config('app.env') !== 'production') {
                     /* @noinspection PhpUnhandledExceptionInspection */

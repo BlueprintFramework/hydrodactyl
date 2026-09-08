@@ -14,7 +14,9 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Pterodactyl\Exceptions\Http\Server\ServerStateConflictException;
+use Pterodactyl\Models\ActivityLog;
 use Pterodactyl\Models\ServerSubdomain;
 
 /**
@@ -602,12 +604,101 @@ class Server extends Model
     /**
      * Logs an activity log event to the server webhook
      */
-    public function logWebhookEvent(string $event, Collection|null $properties)
+    public function logWebhookEvent(ActivityLog $activity)
     {
-        if ($this->webhook_type == "discord" && $this->webhook_url) {
-            $response = Http::post($this->webhook_url, [
-                'content' => $event
-            ]);
+        if (!$this->webhook_type || !$this->webhook_url) {
+            return;
+        }
+
+        $event = $activity->event;
+        $properties = $activity->properties;
+
+        $eventFmt = implode(' · ', explode('.', explode(':', $event)[1]));
+
+        $actor = $activity->actor;
+
+        $appUrl = config('app.url');
+
+        $time = gmdate('c');
+
+        $data = match ($this->webhook_type) {
+            'discord' => [
+                'components' => [
+                    [
+                        'type' => 17,
+                        'accent_color' => 4760058,
+                        'spoiler' => false,
+                        'components' => [
+                            [
+                                'type' => 10,
+                                'content' => "### {$this->name} - Server action\n{$eventFmt}\n\n`server id: {$this->uuidShort}` - `timestamp: {$time}`"
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => 10,
+                        'content' => "-# Triggered by `{$actor->username}` from `{$activity->ip}` · [View logs](<{$appUrl}/server/{$this->uuidShort}/activity>) · " . json_encode($properties)
+                    ]
+                ],
+                'flags' => 32768,
+            ],
+            'slack' => [
+                'blocks' => [
+                    [
+                        'type' => 'card',
+                        'title' => [
+                            'type' => 'mrkdwn',
+                            'text' => "{$this->name} - Server action",
+                            'verbatim' => false
+                        ],
+                        'subtitle' => [
+                            'type' => 'mrkdwn',
+                            'text' => $eventFmt, //'file · read',
+                            'verbatim' => false
+                        ],
+                        'body' => [
+                            'type' => 'mrkdwn',
+                            'text' => "`server id: {$this->uuidShort}` - `timestamp: {$time}`",
+                            'verbatim' => false
+                        ]
+                    ],
+                    [
+                        'type' => 'context',
+                        'elements' => [
+                            [
+                                'type' => 'mrkdwn',
+                                'text' => "Triggered by `{$actor->username}` from `{$activity->ip}` · <{$appUrl}/server/{$this->uuidShort}/activity|View logs> · " . json_encode($properties)
+                            ],
+                        ]
+                    ]
+                ],
+            ],
+            'mattermost' => [
+                'text' => $event
+            ],
+            default => [
+                'text' => $event
+            ],
+        };
+
+        $urlParams = match ($this->webhook_type) {
+            'discord' => [
+                'with_components' => 'true'
+            ],
+            default => [],
+        };
+        $queryString = http_build_query($urlParams);
+
+        $hasQuery = parse_url($this->webhook_url, PHP_URL_QUERY) != '';
+
+        $url = $this->webhook_url . ($hasQuery ? '&' : '?') . $queryString;
+
+        $res = Http::post($url, $data);
+
+        if (floor($res->status() / 100) == 2) {
+            Log::debug((string) $res->body());
+        } else {
+            Log::warning((string) $res->body());
         }
     }
 }
