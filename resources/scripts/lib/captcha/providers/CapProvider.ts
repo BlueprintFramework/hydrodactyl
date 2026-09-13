@@ -11,6 +11,7 @@ export class CapProvider extends BaseCaptchaProvider {
     private loadPromise: Promise<void> | null = null;
     private widgetElements = new Map<string, CapWidgetElement>();
     private tokenByWidget = new Map<string, string>();
+    private manualResets = new Set<string>();
     private nextWidgetId = 1;
 
     getName(): string {
@@ -77,11 +78,50 @@ export class CapProvider extends BaseCaptchaProvider {
         return this.loadPromise;
     }
 
+    private static readonly DARK_THEME = {
+        '--cap-background': 'var(--color-bg-raised)',
+        '--cap-color': 'var(--color-cream-400)',
+        '--cap-border-color': 'color-mix(in srgb, var(--color-cream-500) 10%, transparent)',
+        '--cap-checkbox-background': 'color-mix(in srgb, var(--color-cream-500) 6%, transparent)',
+        '--cap-checkbox-border': '1px solid color-mix(in srgb, var(--color-cream-500) 25%, transparent)',
+        '--cap-spinner-color': 'var(--color-cream-400)',
+        '--cap-spinner-background-color': 'color-mix(in srgb, var(--color-cream-500) 12%, transparent)',
+        '--cap-focus-ring': 'var(--color-ring)',
+        '--cap-troubleshoot-color': 'var(--color-ring)',
+        '--cap-font': '"Plus Jakarta Sans", sans-serif',
+    };
+
+    private applyTheme(widget: CapWidgetElement, theme: CaptchaRenderConfig['theme']): void {
+        const light =
+            theme === 'light' ||
+            (theme !== 'dark' && window.matchMedia?.('(prefers-color-scheme: light)').matches);
+
+        if (light) {
+            return;
+        }
+
+        for (const [property, value] of Object.entries(CapProvider.DARK_THEME)) {
+            widget.style.setProperty(property, value);
+        }
+    }
+
+    private applySize(widget: CapWidgetElement, size: CaptchaRenderConfig['size']): void {
+        if (size === 'flexible') {
+            // The widget is inline by default, which makes a 100% width
+            // shrink to nothing — make it block-level so it can fill the form.
+            widget.style.display = 'block';
+            widget.style.width = '100%';
+            widget.style.setProperty('--cap-widget-width', '100%');
+        }
+    }
+
     async render(container: HTMLElement, config: CaptchaRenderConfig): Promise<string> {
         await this.loadSdk();
 
         const widgetId = `cap-${this.nextWidgetId++}`;
         const widget = document.createElement('cap-widget') as CapWidgetElement;
+        this.applyTheme(widget, config.theme);
+        this.applySize(widget, config.size);
         const serverUrl = (config.serverUrl || window.SiteConfiguration?.captcha?.serverUrl || '').replace(/\/+$/, '');
 
         if (!serverUrl) {
@@ -89,9 +129,16 @@ export class CapProvider extends BaseCaptchaProvider {
         }
 
         widget.setAttribute('data-cap-api-endpoint', `${serverUrl}/${config.siteKey}/`);
+
+        // The widget has no 'expired' event, so we treat its own reset (when
+        // the token gets too old) as expired. Resets we call ourselves are
+        // skipped so they don't count as expired.
+        let hadToken = false;
+
         widget.addEventListener('solve', (event) => {
             const token = (event as CustomEvent).detail?.token || widget.tokenValue || '';
             if (token) {
+                hadToken = true;
                 this.tokenByWidget.set(widgetId, token);
                 config.onSuccess?.(token);
             }
@@ -103,6 +150,10 @@ export class CapProvider extends BaseCaptchaProvider {
             config.onError?.(detail);
         });
         widget.addEventListener('reset', () => {
+            if (hadToken && !this.manualResets.has(widgetId)) {
+                config.onExpired?.();
+            }
+            hadToken = false;
             this.tokenByWidget.delete(widgetId);
         });
 
@@ -132,7 +183,11 @@ export class CapProvider extends BaseCaptchaProvider {
         }
 
         const widget = this.widgetElements.get(widgetId);
-        widget?.reset?.();
+        if (widget) {
+            this.manualResets.add(widgetId);
+            widget.reset?.();
+            this.manualResets.delete(widgetId);
+        }
         this.tokenByWidget.delete(widgetId);
     }
 
