@@ -1,6 +1,7 @@
 import { useStoreState } from 'easy-peasy';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Grip } from '@gravity-ui/icons';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import getFilterOptions, { type FilterOptions } from '@/api/getFilterOptions';
@@ -101,6 +102,12 @@ const DashboardContainer = () => {
         { revalidateOnFocus: false },
     );
 
+    const [customOrder, setCustomOrder] = usePersistedState<string[]>(`${uuid}:custom_server_order`, []);
+    const [draggingServerId, setDraggingServerId] = useState<string | null>(null);
+    const [dragOverServerId, setDragOverServerId] = useState<string | null>(null);
+    const previewRef = useRef<HTMLDivElement>(null);
+    const previewNameRef = useRef<HTMLSpanElement>(null);
+
     const handleSortChange = useCallback((value: string) => {
         setSortValue(value);
         setPage(1);
@@ -112,6 +119,57 @@ const DashboardContainer = () => {
             setPage(1);
         },
         [setOwnerFilter],
+    );
+
+    const handleDragStart = useCallback((event: React.DragEvent, server: Server) => {
+        event.dataTransfer.setData('text/plain', server.id);
+        event.dataTransfer.effectAllowed = 'move';
+        setDraggingServerId(server.id);
+
+        const preview = previewRef.current;
+        if (preview && previewNameRef.current) {
+            previewNameRef.current.textContent = server.name;
+            event.dataTransfer.setDragImage(preview, 24, 24);
+        }
+    }, []);
+
+    const handleDragEnd = useCallback(() => {
+        setDraggingServerId(null);
+        setDragOverServerId(null);
+    }, []);
+
+    const handleDragOver = useCallback((event: React.DragEvent, serverId: string) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+        setDragOverServerId(serverId);
+    }, []);
+
+    const handleDragLeave = useCallback((serverId: string) => {
+        setDragOverServerId((prev) => (prev === serverId ? null : prev));
+    }, []);
+
+    const handleDrop = useCallback(
+        (event: React.DragEvent, targetServer: Server, currentItems: Server[]) => {
+            event.preventDefault();
+            setDragOverServerId(null);
+            const sourceServerId = event.dataTransfer.getData('text/plain');
+            if (!sourceServerId || sourceServerId === targetServer.id) return;
+
+            const currentOrder = currentItems.map((s) => s.id);
+            const sourceIndex = currentOrder.indexOf(sourceServerId);
+            const targetIndex = currentOrder.indexOf(targetServer.id);
+
+            if (sourceIndex === -1 || targetIndex === -1) return;
+
+            const newOrder = [...currentOrder];
+            const [movedItem] = newOrder.splice(sourceIndex, 1);
+            newOrder.splice(targetIndex, 0, movedItem);
+
+            // Merge with any known customOrder for servers not currently on this page
+            const existingNonPage = (customOrder || []).filter((id) => !currentOrder.includes(id));
+            setCustomOrder([...newOrder, ...existingNonPage]);
+        },
+        [customOrder, setCustomOrder],
     );
 
     const handleFilterChange = useCallback((field: FilterCategory | undefined, value: number | undefined) => {
@@ -340,6 +398,22 @@ const DashboardContainer = () => {
         <PageContentBlock title={'Dashboard'} showFlashKey={'dashboard'}>
             {!servers ? null : (
                 <Pagination data={servers} onPageSelect={setPage}>
+                    {({ items }) => {
+                        const sortedItems =
+                            !customOrder || customOrder.length === 0 || sortValue
+                                ? items
+                                : [...items].sort((a, b) => {
+                                      const aIdx = customOrder.indexOf(a.id);
+                                      const bIdx = customOrder.indexOf(b.id);
+                                      if (aIdx === -1 && bIdx === -1) return 0;
+                                      if (aIdx === -1) return 1;
+                                      if (bIdx === -1) return -1;
+                                      return aIdx - bIdx;
+                                  });
+
+                        return dashboardMode === 'groups' ? (
+                            <GroupSection
+                                servers={sortedItems}
                     {({ items }) =>
                         dashboardMode === 'groups' ? (
                             <GroupSection
@@ -348,15 +422,33 @@ const DashboardContainer = () => {
                                 groupFilterId={groupFilterId}
                                 filterActive={filterActive}
                             />
+                        ) : sortedItems.length > 0 ? (
                         ) : items.length > 0 ? (
                             <div
                                 className={
                                     dashboardMode === 'grid' ? 'flex flex-wrap gap-4 max-lg:flex-col max-lg:gap-0' : ''
                                 }
                             >
-                                {items.map((server, index) => (
+                                {sortedItems.map((server, index) => (
                                     <div
                                         key={`${server.uuid}-${dashboardMode}`}
+                                        draggable
+                                        onDragStart={(e) => handleDragStart(e, server)}
+                                        onDragEnd={handleDragEnd}
+                                        onDragOver={(e) => handleDragOver(e, server.id)}
+                                        onDragLeave={() => handleDragLeave(server.id)}
+                                        onDrop={(e) => handleDrop(e, server, sortedItems)}
+                                        className={`transform-gpu skeleton-anim-2 transition-all duration-200 cursor-default ${
+                                            dashboardMode === 'grid'
+                                                ? 'w-[calc(50%-0.5rem)] max-lg:w-full'
+                                                : 'mb-4'
+                                        } max-lg:mb-4 ${
+                                            draggingServerId === server.id ? 'opacity-40 scale-[0.98]' : ''
+                                        } ${
+                                            dragOverServerId === server.id
+                                                ? 'ring-2 ring-cream-400 rounded-xl bg-mocha-400/40 shadow-lg shadow-cream-500/10'
+                                                : ''
+                                        }`}
                                         className={`transform-gpu skeleton-anim-2 ${dashboardMode === 'grid'
                                                 ? items.length === 1
                                                     ? 'w-[calc(50%-0.5rem)] max-lg:w-full'
@@ -395,10 +487,18 @@ const DashboardContainer = () => {
                                     {ownerFilter === 'admin-all' ? 'No other servers found' : 'No servers found'}
                                 </h3>
                             </div>
-                        )
-                    }
+                        );
+                    }}
                 </Pagination>
             )}
+            <div
+                ref={previewRef}
+                aria-hidden
+                className='pointer-events-none fixed -left-[9999px] top-0 z-50 flex w-72 items-center gap-3 rounded-xl border border-cream-500/30 bg-mocha-500 px-4 py-3 shadow-lg shadow-black/50'
+            >
+                <Grip className='w-4 h-4 text-cream-400 shrink-0' />
+                <span ref={previewNameRef} className='truncate text-sm font-semibold text-cream-200' />
+            </div>
         </PageContentBlock>
     );
 };

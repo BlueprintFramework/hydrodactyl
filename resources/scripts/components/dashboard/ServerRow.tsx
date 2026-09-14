@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { Grip } from '@gravity-ui/icons';
 import type { Server } from '@/api/server/getServer';
 import getServerResourceUsage, { type ServerPowerState, type ServerStats } from '@/api/server/getServerResourceUsage';
 import { bytesToString, ip } from '@/lib/formatters';
@@ -63,6 +64,19 @@ position: relative;
     }
 `;
 
+interface ServerRowProps {
+    server: Server;
+    className?: string;
+    hideGroup?: boolean;
+    dragHandleProps?: React.HTMLAttributes<HTMLDivElement>;
+}
+
+const ServerRow = ({
+    server,
+    className,
+    hideGroup,
+    dragHandleProps,
+}: ServerRowProps) => {
 const ServerRow = ({ server, className, hideGroup }: { server: Server; className?: string; hideGroup?: boolean }) => {
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [isInstalling, setIsInstalling] = useState(server.status === 'installing');
@@ -108,10 +122,17 @@ const ServerRow = ({ server, className, hideGroup }: { server: Server; className
         <StatusIndicatorBox
             as={Link}
             to={`/server/${server.id}`}
-            className={`${className} bg-mocha-500 hover:bg-mocha-400 border border-[1px] border-mocha-400 hover:border-mocha-400`}
+            className={`${className} group bg-mocha-500 hover:bg-mocha-400 border border-[1px] border-mocha-400 hover:border-mocha-400`}
             $status={stats?.status || 'offline'}
         >
-            <div className={`flex items-center min-w-0`}>
+            <div className={`flex items-center min-w-0 gap-2`}>
+                    <div
+                        {...dragHandleProps}
+                        className={`opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-cream-400/50 hover:text-cream-200 cursor-grab active:cursor-grabbing p-1 -ml-2 rounded flex items-center justify-center shrink-0 select-none ${dragHandleProps?.className || ''}`}
+                        title='Przeciągnij, aby zmienić kolejność'
+                    >
+                        <Grip className='w-4 h-4 pointer-events-none' />
+                    </div>
                 <div className='flex flex-col min-w-0'>
                     <div className='flex items-center gap-2 min-w-0'>
                         <p className={`text-xl tracking-tight font-bold truncate min-w-0 max-w-full sm:max-w-[20vw]`}>
