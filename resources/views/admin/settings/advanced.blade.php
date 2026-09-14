@@ -67,6 +67,23 @@
         </div>
         </div>
       </div>
+      </div>
+      <div class="box box-primary">
+      <div class="box-header with-border">
+        <i class="fa fa-folder"></i> <h3 class="box-title" style="display:inline;">Server Groups</h3>
+      </div>
+      <div class="box-body">
+        <div class="row">
+        <div class="form-group col-md-6">
+          <label class="control-label">Status</label>
+          <select class="form-control" name="pterodactyl:client_features:groups:enabled">
+            <option value="false">Disabled</option>
+            <option value="true" @if(old('pterodactyl:client_features:groups:enabled', config('pterodactyl.client_features.groups.enabled'))) selected @endif>Enabled</option>
+          </select>
+          <p class="text-muted small" style="margin-top:4px;">Allow users to create server groups and organize their servers on the dashboard.</p>
+        </div>
+        </div>
+      </div>
       <div class="box-footer">
         {{ csrf_field() }}
         <input type="hidden" name="_method" value="PATCH">

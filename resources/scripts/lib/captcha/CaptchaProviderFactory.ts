@@ -1,4 +1,5 @@
 import type { CaptchaProviderInterface } from './CaptchaProvider';
+import { CapProvider } from './providers/CapProvider';
 import { HCaptchaProvider } from './providers/HCaptchaProvider';
 import { NullProvider } from './providers/NullProvider';
 import { RecaptchaProvider } from './providers/RecaptchaProvider';
@@ -8,6 +9,7 @@ const providers: Map<string, () => CaptchaProviderInterface> = new Map([
     ['turnstile', () => new TurnstileProvider()],
     ['hcaptcha', () => new HCaptchaProvider()],
     ['recaptcha', () => new RecaptchaProvider()],
+    ['cap', () => new CapProvider()],
     ['none', () => new NullProvider()],
 ]);
 

@@ -74,7 +74,7 @@
         "yup": "^1.7.0"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.5.4",
+        "@biomejs/biome": "^2.5.13",
         "@swc/core": "^1.13.3",
         "@swc/plugin-styled-components": "^12.14.1",
         "@types/debounce": "^1.2.4",

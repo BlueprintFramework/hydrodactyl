@@ -69,10 +69,10 @@
               <h4 class="list-group-item-heading"><i class="fa fa-fw fa-comments"></i> Discord</h4>
               <p class="list-group-item-text">Join the community, ask questions, and stay up to date.</p>
             </a>
-            <div class="list-group-item support-item">
+            <a href="https://github.com/BlueprintFramework/hydrodactyl" target="_blank" rel="noopener" class="list-group-item support-item">
               <h4 class="list-group-item-heading"><i class="fa fa-fw fa-star"></i> Share</h4>
               <p class="list-group-item-text">Star the repo on GitHub and share it with someone who might find it useful!</p>
-            </div>
+            </a>
           </div>
         </div>
         <div class="modal-footer">

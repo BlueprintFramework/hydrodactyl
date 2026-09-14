@@ -10,7 +10,7 @@ class CaptchaSettingsFormRequest extends AdminFormRequest
     public function rules(): array
     {
         return [
-            'pterodactyl:captcha:provider' => ['required', 'string', Rule::in(['none', 'turnstile', 'hcaptcha', 'recaptcha'])],
+            'pterodactyl:captcha:provider' => ['required', 'string', Rule::in(['none', 'turnstile', 'hcaptcha', 'recaptcha', 'cap'])],
             'pterodactyl:captcha:turnstile:site_key' => [
                 'nullable',
                 'string',
@@ -47,6 +47,25 @@ class CaptchaSettingsFormRequest extends AdminFormRequest
                 'max:255',
                 'required_if:pterodactyl:captcha:provider,recaptcha',
             ],
+            'pterodactyl:captcha:cap:site_key' => [
+                'nullable',
+                'string',
+                'max:255',
+                'required_if:pterodactyl:captcha:provider,cap',
+            ],
+            'pterodactyl:captcha:cap:secret_key' => [
+                'nullable',
+                'string',
+                'max:255',
+                'required_if:pterodactyl:captcha:provider,cap',
+            ],
+            'pterodactyl:captcha:cap:server_url' => [
+                'nullable',
+                'string',
+                'max:255',
+                'url',
+                'required_if:pterodactyl:captcha:provider,cap',
+            ],
         ];
     }
 
@@ -60,6 +79,9 @@ class CaptchaSettingsFormRequest extends AdminFormRequest
             'pterodactyl:captcha:hcaptcha:secret_key' => 'hCaptcha Secret Key',
             'pterodactyl:captcha:recaptcha:site_key' => 'reCAPTCHA Site Key',
             'pterodactyl:captcha:recaptcha:secret_key' => 'reCAPTCHA Secret Key',
+            'pterodactyl:captcha:cap:site_key' => 'Cap Site Key',
+            'pterodactyl:captcha:cap:secret_key' => 'Cap Secret Key',
+            'pterodactyl:captcha:cap:server_url' => 'Cap Server URL',
         ];
     }
 
@@ -75,6 +97,9 @@ class CaptchaSettingsFormRequest extends AdminFormRequest
             $data['pterodactyl:captcha:hcaptcha:secret_key'] = '';
             $data['pterodactyl:captcha:recaptcha:site_key'] = '';
             $data['pterodactyl:captcha:recaptcha:secret_key'] = '';
+            $data['pterodactyl:captcha:cap:site_key'] = '';
+            $data['pterodactyl:captcha:cap:secret_key'] = '';
+            $data['pterodactyl:captcha:cap:server_url'] = '';
         }
 
         // Clear other provider settings when switching providers
@@ -83,16 +108,32 @@ class CaptchaSettingsFormRequest extends AdminFormRequest
             $data['pterodactyl:captcha:hcaptcha:secret_key'] = '';
             $data['pterodactyl:captcha:recaptcha:site_key'] = '';
             $data['pterodactyl:captcha:recaptcha:secret_key'] = '';
+            $data['pterodactyl:captcha:cap:site_key'] = '';
+            $data['pterodactyl:captcha:cap:secret_key'] = '';
+            $data['pterodactyl:captcha:cap:server_url'] = '';
         } elseif ($data['pterodactyl:captcha:provider'] === 'hcaptcha') {
             $data['pterodactyl:captcha:turnstile:site_key'] = '';
             $data['pterodactyl:captcha:turnstile:secret_key'] = '';
             $data['pterodactyl:captcha:recaptcha:site_key'] = '';
             $data['pterodactyl:captcha:recaptcha:secret_key'] = '';
+            $data['pterodactyl:captcha:cap:site_key'] = '';
+            $data['pterodactyl:captcha:cap:secret_key'] = '';
+            $data['pterodactyl:captcha:cap:server_url'] = '';
         } elseif ($data['pterodactyl:captcha:provider'] === 'recaptcha') {
             $data['pterodactyl:captcha:turnstile:site_key'] = '';
             $data['pterodactyl:captcha:turnstile:secret_key'] = '';
             $data['pterodactyl:captcha:hcaptcha:site_key'] = '';
             $data['pterodactyl:captcha:hcaptcha:secret_key'] = '';
+            $data['pterodactyl:captcha:cap:site_key'] = '';
+            $data['pterodactyl:captcha:cap:secret_key'] = '';
+            $data['pterodactyl:captcha:cap:server_url'] = '';
+        } elseif ($data['pterodactyl:captcha:provider'] === 'cap') {
+            $data['pterodactyl:captcha:turnstile:site_key'] = '';
+            $data['pterodactyl:captcha:turnstile:secret_key'] = '';
+            $data['pterodactyl:captcha:hcaptcha:site_key'] = '';
+            $data['pterodactyl:captcha:hcaptcha:secret_key'] = '';
+            $data['pterodactyl:captcha:recaptcha:site_key'] = '';
+            $data['pterodactyl:captcha:recaptcha:secret_key'] = '';
         }
 
         // Apply the $only filter if provided, similar to parent class

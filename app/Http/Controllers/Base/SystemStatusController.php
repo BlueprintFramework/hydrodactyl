@@ -22,6 +22,7 @@ class SystemStatusController extends Controller
             'uptime' => $this->getUptime(),
             'memory' => $this->getMemoryUsage(),
             'cpu' => $this->getCpuUsage(),
+            'cpu_cores' => $this->getCpuCores(),
             'disk' => $this->getDiskUsage(),
           ],
           'system' => [
@@ -114,6 +115,23 @@ class SystemStatusController extends Controller
     }
 
     return (float) $usage;
+  }
+
+  private function getCpuCores(): int
+  {
+    if (PHP_OS_FAMILY === 'Linux') {
+      $out = shell_exec('nproc 2>/dev/null');
+      if ($out !== null && is_numeric(trim($out))) {
+        return (int) trim($out);
+      }
+
+      $cpuinfo = @file_get_contents('/proc/cpuinfo');
+      if ($cpuinfo !== false) {
+        return (int) preg_match_all('/^processor\s/m', $cpuinfo);
+      }
+    }
+
+    return 1;
   }
 
   private function getDiskUsage(): array

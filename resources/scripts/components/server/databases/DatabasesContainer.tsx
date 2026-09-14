@@ -1,6 +1,5 @@
 import { Database, Plus } from '@gravity-ui/icons';
 import { Form, Formik, type FormikHelpers } from 'formik';
-import { For } from 'million/react';
 import { useEffect, useState } from 'react';
 import { object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
@@ -9,8 +8,8 @@ import getServerDatabases from '@/api/server/databases/getServerDatabases';
 import Can from '@/components/elements/Can';
 import Field from '@/components/elements/Field';
 import Modal from '@/components/elements/Modal';
-import { PageListContainer } from '@/components/elements/pages/PageList';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
+import VirtualizedList from '@/components/elements/VirtualizedList';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import DatabaseRow from '@/components/server/databases/DatabaseRow';
 import ServerHeader from '@/components/server/header/ServerHeader';
@@ -162,11 +161,14 @@ const DatabasesContainer = () => {
                     <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-brand'></div>
                 </div>
             ) : databases.length > 0 ? (
-                <PageListContainer data-hydrodactyl-databases>
-                    <For each={databases} memo>
-                        {(database, _index) => <DatabaseRow key={database.id} database={database} />}
-                    </For>
-                </PageListContainer>
+                <div className='px-2 sm:px-14 pt-2'>
+                    <VirtualizedList
+                        items={databases}
+                        renderItem={(database) => <DatabaseRow key={database.id} database={database} />}
+                        estimateSize={() => 80}
+                        gap={12}
+                    />
+                </div>
             ) : (
                 <div className='flex flex-col items-center justify-center min-h-[60vh] py-12 px-4'>
                     <div className='text-center'>

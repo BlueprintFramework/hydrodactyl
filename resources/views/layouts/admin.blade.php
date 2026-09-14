@@ -215,7 +215,7 @@
         {{ $appVersion }}<br />
         <strong><i class="fa fa-fw fa-clock-o"></i></strong> {{ round(microtime(true) - LARAVEL_START, 3) }}s
       </div>
-      Copyright &copy; 2015 - {{ date('Y') }} <a href="https://hydrodactyl.dev">BlueprintFramework</a> and <a
+      Copyright &copy; 2015 - {{ date('Y') }} <a href="https://blueprint.zip/">BlueprintFramework</a> and <a
         href="https://hydrodactyl.dev">Hydrodactyl</a>.
     </footer>
   </div>

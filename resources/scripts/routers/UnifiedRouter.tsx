@@ -26,17 +26,17 @@ import {
 } from '@hugeicons/core-free-icons';
 import type { IconSvgElement } from '@hugeicons/react';
 import { useStoreState } from 'easy-peasy';
-import { Fragment, Suspense, useEffect, useRef, useState } from 'react';
+import { Fragment, lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { httpErrorToHuman } from '@/api/http';
 import getNests from '@/api/nests/getNests';
-import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import CommandMenu from '@/components/elements/commandk/CmdK';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import Logo from '@/components/elements/HydroLogo';
 import MainWrapper from '@/components/elements/MainWrapper';
 import PermissionRoute from '@/components/elements/PermissionRoute';
 import { NotFound, ServerError } from '@/components/elements/ScreenBlock';
+import Spinner from '@/components/elements/Spinner';
 import BottomNav from '@/components/layout/BottomNav';
 import AppHeader from '@/components/layout/header/AppHeader';
 import MobileSidebar from '@/components/layout/sidebar/MobileSidebar';
@@ -50,6 +50,9 @@ import { SidebarProvider } from '@/contexts/SidebarContext';
 import routes from '@/routers/routes';
 
 import { ServerContext } from '@/state/server';
+
+// Lazy-loaded so the (heavy) dashboard view is split into its own chunk.
+const DashboardContainer = lazy(() => import('@/components/dashboard/DashboardContainer'));
 
 const blank_egg_prefix = '@';
 
@@ -423,7 +426,14 @@ const UnifiedRouter = () => {
                                                 {/* dashboard routes */}
                                                 {!isServerRoute && (
                                                     <>
-                                                        <Route path='' element={<DashboardContainer />} />
+                                                        <Route
+                                                            path=''
+                                                            element={
+                                                                <Spinner.Suspense>
+                                                                    <DashboardContainer />
+                                                                </Spinner.Suspense>
+                                                            }
+                                                        />
                                                         {routes.account.map(({ route, component: Component }) => (
                                                             <Route
                                                                 key={route}

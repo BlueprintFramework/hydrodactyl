@@ -161,6 +161,54 @@
         </div>
 
 
+        <div class="box" id="cap-settings" style="display: none;">
+          <div class="box-header with-border">
+            <h3 class="box-title">Cap Configuration</h3>
+          </div>
+          <div class="box-body">
+            <div class="row">
+              <div class="form-group col-md-4">
+                <label class="control-label">Server URL</label>
+                <div>
+                  <input type="text" class="form-control" name="pterodactyl:captcha:cap:server_url"
+                    value="{{ old('pterodactyl:captcha:cap:server_url', config('pterodactyl.captcha.cap.server_url', '')) }}" />
+                  <p class="text-muted"><small>The base URL of your Cap instance, e.g. https://cap.example.com. This is used for server-side verification.</small></p>
+                </div>
+              </div>
+              <div class="form-group col-md-4">
+                <label class="control-label">Site Key</label>
+                <div>
+                  <input type="text" class="form-control" name="pterodactyl:captcha:cap:site_key"
+                    value="{{ old('pterodactyl:captcha:cap:site_key', config('pterodactyl.captcha.cap.site_key', '')) }}" />
+                  <p class="text-muted"><small>The site key provided by Cap. This is used in the frontend widget.</small></p>
+                </div>
+              </div>
+              <div class="form-group col-md-4">
+                <label class="control-label">Secret Key</label>
+                <div>
+                  <input type="password" class="form-control" name="pterodactyl:captcha:cap:secret_key"
+                    value="{{ old('pterodactyl:captcha:cap:secret_key', config('pterodactyl.captcha.cap.secret_key', '')) }}" />
+                  <p class="text-muted"><small>The secret key provided by Cap. This is used for server-side verification.</small></p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="alert alert-info">
+                  <strong>Setup Instructions:</strong>
+                  <ol>
+                    <li>Set up a Cap server or use the hosted one — see the <a href="https://trycap.dev" target="_blank">Cap website</a> and <a href="https://docs.cap.js.org" target="_blank">Cap documentation</a></li>
+                    <li>Create a new site in your Cap instance</li>
+                    <li>Add your panel domain to the site configuration</li>
+                    <li>Copy the Site Key and Secret Key from the dashboard</li>
+                    <li>Enter your Cap instance base URL, then paste the keys into the fields above</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="box box-primary">
           <div class="box-footer">
             {{ csrf_field() }}
@@ -177,6 +225,7 @@
       const turnstileSettings = document.getElementById('turnstile-settings');
       const hcaptchaSettings = document.getElementById('hcaptcha-settings');
       const recaptchaSettings = document.getElementById('recaptcha-settings');
+      const capSettings = document.getElementById('cap-settings');
 
       function toggleSettings() {
         const provider = providerSelect.value;
@@ -185,6 +234,7 @@
         turnstileSettings.style.display = 'none';
         hcaptchaSettings.style.display = 'none';
         recaptchaSettings.style.display = 'none';
+        capSettings.style.display = 'none';
 
         if (provider === 'turnstile') {
           turnstileSettings.style.display = 'block';
@@ -192,6 +242,8 @@
           hcaptchaSettings.style.display = 'block';
         } else if (provider === 'recaptcha') {
           recaptchaSettings.style.display = 'block';
+        } else if (provider === 'cap') {
+          capSettings.style.display = 'block';
         }
       }
 

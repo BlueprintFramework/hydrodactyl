@@ -10,6 +10,7 @@ declare global {
                 enabled: boolean;
                 provider: string;
                 siteKey: string;
+                serverUrl?: string;
                 scriptIncludes: string[];
             };
         };

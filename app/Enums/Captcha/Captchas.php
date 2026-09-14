@@ -8,12 +8,14 @@ enum Captchas: string
     case TURNSTILE = 'turnstile';
     case HCAPTCHA = 'hcaptcha';
     case RECAPTCHA = 'recaptcha';
+    case CAP = 'cap';
 
     private const DESCRIPTION_MAP = [
         self::NONE->value => 'Disabled',
         self::TURNSTILE->value => 'Cloudflare Turnstile',
         self::HCAPTCHA->value => 'HCaptcha',
         self::RECAPTCHA->value => 'Google ReCaptcha',
+        self::CAP->value => 'Cap',
     ];
 
 

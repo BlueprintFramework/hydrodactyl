@@ -7,6 +7,7 @@ use Illuminate\Support\Manager;
 use Pterodactyl\Services\Captcha\Providers\TurnstileProvider;
 use Pterodactyl\Services\Captcha\Providers\HCaptchaProvider;
 use Pterodactyl\Services\Captcha\Providers\RecaptchaProvider;
+use Pterodactyl\Services\Captcha\Providers\CapProvider;
 use Pterodactyl\Services\Captcha\Providers\NullProvider;
 use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 
@@ -66,6 +67,18 @@ class CaptchaManager extends Manager
         return new RecaptchaProvider([
             'site_key' => config('pterodactyl.captcha.recaptcha.site_key', ''),
             'secret_key' => config('pterodactyl.captcha.recaptcha.secret_key', ''),
+        ]);
+    }
+
+    /**
+     * Create the Cap captcha driver.
+     */
+    public function createCapDriver(): CapProvider
+    {
+        return new CapProvider([
+            'site_key' => config('pterodactyl.captcha.cap.site_key', ''),
+            'secret_key' => config('pterodactyl.captcha.cap.secret_key', ''),
+            'server_url' => config('pterodactyl.captcha.cap.server_url', ''),
         ]);
     }
 

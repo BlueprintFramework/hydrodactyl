@@ -77,6 +77,7 @@ const ServerRow = ({
     hideGroup,
     dragHandleProps,
 }: ServerRowProps) => {
+const ServerRow = ({ server, className, hideGroup }: { server: Server; className?: string; hideGroup?: boolean }) => {
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [isInstalling, setIsInstalling] = useState(server.status === 'installing');
     const [stats, setStats] = useState<ServerStats | null>(null);

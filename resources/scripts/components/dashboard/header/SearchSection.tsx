@@ -64,7 +64,7 @@ const SearchSection = memo(({ className, onSearch }: SearchSectionProps) => {
 
     return (
         <div className={`flex items-center gap-2 h-full group ${className || ''}`}>
-            <div className='relative w-3/4 transition-all duration-200 ease-out group group-focus-within:w-full mx-auto'>
+            <div className='relative w-full transition-all duration-200 ease-out group mx-auto'>
                 <Input
                     id='header-search'
                     ref={inputRef}

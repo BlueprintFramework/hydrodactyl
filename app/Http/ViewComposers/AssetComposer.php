@@ -43,9 +43,35 @@ class AssetComposer
         'enabled' => $this->captcha->getDefaultDriver() !== 'none',
         'provider' => $this->captcha->getDefaultDriver(),
         'siteKey' => $this->getSiteKeyForCurrentProvider(),
+        'serverUrl' => $this->getServerUrlForCurrentProvider(),
         'scriptIncludes' => $this->captcha->getScriptIncludes(),
       ],
     ]);
+  }
+
+  /**
+   * Get the server URL for the currently active captcha provider.
+   *
+   * Only Cap needs a server URL; other providers return an empty string.
+   */
+  private function getServerUrlForCurrentProvider(): string
+  {
+    $provider = $this->captcha->getDefaultDriver();
+
+    if ($provider === 'none') {
+      return '';
+    }
+
+    try {
+      $driver = $this->captcha->driver();
+      if (method_exists($driver, 'getServerUrl')) {
+        return $driver->getServerUrl();
+      }
+    } catch (\Exception $e) {
+      // Silently fail to avoid exposing errors to frontend
+    }
+
+    return '';
   }
 
   /**

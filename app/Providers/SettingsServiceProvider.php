@@ -31,6 +31,7 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:client_features:allocations:enabled',
     'pterodactyl:client_features:allocations:range_start',
     'pterodactyl:client_features:allocations:range_end',
+    'pterodactyl:client_features:groups:enabled',
     'pterodactyl:captcha:provider',
     'pterodactyl:captcha:turnstile:site_key',
     'pterodactyl:captcha:turnstile:secret_key',
@@ -38,6 +39,9 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:captcha:hcaptcha:secret_key',
     'pterodactyl:captcha:recaptcha:site_key',
     'pterodactyl:captcha:recaptcha:secret_key',
+    'pterodactyl:captcha:cap:site_key',
+    'pterodactyl:captcha:cap:secret_key',
+    'pterodactyl:captcha:cap:server_url',
   ];
 
 
@@ -64,6 +68,7 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:captcha:turnstile:secret_key',
     'pterodactyl:captcha:hcaptcha:secret_key',
     'pterodactyl:captcha:recaptcha:secret_key',
+    'pterodactyl:captcha:cap:secret_key',
   ];
 
   /**

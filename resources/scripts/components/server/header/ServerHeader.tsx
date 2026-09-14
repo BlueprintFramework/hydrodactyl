@@ -12,7 +12,7 @@ interface headerProps {
 
 const ServerHeader = (props: headerProps) => {
     const name = ServerContext.useStoreState((state) => state.server.data?.name);
-    const { setHeaderActions, clearHeaderActions } = useHeader();
+    const { setHeaderActions, setRightActions, clearHeaderActions } = useHeader();
 
     const buttonsSection = useMemo(
         () => (
@@ -25,23 +25,26 @@ const ServerHeader = (props: headerProps) => {
 
     const statusSection = useMemo(
         () => (
-            <HeaderCentered className='hidden lg:flex items-center gap-6'>
+            <HeaderCentered className='flex items-center gap-6'>
                 <div className='flex items-center gap-3'>
                     <StatusPillHeader />
                     <span className='xl:max-w-[20vw] min-w-0 truncate'>{name}</span>
                 </div>
 
-                <div className='border-l border-gray-200 h-6' />
-                <ServerDetailsHeader />
+                <div className='hidden md:block border-l border-gray-200 h-6' />
+                <div className='hidden md:flex'>
+                    <ServerDetailsHeader />
+                </div>
             </HeaderCentered>
         ),
         [name],
     );
 
     useEffect(() => {
-        setHeaderActions([statusSection, buttonsSection]);
+        setHeaderActions(statusSection);
+        setRightActions(buttonsSection);
         return () => clearHeaderActions();
-    }, [setHeaderActions, clearHeaderActions, statusSection, buttonsSection]);
+    }, [setHeaderActions, setRightActions, clearHeaderActions, statusSection, buttonsSection]);
 
     return null;
 };

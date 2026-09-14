@@ -2,6 +2,7 @@ export interface CaptchaConfig {
     enabled: boolean;
     provider: string;
     siteKey: string;
+    serverUrl?: string;
     scriptIncludes: string[];
 }
 
@@ -54,6 +55,7 @@ export interface CaptchaProviderInterface {
 
 export interface CaptchaRenderConfig {
     siteKey: string;
+    serverUrl?: string;
     theme?: 'light' | 'dark' | 'auto';
     size?: 'normal' | 'compact' | 'invisible' | 'flexible';
     onSuccess?: (token: string) => void;

@@ -12,38 +12,37 @@ import {
     Persons,
     Terminal,
 } from '@gravity-ui/icons';
-import type { ComponentType, SVGProps } from 'react';
+import type { ComponentType, LazyExoticComponent, SVGProps } from 'react';
 import { lazy } from 'react';
 
-import AccountApiContainer from '@/components/dashboard/AccountApiContainer';
-import AccountOverviewContainer from '@/components/dashboard/AccountOverviewContainer';
-import ActivityLogContainer from '@/components/dashboard/activity/ActivityLogContainer';
-import AccountSSHContainer from '@/components/dashboard/ssh/AccountSSHContainer';
-import BackupContainer from '@/components/server/backups/BackupContainer';
-import ServerConsoleContainer from '@/components/server/console/ServerConsoleContainer';
-import DatabasesContainer from '@/components/server/databases/DatabasesContainer';
-import FileManagerContainer from '@/components/server/files/FileManagerContainer';
-import InstallerContainer from '@/components/server/installer/InstallerContainer';
-import NetworkContainer from '@/components/server/network/NetworkContainer';
-import ServerActivityLogContainer from '@/components/server/ServerActivityLogContainer';
-import ScheduleContainer from '@/components/server/schedules/ScheduleContainer';
-import SettingsContainer from '@/components/server/settings/SettingsContainer';
-import SoftwareContainer from '@/components/server/software/SoftwareContainer';
-import StartupContainer from '@/components/server/startup/StartupContainer';
-import CreateUserContainer from '@/components/server/users/CreateUserContainer';
-import EditUserContainer from '@/components/server/users/EditUserContainer';
-import UsersContainer from '@/components/server/users/UsersContainer';
-
-// Each of the router files is already code split out appropriately — so
-// all the items above will only be loaded in when that router is loaded.
-//
-// These specific lazy loaded routes are to avoid loading in heavy screens
-// for the server dashboard when they're only needed for specific instances.
+// Every route-level page container is lazy-loaded so each screen is split into
+// its own chunk and only fetched when that route is actually visited.
+const AccountApiContainer = lazy(() => import('@/components/dashboard/AccountApiContainer'));
+const AccountOverviewContainer = lazy(() => import('@/components/dashboard/AccountOverviewContainer'));
+const ActivityLogContainer = lazy(() => import('@/components/dashboard/activity/ActivityLogContainer'));
+const AccountSSHContainer = lazy(() => import('@/components/dashboard/ssh/AccountSSHContainer'));
+const BackupContainer = lazy(() => import('@/components/server/backups/BackupContainer'));
+const ServerConsoleContainer = lazy(() => import('@/components/server/console/ServerConsoleContainer'));
+const DatabasesContainer = lazy(() => import('@/components/server/databases/DatabasesContainer'));
+const FileManagerContainer = lazy(() => import('@/components/server/files/FileManagerContainer'));
+const InstallerContainer = lazy(() => import('@/components/server/installer/InstallerContainer'));
+const NetworkContainer = lazy(() => import('@/components/server/network/NetworkContainer'));
+const ServerActivityLogContainer = lazy(() => import('@/components/server/ServerActivityLogContainer'));
+const ScheduleContainer = lazy(() => import('@/components/server/schedules/ScheduleContainer'));
+const SettingsContainer = lazy(() => import('@/components/server/settings/SettingsContainer'));
+const SoftwareContainer = lazy(() => import('@/components/server/software/SoftwareContainer'));
+const StartupContainer = lazy(() => import('@/components/server/startup/StartupContainer'));
+const CreateUserContainer = lazy(() => import('@/components/server/users/CreateUserContainer'));
+const EditUserContainer = lazy(() => import('@/components/server/users/EditUserContainer'));
+const UsersContainer = lazy(() => import('@/components/server/users/UsersContainer'));
 const FileEditContainer = lazy(() => import('@/components/server/files/FileEditContainer'));
 const ScheduleEditContainer = lazy(() => import('@/components/server/schedules/ScheduleEditContainer'));
 
 // Icon component type that works with Gravity UI icons
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
+
+// A route component may be a regular component or a lazily-loaded one.
+type RouteComponent = ComponentType | LazyExoticComponent<ComponentType>;
 
 // Feature limit types for visibility conditions
 export type FeatureLimitKey = 'databases' | 'backups' | 'allocations';
@@ -61,7 +60,7 @@ interface RouteDefinition {
     // If undefined is passed this route is still rendered into the router itself
     // but no navigation link is displayed in the sub-navigation menu.
     name: string | undefined;
-    component: ComponentType;
+    component: RouteComponent;
     end?: boolean;
 }
 

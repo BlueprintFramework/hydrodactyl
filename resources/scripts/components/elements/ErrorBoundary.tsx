@@ -24,13 +24,37 @@ class ErrorBoundary extends Component<Props, State> {
     override render() {
         if (this.state.hasError) {
             return (
-                <div className={`flex items-center justify-center w-full my-4`}>
-                    <div className={`flex items-center bg-neutral-900 rounded-sm p-3 text-red-500`}>
-                        <p className={`text-sm text-neutral-100`}>
-                            An error was encountered by the application while rendering this view. Try refreshing the
-                            page.
+                <div className='w-full h-full flex gap-12 items-center p-8 max-w-3xl mx-auto'>
+                    <div className='flex flex-col gap-8 max-w-sm text-left'>
+                        <h1 className='text-[32px] font-extrabold leading-[98%] tracking-[-0.11rem]'>
+                            Something Went Wrong
+                        </h1>
+                        <p className=''>
+                            An error was encountered while rendering this view. Try refreshing the page, or navigate
+                            back to your servers.
                         </p>
+                        <div className='flex flex-col gap-2'>
+                            <a href='/' className='text-brand hover:underline'>
+                                Your Servers
+                            </a>
+                            <button
+                                type='button'
+                                onClick={() => window.location.reload()}
+                                className='text-brand hover:underline text-left'
+                            >
+                                Refresh Page
+                            </button>
+                        </div>
                     </div>
+                    <img
+                        alt=''
+                        className='w-64 rounded-2xl'
+                        height='256'
+                        src='https://media.tenor.com/scX-kVPwUn8AAAAC/this-is-fine.gif'
+                        width='256'
+                        loading='lazy'
+                        decoding='async'
+                    />
                 </div>
             );
         }

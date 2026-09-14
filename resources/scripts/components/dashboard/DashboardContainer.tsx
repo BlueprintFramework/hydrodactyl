@@ -414,11 +414,16 @@ const DashboardContainer = () => {
                         return dashboardMode === 'groups' ? (
                             <GroupSection
                                 servers={sortedItems}
+                    {({ items }) =>
+                        dashboardMode === 'groups' ? (
+                            <GroupSection
+                                servers={items}
                                 displayOption={dashboardMode === 'grid' ? 'grid' : 'list'}
                                 groupFilterId={groupFilterId}
                                 filterActive={filterActive}
                             />
                         ) : sortedItems.length > 0 ? (
+                        ) : items.length > 0 ? (
                             <div
                                 className={
                                     dashboardMode === 'grid' ? 'flex flex-wrap gap-4 max-lg:flex-col max-lg:gap-0' : ''
@@ -444,6 +449,12 @@ const DashboardContainer = () => {
                                                 ? 'ring-2 ring-cream-400 rounded-xl bg-mocha-400/40 shadow-lg shadow-cream-500/10'
                                                 : ''
                                         }`}
+                                        className={`transform-gpu skeleton-anim-2 ${dashboardMode === 'grid'
+                                                ? items.length === 1
+                                                    ? 'w-[calc(50%-0.5rem)] max-lg:w-full'
+                                                    : 'w-[calc(50%-0.5rem)] max-lg:w-full'
+                                                : 'mb-4'
+                                            } max-lg:mb-4`}
                                         style={{
                                             animationDelay: `${index * 50 + 50}ms`,
                                             animationTimingFunction:

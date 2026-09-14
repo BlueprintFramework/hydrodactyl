@@ -27,6 +27,16 @@ Route::get('/version', function () {
     return response()->json(['version' => config('app.version')]);
 });
 
+Route::prefix('/server-groups')->group(function () {
+    Route::get('/', [Client\ServerGroupController::class, 'index'])->name('api:client.server-groups.index');
+    Route::post('/', [Client\ServerGroupController::class, 'store'])->name('api:client.server-groups.store');
+    Route::put('/{serverGroup}', [Client\ServerGroupController::class, 'update'])->name('api:client.server-groups.update');
+    Route::delete('/{serverGroup}', [Client\ServerGroupController::class, 'destroy'])->name('api:client.server-groups.destroy');
+    Route::post('/{serverGroup}/servers', [Client\ServerGroupController::class, 'addServers'])->name('api:client.server-groups.servers.add');
+    Route::delete('/{serverGroup}/servers', [Client\ServerGroupController::class, 'removeServers'])->name('api:client.server-groups.servers.remove');
+    Route::put('/reorder', [Client\ServerGroupController::class, 'reorder'])->name('api:client.server-groups.reorder');
+});
+
 Route::prefix('/nests')->group(function () {
     Route::get('/', [Client\Nests\NestController::class, 'index'])->name('api:client.nests');
     Route::get('/{nest}', [Client\Nests\NestController::class, 'view'])->name('api:client.nests.view');

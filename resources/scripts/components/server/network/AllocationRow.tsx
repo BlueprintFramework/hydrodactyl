@@ -100,9 +100,9 @@ const AllocationRow = ({ allocation }: Props) => {
     return (
         <>
             <div className='flex items-center gap-3 w-full'>
-                <div className='flex-shrink-0 w-5' />
+                <div className='shrink-0 w-5' />
 
-                <div className='flex-shrink-0 w-9 h-9 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
+                <div className='shrink-0 w-9 h-9 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
                     <AntennaSignal width={22} height={22} fill='currentColor' className='text-zinc-400' />
                 </div>
 
@@ -161,15 +161,14 @@ const AllocationRow = ({ allocation }: Props) => {
                     )}
                 </div>
 
-                <div className='flex-shrink-0 flex items-center gap-2 min-w-[68px] justify-end'>
+                <div className='shrink-0 flex items-center gap-2 min-w-17 justify-end'>
                     <Can action={'allocation.update'}>
                         <Button
                             onClick={setPrimaryAllocation}
                             disabled={allocation.isDefault}
                             variant={'secondary'}
-                            className={`p-2 transition-colors ${
-                                allocation.isDefault ? ' text-zinc-600 cursor-not-allowed' : ' text-zinc-400'
-                            }`}
+                            className={`p-2 transition-colors ${allocation.isDefault ? ' text-zinc-600 cursor-not-allowed' : ' text-zinc-400'
+                                }`}
                             title={
                                 allocation.isDefault
                                     ? 'This is already the primary allocation'
