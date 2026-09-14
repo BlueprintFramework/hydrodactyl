@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from "styled-components";
 
 interface Props {
     hideDropdownArrow?: boolean;
@@ -7,6 +7,8 @@ interface Props {
 const Select = styled.select<Props>`
     -webkit-appearance: none;
     -moz-appearance: none;
+    color-scheme: dark;
+    color: #f4f4f5;
     background-size: 1rem;
     background-repeat: no-repeat;
     background-position-x: calc(100% - 0.75rem);
@@ -14,6 +16,11 @@ const Select = styled.select<Props>`
 
     &::-ms-expand {
         display: none;
+    }
+
+    option {
+        background-color: #27272a;
+        color: #f4f4f5;
     }
 
     ${(props) =>

@@ -2,13 +2,14 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client;
 
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Transformers\Api\Client\ServerTransformer;
 use Pterodactyl\Services\Servers\GetUserPermissionsService;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Pterodactyl\Http\Requests\Api\Client\Servers\GetServerRequest;
 use Pterodactyl\Enums\Daemon\DaemonType;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\SetWebhookRequest;
 
 class ServerController extends ClientApiController
 {
@@ -34,6 +35,7 @@ class ServerController extends ClientApiController
                 'daemonType' => $daemonType,
                 'is_server_owner' => $request->user()->id === $server->owner_id,
                 'user_permissions' => $this->permissionsService->handle($server, $request->user()),
+                'allowed_webhook_types' => config('webhook.allowed_webhook_types', []),
             ])
             ->toArray();
     }
@@ -51,5 +53,19 @@ class ServerController extends ClientApiController
 
         $controller = app($controllerClass);
         return $controller->__invoke($request, $server);
+    }
+
+    /**
+     * Set the webhook type and URL for the server
+     */
+    public function webhook(SetWebhookRequest $request, Server $server): Response
+    {
+        $server->loadMissing('node');
+
+        $server->webhook_type = $request->input('webhook_type');
+        $server->webhook_url = $request->input('webhook_url');
+        $server->save();
+
+        return response()->noContent();
     }
 }

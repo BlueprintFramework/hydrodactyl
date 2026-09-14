@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { ip } from '@/lib/formatters';
 
 import { ServerContext } from '@/state/server';
-
+import EditWebhookBox from './EditWebhookBox';
 import RenameServerBox from './RenameServerBox';
 
 const SettingsContainer = () => {
@@ -22,6 +22,7 @@ const SettingsContainer = () => {
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const node = ServerContext.useStoreState((state) => state.server.data?.node);
+    const allowedWebhookTypes = ServerContext.useStoreState((state) => state.server.data?.allowedWebhookTypes);
     const sftp = ServerContext.useStoreState((state) => state.server.data?.sftpDetails, isEqual);
 
     return (
@@ -37,6 +38,12 @@ const SettingsContainer = () => {
             <Can action={'settings.rename'}>
                 <div className={`mb-6 md:mb-10`}>
                     <RenameServerBox />
+                </div>
+            </Can>
+
+            <Can action={'settings.webhook'}>
+                <div className={`mb-6 md:mb-10`}>
+                    <EditWebhookBox allowedWebhookTypes={allowedWebhookTypes || {}} />
                 </div>
             </Can>
 
