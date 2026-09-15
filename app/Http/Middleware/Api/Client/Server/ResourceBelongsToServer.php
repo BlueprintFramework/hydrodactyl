@@ -58,7 +58,11 @@ class ResourceBelongsToServer
                     // Regular users are a special case here as we need to make sure they're
                     // currently assigned as a subuser on the server.
                 case User::class:
-                    $subuser = $server->subusers()->where('user_id', $model->id)->first();
+                    // Prefer an already-loaded subuser collection to avoid a redundant
+                    // query, falling back to a targeted lookup if it hasn't been loaded.
+                    $subuser = $server->relationLoaded('subusers')
+                        ? $server->subusers->firstWhere('user_id', $model->id)
+                        : $server->subusers()->where('user_id', $model->id)->first();
                     if (is_null($subuser)) {
                         throw $exception;
                     }
