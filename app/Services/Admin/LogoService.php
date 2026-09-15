@@ -4,13 +4,14 @@ namespace Pterodactyl\Services\Admin;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 
 class LogoService
 {
     private const HISTORY_MAX = 10;
-    private const AVIF_QUALITY = 80;
+    private const WEBP_QUALITY = 85;
     private const LOGO_DIR = 'logo';
     private const ALLOWED_MIMES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml'];
 
@@ -25,7 +26,7 @@ class LogoService
             return;
         }
 
-        if (!empty($data['rewind'])) {
+        if (isset($data['rewind']) && $data['rewind'] !== '') {
             $this->rewind((int) $data['rewind']);
             return;
         }
@@ -40,6 +41,18 @@ class LogoService
         }
     }
 
+    /**
+     * Whether the server can decode raster images and convert them to WebP.
+     */
+    public function canProcessImages(): bool
+    {
+        return function_exists('imagewebp')
+            && (function_exists('imagecreatefrompng')
+                || function_exists('imagecreatefromjpeg')
+                || function_exists('imagecreatefromgif')
+                || function_exists('imagecreatefromwebp'));
+    }
+
     private function storeUpload(UploadedFile $file): void
     {
         $mime = $file->getMimeType();
@@ -49,35 +62,71 @@ class LogoService
             $file->storeAs(self::LOGO_DIR, $filename, 'public');
             $value = self::LOGO_DIR . '/' . $filename;
         } else {
-            $filename = Str::uuid() . '.avif';
-            $tempPath = $file->getRealPath();
-
-            $image = match ($mime) {
-                'image/png' => @imagecreatefrompng($tempPath),
-                'image/jpeg' => @imagecreatefromjpeg($tempPath),
-                'image/gif' => @imagecreatefromgif($tempPath),
-                'image/webp' => @imagecreatefromwebp($tempPath),
-                default => null,
-            };
-
-            if ($image !== null && function_exists('imageavif')) {
-                $storage = Storage::disk('public');
-                $storage->makeDirectory(self::LOGO_DIR);
-                $fullPath = $storage->path(self::LOGO_DIR . '/' . $filename);
-                imageavif($image, $fullPath, self::AVIF_QUALITY);
-                imagedestroy($image);
-                $value = self::LOGO_DIR . '/' . $filename;
-            } else {
-                if ($image) {
-                    imagedestroy($image);
-                }
-                $value = $file->store(self::LOGO_DIR, 'public');
-            }
+            $value = $this->storeRaster($file, $mime);
         }
 
         $this->addToHistory('upload', $value);
         $this->settings->set('settings::app:logo:type', 'upload');
         $this->settings->set('settings::app:logo:value', $value);
+    }
+
+    private function storeRaster(UploadedFile $file, string $mime): string
+    {
+        $converted = $this->convertToWebp($file, $mime);
+
+        if ($converted !== null) {
+            return $converted;
+        }
+
+        // Conversion unavailable or failed — store the original file unchanged.
+        return $file->store(self::LOGO_DIR, 'public');
+    }
+
+    private function convertToWebp(UploadedFile $file, string $mime): ?string
+    {
+        if (!function_exists('imagewebp')) {
+            return null;
+        }
+
+        $decoder = match ($mime) {
+            'image/png' => 'imagecreatefrompng',
+            'image/jpeg' => 'imagecreatefromjpeg',
+            'image/gif' => 'imagecreatefromgif',
+            'image/webp' => 'imagecreatefromwebp',
+            default => null,
+        };
+
+        if ($decoder === null || !function_exists($decoder)) {
+            return null;
+        }
+
+        try {
+            $image = @$decoder($file->getRealPath());
+            if ($image === false) {
+                return null;
+            }
+
+            $storage = Storage::disk('public');
+            $storage->makeDirectory(self::LOGO_DIR);
+            $filename = Str::uuid() . '.webp';
+            $relativePath = self::LOGO_DIR . '/' . $filename;
+
+            $saved = imagewebp($image, $storage->path($relativePath), self::WEBP_QUALITY);
+
+            if (!$saved) {
+                $storage->delete($relativePath);
+                return null;
+            }
+
+            return $relativePath;
+        } catch (\Throwable $exception) {
+            Log::warning('Logo conversion to WebP failed; storing the original file.', [
+                'mime' => $mime,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return null;
+        }
     }
 
     private function storeLink(string $url): void
@@ -126,7 +175,13 @@ class LogoService
             $history = $this->dedupPrepend($history, $currentType, $currentValue);
         }
 
-        $history = $this->moveToFront($history, $index);
+        // Remove the target entry by value (the array may have shifted after dedupPrepend)
+        // and prepend it so it becomes the current logo.
+        $history = array_values(array_filter(
+            $history,
+            fn($h) => !($h['type'] === $entry['type'] && $h['value'] === $entry['value'])
+        ));
+        array_unshift($history, $entry);
 
         $this->settings->set('settings::app:logo:type', $entry['type']);
         $this->settings->set('settings::app:logo:value', $entry['value']);
@@ -137,17 +192,6 @@ class LogoService
     {
         $history = array_filter($history, fn($h) => !($h['type'] === $type && $h['value'] === $value));
         array_unshift($history, ['type' => $type, 'value' => $value]);
-        return array_values($history);
-    }
-
-    private function moveToFront(array $history, int $index): array
-    {
-        if (!isset($history[$index])) {
-            return $history;
-        }
-        $entry = $history[$index];
-        unset($history[$index]);
-        array_unshift($history, $entry);
         return array_values($history);
     }
 
@@ -201,7 +245,12 @@ class LogoService
         }
 
         if ($type === 'upload') {
-            return url('storage/' . $value);
+            $url = url('storage/' . $value);
+            $path = Storage::disk('public')->path($value);
+            if (file_exists($path)) {
+                $url .= '?v=' . filemtime($path);
+            }
+            return $url;
         }
 
         return $value;

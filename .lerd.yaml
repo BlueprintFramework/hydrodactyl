@@ -1,26 +1,25 @@
 domains:
-    - hydrodactyl
+  - hydrodactyl
 php_version: "8.5"
 js_runtime: pnpm
 framework: laravel
 framework_version: "13"
 services:
-    - mariadb-11:
-        preset: mariadb
-        version: "11"
-    - postgresql-18:
-        preset: postgres
-        version: "18"
-    - mailpit
-    - rustfs
-    - valkey:
-        preset: valkey
+  - mailpit
+  - mariadb-11:
+      preset: mariadb
+      version: "11"
+  - postgresql-18:
+      preset: postgres
+      version: "18"
+  - rustfs
+  - valkey:
+      preset: valkey
 workers:
-    - queue
-    - schedule
-    - vite
+  - schedule
+  - vite
 commands:
-    - name: mcp:inject
-      label: ""
-      command: ""
-      disabled: true
+  - name: mcp:inject
+    label: ""
+    command: ""
+    disabled: true

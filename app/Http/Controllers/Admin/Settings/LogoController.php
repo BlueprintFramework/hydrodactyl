@@ -4,11 +4,13 @@ namespace Pterodactyl\Http\Controllers\Admin\Settings;
 
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 use Prologue\Alerts\AlertsMessageBag;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\View\Factory as ViewFactory;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Services\Admin\LogoService;
+use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 use Pterodactyl\Http\Requests\Admin\Settings\LogoFormRequest;
 
 class LogoController extends Controller
@@ -17,6 +19,7 @@ class LogoController extends Controller
         private AlertsMessageBag $alert,
         private Kernel $kernel,
         private LogoService $logoService,
+        private SettingsRepositoryInterface $settings,
         private ViewFactory $view,
     ) {}
 
@@ -27,15 +30,27 @@ class LogoController extends Controller
             'logoUrl' => $this->logoService->getCurrentUrl(),
             'logoValue' => $this->logoService->getCurrentValue(),
             'history' => $this->logoService->getHistory(),
+            'canProcessImages' => $this->logoService->canProcessImages(),
         ]);
     }
 
     public function update(LogoFormRequest $request): RedirectResponse
     {
-        $this->logoService->handle($request->validated());
+        try {
+            $data = $request->validated();
 
-        $this->kernel->call('queue:restart');
-        $this->alert->success('Logo settings have been updated successfully.')->flash();
+            if (array_key_exists('app:name', $data) && $data['app:name'] !== null) {
+                $this->settings->set('settings::app:name', $data['app:name']);
+            }
+
+            $this->logoService->handle($data);
+
+            $this->kernel->call('queue:restart');
+            $this->alert->success('Logo settings have been updated successfully.')->flash();
+        } catch (\Throwable $exception) {
+            Log::error('Failed to update logo settings.', ['error' => $exception->getMessage()]);
+            $this->alert->danger('Failed to update the logo. Please check the file and try again.')->flash();
+        }
 
         return redirect()->route('admin.settings.logo');
     }
