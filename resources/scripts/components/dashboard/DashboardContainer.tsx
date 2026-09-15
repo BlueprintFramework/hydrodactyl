@@ -1,3 +1,4 @@
+import { Server, Xmark } from '@gravity-ui/icons';
 import { useStoreState } from 'easy-peasy';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -127,6 +128,14 @@ const DashboardContainer = () => {
 
     const handleGroupChange = useCallback((groupId: number | undefined) => {
         setGroupFilterId(groupId);
+        setPage(1);
+    }, []);
+
+    const clearFilters = useCallback(() => {
+        setSearchQuery('');
+        setFilterField(undefined);
+        setFilterValue(undefined);
+        setGroupFilterId(undefined);
         setPage(1);
     }, []);
 
@@ -383,17 +392,30 @@ const DashboardContainer = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className='text-center text-sm text-zinc-400 absolute w-full left-1/2 -translate-x-1/2'>
-                                <p className='max-w-sm mx-auto mb-5'>
+                            <div className='flex flex-col items-center justify-center py-16 text-center'>
+                                <div className='size-16 rounded-2xl bg-mocha-500/50 flex items-center justify-center mb-4'>
+                                    <Server className='size-8 text-cream-200/60' />
+                                </div>
+                                <p className='text-sm font-medium text-cream-200 mb-1'>
+                                    {ownerFilter === 'admin-all' ? 'No other servers found' : 'No servers found'}
+                                </p>
+                                <p className='text-xs text-cream-200/40 mb-5 max-w-xs'>
                                     {ownerFilter === 'admin-all'
                                         ? 'There are no other servers to display.'
                                         : ownerFilter === 'all'
                                             ? 'No Server Shared With your Account'
                                             : 'There are no servers associated with your account.'}
                                 </p>
-                                <h3 className='text-lg font-medium text-zinc-200 mb-2'>
-                                    {ownerFilter === 'admin-all' ? 'No other servers found' : 'No servers found'}
-                                </h3>
+                                {filterActive && (
+                                    <button
+                                        type='button'
+                                        onClick={clearFilters}
+                                        className='flex items-center gap-2 px-4 py-2 bg-cream-400 text-mocha-500 hover:bg-cream-500/80 rounded-lg text-sm font-medium transition-colors'
+                                    >
+                                        <Xmark className='size-4' />
+                                        Clear Filters
+                                    </button>
+                                )}
                             </div>
                         )
                     }

@@ -13,7 +13,6 @@ class BaseSettingsFormRequest extends AdminFormRequest
     public function rules(): array
     {
         return [
-            'app:name' => 'required|string|max:191',
             'pterodactyl:auth:2fa_required' => 'required|integer|in:0,1,2',
             'app:locale' => ['required', 'string', Rule::in(array_keys($this->getAvailableLanguages()))],
         ];
@@ -22,7 +21,6 @@ class BaseSettingsFormRequest extends AdminFormRequest
     public function normalize(?array $only = null): array
     {
         $values = parent::normalize([
-            'app:name',
             'pterodactyl:auth:2fa_required',
             'app:locale',
         ]);
@@ -33,7 +31,6 @@ class BaseSettingsFormRequest extends AdminFormRequest
     public function attributes(): array
     {
         return [
-            'app:name' => 'Company Name',
             'pterodactyl:auth:2fa_required' => 'Require 2-Factor Authentication',
             'app:locale' => 'Default Language',
         ];

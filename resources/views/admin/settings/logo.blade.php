@@ -16,9 +16,13 @@
 
 @section('content')
   @yield('settings::nav')
-  <div class="alert alert-info" style="margin-bottom:20px;">
-    <i class="fa fa-flask"></i> <strong>Experimental:</strong> Logo customization is a new, experimental feature. Some aspects may change in future updates.
-  </div>
+
+  @if(!$canProcessImages)
+    <div class="alert alert-warning" style="margin-bottom:20px;">
+      <i class="fa fa-exclamation-triangle"></i> <strong>Image processing unavailable:</strong>
+      The PHP GD extension on this server cannot convert images. Uploaded logos will be stored in their original format.
+    </div>
+  @endif
 
   <div class="row">
     <div class="col-xs-12">
@@ -34,6 +38,10 @@
                 <svg id="currentLogoSvg" width="80" height="80" viewBox="0 0 100 92" fill="none" xmlns="http://www.w3.org/2000/svg" style="{{ $logoUrl ? 'display:none;' : '' }}">
                   <path d="M35.1293 92L39.2242 59.3897L44.8276 60.4695L14.2241 81.2019L0 57.0141L32.7586 45.3521V47.7277L0 33.4742L14.2241 8.85446L45.6896 33.2582L39.2242 34.1221L34.4828 0H65.5172L61.4225 33.9061L56.681 32.8263L85.7759 8.85446L100 33.4742L66.1638 47.7277V45.5681L99.569 57.0141L85.3448 81.2019L57.5431 59.3897H61.638L66.1638 92H35.1293Z" fill="#52A9FF"/>
                 </svg>
+              </div>
+              <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:10px;">
+                <img id="faviconPreview" src="{{ $logoUrl ?? '' }}" alt="Favicon" style="width:32px;height:32px;border-radius:4px;border:1px solid #444;{{ $logoUrl ? '' : 'display:none;' }}">
+                <span class="text-muted" style="font-size:12px;">{{ $logoUrl ? 'Favicon preview (32×32)' : 'Default favicon is used' }}</span>
               </div>
             </div>
           </div>
@@ -51,6 +59,14 @@
         <form action="{{ route('admin.settings.logo') }}" method="POST" enctype="multipart/form-data" id="logoForm">
           <div class="box-body">
             <div class="row">
+              <div class="form-group col-md-12">
+                <label class="control-label">Company Name</label>
+                <input type="text" class="form-control" name="app:name" id="companyNameInput"
+                  value="{{ old('app:name', config('app.name')) }}" />
+                <p class="text-muted small" style="margin-top:4px;">Displayed throughout the panel and in outgoing emails.</p>
+              </div>
+            </div>
+            <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
                   <label class="control-label">Upload Logo</label>
@@ -64,6 +80,7 @@
                     </p>
                     <input type="file" name="logo_file" id="logoFileInput" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml" style="display:none;">
                   </div>
+                  <div id="fileError" class="text-danger" style="display:none;margin-top:8px;font-size:12px;"></div>
                   <div id="uploadPreview" style="display:none;margin-top:10px;text-align:center;">
                     <img id="uploadPreviewImg" src="#" alt="Preview" style="max-width:100%;max-height:150px;border-radius:4px;border:1px solid #555;padding:5px;">
                     <p class="text-muted" style="margin-top:5px;font-size:12px;">Preview</p>
@@ -76,12 +93,13 @@
                   <div class="input-group">
                     <input type="url" name="logo_url" id="logoUrlInput" class="form-control" placeholder="https://example.com/logo.png">
                     <span class="input-group-btn">
-                      <button type="button" class="btn btn-outline-primary" id="previewUrlBtn" onclick="previewUrl()">
+                      <button type="button" class="btn btn-outline-primary" id="previewUrlBtn">
                         <i class="fa fa-eye"></i>
                       </button>
                     </span>
                   </div>
                   <p class="text-muted"><small>Enter a direct link to an image hosted elsewhere.</small></p>
+                  <div id="urlError" class="text-danger" style="display:none;margin-top:8px;font-size:12px;"></div>
                   <div id="urlPreview" style="display:none;margin-top:10px;text-align:center;">
                     <img id="urlPreviewImg" src="#" alt="URL Preview" style="max-width:100%;max-height:150px;border-radius:4px;border:1px solid #555;padding:5px;">
                   </div>
@@ -92,11 +110,11 @@
           <div class="box-footer">
             {!! csrf_field() !!}
             <input type="hidden" name="_method" value="PATCH">
-            <button type="submit" class="btn btn-primary btn-sm btn-outline-primary pull-right">
+            <button type="submit" id="saveBtn" class="btn btn-primary btn-sm btn-outline-primary pull-right" disabled>
               <i class="fa fa-save"></i> Save Logo
             </button>
             @if($logoUrl)
-              <button type="submit" name="remove" value="1" class="btn btn-danger btn-sm btn-outline-danger pull-right" style="margin-right:5px;" onclick="return confirm('Remove custom logo and restore default?');">
+              <button type="button" id="removeLogoBtn" class="btn btn-danger btn-sm btn-outline-danger pull-right" style="margin-right:5px;">
                 <i class="fa fa-trash"></i> Remove Logo
               </button>
             @endif
@@ -153,10 +171,25 @@
     var fileInput = document.getElementById('logoFileInput');
     var uploadPreview = document.getElementById('uploadPreview');
     var uploadPreviewImg = document.getElementById('uploadPreviewImg');
+    var fileError = document.getElementById('fileError');
     var urlInput = document.getElementById('logoUrlInput');
     var urlPreview = document.getElementById('urlPreview');
     var urlPreviewImg = document.getElementById('urlPreviewImg');
+    var urlError = document.getElementById('urlError');
+    var saveBtn = document.getElementById('saveBtn');
     var logoForm = document.getElementById('logoForm');
+    var nameInput = document.getElementById('companyNameInput');
+    var originalName = nameInput.value;
+
+    var allowedTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml'];
+    var maxSize = 2 * 1024 * 1024; // 2MB
+
+    function updateSaveState() {
+      var hasFile = fileInput.files && fileInput.files.length > 0;
+      var hasUrl = urlInput.value.trim().length > 0;
+      var nameChanged = nameInput.value.trim() !== originalName;
+      saveBtn.disabled = !(hasFile || hasUrl || nameChanged);
+    }
 
     dropZone.addEventListener('click', function() {
       fileInput.click();
@@ -185,27 +218,58 @@
       var files = e.dataTransfer.files;
       if (files.length > 0) {
         fileInput.files = files;
-        showFilePreview(files[0]);
+        handleFileSelect(files[0]);
       }
     });
 
     fileInput.addEventListener('change', function() {
       if (this.files && this.files[0]) {
-        showFilePreview(this.files[0]);
+        handleFileSelect(this.files[0]);
         urlInput.value = '';
         urlPreview.style.display = 'none';
+        urlError.style.display = 'none';
       }
+      updateSaveState();
     });
 
-    function showFilePreview(file) {
-      if (!file.type.match('image.*')) return;
+    urlInput.addEventListener('input', function() {
+      if (this.value.trim()) {
+        fileInput.value = '';
+        uploadPreview.style.display = 'none';
+        fileError.style.display = 'none';
+      }
+      updateSaveState();
+    });
 
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        uploadPreviewImg.src = e.target.result;
-        uploadPreview.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
+    nameInput.addEventListener('input', updateSaveState);
+
+    function handleFileSelect(file) {
+      fileError.style.display = 'none';
+
+      if (allowedTypes.indexOf(file.type) === -1) {
+        fileError.textContent = 'Unsupported file type. Please use PNG, JPG, GIF, WEBP or SVG.';
+        fileError.style.display = 'block';
+        uploadPreview.style.display = 'none';
+        fileInput.value = '';
+        return;
+      }
+
+      if (file.size > maxSize) {
+        fileError.textContent = 'File is too large. Maximum size is 2MB.';
+        fileError.style.display = 'block';
+        uploadPreview.style.display = 'none';
+        fileInput.value = '';
+        return;
+      }
+
+      if (file.type.match('image.*')) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          uploadPreviewImg.src = e.target.result;
+          uploadPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
     }
 
     document.getElementById('currentLogoImg').onerror = function() {
@@ -213,21 +277,67 @@
       document.getElementById('currentLogoSvg').style.display = '';
     };
 
-    function previewUrl() {
+    document.getElementById('faviconPreview').onerror = function() {
+      this.style.display = 'none';
+    };
+
+    document.getElementById('previewUrlBtn').addEventListener('click', function() {
       var url = urlInput.value.trim();
+      urlError.style.display = 'none';
+
       if (!url) return;
 
       urlPreviewImg.src = url;
+      urlPreviewImg.onerror = function() {
+        urlError.textContent = 'Could not load the image from this URL.';
+        urlError.style.display = 'block';
+        urlPreview.style.display = 'none';
+      };
       urlPreview.style.display = 'block';
       fileInput.value = '';
       uploadPreview.style.display = 'none';
-    }
+      fileError.style.display = 'none';
+      updateSaveState();
+    });
 
     function rewindLogo(index) {
-      if (confirm('Switch to this logo version?')) {
+      swal({
+        title: '',
+        type: 'warning',
+        text: 'Switch to this logo version?',
+        showCancelButton: true,
+        confirmButtonText: 'Switch',
+        confirmButtonColor: '#52A9FF',
+        closeOnConfirm: false
+      }, function() {
         document.getElementById('rewindInput').value = index;
         document.getElementById('rewindForm').submit();
-      }
+      });
     }
+
+    var removeLogoBtn = document.getElementById('removeLogoBtn');
+    if (removeLogoBtn) {
+      removeLogoBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        swal({
+          title: '',
+          type: 'warning',
+          text: 'Remove custom logo and restore default?',
+          showCancelButton: true,
+          confirmButtonText: 'Remove',
+          confirmButtonColor: '#d9534f',
+          closeOnConfirm: false
+        }, function() {
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'remove';
+          input.value = '1';
+          logoForm.appendChild(input);
+          logoForm.submit();
+        });
+      });
+    }
+
+    updateSaveState();
   </script>
 @endsection

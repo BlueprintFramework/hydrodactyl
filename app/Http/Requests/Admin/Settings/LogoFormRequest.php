@@ -13,6 +13,7 @@ class LogoFormRequest extends AdminFormRequest
             'logo_url' => 'nullable|url|max:2048',
             'remove' => 'nullable|boolean',
             'rewind' => 'nullable|integer|min:0',
+            'app:name' => 'nullable|string|max:191',
         ];
     }
 
@@ -21,6 +22,7 @@ class LogoFormRequest extends AdminFormRequest
         return [
             'logo_file' => 'Logo File',
             'logo_url' => 'Logo URL',
+            'app:name' => 'Company Name',
         ];
     }
 

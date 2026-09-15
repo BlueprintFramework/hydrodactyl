@@ -8,6 +8,7 @@ import {
     type SubdomainInfo,
     setSubdomain,
 } from '@/api/server/network/subdomain';
+import ConfirmationModal from '@/components/elements/ConfirmationModal';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
@@ -77,6 +78,7 @@ const SubdomainManagement = ({ onClose: _onClose }: Props) => {
         message: string;
     } | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const { clearFlashes, clearAndAddHttpError } = useFlashKey('server:network:subdomain');
@@ -180,22 +182,16 @@ const SubdomainManagement = ({ onClose: _onClose }: Props) => {
     };
 
     const handleDeleteSubdomain = async () => {
-        if (
-            !confirm(
-                'Are you sure you want to delete this subdomain? This will remove all associated DNS records and cannot be undone.',
-            )
-        ) {
-            return;
-        }
-
         try {
             clearFlashes();
             setLoading(true);
             await deleteSubdomain(uuid);
             await loadSubdomainInfo();
             setAvailabilityStatus(null);
+            setShowDeleteConfirmation(false);
         } catch (error) {
             clearAndAddHttpError(error as Error);
+            setShowDeleteConfirmation(false);
         } finally {
             setLoading(false);
         }
@@ -245,6 +241,18 @@ const SubdomainManagement = ({ onClose: _onClose }: Props) => {
 
     return (
         <div>
+            <ConfirmationModal
+                title='Delete Subdomain?'
+                buttonText='Delete Subdomain'
+                visible={showDeleteConfirmation}
+                loading={loading}
+                onConfirmed={() => handleDeleteSubdomain()}
+                onModalDismissed={() => setShowDeleteConfirmation(false)}
+            >
+                Are you sure you want to delete this subdomain? This will remove all associated DNS records and cannot
+                be undone.
+            </ConfirmationModal>
+
             {subdomainInfo?.current_subdomain && (
                 <div className='flex items-center gap-2 text-sm mb-4'>
                     <div
@@ -276,7 +284,12 @@ const SubdomainManagement = ({ onClose: _onClose }: Props) => {
                         </div>
                     </div>
                     <div className='flex items-center justify-end gap-3 pt-4 border-t border-[#ffffff15]'>
-                        <Button type='button' variant='attention' onClick={handleDeleteSubdomain} disabled={loading}>
+                        <Button
+                            type='button'
+                            variant='attention'
+                            onClick={() => setShowDeleteConfirmation(true)}
+                            disabled={loading}
+                        >
                             {loading ? 'Deleting...' : 'Delete Subdomain'}
                         </Button>
                         <Button type='button' variant='secondary' onClick={() => setIsEditing(true)} disabled={loading}>

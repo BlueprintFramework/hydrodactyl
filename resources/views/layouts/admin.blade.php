@@ -13,6 +13,10 @@
     $_favVal = config('app.logo.value');
     if ($_favType === 'upload' && $_favVal && Storage::disk('public')->exists($_favVal)) {
       $_favUrl = url('storage/' . $_favVal);
+      $_favPath = Storage::disk('public')->path($_favVal);
+      if (file_exists($_favPath)) {
+        $_favUrl .= '?v=' . filemtime($_favPath);
+      }
     } elseif ($_favType === 'link' && $_favVal) {
       $_favUrl = $_favVal;
     } else {
@@ -22,11 +26,12 @@
   @if($_favUrl)
   <link rel="icon" href="{{ $_favUrl }}" />
   <link rel="apple-touch-icon" href="{{ $_favUrl }}" />
-  @endif
+  @else
   <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
   <link rel="shortcut icon" href="/favicons/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+  @endif
   <meta name="apple-mobile-web-app-title" content="Hydrodactyl" />
   <link rel="manifest" href="/favicons/site.webmanifest" />
 
