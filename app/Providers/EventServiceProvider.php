@@ -2,12 +2,6 @@
 
 namespace Pterodactyl\Providers;
 
-use Pterodactyl\Models\User;
-use Pterodactyl\Models\Subuser;
-use Pterodactyl\Models\EggVariable;
-use Pterodactyl\Observers\UserObserver;
-use Pterodactyl\Observers\SubuserObserver;
-use Pterodactyl\Observers\EggVariableObserver;
 use Pterodactyl\Listeners\Auth\AuthenticationListener;
 use Pterodactyl\Events\Server\Installed as ServerInstalledEvent;
 use Pterodactyl\Notifications\ServerInstalled as ServerInstalledNotification;
@@ -28,13 +22,12 @@ class EventServiceProvider extends ServiceProvider
 
     /**
      * Register any events for your application.
+     *
+     * Observer registrations for User, Server, Subuser, Allocation, Egg,
+     * EggVariable, and SessionActivity are handled by ObserverServiceProvider.
      */
     public function boot(): void
     {
         parent::boot();
-
-        User::observe(UserObserver::class);
-        Subuser::observe(SubuserObserver::class);
-        EggVariable::observe(EggVariableObserver::class);
     }
 }

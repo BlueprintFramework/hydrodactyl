@@ -42,6 +42,8 @@ class ServerViewController extends Controller
      */
     public function index(Request $request, Server $server): View
     {
+        $server->load(['nest', 'egg', 'user', 'node']);
+
         return $this->view->make('admin.servers.view.index', compact('server'));
     }
 
@@ -50,6 +52,8 @@ class ServerViewController extends Controller
      */
     public function details(Request $request, Server $server): View
     {
+        $server->load(['nest', 'egg', 'user', 'node']);
+
         return $this->view->make('admin.servers.view.details', compact('server'));
     }
 
@@ -58,6 +62,8 @@ class ServerViewController extends Controller
      */
     public function build(Request $request, Server $server): View
     {
+        $server->load(['node', 'allocation']);
+
         $allocations = $server->node->allocations->toBase();
 
         return $this->view->make('admin.servers.view.build', [

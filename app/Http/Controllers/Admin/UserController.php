@@ -88,6 +88,8 @@ public function index(Request $request): View
      */
     public function view(User $user): View
     {
+        $user->loadCount('servers');
+
         return $this->view->make('admin.users.view', [
             'user' => $user,
             'languages' => $this->getAvailableLanguages(true),

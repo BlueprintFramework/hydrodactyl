@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\S3;
 
+use Illuminate\Support\Facades\Cache;
 use Pterodactyl\Models\S3;
 use Pterodactyl\Contracts\Repository\S3RepositoryInterface;
 use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
@@ -23,6 +24,8 @@ class S3DeletionService
         if ($this->serverRepository->findCountWhere([['s3_id', '=', $id]]) > 0) {
             throw new DisplayException($this->translator->get('Cannot delete: in use by servers'));
         }
+
+        Cache::forget('pterodactyl:s3:active');
 
         return $this->repository->delete($id);
     }

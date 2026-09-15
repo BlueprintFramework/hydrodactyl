@@ -114,7 +114,7 @@
                 <form action="{{ route('admin.users.view', $user->id) }}" method="POST">
                     {!! csrf_field() !!}
                     {!! method_field('DELETE') !!}
-                    <input id="delete" type="submit" class="btn btn-sm btn-danger pull-right" {{ $user->servers->count() < 1 ?: 'disabled' }} value="Delete User" />
+                    <input id="delete" type="submit" class="btn btn-sm btn-danger pull-right" {{ $user->servers_count < 1 ?: 'disabled' }} value="Delete User" />
                 </form>
             </div>
         </div>

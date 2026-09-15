@@ -4,6 +4,7 @@ namespace Pterodactyl\Providers;
 
 use Psr\Log\LoggerInterface as Log;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -83,9 +84,11 @@ class SettingsServiceProvider extends ServiceProvider
     }
 
     try {
-      $values = $settings->all()->mapWithKeys(function ($setting) {
-        return [$setting->key => $setting->value];
-      })->toArray();
+      $values = Cache::remember(
+        'pterodactyl:settings:all',
+        now()->addHour(),
+        fn () => $settings->all()->mapWithKeys(fn ($setting) => [$setting->key => $setting->value])->toArray()
+      );
     } catch (QueryException $exception) {
       $log->notice('A query exception was encountered while trying to load settings from the database: ' . $exception->getMessage());
 

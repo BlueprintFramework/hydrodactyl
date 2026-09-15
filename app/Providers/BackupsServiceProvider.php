@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Providers;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Pterodactyl\Extensions\Backups\BackupManager;
 use Pterodactyl\Models\S3;
@@ -24,7 +25,12 @@ class BackupsServiceProvider extends ServiceProvider
     public function boot(): void
     {
         try {
-            $s3Bucket = S3::where('enabled', true)->first();
+            $s3Bucket = Cache::remember(
+                'pterodactyl:s3:active',
+                now()->addHour(),
+                fn () => S3::where('enabled', true)->first()
+            );
+
             if (!$s3Bucket) {
                 return;
             }
