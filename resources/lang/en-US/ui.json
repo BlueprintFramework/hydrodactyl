@@ -139,10 +139,12 @@
         "metrics": {
             "cpu_cores": "CPU Cores",
             "disk": "Disk",
+            "free": "Free",
             "memory": "Memory",
             "percent_used": "{{percent}}% used",
             "uptime": "Uptime",
-            "uptime_format": "{{days}}d {{hours}}h {{minutes}}m"
+            "uptime_format": "{{days}}d {{hours}}h {{minutes}}m",
+            "used": "Used"
         },
         "system_info": {
             "cpu_cores": "CPU Cores",

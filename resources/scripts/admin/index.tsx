@@ -89,8 +89,22 @@ function UsageBar({
                         contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: 6, fontSize: 12 }}
                         formatter={(v: number) => fmt(v)}
                     />
-                    <Bar dataKey='used' fill={COLORS.used} radius={[4, 0, 0, 4]} stackId='a' maxBarSize={24} />
-                    <Bar dataKey='free' fill={COLORS.bg} radius={[0, 4, 4, 0]} stackId='a' maxBarSize={24} />
+                    <Bar
+                        dataKey='used'
+                        name={t('admin.metrics.used')}
+                        fill={COLORS.used}
+                        radius={[4, 0, 0, 4]}
+                        stackId='a'
+                        maxBarSize={24}
+                    />
+                    <Bar
+                        dataKey='free'
+                        name={t('admin.metrics.free')}
+                        fill={COLORS.bg}
+                        radius={[0, 4, 4, 0]}
+                        stackId='a'
+                        maxBarSize={24}
+                    />
                 </BarChart>
             </ResponsiveContainer>
             <div style={{ fontSize: 11, color: '#777', marginTop: 2 }}>
@@ -116,7 +130,13 @@ function LoadGraph({ loads }: { loads: number[] }) {
                     <Tooltip
                         contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: 6, fontSize: 12 }}
                     />
-                    <Bar dataKey='value' fill={COLORS.used} radius={[3, 3, 0, 0]} maxBarSize={32} />
+                    <Bar
+                        dataKey='value'
+                        name={t('admin.load.title')}
+                        fill={COLORS.used}
+                        radius={[3, 3, 0, 0]}
+                        maxBarSize={32}
+                    />
                 </BarChart>
             </ResponsiveContainer>
         </div>
