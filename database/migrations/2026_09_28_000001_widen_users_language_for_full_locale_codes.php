@@ -1,12 +1,11 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,15 +13,9 @@ return new class extends Migration
     {
         // Full locale codes such as "en-US" or "pt-BR" need a little more room
         // than the historical two letter codes.
-        if (DB::connection()->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
-            Schema::table('users', function (Blueprint $table) {
-                $table->char('language', 16)->default('en-US')->change();
-            });
-        } else {
-            Schema::table('users', function (Blueprint $table) {
-                $table->string('language', 16)->default('en-US')->change();
-            });
-        }
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('language', 16)->default('en-US')->change();
+        });
 
         // Carry existing two letter preferences over to their regional codes.
         DB::table('users')->where('language', 'en')->update(['language' => 'en-US']);
@@ -57,14 +50,8 @@ return new class extends Migration
         DB::table('users')->where('language', 'en-US')->update(['language' => 'en']);
         DB::table('users')->where('language', 'es-ES')->update(['language' => 'es']);
 
-        if (DB::connection()->getPdo()->getAttribute(PDO::ATTR_DRIVER_NAME) === 'pgsql') {
-            Schema::table('users', function (Blueprint $table) {
-                $table->char('language', 5)->default('en')->change();
-            });
-        } else {
-            Schema::table('users', function (Blueprint $table) {
-                $table->string('language', 5)->default('en')->change();
-            });
-        }
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('language', 5)->default('en')->change();
+        });
     }
 };
