@@ -53,6 +53,8 @@ class ServerTransformer extends BaseClientTransformer
                 'port' => $server->node->SFTPAliasPort
             ],
             'description' => $server->description,
+            'webhook_type' => $server->webhook_type,
+            'webhook_url' => $server->webhook_url,
             'limits' => [
                 'memory' => $server->memory,
                 'overhead_memory' => $server->overhead_memory,
