@@ -23,4 +23,15 @@ return [
         'subtitle' => 'Create a new application API key.',
         'title' => 'New Credentials',
     ],
+    'permissions' => [
+        'allocations' => 'Allocations',
+        'database_hosts' => 'Database Hosts',
+        'eggs' => 'Eggs',
+        'locations' => 'Locations',
+        'nests' => 'Nests',
+        'nodes' => 'Nodes',
+        'server_databases' => 'Server Databases',
+        'servers' => 'Servers',
+        'users' => 'Users',
+    ],
 ];

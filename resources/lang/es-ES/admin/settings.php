@@ -46,6 +46,13 @@ return [
         'provider' => 'Proveedor',
         'provider_box' => 'Proveedor de captcha',
         'provider_help' => 'Selecciona el proveedor de captcha que se usará en los formularios de autenticación.',
+        'providers' => [
+            'cap' => 'Cap',
+            'hcaptcha' => 'HCaptcha',
+            'none' => 'Desactivado',
+            'recaptcha' => 'Google ReCaptcha',
+            'turnstile' => 'Cloudflare Turnstile',
+        ],
         'recaptcha' => [
             'note' => 'reCAPTCHA v3 se ejecuta de forma invisible en segundo plano y devuelve una puntuación (0.0-1.0) basada en las interacciones del usuario. De forma predeterminada se usa un umbral de 0.5.',
             'note_label' => 'Nota:',

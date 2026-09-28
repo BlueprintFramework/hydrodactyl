@@ -2,7 +2,7 @@
 
 return [
     'index' => [
-        'create_new' => 'Crear nuevo',
+        'create_new' => 'Crear nueva clave de API',
         'credentials_list' => 'Lista de credenciales',
         'key' => 'Clave',
         'revoke_error' => 'Se ha producido un error al intentar revocar esta clave.',
@@ -22,5 +22,16 @@ return [
         'select_permissions' => 'Seleccionar permisos',
         'subtitle' => 'Crea una nueva clave de API de aplicación.',
         'title' => 'Nuevas credenciales',
+    ],
+    'permissions' => [
+        'allocations' => 'Asignaciones',
+        'database_hosts' => 'Hosts de bases de datos',
+        'eggs' => 'Eggs',
+        'locations' => 'Ubicaciones',
+        'nests' => 'Nests',
+        'nodes' => 'Nodos',
+        'server_databases' => 'Bases de datos de servidores',
+        'servers' => 'Servidores',
+        'users' => 'Usuarios',
     ],
 ];

@@ -2,7 +2,7 @@
 
 return [
     'index' => [
-        'create_new' => 'Crear nuevo',
+        'create_new' => 'Crear nuevo host',
         'create_title' => 'Crear nuevo host de base de datos',
         'danger_notice' => 'La cuenta definida para este host de base de datos <strong>debe</strong> tener el permiso <code>WITH GRANT OPTION</code>. Si la cuenta definida no tiene este permiso, las solicitudes para crear bases de datos <em>fallarán</em>. <strong>No uses los mismos datos de cuenta para MySQL que has definido para este panel.</strong>',
         'error_label' => 'Error:',

@@ -46,6 +46,13 @@ return [
         'provider' => 'Provider',
         'provider_box' => 'Captcha Provider',
         'provider_help' => 'Select the captcha provider to use for authentication forms.',
+        'providers' => [
+            'cap' => 'Cap',
+            'hcaptcha' => 'HCaptcha',
+            'none' => 'Disabled',
+            'recaptcha' => 'Google ReCaptcha',
+            'turnstile' => 'Cloudflare Turnstile',
+        ],
         'recaptcha' => [
             'note' => 'reCAPTCHA v3 runs invisibly in the background and returns a score (0.0-1.0) based on user interactions. A threshold of 0.5 is used by default.',
             'note_label' => 'Note:',

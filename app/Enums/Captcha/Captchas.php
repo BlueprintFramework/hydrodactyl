@@ -10,24 +10,18 @@ enum Captchas: string
     case RECAPTCHA = 'recaptcha';
     case CAP = 'cap';
 
-    private const DESCRIPTION_MAP = [
-        self::NONE->value => 'Disabled',
-        self::TURNSTILE->value => 'Cloudflare Turnstile',
-        self::HCAPTCHA->value => 'HCaptcha',
-        self::RECAPTCHA->value => 'Google ReCaptcha',
-        self::CAP->value => 'Cap',
-    ];
-
-
+    /**
+     * Return the providers keyed by value with their translated labels.
+     */
     public static function all(): array
     {
         $result = [];
         foreach (self::cases() as $case) {
-            $result[$case->value] = self::DESCRIPTION_MAP[$case->value];
+            $result[$case->value] = __("admin/settings.captcha.providers.{$case->value}");
         }
+
         return $result;
     }
-
 
     public static function values(): array
     {
