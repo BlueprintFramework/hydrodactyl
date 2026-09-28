@@ -173,4 +173,11 @@ return [
         'verb_test' => 'test',
         'whoops' => 'Whoops!',
     ],
+    'notices' => [
+        'logo' => 'Logo settings have been updated successfully.',
+        'panel' => 'Panel settings have been updated successfully and the queue worker was restarted to apply these changes.',
+        'custom_navigation' => 'Custom navigation settings have been updated successfully and the queue worker was restarted to apply these changes.',
+        'captcha' => 'Captcha settings have been updated successfully and the queue worker was restarted to apply these changes.',
+        'advanced' => 'Advanced settings have been updated successfully and the queue worker was restarted to apply these changes.',
+    ],
 ];

@@ -59,7 +59,7 @@ class CaptchaController extends Controller
         }
 
         $this->kernel->call('queue:restart');
-        $this->alert->success('Captcha settings have been updated successfully and the queue worker was restarted to apply these changes.')->flash();
+        $this->alert->success(__('admin/settings.notices.captcha'))->flash();
 
         return redirect()->route('admin.settings.captcha');
     }

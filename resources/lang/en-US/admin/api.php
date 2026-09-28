@@ -12,6 +12,7 @@ return [
         'subtitle' => 'Control access credentials for managing this Panel via the API.',
         'whoops' => 'Whoops!',
     ],
+    'key_generated' => 'A new application API key has been generated for your account.',
     'new' => [
         'create_credentials' => 'Create Credentials',
         'description_label' => 'Description',

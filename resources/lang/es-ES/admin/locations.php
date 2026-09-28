@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'created' => 'Ubicación creada correctamente.',
     'index' => [
         'allocated' => 'Asignado',
         'create_new' => 'Crear nueva',
@@ -16,6 +17,7 @@ return [
         'subtitle' => 'Todas las ubicaciones a las que se pueden asignar nodos para facilitar su categorización.',
         'total' => 'Total',
     ],
+    'updated' => 'Ubicación actualizada correctamente.',
     'view' => [
         'allocated' => 'Asignado:',
         'description' => 'Descripción',

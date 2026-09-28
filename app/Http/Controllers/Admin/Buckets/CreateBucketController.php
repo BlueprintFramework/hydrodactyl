@@ -27,7 +27,7 @@ class CreateBucketController extends Controller
     {
         $s3 = $this->creationService->handle($request->validated());
 
-        $this->alert->success('S3 configuration created')->flash();
+        $this->alert->success(__('admin/s3.bucket_created'))->flash();
 
         return redirect()->route('admin.buckets.view', $s3->id);
     }

@@ -3,6 +3,11 @@
 return [
     'breadcrumb' => 'S3',
     'configurations' => 'S3 Configurations',
+    'created' => 'S3 configuration created.',
+    'bucket_created' => 'S3 configuration created',
+    'updated' => 'S3 configuration updated.',
+    'deleted' => 'S3 configuration deleted.',
+    'in_use' => 'Cannot delete: bucket is used by servers.',
     'index' => [
         'bucket_list' => 'S3 Bucket List',
         'bucket_name' => 'Bucket Name',

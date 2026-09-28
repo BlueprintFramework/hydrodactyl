@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'host_created' => 'Se ha creado un nuevo host de base de datos en el sistema.',
+    'host_updated' => 'El host de base de datos se ha actualizado correctamente.',
+    'host_deleted' => 'El host de base de datos solicitado se ha eliminado del sistema.',
     'index' => [
         'create_new' => 'Crear nuevo host',
         'create_title' => 'Crear nuevo host de base de datos',

@@ -26,7 +26,7 @@ return [
         'locations' => 'Ubicaciones',
         'management' => 'GESTIÓN',
         'mounts' => 'Montajes',
-        'nests' => 'Nests',
+        'nests' => 'Nidos',
         'nodes' => 'Nodos',
         'overview' => 'Resumen',
         's3_buckets' => 'Buckets S3',

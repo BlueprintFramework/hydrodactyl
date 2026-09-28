@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'created' => 'Mount was created successfully.',
     'index' => [
         'create_new' => 'Create New',
         'create_title' => 'Create Mount',
@@ -22,6 +23,7 @@ return [
         'user_mountable_help' => 'Should users be able to mount this themselves?',
         'what_are_mounts' => '<strong>What are mounts?</strong> Mounts allow you to attach directories from the host machine into a server\'s container. They are useful for shared resources, persistent storage, or configuration files. <a href="https://pterodactyl.io/community/mounts.html" target="_blank" rel="noopener">Learn more in the Pterodactyl docs <i class="fa fa-external-link"></i></a>.',
     ],
+    'updated' => 'Mount was updated successfully.',
     'view' => [
         'add' => 'Add',
         'add_eggs' => 'Add Eggs',

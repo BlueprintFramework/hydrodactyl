@@ -9,6 +9,9 @@ return [
     'eggs' => [
         'notices' => [
             'imported' => 'Successfully imported this Egg and its associated variables.',
+            'import_url_host' => 'The Egg import URL is not from an allowed host.',
+            'import_url_scheme' => 'The Egg import URL scheme is invalid.',
+            'import_fetch_failed' => 'Fetching the Egg from the URL failed.',
             'updated_via_import' => 'This Egg has been updated using the file provided.',
             'deleted' => 'Successfully deleted the requested egg from the Panel.',
             'updated' => 'Egg configuration has been updated successfully.',

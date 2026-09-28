@@ -19,6 +19,8 @@ return [
         'install_toggled' => 'The installation status for this server has been toggled.',
         'server_reinstalled' => 'This server has been queued for a reinstallation beginning now.',
         'details_updated' => 'Server details have been successfully updated.',
+        'mount_added' => 'Mount was added successfully.',
+        'mount_removed' => 'Mount was removed successfully.',
         'docker_image_updated' => 'Successfully changed the default Docker image to use for this server. A reboot is required to apply this change.',
         'node_required' => 'You must have at least one node configured before you can add a server to this panel.',
         'transfer_nodes_required' => 'You must have at least two nodes configured before you can transfer servers.',

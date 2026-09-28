@@ -48,8 +48,9 @@ The legacy `GET /locales/locale.json` endpoint converts `:foo` to `{{foo}}` for 
 
 - Castilian Spanish from Spain following RAE orthography (<https://www.rae.es/ortografia/>).
 - Use "contraseña" (password), "servidor" (server), "copia de seguridad" (backup),
-  "tarea programada" (schedule).
-- Keep `:placeholders`, product names, egg names, and technical identifiers untranslated.
+  "tarea programada" (schedule), "huevo" (egg) and "nido" (nest).
+- Keep `:placeholders`, product names, egg/nest proper names, and technical identifiers untranslated.
+- Do not use em dashes (—) as clause separators; prefer a colon, a comma or parentheses.
 - Preserve the terminating punctuation style of each English source string.
 
 ## Verification

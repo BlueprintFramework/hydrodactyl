@@ -84,7 +84,7 @@ class DatabaseController extends Controller
             }
         }
 
-        $this->alert->success('Successfully created a new database host on the system.')->flash();
+        $this->alert->success(__('admin/databases.host_created'))->flash();
 
         return redirect()->route('admin.databases.view', $host->id);
     }
@@ -100,7 +100,7 @@ class DatabaseController extends Controller
 
         try {
             $this->updateService->handle($host->id, $request->normalize());
-            $this->alert->success('Database host was updated successfully.')->flash();
+            $this->alert->success(__('admin/databases.host_updated'))->flash();
         } catch (\Exception $exception) {
             // Catch any SQL related exceptions and display them back to the user, otherwise just
             // throw the exception like normal and move on with it.
@@ -126,7 +126,7 @@ class DatabaseController extends Controller
     public function delete(int $host): RedirectResponse
     {
         $this->deletionService->handle($host);
-        $this->alert->success('The requested database host has been deleted from the system.')->flash();
+        $this->alert->success(__('admin/databases.host_deleted'))->flash();
 
         return redirect()->route('admin.databases');
     }

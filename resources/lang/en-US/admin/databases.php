@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'host_created' => 'Successfully created a new database host on the system.',
+    'host_updated' => 'Database host was updated successfully.',
+    'host_deleted' => 'The requested database host has been deleted from the system.',
     'index' => [
         'create_new' => 'Create New',
         'create_title' => 'Create New Database Host',

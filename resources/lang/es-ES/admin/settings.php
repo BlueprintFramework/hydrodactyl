@@ -173,4 +173,11 @@ return [
         'verb_test' => 'probar',
         'whoops' => '¡Vaya!',
     ],
+    'notices' => [
+        'logo' => 'Los ajustes del logotipo se han actualizado correctamente.',
+        'panel' => 'Los ajustes del panel se han actualizado correctamente y el worker de la cola se ha reiniciado para aplicar estos cambios.',
+        'custom_navigation' => 'Los ajustes de la navegación personalizada se han actualizado correctamente y el worker de la cola se ha reiniciado para aplicar estos cambios.',
+        'captcha' => 'Los ajustes del captcha se han actualizado correctamente y el worker de la cola se ha reiniciado para aplicar estos cambios.',
+        'advanced' => 'Los ajustes avanzados se han actualizado correctamente y el worker de la cola se ha reiniciado para aplicar estos cambios.',
+    ],
 ];

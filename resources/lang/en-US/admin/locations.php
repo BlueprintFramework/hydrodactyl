@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'created' => 'Location was created successfully.',
     'index' => [
         'allocated' => 'Allocated',
         'create_new' => 'Create New',
@@ -16,6 +17,7 @@ return [
         'subtitle' => 'All locations that nodes can be assigned to for easier categorization.',
         'total' => 'Total',
     ],
+    'updated' => 'Location was updated successfully.',
     'view' => [
         'allocated' => 'Allocated:',
         'description' => 'Description',

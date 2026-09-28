@@ -270,9 +270,9 @@
             "aria_filtered": "Filtro: {{filter}}",
             "clear_all": "Limpiar todos los filtros",
             "clear_one": "Limpiar este filtro",
-            "egg": "Egg",
+            "egg": "Huevo",
             "filter": "Filtro",
-            "nest": "Nest",
+            "nest": "Nido",
             "no_options": "No hay opciones de filtro disponibles",
             "node": "Nodo",
             "open": "Abrir filtros",
@@ -820,7 +820,7 @@
             "no_versions": "No hay versiones disponibles. Prueba con otro loader.",
             "no_versions_loader": "No hay versiones disponibles para {{loader}}. Prueba con otro loader.",
             "nothing_to_show": "No hay nada que mostrar ahora mismo.",
-            "open_project_page": "{{title}} — abrir la página del proyecto",
+            "open_project_page": "{{title}}: abrir la página del proyecto",
             "plugins": "Plugins",
             "reinstall": "Reinstalar",
             "remove_success": "Se ha quitado {{filename}}",
@@ -991,7 +991,7 @@
                 "ahead_other": "{{count}} horas por delante de",
                 "behind_one": "{{count}} hora por detrás de",
                 "behind_other": "{{count}} horas por detrás de",
-                "difference_suffix": "— el servidor está {{difference}} tu zona horaria",
+                "difference_suffix": "(el servidor está {{difference}} tu zona horaria)",
                 "hours_minutes_ahead": "{{hours}} h {{minutes}} min por delante de",
                 "hours_minutes_behind": "{{hours}} h {{minutes}} min por detrás de",
                 "minutes_ahead_one": "{{count}} minuto por delante de",
@@ -1176,7 +1176,7 @@
                 "notice": "Un administrador ha establecido manualmente la imagen de Docker de este servidor y no se puede cambiar desde esta interfaz.",
                 "notice_title": "Aviso:",
                 "revert": "Revertir al valor predeterminado",
-                "revert_notice": "Puedes revertir a la imagen predeterminada del egg, pero no podrás volver a establecerla sin contactar con el soporte.",
+                "revert_notice": "Puedes revertir a la imagen predeterminada del huevo, pero no podrás volver a establecerla sin contactar con el soporte.",
                 "title": "Imagen de Docker"
             },
             "error_title": "¡Vaya!",
@@ -1184,7 +1184,7 @@
             "revert": {
                 "confirm": "Sí, revertir al valor predeterminado",
                 "confirm_question": "¿Seguro que quieres continuar?",
-                "description": "Esto revertirá la imagen de Docker de tu servidor a la especificación predeterminada del egg.",
+                "description": "Esto revertirá la imagen de Docker de tu servidor a la especificación predeterminada del huevo.",
                 "title": "Revertir imagen de Docker",
                 "warning": "No podrás volver a establecer una imagen personalizada sin contactar con el soporte.",
                 "warning_title": "⚠️ Aviso:"
@@ -1541,7 +1541,7 @@
         "username_format": "Usa entre 3 y 191 caracteres, empezando y terminando por una letra o un número. Solo se permiten letras, números, puntos, guiones y guiones bajos.",
         "username_required": "El nombre de usuario es obligatorio.",
         "welcome": {
-            "description": "Esta es una instalación nueva de Hydrodactyl — todavía no existe ninguna cuenta de administrador. Crearemos tu primera cuenta, le concederemos acceso completo al panel y te dejaremos con la sesión iniciada. Solo tarda un momento.",
+            "description": "Esta es una instalación nueva de Hydrodactyl: todavía no existe ninguna cuenta de administrador. Crearemos tu primera cuenta, le concederemos acceso completo al panel y te dejaremos con la sesión iniciada. Solo tarda un momento.",
             "notice": "No volverás a ver esto. En cuanto exista una cuenta, esta pantalla de configuración desaparecerá por completo.",
             "title": "Bienvenido."
         }

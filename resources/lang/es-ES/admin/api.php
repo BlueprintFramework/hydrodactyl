@@ -12,6 +12,7 @@ return [
         'subtitle' => 'Controla las credenciales de acceso para gestionar este Panel mediante la API.',
         'whoops' => '¡Vaya!',
     ],
+    'key_generated' => 'Se ha generado una nueva clave de API de aplicación para tu cuenta.',
     'new' => [
         'create_credentials' => 'Crear credenciales',
         'description_label' => 'Descripción',
@@ -26,9 +27,9 @@ return [
     'permissions' => [
         'allocations' => 'Asignaciones',
         'database_hosts' => 'Hosts de bases de datos',
-        'eggs' => 'Eggs',
+        'eggs' => 'Huevos',
         'locations' => 'Ubicaciones',
-        'nests' => 'Nests',
+        'nests' => 'Nidos',
         'nodes' => 'Nodos',
         'server_databases' => 'Bases de datos de servidores',
         'servers' => 'Servidores',

@@ -55,7 +55,7 @@ Placeholders use `{{snake_case}}` and must be declared where the key is added:
 
 ## Locale resolution
 
-`localStorage` override -> `user.language` -> site default (admin setting) -> browser languages -> `en-US`.
+`user.language` -> `localStorage` override -> site default (admin setting) -> browser languages -> `en-US`.
 
 - `setLocale(code)` persists the override, updates `document.documentElement.lang`, and fetches
   the locale dictionary from the panel (cached in memory for the session).
@@ -87,8 +87,9 @@ A PHPUnit guard (`tests/Unit/I18n/LocaleSyncTest.php`) fails if a locale folder 
 - Castilian Spanish from Spain, following RAE orthography (<https://www.rae.es/ortografia/>).
 - Address the user impersonally or with `tú`; do not use `vosotros` outside explanatory prose.
 - Use Spanish technical vocabulary: "contraseña" (password), "servidor" (server),
-  "copia de seguridad" (backup), "tarea programada" (schedule).
-- Keep placeholders and product names (`Hydrodactyl`, egg names, file names) untranslated.
+  "copia de seguridad" (backup), "tarea programada" (schedule), "huevo" (egg) and "nido" (nest).
+- Keep placeholders and product names (`Hydrodactyl`, egg/nest proper names, file names) untranslated.
+- Do not use em dashes (—) as clause separators; prefer a colon, a comma or parentheses.
 
 ## Verification
 

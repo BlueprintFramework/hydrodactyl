@@ -3,6 +3,11 @@
 return [
     'breadcrumb' => 'S3',
     'configurations' => 'Configuraciones de S3',
+    'created' => 'Configuración de S3 creada.',
+    'bucket_created' => 'Configuración de S3 creada',
+    'updated' => 'Configuración de S3 actualizada.',
+    'deleted' => 'Configuración de S3 eliminada.',
+    'in_use' => 'No se puede eliminar: hay servidores usando el bucket.',
     'index' => [
         'bucket_list' => 'Lista de buckets S3',
         'bucket_name' => 'Nombre del bucket',
@@ -52,7 +57,7 @@ return [
             'in_use' => '<strong>:count servidor(es)</strong> están usando actualmente esta configuración de S3. Debes reasignarlos a otro bucket antes de eliminarla.',
             'irreversible_help' => 'Eliminar una configuración de S3 es irreversible. Las copias de seguridad almacenadas en este bucket dejarán de ser accesibles desde el panel.',
             'subtitle' => 'Elimina esta configuración de S3.',
-            'title' => 'S3 — :name: Eliminar',
+            'title' => 'S3 - :name: Eliminar',
             'warning' => 'Esta acción eliminará permanentemente esta configuración de bucket S3.',
         ],
         'details' => [
@@ -80,7 +85,7 @@ return [
             'subtitle' => 'Edita los detalles de esta configuración de S3.',
             'success' => 'Correcto',
             'test_connection' => 'Probar conexión',
-            'title' => 'S3 — :name: Detalles',
+            'title' => 'S3 - :name: Detalles',
             'update' => 'Actualizar configuración',
         ],
         'index' => [
@@ -95,7 +100,7 @@ return [
             'information' => 'Información',
             'path_style' => 'Endpoints de estilo de ruta',
             'region' => 'Región',
-            'title' => 'S3 — :name',
+            'title' => 'S3 - :name',
             'updated' => 'Actualizado',
             'view_servers' => 'Ver servidores',
         ],

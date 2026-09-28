@@ -76,12 +76,12 @@ class S3Controller extends Controller
     {
         // Optional: check if in use
         if ($s3->servers()->exists()) {
-            $this->alert->error('Cannot delete: bucket is used by servers.')->flash();
+            $this->alert->error(__('admin/s3.in_use'))->flash();
             return redirect()->route('admin.buckets.view', $s3->id);
         }
 
         $this->deletionService->handle($s3);
-        $this->alert->success('S3 configuration deleted.')->flash();
+        $this->alert->success(__('admin/s3.deleted'))->flash();
 
         return redirect()->route('admin.buckets');
     }
@@ -90,7 +90,7 @@ class S3Controller extends Controller
     {
         $s3 = $this->creationService->handle($request->validated());
 
-        $this->alert->success('S3 configuration created.')->flash();
+        $this->alert->success(__('admin/s3.created'))->flash();
 
         return redirect()->route('admin.buckets.view', $s3->id);
     }
@@ -99,7 +99,7 @@ class S3Controller extends Controller
     {
         $this->updateService->handle($s3, $request->validated());
 
-        $this->alert->success('S3 configuration updated.')->flash();
+        $this->alert->success(__('admin/s3.updated'))->flash();
 
         return redirect()->route('admin.buckets.view', $s3->id);
     }
