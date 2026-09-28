@@ -1,8 +1,10 @@
 import enUSDictionary from '@lang/en-US/ui.json';
+import type { Locale } from 'date-fns';
+import { enUS } from 'date-fns/locale/en-US';
 import { useStoreState } from 'easy-peasy';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { interpolate } from '@/i18n/interpolate';
-import { DEFAULT_LOCALE, getDateFnsLocale, loadLocale, localeLabel, matchLocale } from '@/i18n/loader';
+import { DEFAULT_LOCALE, loadDateFnsLocale, loadLocale, localeLabel, matchLocale } from '@/i18n/loader';
 import type {
     DeepPartial,
     I18nContextValue,
@@ -113,7 +115,7 @@ const I18nProvider = ({ children }: I18nProviderProps) => {
     const [dictionary, setDictionary] = useState<Translations>(enUSDictionary);
     const [ready, setReady] = useState(locale === DEFAULT_LOCALE);
 
-    const dateFnsLocale = useMemo(() => getDateFnsLocale(locale), [locale]);
+    const [dateFnsLocale, setDateFnsLocale] = useState<Locale>(enUS);
 
     useEffect(() => {
         let cancelled = false;
@@ -130,6 +132,12 @@ const I18nProvider = ({ children }: I18nProviderProps) => {
                 }
             });
         }
+
+        void loadDateFnsLocale(locale).then((value) => {
+            if (!cancelled) {
+                setDateFnsLocale(value);
+            }
+        });
 
         document.documentElement.lang = locale;
 

@@ -1,22 +1,6 @@
 import enUSDictionary from '@lang/en-US/ui.json';
 import type { Locale } from 'date-fns';
-import { de } from 'date-fns/locale/de';
-import { enGB } from 'date-fns/locale/en-GB';
 import { enUS } from 'date-fns/locale/en-US';
-import { es } from 'date-fns/locale/es';
-import { fr } from 'date-fns/locale/fr';
-import { it } from 'date-fns/locale/it';
-import { ja } from 'date-fns/locale/ja';
-import { ko } from 'date-fns/locale/ko';
-import { nl } from 'date-fns/locale/nl';
-import { pl } from 'date-fns/locale/pl';
-import { pt } from 'date-fns/locale/pt';
-import { ptBR } from 'date-fns/locale/pt-BR';
-import { ru } from 'date-fns/locale/ru';
-import { tr } from 'date-fns/locale/tr';
-import { uk } from 'date-fns/locale/uk';
-import { zhCN } from 'date-fns/locale/zh-CN';
-import { zhTW } from 'date-fns/locale/zh-TW';
 import { deepmerge } from 'deepmerge-ts';
 import type { DeepPartial, Translations } from '@/i18n/types';
 
@@ -72,39 +56,49 @@ export function matchLocale(value: string | null | undefined, codes: string[]): 
     return codes.find((code) => code.toLowerCase().split('-')[0] === language);
 }
 
-const dateFnsLocales: Record<string, Locale> = {
-    de: de,
-    'de-de': de,
-    en: enUS,
-    'en-gb': enGB,
-    'en-us': enUS,
-    es: es,
-    'es-es': es,
-    fr: fr,
-    'fr-fr': fr,
-    it: it,
-    ja: ja,
-    ko: ko,
-    nl: nl,
-    pl: pl,
-    pt: pt,
-    'pt-br': ptBR,
-    ru: ru,
-    tr: tr,
-    uk: uk,
-    'zh-cn': zhCN,
-    'zh-tw': zhTW,
-};
+/**
+ * Every locale shipped with date-fns, resolved on demand. A language folder
+ * dropped into `resources/lang` therefore localizes dates without any code
+ * change, and the locale bundles are only downloaded when they are used.
+ */
+const dateFnsModules = import.meta.glob<{ default: Locale }>('/node_modules/date-fns/locale/*.js');
+
+const dateFnsCache = new Map<string, Locale>();
 
 /**
- * Best-effort date-fns locale lookup based on the language part of the code.
- * Unknown languages still get translated panel copy, only dates stay English.
+ * Load the date-fns locale for a code, preferring the regional variant when
+ * the package ships one ("pt-BR") and falling back to the bare language
+ * ("es") or en-US. Unknown languages still get translated panel copy, only
+ * dates stay English.
  */
-export function getDateFnsLocale(code: string): Locale {
-    const lower = code.toLowerCase();
-    const language = lower.split('-')[0] ?? lower;
+export async function loadDateFnsLocale(code: string): Promise<Locale> {
+    if (code === DEFAULT_LOCALE) {
+        return enUS;
+    }
 
-    return dateFnsLocales[lower] ?? dateFnsLocales[language] ?? enUS;
+    const cached = dateFnsCache.get(code);
+
+    if (cached) {
+        return cached;
+    }
+
+    const [language = '', region] = code.toLowerCase().split('-');
+    const candidates = [region ? `${language}-${region.toUpperCase()}` : null, language];
+
+    for (const candidate of candidates) {
+        const loader = candidate ? dateFnsModules[`/node_modules/date-fns/locale/${candidate}.js`] : undefined;
+
+        if (loader) {
+            const { default: locale } = await loader();
+            dateFnsCache.set(code, locale);
+
+            return locale;
+        }
+    }
+
+    dateFnsCache.set(code, enUS);
+
+    return enUS;
 }
 
 /** cronstrue ships per-language bundles keyed by the language part ("es"). */
