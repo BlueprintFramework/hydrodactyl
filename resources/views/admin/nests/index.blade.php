@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
 @section('title')
-    Nests
+    {{ __('admin/nests.index.title') }}
 @endsection
 
 @section('content-header')
-    <h1>Nests<small>All nests currently available on this system.</small></h1>
+    <h1>{{ __('admin/nests.index.title') }}<small>{{ __('admin/nests.index.subtitle') }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li class="active">Nests</li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li class="active">{{ __('admin/nests.index.title') }}</li>
     </ol>
 @endsection
 
@@ -16,7 +16,7 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="callout callout-warning">
-            <i class="fa fa-warning"></i> <strong>Eggs are powerful</strong> — modifying them incorrectly can break your servers. Avoid editing default eggs unless you know what you're doing.
+            <i class="fa fa-warning"></i> {!! __('admin/nests.index.warning') !!}
         </div>
     </div>
 </div>
@@ -24,21 +24,21 @@
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header with-border">
-                <h3 class="box-title">Configured Nests</h3>
+                <h3 class="box-title">{{ __('admin/nests.index.configured_nests') }}</h3>
                 <div class="box-tools">
-                    <a href="#" class="btn btn-sm btn-success" data-toggle="modal" data-target="#importServiceOptionModal" role="button"><i class="fa fa-upload"></i> Import Egg</a>
-                    <a href="#" class="btn btn-sm btn-success" data-toggle="modal" data-target="#importServiceOptionFromUrlModal" role="button"><i class="fa fa-upload"></i> Import Egg from URL</a>
-                    <a href="{{ route('admin.nests.new') }}" class="btn btn-primary btn-sm">Create New</a>
+                    <a href="#" class="btn btn-sm btn-success" data-toggle="modal" data-target="#importServiceOptionModal" role="button"><i class="fa fa-upload"></i> {{ __('admin/nests.index.import_egg') }}</a>
+                    <a href="#" class="btn btn-sm btn-success" data-toggle="modal" data-target="#importServiceOptionFromUrlModal" role="button"><i class="fa fa-upload"></i> {{ __('admin/nests.index.import_egg_from_url') }}</a>
+                    <a href="{{ route('admin.nests.new') }}" class="btn btn-primary btn-sm">{{ __('admin/nests.index.create_new') }}</a>
                 </div>
             </div>
             <div class="box-body table-responsive no-padding">
                 <table class="table table-hover">
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th class="text-center">Eggs</th>
-                        <th class="text-center">Servers</th>
+                        <th>{{ __('strings.id') }}</th>
+                        <th>{{ __('strings.name') }}</th>
+                        <th>{{ __('admin/nests.index.table_description') }}</th>
+                        <th class="text-center">{{ __('admin/nests.index.table_eggs') }}</th>
+                        <th class="text-center">{{ __('strings.servers') }}</th>
                     </tr>
                     @foreach($nests as $nest)
                         <tr>
@@ -58,34 +58,34 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Import an Egg</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('strings.close') }}"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">{{ __('admin/nests.index.import_modal_title') }}</h4>
             </div>
             <form action="{{ route('admin.nests.egg.import') }}" enctype="multipart/form-data" method="POST">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="control-label" for="pImportFile">Egg File <span class="field-required"></span></label>
+                        <label class="control-label" for="pImportFile">{{ __('admin/nests.index.egg_file') }} <span class="field-required"></span></label>
                         <div>
                             <input id="pImportFile" type="file" name="import_file" class="form-control" accept="application/json" />
-                            <p class="small text-muted">Select the <code>.json</code> file for the new egg that you wish to import.</p>
+                            <p class="small text-muted">{!! __('admin/nests.index.egg_file_help') !!}</p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label" for="pImportToNest">Associated Nest <span class="field-required"></span></label>
+                        <label class="control-label" for="pImportToNest">{{ __('admin/nests.index.associated_nest') }} <span class="field-required"></span></label>
                         <div>
                             <select id="pImportToNest" name="import_to_nest">
                                 @foreach($nests as $nest)
                                    <option value="{{ $nest->id }}">{{ $nest->name }} &lt;{{ $nest->author }}&gt;</option>
                                 @endforeach
                             </select>
-                            <p class="small text-muted">Select the nest that this egg will be associated with from the dropdown. If you wish to associate it with a new nest you will need to create that nest before continuing.</p>
+                            <p class="small text-muted">{{ __('admin/nests.index.associated_nest_help') }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     {{ csrf_field() }}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Import</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('strings.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('admin/nests.index.import_button') }}</button>
                 </div>
             </form>
         </div>
@@ -95,34 +95,34 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Import an Egg</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('strings.close') }}"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">{{ __('admin/nests.index.import_modal_title') }}</h4>
             </div>
             <form action="{{ route('admin.nests.egg.import_url') }}" enctype="multipart/form-data" method="POST">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="control-label" for="pImportFile">Egg URL <span class="field-required"></span></label>
+                        <label class="control-label" for="pImportFile">{{ __('admin/nests.index.egg_url') }} <span class="field-required"></span></label>
                         <div>
                             <input id="pImportFile" type="url" name="import_file_url" class="form-control" accept="application/json" />
-                            <p class="small text-muted">Type the URL of the file for the new egg that you wish to import.</p>
+                            <p class="small text-muted">{{ __('admin/nests.index.egg_url_help') }}</p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label" for="pImportToNest">Associated Nest <span class="field-required"></span></label>
+                        <label class="control-label" for="pImportToNest">{{ __('admin/nests.index.associated_nest') }} <span class="field-required"></span></label>
                         <div>
                             <select id="pImportToNest" name="import_to_nest">
                                 @foreach($nests as $nest)
                                    <option value="{{ $nest->id }}">{{ $nest->name }} &lt;{{ $nest->author }}&gt;</option>
                                 @endforeach
                             </select>
-                            <p class="small text-muted">Select the nest that this egg will be associated with from the dropdown. If you wish to associate it with a new nest you will need to create that nest before continuing.</p>
+                            <p class="small text-muted">{{ __('admin/nests.index.associated_nest_help') }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     {{ csrf_field() }}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Import</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('strings.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('admin/nests.index.import_button') }}</button>
                 </div>
             </form>
         </div>

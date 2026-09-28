@@ -13,11 +13,13 @@ import ServerHeader from '@/components/server/header/ServerHeader';
 import AllocationRow from '@/components/server/network/AllocationRow';
 import SubdomainManagement from '@/components/server/network/SubdomainManagement';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 import { useFlashKey } from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
 const NetworkContainer = () => {
+    const { t } = useTranslation();
     const [_, setLoading] = useState(false);
     const [showSubdomainModal, setShowSubdomainModal] = useState(false);
     const [subdomainSupported, setSubdomainSupported] = useState(false);
@@ -78,7 +80,7 @@ const NetworkContainer = () => {
     };
 
     return (
-        <ServerContentBlock title={'Network'} className='p-0!'>
+        <ServerContentBlock title={t('navigation.network')} className='p-0!'>
             <ServerHeader />
             <FlashMessageRender byKey={'server:network'} />
 
@@ -91,7 +93,7 @@ const NetworkContainer = () => {
                                     {(allocationLimit === null || data.length < allocationLimit) && (
                                         <Button variant='secondary' className='gap-2' onClick={onCreateAllocation}>
                                             <Plus width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                                            New Allocation
+                                            {t('server.network.new_allocation')}
                                         </Button>
                                     )}
                                     {subdomainSupported && (
@@ -100,17 +102,20 @@ const NetworkContainer = () => {
                                             className='gap-2'
                                             onClick={() => setShowSubdomainModal(true)}
                                         >
-                                            Subdomains
+                                            {t('server.network.subdomains')}
                                         </Button>
                                     )}
                                     <span
                                         className={`text-sm ${allocationLimit === 0 ? 'text-red-400' : 'text-zinc-300'} gap-0.5`}
                                     >
                                         {allocationLimit === null
-                                            ? `${data.length} allocations `
+                                            ? t('server.network.allocations_count', { count: data.length })
                                             : allocationLimit === 0
-                                              ? 'Allocations disabled'
-                                              : `${data.length} of ${allocationLimit}`}
+                                              ? t('server.network.allocations_disabled')
+                                              : t('server.network.allocations_of_limit', {
+                                                    count: data.length,
+                                                    limit: allocationLimit ?? 0,
+                                                })}
                                     </span>
                                 </div>
                             </Can>
@@ -121,7 +126,7 @@ const NetworkContainer = () => {
                         <div className='flex items-center justify-center py-12'>
                             <div className='flex flex-col items-center gap-3'>
                                 <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-brand'></div>
-                                <p className='text-sm text-neutral-400'>Loading allocations...</p>
+                                <p className='text-sm text-neutral-400'>{t('server.network.loading')}</p>
                             </div>
                         </div>
                     ) : data.length > 0 ? (
@@ -149,12 +154,14 @@ const NetworkContainer = () => {
                                     </svg>
                                 </div>
                                 <h4 className='text-lg font-medium text-zinc-200 mb-2'>
-                                    {allocationLimit === 0 ? 'Allocations unavailable' : 'No allocations found'}
+                                    {allocationLimit === 0
+                                        ? t('server.network.unavailable_title')
+                                        : t('server.network.empty_title')}
                                 </h4>
                                 <p className='text-sm text-zinc-400 max-w-sm text-center'>
                                     {allocationLimit === 0
-                                        ? 'Network allocations cannot be created for this server.'
-                                        : 'Create your first allocation to get started.'}
+                                        ? t('server.network.unavailable_description')
+                                        : t('server.network.empty_description')}
                                 </p>
                             </div>
                         </div>
@@ -165,7 +172,7 @@ const NetworkContainer = () => {
                 <Dialog
                     open={showSubdomainModal}
                     onClose={() => setShowSubdomainModal(false)}
-                    title='Subdomain Management'
+                    title={t('server.network.subdomain_management')}
                 >
                     <SubdomainManagement onClose={() => setShowSubdomainModal(false)} />
                 </Dialog>

@@ -73,7 +73,7 @@ class ServersController extends Controller
             'owner_id', 'external_id', 'name', 'description',
         ]));
 
-        $this->alert->success(trans('admin/server.alerts.details_updated'))->flash();
+        $this->alert->success(__('admin/server.alerts.details_updated'))->flash();
 
         return redirect()->route('admin.servers.view.details', $server->id);
     }
@@ -88,14 +88,14 @@ class ServersController extends Controller
     public function toggleInstall(Server $server): RedirectResponse
     {
         if ($server->status === Server::STATUS_INSTALL_FAILED) {
-            throw new DisplayException(trans('admin/server.exceptions.marked_as_failed'));
+            throw new DisplayException(__('admin/server.exceptions.marked_as_failed'));
         }
 
         $this->repository->update($server->id, [
             'status' => $server->isInstalled() ? Server::STATUS_INSTALLING : null,
         ], true, true);
 
-        $this->alert->success(trans('admin/server.alerts.install_toggled'))->flash();
+        $this->alert->success(__('admin/server.alerts.install_toggled'))->flash();
 
         return redirect()->route('admin.servers.view.manage', $server->id);
     }
@@ -110,7 +110,7 @@ class ServersController extends Controller
     public function reinstallServer(Server $server): RedirectResponse
     {
         $this->reinstallService->handle($server);
-        $this->alert->success(trans('admin/server.alerts.server_reinstalled'))->flash();
+        $this->alert->success(__('admin/server.alerts.server_reinstalled'))->flash();
 
         return redirect()->route('admin.servers.view.manage', $server->id);
     }
@@ -125,7 +125,7 @@ class ServersController extends Controller
     public function manageSuspension(Request $request, Server $server): RedirectResponse
     {
         $this->suspensionService->toggle($server, $request->input('action'));
-        $this->alert->success(trans('admin/server.alerts.suspension_toggled', [
+        $this->alert->success(__('admin/server.alerts.suspension_toggled', [
             'status' => $request->input('action') . 'ed',
         ]))->flash();
 
@@ -152,7 +152,7 @@ class ServersController extends Controller
             throw new ValidationException($exception->getValidator());
         }
 
-        $this->alert->success(trans('admin/server.alerts.build_updated'))->flash();
+        $this->alert->success(__('admin/server.alerts.build_updated'))->flash();
 
         return redirect()->route('admin.servers.view.build', $server->id);
     }
@@ -166,7 +166,7 @@ class ServersController extends Controller
     public function delete(Request $request, Server $server): RedirectResponse
     {
         $this->deletionService->withForce($request->filled('force_delete'))->handle($server);
-        $this->alert->success(trans('admin/server.alerts.server_deleted'))->flash();
+        $this->alert->success(__('admin/server.alerts.server_deleted'))->flash();
 
         return redirect()->route('admin.servers');
     }
@@ -192,7 +192,7 @@ class ServersController extends Controller
             throw new ValidationException($exception->getValidator());
         }
 
-        $this->alert->success(trans('admin/server.alerts.startup_changed'))->flash();
+        $this->alert->success(__('admin/server.alerts.startup_changed'))->flash();
 
         return redirect()->route('admin.servers.view.startup', $server->id);
     }

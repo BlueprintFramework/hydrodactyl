@@ -41,16 +41,16 @@ class DomainFormRequest extends AdminFormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'A domain name is required.',
-            'name.regex' => 'The domain name format is invalid.',
-            'name.unique' => 'This domain is already configured.',
-            'dns_provider.required' => 'A DNS provider must be selected.',
-            'dns_provider.in' => 'The selected DNS provider is not supported.',
-            'dns_config.required' => 'DNS configuration is required.',
-            'dns_config.api_token.required_if' => 'API token is required for Cloudflare.',
-            'dns_config.access_key_id.required_if' => 'Access Key ID is required for Route53.',
-            'dns_config.secret_access_key.required_if' => 'Secret Access Key is required for Route53.',
-            'dns_config.api_key.required_if' => 'Bunny.net API Access Key is required for Bunny.net.',
+            'name.required' => __('validation.json_api.domain_name_required'),
+            'name.regex' => __('validation.json_api.domain_name_format'),
+            'name.unique' => __('validation.json_api.domain_name_unique'),
+            'dns_provider.required' => __('validation.json_api.dns_provider_required'),
+            'dns_provider.in' => __('validation.json_api.dns_provider_invalid'),
+            'dns_config.required' => __('validation.json_api.dns_config_required'),
+            'dns_config.api_token.required_if' => __('validation.json_api.dns_api_token_required'),
+            'dns_config.access_key_id.required_if' => __('validation.json_api.dns_access_key_id_required'),
+            'dns_config.secret_access_key.required_if' => __('validation.json_api.dns_secret_access_key_required'),
+            'dns_config.api_key.required_if' => __('validation.json_api.dns_api_key_required'),
         ];
     }
 
@@ -60,14 +60,14 @@ class DomainFormRequest extends AdminFormRequest
     public function attributes(): array
     {
         return [
-            'name' => 'domain name',
-            'dns_provider' => 'DNS provider',
-            'dns_config.api_token' => 'API token',
-            'dns_config.access_key_id' => 'Access Key ID',
-            'dns_config.secret_access_key' => 'Secret Access Key',
-            'dns_config.region' => 'AWS Region',
-            'dns_config.hosted_zone_id' => 'Hosted Zone ID',
-            'dns_config.api_key' => 'Bunny.net API Access Key',
+            'name' => __('validation.attributes.domain_name'),
+            'dns_provider' => __('validation.attributes.dns_provider'),
+            'dns_config.api_token' => __('validation.attributes.dns_config.api_token'),
+            'dns_config.access_key_id' => __('validation.attributes.dns_config.access_key_id'),
+            'dns_config.secret_access_key' => __('validation.attributes.dns_config.secret_access_key'),
+            'dns_config.region' => __('validation.attributes.dns_config.region'),
+            'dns_config.hosted_zone_id' => __('validation.attributes.dns_config.hosted_zone_id'),
+            'dns_config.api_key' => __('validation.attributes.dns_config.api_key'),
         ];
     }
 

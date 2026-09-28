@@ -33,13 +33,13 @@ class SftpAuthenticationController extends Controller
     {
         $connection = $this->parseUsername($request->input('username'));
         if (empty($connection['server'])) {
-            throw new BadRequestHttpException('No valid server identifier was included in the request.');
+            throw new BadRequestHttpException(__('exceptions.remote.sftp.invalid_server'));
         }
 
         if ($this->hasTooManyLoginAttempts($request)) {
             $seconds = $this->limiter()->availableIn($this->throttleKey($request));
 
-            throw new TooManyRequestsHttpException($seconds, "Too many login attempts for this account, please try again in $seconds seconds.");
+            throw new TooManyRequestsHttpException($seconds, __('exceptions.remote.sftp.too_many_attempts', ['seconds' => $seconds]));
         }
 
         $user = $this->getUser($request, $connection['username']);
@@ -130,7 +130,7 @@ class SftpAuthenticationController extends Controller
             $this->incrementLoginAttempts($request);
         }
 
-        throw new HttpForbiddenException('Authorization credentials were not correct, please try again.');
+        throw new HttpForbiddenException(__('exceptions.remote.sftp.invalid_credentials'));
     }
 
     /**
@@ -144,7 +144,7 @@ class SftpAuthenticationController extends Controller
             if (!in_array(Permission::ACTION_FILE_SFTP, $permissions)) {
                 Activity::event('server:sftp.denied')->actor($user)->subject($server)->log();
 
-                throw new HttpForbiddenException('You do not have permission to access SFTP for this server.');
+                throw new HttpForbiddenException(__('exceptions.remote.sftp.forbidden'));
             }
         }
 

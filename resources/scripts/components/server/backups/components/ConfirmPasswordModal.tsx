@@ -5,6 +5,7 @@ import { Dialog } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import type { ApplicationStore } from '@/state';
 
 interface ConfirmPasswordModalProps {
@@ -29,9 +30,10 @@ const ConfirmPasswordModal = ({
     loading = false,
     description,
     warningItems,
-    confirmText = 'Confirm',
+    confirmText,
     showWarning = true,
 }: ConfirmPasswordModalProps) => {
+    const { t } = useTranslation();
     const [password, setPassword] = useState('');
     const [totpCode, setTotpCode] = useState('');
     const hasTwoFactor = useStoreState((state: ApplicationStore) => state.user.data?.useTotp || false);
@@ -62,7 +64,7 @@ const ConfirmPasswordModal = ({
                                 className='text-red-400 mt-0.5 flex-shrink-0'
                             />
                             <div className='text-sm'>
-                                <p className='font-medium text-red-300'>Warning</p>
+                                <p className='font-medium text-red-300'>{t('common.warning')}</p>
                                 <ul className='text-red-400 mt-2 space-y-1 list-disc list-inside'>
                                     {warningItems.map((item, i) => (
                                         <li key={i}>{item}</li>
@@ -79,13 +81,13 @@ const ConfirmPasswordModal = ({
                             htmlFor={`${flashKey}-password`}
                             className='block text-sm font-medium text-zinc-300 mb-1'
                         >
-                            Password
+                            {t('server.backups.password_label')}
                         </label>
                         <input
                             id={`${flashKey}-password`}
                             type='password'
                             className='w-full px-4 py-2 rounded-lg outline-hidden bg-[#ffffff17] text-sm border border-zinc-700 focus:border-brand'
-                            placeholder='Enter your password'
+                            placeholder={t('server.backups.password_placeholder')}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={loading}
@@ -98,13 +100,13 @@ const ConfirmPasswordModal = ({
                                 htmlFor={`${flashKey}-totp`}
                                 className='block text-sm font-medium text-zinc-300 mb-1'
                             >
-                                Two-Factor Authentication Code
+                                {t('server.backups.totp_label')}
                             </label>
                             <input
                                 id={`${flashKey}-totp`}
                                 type='text'
                                 className='w-full px-4 py-2 rounded-lg outline-hidden bg-[#ffffff17] text-sm border border-zinc-700 focus:border-brand'
-                                placeholder='6-digit code'
+                                placeholder={t('server.backups.totp_placeholder')}
                                 maxLength={6}
                                 value={totpCode}
                                 onChange={(e) => setTotpCode(e.target.value.replace(/[^0-9]/g, ''))}
@@ -117,11 +119,11 @@ const ConfirmPasswordModal = ({
 
             <Dialog.Footer>
                 <Button onClick={handleClose} variant='secondary' disabled={loading}>
-                    Cancel
+                    {t('common.cancel')}
                 </Button>
                 <Button onClick={handleConfirm} variant='attention' disabled={loading || !password}>
                     {loading && <Spinner size='small' />}
-                    {loading ? 'Processing...' : confirmText}
+                    {loading ? t('server.backups.processing') : (confirmText ?? t('common.confirm'))}
                 </Button>
             </Dialog.Footer>
         </Dialog>

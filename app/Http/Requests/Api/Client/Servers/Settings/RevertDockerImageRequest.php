@@ -30,8 +30,8 @@ class RevertDockerImageRequest extends ClientApiRequest implements ClientPermiss
     public function messages(): array
     {
         return [
-            'confirm.required' => 'You must confirm that you understand this action cannot be undone without administrator assistance.',
-            'confirm.accepted' => 'You must confirm that you understand this action cannot be undone without administrator assistance.',
+            'confirm.required' => __('validation.json_api.revert_docker_image_confirm'),
+            'confirm.accepted' => __('validation.json_api.revert_docker_image_confirm'),
         ];
     }
 

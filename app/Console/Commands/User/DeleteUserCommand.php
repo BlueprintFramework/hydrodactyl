@@ -23,7 +23,7 @@ class DeleteUserCommand extends Command
 
     public function handle(): int
     {
-        $search = $this->option('user') ?? $this->ask(trans('command/messages.user.search_users'));
+        $search = $this->option('user') ?? $this->ask(__('command/messages.user.search_users'));
         Assert::notEmpty($search, 'Search term should be an email address, got: %s.');
 
         $results = User::query()
@@ -33,7 +33,7 @@ class DeleteUserCommand extends Command
             ->get();
 
         if (count($results) < 1) {
-            $this->error(trans('command/messages.user.no_users_found'));
+            $this->error(__('command/messages.user.no_users_found'));
             if ($this->input->isInteractive()) {
                 return $this->handle();
             }
@@ -48,12 +48,12 @@ class DeleteUserCommand extends Command
             }
 
             $this->table(['User ID', 'Email', 'Name'], $tableValues);
-            if (!$deleteUser = $this->ask(trans('command/messages.user.select_search_user'))) {
+            if (!$deleteUser = $this->ask(__('command/messages.user.select_search_user'))) {
                 return $this->handle();
             }
         } else {
             if (count($results) > 1) {
-                $this->error(trans('command/messages.user.multiple_found'));
+                $this->error(__('command/messages.user.multiple_found'));
 
                 return 1;
             }
@@ -61,9 +61,9 @@ class DeleteUserCommand extends Command
             $deleteUser = $results->first();
         }
 
-        if ($this->confirm(trans('command/messages.user.confirm_delete')) || !$this->input->isInteractive()) {
+        if ($this->confirm(__('command/messages.user.confirm_delete')) || !$this->input->isInteractive()) {
             $this->deletionService->handle($deleteUser);
-            $this->info(trans('command/messages.user.deleted'));
+            $this->info(__('command/messages.user.deleted'));
         }
 
         return 0;

@@ -91,4 +91,18 @@ return [
     'disable' => 'Disable',
     'save' => 'Save',
     'copyright' => '&copy; 2015 - :year Pterodactyl Software',
+    'error_processing_request' => 'An unexpected error was encountered while processing this request, please try again.',
+    'error_resource_not_found' => 'The requested resource could not be found on the server.',
+    'setup_atomic_cache_required' => 'The setup flow requires an atomic cache driver.',
+    'system_status' => [
+        'retrieve_failed' => 'Failed to retrieve system metrics',
+        'vm_stat_failed' => 'Failed to execute vm_stat command',
+        'free_command_failed' => 'Failed to execute free command',
+        'memory_parse_failed' => 'Failed to parse memory information',
+        'total_memory_failed' => 'Failed to get total memory size',
+        'cpu_usage_failed' => 'Failed to get CPU usage',
+        'disk_info_failed' => 'Failed to get disk  space information',
+        'uptime_failed' => 'Failed to get system uptime',
+        'uptime_read_failed' => 'Failed to read uptime file',
+    ],
 ];

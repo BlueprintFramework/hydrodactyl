@@ -71,7 +71,7 @@ class ElytraJobService
                 'job_id' => $job->uuid,
                 'elytra_job_id' => $elytraJobId,
                 'status' => 'submitted',
-                'message' => 'Job submitted to Elytra successfully',
+                'message' => __('exceptions.elytra.job_submitted'),
                 'data' => $handler->formatJobResponse($job),
             ];
 
@@ -126,11 +126,11 @@ class ElytraJobService
             ->first();
 
         if (!$job) {
-            throw new \Exception('Job not found');
+            throw new \Exception(__('exceptions.client.jobs.not_found'));
         }
 
         if (!in_array($job->status, [ElytraJob::STATUS_PENDING, ElytraJob::STATUS_SUBMITTED, ElytraJob::STATUS_RUNNING])) {
-            throw new \Exception('Job cannot be cancelled in current status');
+            throw new \Exception(__('exceptions.elytra.cannot_cancel'));
         }
 
         $handler = $this->getJobHandler($job->job_type);
@@ -145,7 +145,7 @@ class ElytraJobService
             return [
                 'job_id' => $job->uuid,
                 'status' => 'cancelled',
-                'message' => 'Job cancelled successfully',
+                'message' => __('exceptions.elytra.job_cancelled'),
             ];
 
         } catch (\Exception $e) {
@@ -208,7 +208,7 @@ class ElytraJobService
 
         $errorMessage = $statusData['error_message'] ?? null;
         if ($errorMessage && str_starts_with($job->job_type, 'backup_')) {
-            $errorMessage = 'Backup operation failed. Please contact an administrator for details.';
+            $errorMessage = __('exceptions.elytra.backup_failed_generic');
         }
 
         $job->update([
@@ -301,7 +301,7 @@ class ElytraJobService
     public function getJobHandler(string $jobType): Job
     {
         if (!isset($this->jobHandlers[$jobType])) {
-            throw new \Exception("No handler registered for job type: {$jobType}");
+            throw new \Exception(__('exceptions.elytra.no_handler', ['type' => $jobType]));
         }
 
         return $this->jobHandlers[$jobType];

@@ -5,6 +5,8 @@ import { type OperationStatus, type ServerOperation, useOperationPolling } from 
 import { Dialog } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 import {
     canCloseOperation,
     formatOperationId,
@@ -17,6 +19,14 @@ import {
 } from '@/lib/server-operations';
 
 import { ServerContext } from '@/state/server';
+
+const STATUS_LABEL_KEYS: Record<OperationStatus, TranslationKey> = {
+    pending: 'server.operations.status_pending',
+    running: 'server.operations.status_running',
+    completed: 'server.operations.status_completed',
+    failed: 'server.operations.status_failed',
+    cancelled: 'server.operations.status_cancelled',
+};
 
 interface Props {
     visible: boolean;
@@ -39,6 +49,7 @@ const OperationProgressModal: React.FC<Props> = ({
     onComplete,
     onError,
 }) => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const [operation, setOperation] = useState<ServerOperation | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -141,7 +152,9 @@ const OperationProgressModal: React.FC<Props> = ({
                 {operationId && (
                     <div className='flex justify-center'>
                         <div className='px-3 py-1.5 bg-[#ffffff11] border border-[#ffffff12] rounded-lg'>
-                            <p className='text-xs text-zinc-400 font-mono'>ID: {formatOperationId(operationId)}</p>
+                            <p className='text-xs text-zinc-400 font-mono'>
+                                {t('server.operations.id')} {formatOperationId(operationId)}
+                            </p>
                         </div>
                     </div>
                 )}
@@ -156,7 +169,7 @@ const OperationProgressModal: React.FC<Props> = ({
                                 fill='currentColor'
                                 className='w-6 h-6 text-red-400'
                             />
-                            <span className='text-red-400 font-semibold text-lg'>Error</span>
+                            <span className='text-red-400 font-semibold text-lg'>{t('common.error')}</span>
                         </div>
                         <div className='p-4 bg-red-500/10 border border-red-500/20 rounded-lg'>
                             <p className='text-sm text-red-300'>{error}</p>
@@ -171,13 +184,15 @@ const OperationProgressModal: React.FC<Props> = ({
                             <span
                                 className={`font-semibold capitalize text-lg ${statusStyling?.color || 'text-zinc-300'}`}
                             >
-                                {operation.status}
+                                {t(STATUS_LABEL_KEYS[operation.status])}
                             </span>
                         </div>
 
                         {/* Message Box */}
                         <div className='p-4 bg-[#ffffff11] border border-[#ffffff12] rounded-lg'>
-                            <p className='text-sm text-zinc-300 text-center'>{operation.message || 'Processing...'}</p>
+                            <p className='text-sm text-zinc-300 text-center'>
+                                {operation.message || t('server.operations.processing')}
+                            </p>
                         </div>
 
                         {/* Progress Bar for Active Operations */}
@@ -190,7 +205,7 @@ const OperationProgressModal: React.FC<Props> = ({
                                     />
                                 </div>
                                 <p className='text-xs text-zinc-500 text-center'>
-                                    This window will close automatically when complete
+                                    {t('server.operations.auto_close_notice')}
                                 </p>
                             </div>
                         )}
@@ -203,12 +218,12 @@ const OperationProgressModal: React.FC<Props> = ({
                                         <div className='w-2 h-2 rounded-full bg-white' />
                                     </div>
                                     <p className='text-sm text-green-300 font-medium'>
-                                        Operation completed successfully
+                                        {t('server.operations.completed')}
                                     </p>
                                 </div>
                                 {autoCloseTimer && (
                                     <p className='text-xs text-green-200 text-center'>
-                                        Closing automatically in 3 seconds
+                                        {t('server.operations.closing_automatically')}
                                     </p>
                                 )}
                             </div>
@@ -224,7 +239,9 @@ const OperationProgressModal: React.FC<Props> = ({
                                         fill='currentColor'
                                         className='w-5 h-5 text-red-400'
                                     />
-                                    <p className='text-sm text-red-300 font-medium'>Operation failed</p>
+                                    <p className='text-sm text-red-300 font-medium'>
+                                        {t('server.operations.failed')}
+                                    </p>
                                 </div>
                                 {operation.message && (
                                     <p className='text-xs text-red-200 text-center'>{operation.message}</p>
@@ -236,7 +253,7 @@ const OperationProgressModal: React.FC<Props> = ({
                     /* Loading State */
                     <div className='flex items-center justify-center space-x-3 py-4'>
                         <Spinner size={'small'} />
-                        <span className='text-zinc-400 font-medium'>Initializing...</span>
+                        <span className='text-zinc-400 font-medium'>{t('server.operations.initializing')}</span>
                     </div>
                 )}
             </div>
@@ -244,10 +261,10 @@ const OperationProgressModal: React.FC<Props> = ({
             {canClose && (
                 <Dialog.Footer>
                     <Button onClick={handleClose} variant='secondary'>
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button onClick={handleClose} variant='attention'>
-                        {operation?.is_completed ? 'Done' : 'Close'}
+                        {operation?.is_completed ? t('common.done') : t('common.close')}
                     </Button>
                 </Dialog.Footer>
             )}

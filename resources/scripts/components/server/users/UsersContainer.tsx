@@ -11,11 +11,13 @@ import FlashMessageRender from '@/components/FlashMessageRender';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import UserRow from '@/components/server/users/UserRow';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 
 const UsersContainer = () => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -48,7 +50,7 @@ const UsersContainer = () => {
     }, [getPermissions, addError]);
 
     return (
-        <ServerContentBlock title={'Users'} className='p-0!'>
+        <ServerContentBlock title={t('server.users.title')} className='p-0!'>
             <ServerHeader />
             <FlashMessageRender byKey={'users'} />
             {loading ? (
@@ -66,11 +68,13 @@ const UsersContainer = () => {
                                     className='gap-2'
                                 >
                                     <Plus width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                                    New User
+                                    {t('server.users.new_user')}
                                 </Button>
                             </Can>
                         </div>
-                        <p className='text-sm text-zinc-300 text-center sm:text-right'>{subusers.length} users</p>
+                        <p className='text-sm text-zinc-300 text-center sm:text-right'>
+                            {t('server.users.count', { count: subusers.length })}
+                        </p>
                     </div>
                     <div className='px-2 sm:px-14 pt-2'>
                         {!subusers.length ? (
@@ -84,10 +88,11 @@ const UsersContainer = () => {
                                             fill='currentColor'
                                         />
                                     </div>
-                                    <h3 className='text-lg font-medium text-zinc-200 mb-2'>No users found</h3>
+                                    <h3 className='text-lg font-medium text-zinc-200 mb-2'>
+                                        {t('server.users.empty_title')}
+                                    </h3>
                                     <p className='text-sm text-zinc-400 max-w-sm'>
-                                        Your server does not have any additional users. Add others to help you manage
-                                        your server.
+                                        {t('server.users.empty_description')}
                                     </p>
                                 </div>
                             </div>

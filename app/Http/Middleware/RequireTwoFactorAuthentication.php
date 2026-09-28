@@ -60,7 +60,7 @@ class RequireTwoFactorAuthentication
             throw new TwoFactorAuthRequiredException();
         }
 
-        $this->alert->danger(trans('auth.2fa_must_be_enabled'))->flash();
+        $this->alert->danger(__('auth.2fa_must_be_enabled'))->flash();
 
         return redirect()->to($this->redirectRoute);
     }

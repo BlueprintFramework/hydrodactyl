@@ -2,14 +2,14 @@
 @include('partials/admin.settings.nav', ['activeTab' => 'mail'])
 
 @section('title')
-  Mail Settings
+  {{ __('admin/settings.mail.title') }}
 @endsection
 
 @section('content-header')
-  <h1>Mail Settings<small>Configure how Pterodactyl should handle sending emails.</small></h1>
+  <h1>{{ __('admin/settings.mail.title') }}<small>{{ __('admin/settings.mail.subtitle') }}</small></h1>
   <ol class="breadcrumb">
-    <li><a href="{{ route('admin.index') }}">Admin</a></li>
-    <li class="active">Settings</li>
+    <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+    <li class="active">{{ __('admin/navigation.breadcrumb.settings') }}</li>
   </ol>
 @endsection
 
@@ -20,82 +20,81 @@
       @if($disabled)
       <div class="box box-primary">
         <div class="box-header with-border">
-          <i class="fa fa-envelope"></i> <h3 class="box-title" style="display:inline;">Mail Settings</h3>
+          <i class="fa fa-envelope"></i> <h3 class="box-title" style="display:inline;">{{ __('admin/settings.mail.title') }}</h3>
         </div>
         <div class="box-body">
           <div class="alert alert-info no-margin-bottom">
-            <i class="fa fa-info-circle"></i> This interface requires the <code>smtp</code> mail driver. Use
-            <code>php artisan p:environment:mail</code> or set <code>MAIL_DRIVER=smtp</code> in your environment file.
+            <i class="fa fa-info-circle"></i> {!! __('admin/settings.mail.driver_required') !!}
           </div>
         </div>
       </div>
       @else
       <div class="box box-primary">
         <div class="box-header with-border">
-          <i class="fa fa-envelope"></i> <h3 class="box-title" style="display:inline;">SMTP Settings</h3>
+          <i class="fa fa-envelope"></i> <h3 class="box-title" style="display:inline;">{{ __('admin/settings.mail.smtp_settings') }}</h3>
         </div>
         <form>
         <div class="box-body">
           <div class="row">
             <div class="form-group col-md-6">
-              <label class="control-label">SMTP Host</label>
+              <label class="control-label">{{ __('admin/settings.mail.smtp_host') }}</label>
               <input required type="text" class="form-control" name="mail:mailers:smtp:host"
                 value="{{ old('mail:mailers:smtp:host', config('mail.mailers.smtp.host')) }}" />
-              <p class="text-muted small" style="margin-top:4px;">SMTP server address.</p>
+              <p class="text-muted small" style="margin-top:4px;">{{ __('admin/settings.mail.smtp_host_help') }}</p>
             </div>
             <div class="form-group col-md-3">
-              <label class="control-label">Port</label>
+              <label class="control-label">{{ __('strings.port') }}</label>
               <input required type="number" class="form-control" name="mail:mailers:smtp:port"
                 value="{{ old('mail:mailers:smtp:port', config('mail.mailers.smtp.port')) }}" />
-              <p class="text-muted small" style="margin-top:4px;">SMTP server port.</p>
+              <p class="text-muted small" style="margin-top:4px;">{{ __('admin/settings.mail.smtp_port_help') }}</p>
             </div>
             <div class="form-group col-md-3">
-              <label class="control-label">Encryption</label>
+              <label class="control-label">{{ __('admin/settings.mail.encryption') }}</label>
               @php
                 $encryption = old('mail:mailers:smtp:encryption', config('mail.mailers.smtp.encryption'));
               @endphp
               <select name="mail:mailers:smtp:encryption" class="form-control">
-                <option value="" @if($encryption === '') selected @endif>None</option>
+                <option value="" @if($encryption === '') selected @endif>{{ __('strings.none') }}</option>
                 <option value="tls" @if($encryption === 'tls') selected @endif>TLS</option>
                 <option value="ssl" @if($encryption === 'ssl') selected @endif>SSL</option>
               </select>
-              <p class="text-muted small" style="margin-top:4px;">Encryption protocol.</p>
+              <p class="text-muted small" style="margin-top:4px;">{{ __('admin/settings.mail.encryption_help') }}</p>
             </div>
           </div>
           <div class="row">
             <div class="form-group col-md-6">
-              <label class="control-label">Username <span class="field-optional"></span></label>
+              <label class="control-label">{{ __('strings.username') }} <span class="field-optional"></span></label>
               <input type="text" class="form-control" name="mail:mailers:smtp:username"
                 value="{{ old('mail:mailers:smtp:username', config('mail.mailers.smtp.username')) }}" />
-              <p class="text-muted small" style="margin-top:4px;">SMTP authentication username.</p>
+              <p class="text-muted small" style="margin-top:4px;">{{ __('admin/settings.mail.smtp_username_help') }}</p>
             </div>
             <div class="form-group col-md-6">
-              <label class="control-label">Password <span class="field-optional"></span></label>
+              <label class="control-label">{{ __('strings.password') }} <span class="field-optional"></span></label>
               <input type="password" class="form-control" name="mail:mailers:smtp:password" />
-              <p class="text-muted small" style="margin-top:4px;">Leave blank to keep the existing password. Enter <code>!e</code> to set an empty password.</p>
+              <p class="text-muted small" style="margin-top:4px;">{!! __('admin/settings.mail.password_help') !!}</p>
             </div>
           </div>
           <hr />
           <div class="row">
             <div class="form-group col-md-6">
-              <label class="control-label">Mail From Address</label>
+              <label class="control-label">{{ __('admin/settings.mail.from_address') }}</label>
               <input required type="email" class="form-control" name="mail:from:address"
                 value="{{ old('mail:from:address', config('mail.from.address')) }}" />
-              <p class="text-muted small" style="margin-top:4px;">All outgoing emails will use this address.</p>
+              <p class="text-muted small" style="margin-top:4px;">{{ __('admin/settings.mail.from_address_help') }}</p>
             </div>
             <div class="form-group col-md-6">
-              <label class="control-label">Mail From Name <span class="field-optional"></span></label>
+              <label class="control-label">{{ __('admin/settings.mail.from_name') }} <span class="field-optional"></span></label>
               <input type="text" class="form-control" name="mail:from:name"
                 value="{{ old('mail:from:name', config('mail.from.name')) }}" />
-              <p class="text-muted small" style="margin-top:4px;">Display name for outgoing emails.</p>
+              <p class="text-muted small" style="margin-top:4px;">{{ __('admin/settings.mail.from_name_help') }}</p>
             </div>
           </div>
         </div>
         <div class="box-footer">
           {{ csrf_field() }}
           <div class="pull-right" style="display:flex;gap:6px;">
-            <button type="button" id="testButton" class="btn btn-success"><i class="fa fa-paper-plane"></i> Test</button>
-            <button type="button" id="saveButton" class="btn btn-primary"><i class="fa fa-save"></i> Save</button>
+            <button type="button" id="testButton" class="btn btn-success"><i class="fa fa-paper-plane"></i> {{ __('admin/settings.mail.test') }}</button>
+            <button type="button" id="saveButton" class="btn btn-primary"><i class="fa fa-save"></i> {{ __('strings.save') }}</button>
           </div>
         </div>
         </form>
@@ -125,17 +124,17 @@
       }),
       headers: { 'X-CSRF-Token': $('input[name="_token"]').val() }
     }).fail(function (jqXHR) {
-      showErrorDialog(jqXHR, 'save');
+      showErrorDialog(jqXHR, @js(__('admin/settings.mail.verb_save')));
     });
     }
 
     function testSettings() {
     swal({
       type: 'info',
-      title: 'Test Mail Settings',
-      text: 'Click "Test" to begin the test.',
+      title: @js(__('admin/settings.mail.test_mail_settings')),
+      text: @js(__('admin/settings.mail.test_begin')),
       showCancelButton: true,
-      confirmButtonText: 'Test',
+      confirmButtonText: @js(__('admin/settings.mail.test')),
       closeOnConfirm: false,
       showLoaderOnConfirm: true
     }, function () {
@@ -144,11 +143,11 @@
       url: '/admin/settings/mail/test',
       headers: { 'X-CSRF-TOKEN': $('input[name="_token"]').val() }
       }).fail(function (jqXHR) {
-      showErrorDialog(jqXHR, 'test');
+      showErrorDialog(jqXHR, @js(__('admin/settings.mail.verb_test')));
       }).done(function () {
       swal({
-        title: 'Success',
-        text: 'The test message was sent successfully.',
+        title: @js(__('admin/settings.mail.success')),
+        text: @js(__('admin/settings.mail.test_sent')),
         type: 'success'
       });
       });
@@ -175,8 +174,8 @@
     }
 
     swal({
-      title: 'Whoops!',
-      text: 'An error occurred while attempting to ' + verb + ' mail settings: ' + errorText,
+      title: @js(__('admin/settings.mail.whoops')),
+      text: @js(__('admin/settings.mail.error_attempting_prefix')) + verb + @js(__('admin/settings.mail.error_attempting_suffix')) + errorText,
       type: 'error'
     });
     }
@@ -186,8 +185,8 @@
     $('#saveButton').on('click', function () {
       saveSettings().done(function () {
       swal({
-        title: 'Success',
-        text: 'Mail settings have been updated successfully and the queue worker was restarted to apply these changes.',
+        title: @js(__('admin/settings.mail.success')),
+        text: @js(__('admin/settings.mail.updated')),
         type: 'success'
       });
       });

@@ -9,6 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 export interface SortPreset {
     value: string;
@@ -22,6 +23,7 @@ interface SortDropdownProps {
 }
 
 const SortDropdown = ({ presets, value, onSortChange }: SortDropdownProps) => {
+    const { t } = useTranslation();
     const currentPreset = useMemo(() => presets.find((p) => p.value === value), [presets, value]);
 
     return (
@@ -30,12 +32,16 @@ const SortDropdown = ({ presets, value, onSortChange }: SortDropdownProps) => {
                 <Button
                     size={'sm'}
                     variant={'secondary'}
-                    aria-label={currentPreset ? `Sort: ${currentPreset.label}` : 'Sort servers'}
+                    aria-label={
+                        currentPreset
+                            ? t('dashboard.sort.aria_sorted', { sort: currentPreset.label })
+                            : t('dashboard.sort.aria')
+                    }
                     className='h-11 sm:h-8 px-2 sm:px-3 gap-1 rounded-full hover:cursor-pointer'
                 >
                     <div className='flex flex-row items-center gap-1.5'>
                         <HugeiconsIcon size={16} strokeWidth={2} icon={Sorting01Icon} className='size-4' />
-                        <span className='hidden sm:inline'>{currentPreset?.label || 'Sort'}</span>
+                        <span className='hidden sm:inline'>{currentPreset?.label || t('dashboard.sort.label')}</span>
                     </div>
                 </Button>
             </DropdownMenuTrigger>
@@ -56,7 +62,7 @@ const SortDropdown = ({ presets, value, onSortChange }: SortDropdownProps) => {
                     <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={() => onSortChange('')} className='text-red-400'>
-                            Clear Sort
+                            {t('dashboard.sort.clear')}
                         </DropdownMenuItem>
                     </>
                 )}

@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
 @section('title')
-    Locations &rarr; View &rarr; {{ $location->short }}
+    {!! __('admin/locations.view.title', ['location' => $location->short]) !!}
 @endsection
 
 @section('content-header')
     <h1>{{ $location->short }}<small>{{ str_limit($location->long, 75) }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.locations') }}">Locations</a></li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li><a href="{{ route('admin.locations') }}">{{ __('admin/navigation.sidebar.locations') }}</a></li>
         <li class="active">{{ $location->short }}</li>
     </ol>
 @endsection
@@ -44,23 +44,23 @@
     <div class="col-sm-6">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">Location Details</h3>
+                <h3 class="box-title">{{ __('admin/locations.view.details') }}</h3>
             </div>
             <form action="{{ route('admin.locations.view', $location->id) }}" method="POST">
                 <div class="box-body">
                     <div class="form-group">
-                        <label for="pShort" class="form-label">Short Code</label>
+                        <label for="pShort" class="form-label">{{ __('admin/locations.view.short_code') }}</label>
                         <input type="text" id="pShort" name="short" class="form-control" value="{{ $location->short }}" />
                     </div>
                     <div class="form-group">
-                        <label for="pLong" class="form-label">Description</label>
+                        <label for="pLong" class="form-label">{{ __('admin/locations.view.description') }}</label>
                         <textarea id="pLong" name="long" class="form-control" rows="4">{{ $location->long }}</textarea>
                     </div>
                 </div>
                 <div class="box-footer">
                     {!! csrf_field() !!}
                     {!! method_field('PATCH') !!}
-                    <button name="action" value="edit" class="btn btn-sm btn-primary pull-right">Save</button>
+                    <button name="action" value="edit" class="btn btn-sm btn-primary pull-right">{{ __('strings.save') }}</button>
                     <button name="action" value="delete" class="btn btn-sm btn-danger pull-left muted muted-hover"><i class="fa fa-trash-o"></i></button>
                 </div>
             </form>
@@ -69,28 +69,28 @@
     <div class="col-sm-6">
         <div class="box box-default">
             <div class="box-header with-border">
-                <h3 class="box-title">Resource Allocation</h3>
+                <h3 class="box-title">{{ __('admin/locations.view.resource_allocation') }}</h3>
             </div>
             <div class="box-body">
                 <div class="row">
                     <div class="col-sm-6">
-                        <h4>Memory</h4>
+                        <h4>{{ __('strings.memory') }}</h4>
                         <div class="progress" style="height: 20px;">
                             <div class="progress-bar" role="progressbar" style="width: {{ min($memoryPercent, 100) }}%; background-color: {{ $memoryColor }};" aria-valuenow="{{ $memoryPercent }}" aria-valuemin="0" aria-valuemax="100">{{ round($memoryPercent) }}%</div>
                         </div>
                         <p>
-                            <strong>Allocated:</strong> {{ humanizeSize($allocatedMemory * 1024 * 1024) }}<br>
-                            <strong>Total:</strong> {{ humanizeSize($totalMemory * 1024 * 1024) }}
+                            <strong>{{ __('admin/locations.view.allocated') }}</strong> {{ humanizeSize($allocatedMemory * 1024 * 1024) }}<br>
+                            <strong>{{ __('admin/locations.view.total') }}</strong> {{ humanizeSize($totalMemory * 1024 * 1024) }}
                         </p>
                     </div>
                     <div class="col-sm-6">
-                        <h4>Disk</h4>
+                        <h4>{{ __('strings.disk') }}</h4>
                         <div class="progress" style="height: 20px;">
                             <div class="progress-bar" role="progressbar" style="width: {{ min($diskPercent, 100) }}%; background-color: {{ $diskColor }};" aria-valuenow="{{ $diskPercent }}" aria-valuemin="0" aria-valuemax="100">{{ round($diskPercent) }}%</div>
                         </div>
                         <p>
-                            <strong>Allocated:</strong> {{ humanizeSize($allocatedDisk * 1024 * 1024) }}<br>
-                            <strong>Total:</strong> {{ humanizeSize($totalDisk * 1024 * 1024) }}
+                            <strong>{{ __('admin/locations.view.allocated') }}</strong> {{ humanizeSize($allocatedDisk * 1024 * 1024) }}<br>
+                            <strong>{{ __('admin/locations.view.total') }}</strong> {{ humanizeSize($totalDisk * 1024 * 1024) }}
                         </p>
                     </div>
                 </div>
@@ -98,18 +98,18 @@
         </div>
         <div class="box">
             <div class="box-header with-border">
-                <h3 class="box-title">Nodes</h3>
+                <h3 class="box-title">{{ __('admin/locations.view.nodes') }}</h3>
             </div>
             <div class="box-body table-responsive no-padding">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>FQDN</th>
-                            <th>Memory</th>
-                            <th>Disk</th>
-                            <th>Servers</th>
+                            <th>{{ __('strings.id') }}</th>
+                            <th>{{ __('strings.name') }}</th>
+                            <th>{{ __('admin/locations.view.fqdn') }}</th>
+                            <th>{{ __('strings.memory') }}</th>
+                            <th>{{ __('strings.disk') }}</th>
+                            <th>{{ __('strings.servers') }}</th>
                         </tr>
                     </thead>
                     @foreach($location->nodes as $node)

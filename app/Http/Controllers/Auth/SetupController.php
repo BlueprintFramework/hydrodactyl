@@ -72,7 +72,7 @@ class SetupController extends Controller
             Log::critical('Setup endpoint invoked with a non-atomic cache driver.', [
                 'driver' => config('cache.default'),
             ]);
-            abort(500, 'The setup flow requires an atomic cache driver.');
+            abort(500, __('strings.setup_atomic_cache_required'));
         }
 
         // Serialize creation across concurrent requests. Two near-simultaneous

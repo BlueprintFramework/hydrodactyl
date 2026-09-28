@@ -35,7 +35,7 @@ class PreviewEggRequest extends ClientApiRequest
                     ->first();
                 
                 if (!$egg) {
-                    $validator->errors()->add('egg_id', 'The selected egg does not belong to the specified nest.');
+                    $validator->errors()->add('egg_id', __('exceptions.client.egg_change.egg_not_in_nest'));
                 }
             }
         });

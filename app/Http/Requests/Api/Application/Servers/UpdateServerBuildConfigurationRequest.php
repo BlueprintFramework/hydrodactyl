@@ -85,14 +85,14 @@ class UpdateServerBuildConfigurationRequest extends ServerWriteRequest
     public function attributes(): array
     {
         return [
-            'add_allocations' => 'allocations to add',
-            'remove_allocations' => 'allocations to remove',
-            'add_allocations.*' => 'allocation to add',
-            'remove_allocations.*' => 'allocation to remove',
-            'feature_limits.databases' => 'Database Limit',
-            'feature_limits.allocations' => 'Allocation Limit',
-            'feature_limits.backups' => 'Backup Limit',
-            'feature_limits.backup_storage_mb' => 'Backup Storage Limit (MB)',
+            'add_allocations' => __('validation.attributes.add_allocations'),
+            'remove_allocations' => __('validation.attributes.remove_allocations'),
+            'add_allocations.*' => __('validation.attributes.add_allocation'),
+            'remove_allocations.*' => __('validation.attributes.remove_allocation'),
+            'feature_limits.databases' => __('validation.attributes.feature_limits.databases'),
+            'feature_limits.allocations' => __('validation.attributes.feature_limits.allocations'),
+            'feature_limits.backups' => __('validation.attributes.feature_limits.backups'),
+            'feature_limits.backup_storage_mb' => __('validation.attributes.feature_limits.backup_storage_mb'),
         ];
     }
 

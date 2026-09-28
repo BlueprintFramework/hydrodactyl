@@ -5,6 +5,7 @@ import Code from '@/components/elements/Code';
 import Field from '@/components/elements/Field';
 import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
@@ -19,6 +20,7 @@ type OwnProps = RequiredModalProps & {
 };
 
 const RenameFileModal = ({ files, useMoveTerminology, ...props }: OwnProps) => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const { mutate } = useFileManagerSwr();
     const { clearFlashes, clearAndAddHttpError } = useFlash();
@@ -64,14 +66,22 @@ const RenameFileModal = ({ files, useMoveTerminology, ...props }: OwnProps) => {
                     {...props}
                     dismissable={!isSubmitting}
                     showSpinnerOverlay={isSubmitting}
-                    title={useMoveTerminology ? 'Moving files/folders' : 'Renaming file/folder'}
+                    title={useMoveTerminology ? t('server.files.moving_title') : t('server.files.renaming_title')}
                 >
                     <Form className={`w-full`}>
                         <div className='w-full'>
-                            <Field type={'string'} id={'file_name'} name={'name'} label={'File Name'} autoFocus />
+                            <Field
+                                type={'string'}
+                                id={'file_name'}
+                                name={'name'}
+                                label={t('server.files.file_name_label')}
+                                autoFocus
+                            />
                             {useMoveTerminology && (
                                 <p className={`mt-2 text-xs! break-all`}>
-                                    <strong className={`text-sm text-zinc-200`}>New location: </strong>
+                                    <strong className={`text-sm text-zinc-200`}>
+                                        {t('server.files.new_location')}{' '}
+                                    </strong>
                                     <Code>
                                         /root/
                                         <span className={`text-blue-200`}>
@@ -82,7 +92,7 @@ const RenameFileModal = ({ files, useMoveTerminology, ...props }: OwnProps) => {
                             )}
                             <div className={`flex justify-end w-full my-6`}>
                                 <Button variant='attention' type='submit'>
-                                    {useMoveTerminology ? 'Move' : 'Rename'}
+                                    {useMoveTerminology ? t('server.files.move') : t('server.files.rename')}
                                 </Button>
                             </div>
                         </div>

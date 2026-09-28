@@ -12,6 +12,7 @@ import Input from '@/components/elements/Input';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import type { ApplicationStore } from '@/state';
 
@@ -21,6 +22,7 @@ interface Values {
 }
 
 const CreateApiKeyForm = ({ onKeyCreated }: { onKeyCreated: (key: ApiKey) => void }) => {
+    const { t } = useTranslation();
     const [apiKey, setApiKey] = useState('');
     const { addError, clearFlashes } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
 
@@ -66,18 +68,18 @@ const CreateApiKeyForm = ({ onKeyCreated }: { onKeyCreated: (key: ApiKey) => voi
 
                             {/* Description Field */}
                             <FormikFieldWrapper
-                                label='Description'
+                                label={t('account.api_keys.description_label')}
                                 name='description'
-                                description='A description of this API key.'
+                                description={t('account.api_keys.description_helper')}
                             >
                                 <Field name='description' as={Input} className='w-full' />
                             </FormikFieldWrapper>
 
                             {/* Allowed IPs Field */}
                             <FormikFieldWrapper
-                                label='Allowed IPs'
+                                label={t('account.api_keys.allowed_ips_label')}
                                 name='allowedIps'
-                                description='Leave blank to allow any IP address to use this API key, otherwise provide each IP address on a new line.'
+                                description={t('account.api_keys.allowed_ips_description')}
                             >
                                 <Field name='allowedIps' as={Input} className='w-full' />
                             </FormikFieldWrapper>
@@ -85,7 +87,7 @@ const CreateApiKeyForm = ({ onKeyCreated }: { onKeyCreated: (key: ApiKey) => voi
                             {/* Submit Button below form fields */}
                             <div className='flex justify-end mt-6'>
                                 <Button type='submit' disabled={isSubmitting}>
-                                    {isSubmitting ? 'Creating...' : 'Create API Key'}
+                                    {isSubmitting ? t('account.api_keys.creating') : t('account.api_keys.create')}
                                 </Button>
                             </div>
                         </Form>

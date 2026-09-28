@@ -9,6 +9,7 @@ import Captcha, { getCaptchaResponse } from '@/components/elements/Captcha';
 import ContentBox from '@/components/elements/ContentBox';
 import Field from '@/components/elements/Field';
 import Input from '@/components/elements/Input';
+import { useTranslation } from '@/i18n/I18nProvider';
 import CaptchaManager from '@/lib/captcha';
 
 import useFlash from '@/plugins/useFlash';
@@ -24,6 +25,7 @@ function ResetPasswordContainer() {
     const [email, setEmail] = useState('');
 
     const { clearFlashes, clearAndAddHttpError } = useFlash();
+    const { t } = useTranslation();
 
     useEffect(() => {
         clearFlashes();
@@ -65,7 +67,7 @@ function ResetPasswordContainer() {
                     console.error('Captcha enabled but no response available');
                     console.log(captchaResponse);
                     clearAndAddHttpError({
-                        error: new Error('Please complete the captcha verification.'),
+                        error: new Error(t('auth.captcha.verification_required')),
                     });
                     setSubmitting(false);
                     return;
@@ -100,11 +102,11 @@ function ResetPasswordContainer() {
                 }}
                 validationSchema={object().shape({
                     password: string()
-                        .required('A new password is required.')
-                        .min(8, 'Your new password should be at least 8 characters in length.'),
+                        .required(t('auth.reset_password.password_required'))
+                        .min(8, t('auth.reset_password.password_min')),
                     password_confirmation: string()
-                        .required('Your new password does not match.')
-                        .oneOf([ref('password')], 'Your new password does not match.'),
+                        .required(t('auth.reset_password.password_mismatch'))
+                        .oneOf([ref('password')], t('auth.reset_password.password_mismatch')),
                 })}
             >
                 {({ isSubmitting }) => (
@@ -121,21 +123,25 @@ function ResetPasswordContainer() {
                         </div>
                         <div className={`mt-6`}>
                             <Field
-                                label={'New Password'}
+                                label={t('auth.reset_password.new_password_label')}
                                 name={'password'}
                                 type={'password'}
-                                description={'Passwords must be at least 8 characters in length.'}
+                                description={t('auth.reset_password.password_description')}
                             />
                         </div>
                         <div className={`mt-6`}>
-                            <Field label={'Confirm New Password'} name={'password_confirmation'} type={'password'} />
+                            <Field
+                                label={t('auth.reset_password.confirm_password_label')}
+                                name={'password_confirmation'}
+                                type={'password'}
+                            />
                         </div>
                         <Captcha
                             className='mt-6'
                             onError={(error) => {
                                 console.error('Captcha error:', error);
                                 clearAndAddHttpError({
-                                    error: new Error('Captcha verification failed. Please try again.'),
+                                    error: new Error(t('auth.captcha.verification_failed')),
                                 });
                             }}
                         />
@@ -148,7 +154,7 @@ function ResetPasswordContainer() {
                                 disabled={isSubmitting}
                                 isLoading={isSubmitting}
                             >
-                                Reset Password
+                                {t('auth.reset_password.submit')}
                             </Button>
                         </div>
                         <div aria-hidden className='my-8 bg-[#ffffff33] min-h-[1px]'></div>
@@ -160,7 +166,7 @@ function ResetPasswordContainer() {
                                 to={'/auth/login'}
                                 className={`text-sm text-white tracking-wide uppercase no-underline hover:text-neutral-700 border-color-[#ffffff33]`}
                             >
-                                Return to Login
+                                {t('auth.reset_password.return_to_login')}
                             </Link>
                         </div>
                     </LoginFormContainer>

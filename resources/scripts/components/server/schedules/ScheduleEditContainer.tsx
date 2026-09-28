@@ -15,6 +15,7 @@ import EditScheduleModal from '@/components/server/schedules/EditScheduleModal';
 import ScheduleTaskRow from '@/components/server/schedules/ScheduleTaskRow';
 import TaskDetailsModal from '@/components/server/schedules/TaskDetailsModal';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -22,13 +23,18 @@ const CronBox = ({ title, value }: { title: string; value: string }) => (
     <ItemContainer title={title} description={value} />
 );
 
-const ActivePill = ({ active }: { active: boolean }) => (
-    <span className='flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-white'>
-        {active ? 'Active' : 'Inactive'}
-    </span>
-);
+const ActivePill = ({ active }: { active: boolean }) => {
+    const { t } = useTranslation();
+
+    return (
+        <span className='flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-white'>
+            {active ? t('common.active') : t('common.inactive')}
+        </span>
+    );
+};
 
 const ScheduleEditContainer = () => {
+    const { t, dateFnsLocale } = useTranslation();
     const { id: scheduleId } = useParams<'id'>();
 
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
@@ -83,7 +89,7 @@ const ScheduleEditContainer = () => {
     }, [schedule, id, clearFlashes, clearAndAddHttpError, appendSchedule]);
 
     return (
-        <PageContentBlock title={'Schedules'}>
+        <PageContentBlock title={t('navigation.schedules')}>
             <ServerHeader />
             <FlashMessageRender byKey={'schedules'} />
             {!schedule || isLoading ? (
@@ -100,52 +106,52 @@ const ScheduleEditContainer = () => {
                                     <span
                                         className={`flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-white`}
                                     >
-                                        Processing
+                                        {t('server.schedules.processing')}
                                     </span>
                                 ) : (
                                     <ActivePill active={schedule.isActive} />
                                 )}
                             </h3>
                             <p className={`mt-1 text-sm`}>
-                                <strong>Last run at:&nbsp;</strong>
+                                <strong>{t('server.schedules.last_run_at')}&nbsp;</strong>
                                 {schedule.lastRunAt ? (
-                                    format(schedule.lastRunAt, "MMM do 'at' h:mma")
+                                    format(schedule.lastRunAt, "MMM do 'at' h:mma", { locale: dateFnsLocale })
                                 ) : (
-                                    <span>N/A</span>
+                                    <span>{t('common.not_available')}</span>
                                 )}
 
                                 <span className={`ml-4 pl-4 border-l-4 border-neutral-600 py-px hidden sm:inline`} />
                                 <br className={`sm:hidden`} />
 
-                                <strong>Next run at:&nbsp;</strong>
+                                <strong>{t('server.schedules.next_run_at')}&nbsp;</strong>
                                 {schedule.nextRunAt ? (
-                                    format(schedule.nextRunAt, "MMM do 'at' h:mma")
+                                    format(schedule.nextRunAt, "MMM do 'at' h:mma", { locale: dateFnsLocale })
                                 ) : (
-                                    <span>N/A</span>
+                                    <span>{t('common.not_available')}</span>
                                 )}
                             </p>
                         </div>
                         <div className={`flex gap-2 flex-col md:flex-row md:min-w-0 min-w-full`}>
                             <Can action={'schedule.update'}>
                                 <Button variant='secondary' onClick={toggleEditModal} className={'flex-1 min-w-max'}>
-                                    Edit
+                                    {t('common.edit')}
                                 </Button>
                                 <Button
                                     variant='secondary'
                                     onClick={() => setShowTaskModal(true)}
                                     className={'flex-1 min-w-max'}
                                 >
-                                    New Task
+                                    {t('server.schedules.new_task')}
                                 </Button>
                             </Can>
                         </div>
                     </div>
                     <div className={`grid grid-cols-3 sm:grid-cols-5 gap-4`}>
-                        <CronBox title={'Minute'} value={schedule.cron.minute} />
-                        <CronBox title={'Hour'} value={schedule.cron.hour} />
-                        <CronBox title={'Day (Month)'} value={schedule.cron.dayOfMonth} />
-                        <CronBox title={'Month'} value={schedule.cron.month} />
-                        <CronBox title={'Day (Week)'} value={schedule.cron.dayOfWeek} />
+                        <CronBox title={t('server.schedules.cron.minute')} value={schedule.cron.minute} />
+                        <CronBox title={t('server.schedules.cron.hour')} value={schedule.cron.hour} />
+                        <CronBox title={t('server.schedules.cron.day_of_month')} value={schedule.cron.dayOfMonth} />
+                        <CronBox title={t('server.schedules.cron.month')} value={schedule.cron.month} />
+                        <CronBox title={t('server.schedules.cron.day_of_week')} value={schedule.cron.dayOfWeek} />
                     </div>
                     <div>
                         {schedule.tasks.length > 0
@@ -172,7 +178,7 @@ const ScheduleEditContainer = () => {
                                     disabled={schedule.isProcessing}
                                     onClick={onTriggerExecute}
                                 >
-                                    Run Now
+                                    {t('server.schedules.run_now')}
                                 </Button>
                             </Can>
                         )}

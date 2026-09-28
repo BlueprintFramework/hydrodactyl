@@ -4,6 +4,7 @@ import getFileUploadUrl from '@/api/server/files/getFileUploadUrl';
 import { ModalMask } from '@/components/elements/Modal';
 import FadeTransition from '@/components/elements/transitions/FadeTransition';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useEventListener from '@/plugins/useEventListener';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { useFlashKey } from '@/plugins/useFlash';
@@ -18,6 +19,7 @@ function isFileOrDirectory(event: DragEvent): boolean {
 }
 
 const UploadButton = () => {
+    const { t } = useTranslation();
     const fileUploadInput = useRef<HTMLInputElement>(null);
     const [timeouts, _] = useState<NodeJS.Timeout[]>([]);
     const [visible, setVisible] = useState(false);
@@ -57,7 +59,7 @@ const UploadButton = () => {
         clearAndAddHttpError();
         const list = Array.from(files);
         if (list.some((file) => !file.size || (!file.type && file.size === 4096))) {
-            return addError('Folder uploads are not supported at this time.', 'Error');
+            return addError(t('server.files.folder_upload_unsupported'), t('common.error'));
         }
 
         const uploads = list.map((file) => {
@@ -144,7 +146,7 @@ const UploadButton = () => {
                                     'flex-1 text-lg font-bold tracking-tight text-center truncate w-full relative px-4'
                                 }
                             >
-                                Upload to {name}
+                                {t('server.files.upload_to', { name: name ?? '' })}
                             </h1>
                         </div>
                     </div>
@@ -165,7 +167,7 @@ const UploadButton = () => {
                 multiple
             />
             <Button variant='secondary' onClick={() => fileUploadInput.current?.click()}>
-                Upload
+                {t('common.upload')}
             </Button>
         </>
     );

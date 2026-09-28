@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { bytesToString } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
@@ -14,6 +15,7 @@ type Stats = Record<'memory' | 'cpu' | 'disk' | 'uptime' | 'rx' | 'tx', number>;
 const _Limit = ({ children }: { limit: string | null; children: React.ReactNode }) => <>{children}</>;
 
 const ServerDetailsHeader = ({ className }: { className?: string }) => {
+    const { t } = useTranslation();
     const [stats, setStats] = useState<Stats>({
         memory: 0,
         cpu: 0,
@@ -89,13 +91,13 @@ const ServerDetailsHeader = ({ className }: { className?: string }) => {
 
     return (
         <div className={cn('flex md:flex-row gap-4 flex-col text-nowrap', className)}>
-            <Detail label={'CPU'} className='w-14' loading={loading}>
+            <Detail label={t('server.header.cpu')} className='w-14' loading={loading}>
                 {`${stats.cpu.toFixed(2)}%`}
             </Detail>
-            <Detail label={'RAM'} className='w-14' loading={loading}>
+            <Detail label={t('server.header.ram')} className='w-14' loading={loading}>
                 {bytesToString(stats.memory, 0)}
             </Detail>
-            <Detail label={'Disk'} className='w-20' loading={loading}>
+            <Detail label={t('server.header.disk')} className='w-20' loading={loading}>
                 {bytesToString(stats.disk)}
             </Detail>
         </div>

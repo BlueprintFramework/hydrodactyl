@@ -20,8 +20,6 @@
         "allowJs": false,
         "allowSyntheticDefaultImports": true,
         "composite": false,
-        "declaration": true,
-        "declarationMap": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "inlineSources": false,

@@ -28,11 +28,11 @@ class MakeLocationCommand extends Command
      */
     public function handle()
     {
-        $short = $this->option('short') ?? $this->ask(trans('command/messages.location.ask_short'));
-        $long = $this->option('long') ?? $this->ask(trans('command/messages.location.ask_long'));
+        $short = $this->option('short') ?? $this->ask(__('command/messages.location.ask_short'));
+        $long = $this->option('long') ?? $this->ask(__('command/messages.location.ask_long'));
 
         $location = $this->creationService->handle(compact('short', 'long'));
-        $this->line(trans('command/messages.location.created', [
+        $this->line(__('command/messages.location.created', [
             'name' => $location->short,
             'id' => $location->id,
         ]));

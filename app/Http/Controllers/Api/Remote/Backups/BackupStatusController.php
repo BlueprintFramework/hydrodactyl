@@ -46,11 +46,11 @@ class BackupStatusController extends Controller
         /** @var \Pterodactyl\Models\Server $server */
         $server = $model->server;
         if ($server->node_id !== $node->id) {
-            throw new HttpForbiddenException('You do not have permission to access that backup.');
+            throw new HttpForbiddenException(__('exceptions.remote.backups.forbidden_backup'));
         }
 
         if ($model->is_successful) {
-            throw new BadRequestHttpException('Cannot update the status of a backup that is already marked as completed.');
+            throw new BadRequestHttpException(__('exceptions.remote.backups.status_completed'));
         }
 
         $action = $request->boolean('successful') ? 'server:backup.complete' : 'server:backup.fail';
@@ -124,7 +124,7 @@ class BackupStatusController extends Controller
                 return;
             }
 
-            throw new DisplayException('Cannot complete backup request: no upload_id present on model.');
+            throw new DisplayException(__('exceptions.remote.backups.missing_upload_id'));
         }
 
         $params = [
@@ -165,7 +165,7 @@ class BackupStatusController extends Controller
                 foreach ($parts as $part) {
                     // Validate part data
                     if (!isset($part['etag']) || !isset($part['part_number'])) {
-                        throw new DisplayException('Invalid part data provided for multipart upload completion.');
+                        throw new DisplayException(__('exceptions.remote.backups.invalid_part_data'));
                     }
                     
                     $params['MultipartUpload']['Parts'][] = [
@@ -177,7 +177,7 @@ class BackupStatusController extends Controller
 
             // Ensure we have parts to complete
             if (empty($params['MultipartUpload']['Parts'])) {
-                throw new DisplayException('No parts found for multipart upload completion.');
+                throw new DisplayException(__('exceptions.remote.backups.no_parts'));
             }
 
             $client->execute($client->getCommand('CompleteMultipartUpload', $params));

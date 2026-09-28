@@ -56,7 +56,7 @@ class EggController extends Controller
         $data['docker_images'] = $this->normalizeDockerImages($data['docker_images'] ?? null);
 
         $egg = $this->creationService->handle($data);
-        $this->alert->success(trans('admin/nests.eggs.notices.egg_created'))->flash();
+        $this->alert->success(__('admin/nests.eggs.notices.egg_created'))->flash();
 
         return redirect()->route('admin.nests.egg.view', $egg->id);
     }
@@ -89,7 +89,7 @@ class EggController extends Controller
         $data['docker_images'] = $this->normalizeDockerImages($data['docker_images'] ?? null);
 
         $this->updateService->handle($egg, $data);
-        $this->alert->success(trans('admin/nests.eggs.notices.updated'))->flash();
+        $this->alert->success(__('admin/nests.eggs.notices.updated'))->flash();
 
         return redirect()->route('admin.nests.egg.view', $egg->id);
     }
@@ -103,7 +103,7 @@ class EggController extends Controller
     public function destroy(Egg $egg): RedirectResponse
     {
         $this->deletionService->handle($egg->id);
-        $this->alert->success(trans('admin/nests.eggs.notices.deleted'))->flash();
+        $this->alert->success(__('admin/nests.eggs.notices.deleted'))->flash();
 
         return redirect()->route('admin.nests.view', $egg->nest_id);
     }

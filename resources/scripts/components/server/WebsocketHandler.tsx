@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import getWebsocketToken from '@/api/server/getWebsocketToken';
 import Spinner from '@/components/elements/Spinner';
 import FadeTransition from '@/components/elements/transitions/FadeTransition';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { Websocket } from '@/plugins/Websocket';
 import { ServerContext } from '@/state/server';
 
 const reconnectErrors = ['jwt: exp claim is invalid', 'jwt: created too far in past (denylist)'];
 
 function WebsocketHandler() {
+    const { t } = useTranslation();
     let updatingToken = false;
     const [error, setError] = useState<'connecting' | string>('');
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
@@ -61,9 +63,7 @@ function WebsocketHandler() {
             if (reconnectErrors.find((v) => error.toLowerCase().indexOf(v) >= 0)) {
                 updateToken(uuid, socket);
             } else {
-                setError(
-                    'There was an error validating the credentials provided for the websocket. Please refresh the page.',
-                );
+                setError(t('server.websocket.credentials_error'));
             }
         });
 
@@ -160,9 +160,7 @@ function WebsocketHandler() {
                 {error === 'connecting' ? (
                     <>
                         <Spinner size={'small'} />
-                        <p className={`ml-2 text-sm text-red-100`}>
-                            We&apos;re having some trouble connecting to your server, please wait...
-                        </p>
+                        <p className={`ml-2 text-sm text-red-100`}>{t('server.websocket.connecting')}</p>
                     </>
                 ) : (
                     <p className={`ml-2 text-sm text-white`}>{error}</p>

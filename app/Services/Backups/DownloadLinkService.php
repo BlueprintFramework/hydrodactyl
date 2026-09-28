@@ -57,7 +57,7 @@ class DownloadLinkService
     {
         $s3Bucket = $backup->server->node->s3Bucket;
         if (!$s3Bucket) {
-            throw new \RuntimeException('No S3 bucket configured for the node associated with this backup.');
+            throw new \RuntimeException(__('exceptions.backups.no_s3_bucket_for_node'));
         }
 
         /** @var \Pterodactyl\Extensions\Filesystem\S3Filesystem $adapter */
@@ -82,29 +82,29 @@ class DownloadLinkService
     {
         // General backup validation
         if (!$backup->is_successful) {
-            throw new \InvalidArgumentException('Cannot download a failed backup.');
+            throw new \InvalidArgumentException(__('exceptions.backups.download_failed'));
         }
 
         if (is_null($backup->completed_at)) {
-            throw new \InvalidArgumentException('Cannot download backup that is still in progress.');
+            throw new \InvalidArgumentException(__('exceptions.backups.download_in_progress'));
         }
 
         // Rustic-specific validation
         if ($backup->isRustic()) {
             if (!$backup->hasSnapshotId()) {
-                throw new \InvalidArgumentException('Rustic backup cannot be downloaded: missing snapshot ID.');
+                throw new \InvalidArgumentException(__('exceptions.backups.rustic_missing_snapshot'));
             }
 
             // Validate snapshot ID format
             if (strlen($backup->snapshot_id) !== 64 && strlen($backup->snapshot_id) !== 8) {
-                throw new \InvalidArgumentException('Rustic backup has invalid snapshot ID format.');
+                throw new \InvalidArgumentException(__('exceptions.backups.rustic_invalid_snapshot'));
             }
         }
 
         // Legacy S3 backup validation
         if ($backup->disk === BackupAdapter::S3) {
             if ($backup->bytes <= 0) {
-                throw new \InvalidArgumentException('S3 backup has invalid size.');
+                throw new \InvalidArgumentException(__('exceptions.backups.s3_invalid_size'));
             }
         }
     }

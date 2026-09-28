@@ -57,7 +57,7 @@ class NodesController extends Controller
     {
         $locations = $this->locationRepository->all();
         if (count($locations) < 1) {
-            $this->alert->warning(trans('admin/node.notices.location_required'))->flash();
+            $this->alert->warning(__('admin/node.notices.location_required'))->flash();
 
             return redirect()->route('admin.locations');
         }
@@ -78,7 +78,7 @@ class NodesController extends Controller
     public function store(NodeFormRequest $request): RedirectResponse
     {
         $node = $this->creationService->handle($request->normalize());
-        $this->alert->info(trans('admin/node.notices.node_created'))->flash();
+        $this->alert->info(__('admin/node.notices.node_created'))->flash();
 
         return redirect()->route('admin.nodes.view.allocation', $node->id);
     }
@@ -93,7 +93,7 @@ class NodesController extends Controller
     public function updateSettings(NodeFormRequest $request, Node $node): RedirectResponse
     {
         $this->updateService->handle($node, $request->normalize(), $request->input('reset_secret') === 'on');
-        $this->alert->success(trans('admin/node.notices.node_updated'))->flash();
+        $this->alert->success(__('admin/node.notices.node_updated'))->flash();
 
         return redirect()->route('admin.nodes.view.settings', $node->id)->withInput();
     }
@@ -138,7 +138,7 @@ class NodesController extends Controller
             ['ip', '=', $request->input('ip')],
         ]);
 
-        $this->alert->success(trans('admin/node.notices.unallocated_deleted', ['ip' => htmlspecialchars($request->input('ip'))]))
+        $this->alert->success(__('admin/node.notices.unallocated_deleted', ['ip' => htmlspecialchars($request->input('ip'))]))
             ->flash();
 
         return redirect()->route('admin.nodes.view.allocation', $node);
@@ -170,7 +170,7 @@ class NodesController extends Controller
     public function createAllocation(AllocationFormRequest $request, Node $node): RedirectResponse
     {
         $this->assignmentService->handle($node, $request->normalize());
-        $this->alert->success(trans('admin/node.notices.allocations_added'))->flash();
+        $this->alert->success(__('admin/node.notices.allocations_added'))->flash();
 
         return redirect()->route('admin.nodes.view.allocation', $node->id);
     }
@@ -183,7 +183,7 @@ class NodesController extends Controller
     public function delete(int|Node $node): RedirectResponse
     {
         $this->deletionService->handle($node);
-        $this->alert->success(trans('admin/node.notices.node_deleted'))->flash();
+        $this->alert->success(__('admin/node.notices.node_deleted'))->flash();
 
         return redirect()->route('admin.nodes');
     }

@@ -72,16 +72,16 @@ class CaptchaSettingsFormRequest extends AdminFormRequest
     public function attributes(): array
     {
         return [
-            'pterodactyl:captcha:provider' => 'Captcha Provider',
-            'pterodactyl:captcha:turnstile:site_key' => 'Turnstile Site Key',
-            'pterodactyl:captcha:turnstile:secret_key' => 'Turnstile Secret Key',
-            'pterodactyl:captcha:hcaptcha:site_key' => 'hCaptcha Site Key',
-            'pterodactyl:captcha:hcaptcha:secret_key' => 'hCaptcha Secret Key',
-            'pterodactyl:captcha:recaptcha:site_key' => 'reCAPTCHA Site Key',
-            'pterodactyl:captcha:recaptcha:secret_key' => 'reCAPTCHA Secret Key',
-            'pterodactyl:captcha:cap:site_key' => 'Cap Site Key',
-            'pterodactyl:captcha:cap:secret_key' => 'Cap Secret Key',
-            'pterodactyl:captcha:cap:server_url' => 'Cap Server URL',
+            'pterodactyl:captcha:provider' => __('validation.attributes.pterodactyl:captcha:provider'),
+            'pterodactyl:captcha:turnstile:site_key' => __('validation.attributes.pterodactyl:captcha:turnstile:site_key'),
+            'pterodactyl:captcha:turnstile:secret_key' => __('validation.attributes.pterodactyl:captcha:turnstile:secret_key'),
+            'pterodactyl:captcha:hcaptcha:site_key' => __('validation.attributes.pterodactyl:captcha:hcaptcha:site_key'),
+            'pterodactyl:captcha:hcaptcha:secret_key' => __('validation.attributes.pterodactyl:captcha:hcaptcha:secret_key'),
+            'pterodactyl:captcha:recaptcha:site_key' => __('validation.attributes.pterodactyl:captcha:recaptcha:site_key'),
+            'pterodactyl:captcha:recaptcha:secret_key' => __('validation.attributes.pterodactyl:captcha:recaptcha:secret_key'),
+            'pterodactyl:captcha:cap:site_key' => __('validation.attributes.pterodactyl:captcha:cap:site_key'),
+            'pterodactyl:captcha:cap:secret_key' => __('validation.attributes.pterodactyl:captcha:cap:secret_key'),
+            'pterodactyl:captcha:cap:server_url' => __('validation.attributes.pterodactyl:captcha:cap:server_url'),
         ];
     }
 

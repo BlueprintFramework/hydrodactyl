@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'permissions' => [
+        'websocket_*' => 'Permite el acceso al websocket de este servidor.',
+        'control_console' => 'Permite al usuario enviar datos a la consola del servidor.',
+        'control_start' => 'Permite al usuario iniciar la instancia del servidor.',
+        'control_stop' => 'Permite al usuario detener la instancia del servidor.',
+        'control_restart' => 'Permite al usuario reiniciar la instancia del servidor.',
+        'control_kill' => 'Permite al usuario forzar la detención de la instancia del servidor.',
+        'user_create' => 'Permite al usuario crear nuevas cuentas de usuario para el servidor.',
+        'user_read' => 'Otorga al usuario permiso para ver los usuarios asociados a este servidor.',
+        'user_update' => 'Permite al usuario modificar otros usuarios asociados a este servidor.',
+        'user_delete' => 'Permite al usuario eliminar otros usuarios asociados a este servidor.',
+        'file_create' => 'Otorga al usuario permiso para crear nuevos archivos y directorios.',
+        'file_read' => 'Permite al usuario ver los archivos y carpetas asociados a esta instancia de servidor, así como su contenido.',
+        'file_update' => 'Permite al usuario actualizar archivos y carpetas asociados al servidor.',
+        'file_delete' => 'Permite al usuario eliminar archivos y directorios.',
+        'file_archive' => 'Permite al usuario crear archivos comprimidos y descomprimir los existentes.',
+        'file_sftp' => 'Permite al usuario realizar las acciones de archivos anteriores mediante un cliente SFTP.',
+        'allocation_read' => 'Permite el acceso a las páginas de gestión de asignaciones del servidor.',
+        'allocation_update' => 'Otorga al usuario permiso para modificar las asignaciones del servidor.',
+        'database_create' => 'Otorga al usuario permiso para crear una nueva base de datos para el servidor.',
+        'database_read' => 'Otorga al usuario permiso para ver las bases de datos del servidor.',
+        'database_update' => 'Otorga a un usuario permiso para modificar una base de datos. Si el usuario tampoco tiene el permiso "Ver contraseña", no podrá modificar la contraseña.',
+        'database_delete' => 'Otorga a un usuario permiso para eliminar una instancia de base de datos.',
+        'database_view_password' => 'Otorga a un usuario permiso para ver la contraseña de una base de datos en el sistema.',
+        'schedule_create' => 'Permite al usuario crear una nueva tarea programada para el servidor.',
+        'schedule_read' => 'Otorga al usuario permiso para ver las tareas programadas de un servidor.',
+        'schedule_update' => 'Otorga al usuario permiso para modificar una tarea programada existente del servidor.',
+        'schedule_delete' => 'Permite al usuario eliminar una tarea programada del servidor.',
+    ],
+];

@@ -39,7 +39,7 @@ class SystemStatusController extends Controller
     } catch (\Exception $e) {
       return response()->json([
         'status' => 'error',
-        'message' => 'Failed to retrieve system metrics',
+        'message' => __('strings.system_status.retrieve_failed'),
         'error' => $e->getMessage()
       ], 500);
     }
@@ -50,7 +50,7 @@ class SystemStatusController extends Controller
     if (PHP_OS_FAMILY === 'Darwin') {
       $memory = shell_exec('vm_stat');
       if (!$memory) {
-        throw new \RuntimeException('Failed to execute vm_stat command');
+        throw new \RuntimeException(__('strings.system_status.vm_stat_failed'));
       }
 
       // Parse memory stats more reliably
@@ -78,11 +78,11 @@ class SystemStatusController extends Controller
     // Linux memory calculation
     $memory = shell_exec('free -b');
     if (!$memory) {
-      throw new \RuntimeException('Failed to execute free command');
+      throw new \RuntimeException(__('strings.system_status.free_command_failed'));
     }
 
     if (!preg_match('/Mem:\s+(\d+)\s+(\d+)\s+(\d+)/', $memory, $matches)) {
-      throw new \RuntimeException('Failed to parse memory information');
+      throw new \RuntimeException(__('strings.system_status.memory_parse_failed'));
     }
 
     return [
@@ -96,7 +96,7 @@ class SystemStatusController extends Controller
   {
     $memory = shell_exec('sysctl hw.memsize');
     if (!$memory || !preg_match('/hw.memsize: (\d+)/', $memory, $matches)) {
-      throw new \RuntimeException('Failed to get total memory size');
+      throw new \RuntimeException(__('strings.system_status.total_memory_failed'));
     }
     return (int) $matches[1];
   }
@@ -111,7 +111,7 @@ class SystemStatusController extends Controller
 
     $usage = shell_exec($cmd);
     if ($usage === null) {
-      throw new \RuntimeException('Failed to get CPU usage');
+      throw new \RuntimeException(__('strings.system_status.cpu_usage_failed'));
     }
 
     return (float) $usage;
@@ -140,7 +140,7 @@ class SystemStatusController extends Controller
     $free = disk_free_space('/');
 
     if ($total === false || $free === false) {
-      throw new \RuntimeException('Failed to get disk  space information');
+      throw new \RuntimeException(__('strings.system_status.disk_info_failed'));
     }
 
     return [
@@ -155,14 +155,14 @@ class SystemStatusController extends Controller
     if (PHP_OS_FAMILY === 'Darwin') {
       $uptime = shell_exec('sysctl -n kern.boottime');
       if (!$uptime || !preg_match('/sec = (\d+)/', $uptime, $matches)) {
-        throw new \RuntimeException('Failed to get system uptime');
+        throw new \RuntimeException(__('strings.system_status.uptime_failed'));
       }
       return time() - (int) $matches[1];
     }
 
     $uptime = @file_get_contents('/proc/uptime');
     if ($uptime === false) {
-      throw new \RuntimeException('Failed to read uptime file');
+      throw new \RuntimeException(__('strings.system_status.uptime_read_failed'));
     }
 
     return (int) floatval($uptime);

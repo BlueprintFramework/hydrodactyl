@@ -14,6 +14,7 @@ import { Textarea } from '@/components/elements/Input';
 import InputSpinner from '@/components/elements/InputSpinner';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { ip } from '@/lib/formatters';
 import { useFlashKey } from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
@@ -23,6 +24,7 @@ interface Props {
 }
 
 const AllocationRow = ({ allocation }: Props) => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [isEditingNotes, setIsEditingNotes] = useState(false);
@@ -77,7 +79,7 @@ const AllocationRow = ({ allocation }: Props) => {
         mutate((data) => data?.map((a) => ({ ...a, isDefault: a.id === allocation.id })), false);
 
         setPrimaryServerAllocation(uuid, allocation.id)
-            .then(() => toast.success('Allocation set as primary.'))
+            .then(() => toast.success(t('server.network.primary_set')))
             .catch((error) => {
                 clearAndAddHttpError(error);
                 mutate();
@@ -116,7 +118,7 @@ const AllocationRow = ({ allocation }: Props) => {
                         {allocation.isDefault && (
                             <span className='flex items-center gap-1 text-xs text-brand font-medium bg-brand/10 px-2 py-0.5 rounded'>
                                 <CrownDiamond width={14} height={14} fill='currentColor' />
-                                Primary
+                                {t('server.network.primary')}
                             </span>
                         )}
                     </div>
@@ -127,7 +129,7 @@ const AllocationRow = ({ allocation }: Props) => {
                                 <Textarea
                                     ref={textareaRef}
                                     className='w-full bg-[#ffffff06] border border-[#ffffff08] rounded-lg p-3 text-sm text-zinc-300 placeholder-zinc-500 resize-none focus:ring-1 focus:ring-[#ffffff20] focus:border-[#ffffff20] transition-all'
-                                    placeholder='Add notes for this allocation...'
+                                    placeholder={t('server.network.notes_placeholder')}
                                     value={notesValue}
                                     onChange={(e) => setNotesValue(e.currentTarget.value)}
                                     rows={2}
@@ -140,11 +142,11 @@ const AllocationRow = ({ allocation }: Props) => {
                                     ) : (
                                         <Check fill='currentColor' className='w-3 h-3 mr-1' />
                                     )}
-                                    Save
+                                    {t('common.save')}
                                 </Button>
                                 <Button variant='secondary' size='sm' onClick={cancelEdit} disabled={loading}>
                                     <Xmark width={22} height={22} fill='currentColor' className='mr-1' />
-                                    Cancel
+                                    {t('common.cancel')}
                                 </Button>
                             </div>
                         </div>
@@ -155,7 +157,7 @@ const AllocationRow = ({ allocation }: Props) => {
                                 onClick={startEdit}
                                 className='w-full text-left text-xs text-zinc-500 truncate hover:text-zinc-300 transition-colors'
                             >
-                                {allocation.notes || 'Click to add notes...'}
+                                {allocation.notes || t('server.network.notes_empty')}
                             </button>
                         </Can>
                     )}
@@ -171,8 +173,8 @@ const AllocationRow = ({ allocation }: Props) => {
                                 }`}
                             title={
                                 allocation.isDefault
-                                    ? 'This is already the primary allocation'
-                                    : 'Make this the primary allocation'
+                                    ? t('server.network.primary_tooltip')
+                                    : t('server.network.make_primary_tooltip')
                             }
                         >
                             <CrownDiamond width={22} height={22} fill='currentColor' />
@@ -185,7 +187,9 @@ const AllocationRow = ({ allocation }: Props) => {
                             variant={`${allocation.isDefault ? 'secondary' : 'attention'}`}
                             className={`p-2 border transition-colors`}
                             title={
-                                allocation.isDefault ? 'Cannot delete the primary allocation' : 'Delete this allocation'
+                                allocation.isDefault
+                                    ? t('server.network.cannot_delete_primary_tooltip')
+                                    : t('server.network.delete_tooltip')
                             }
                         >
                             {deleteLoading ? (
@@ -200,11 +204,11 @@ const AllocationRow = ({ allocation }: Props) => {
             <Dialog.Confirm
                 open={showDeleteDialog}
                 onClose={() => setShowDeleteDialog(false)}
-                title={'Delete Allocation'}
-                confirm={'Delete'}
+                title={t('server.network.delete_title')}
+                confirm={t('common.delete')}
                 onConfirmed={deleteAllocation}
             >
-                Are you sure you want to delete this allocation? This action cannot be undone.
+                {t('server.network.delete_confirm')}
             </Dialog.Confirm>
         </>
     );

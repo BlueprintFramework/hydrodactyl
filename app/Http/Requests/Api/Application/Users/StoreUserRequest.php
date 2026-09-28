@@ -52,10 +52,10 @@ class StoreUserRequest extends ApplicationApiRequest
     public function attributes(): array
     {
         return [
-            'external_id' => 'Third Party Identifier',
-            'name_first' => 'First Name',
-            'name_last' => 'Last Name',
-            'root_admin' => 'Root Administrator Status',
+            'external_id' => __('validation.attributes.external_id'),
+            'name_first' => __('validation.attributes.name_first'),
+            'name_last' => __('validation.attributes.name_last'),
+            'root_admin' => __('validation.attributes.root_admin'),
         ];
     }
 }

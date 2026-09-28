@@ -17,6 +17,7 @@ import NewDirectoryButton from '@/components/server/files/NewDirectoryButton';
 import UploadButton from '@/components/server/files/UploadButton';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import { hashToPath } from '@/helpers';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { useStoreActions } from '@/state/hooks';
 import { ServerContext } from '@/state/server';
@@ -31,6 +32,7 @@ const sortFiles = (files: FileObject[]): FileObject[] => {
 };
 
 const FileManagerContainer = () => {
+    const { t } = useTranslation();
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
 
     const { hash } = useLocation();
@@ -81,11 +83,11 @@ const FileManagerContainer = () => {
     }, []);
 
     if (error) {
-        return <ServerError title={'Something went wrong.'} message={httpErrorToHuman(error)} />;
+        return <ServerError title={t('server.files.error_title')} message={httpErrorToHuman(error)} />;
     }
 
     return (
-        <ServerContentBlock className='p-0!' title={'File Manager'} showFlashKey={'files'}>
+        <ServerContentBlock className='p-0!' title={t('server.files.title')} showFlashKey={'files'}>
             <div className='px-2 sm:px-14 pt-2 h-fit sm:pt-14'>
                 <ErrorBoundary>
                     <ServerHeader />
@@ -113,7 +115,7 @@ const FileManagerContainer = () => {
                 </ErrorBoundary>
             </div>
             {!files ? null : !files.length ? (
-                <p className={`text-sm text-zinc-400 text-center`}>This folder is empty.</p>
+                <p className={`text-sm text-zinc-400 text-center`}>{t('server.files.empty')}</p>
             ) : (
                 <>
                     <div className='relative p-1 border-[1px] border-[#ffffff12] rounded-md sm:ml-12 sm:mr-12 mx-2'>
@@ -139,7 +141,7 @@ const FileManagerContainer = () => {
                             ref={searchInputRef}
                             className='pl-14 py-4 w-full rounded-lg bg-[#ffffff11] text-sm font-bold outline-none'
                             type='text'
-                            placeholder='Search...'
+                            placeholder={t('server.files.search_placeholder')}
                             onChange={(event) => debouncedSearchTerm(event.target.value)}
                         />
                     </div>

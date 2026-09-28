@@ -1,7 +1,6 @@
 import { TZDate } from '@date-fns/tz';
-
-import { toString as cronToString } from 'cronstrue';
-import { format } from 'date-fns';
+import cronstrue from 'cronstrue/i18n';
+import { format, type Locale } from 'date-fns';
 import { useStoreState } from 'easy-peasy';
 import { Form, Formik, type FormikHelpers } from 'formik';
 import { useEffect, useMemo } from 'react';
@@ -13,6 +12,9 @@ import FormikSwitchV2 from '@/components/elements/FormikSwitchV2';
 import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import { cronstrueLocales } from '@/i18n/loader';
+import type { Translate } from '@/i18n/types';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -31,11 +33,11 @@ interface Values {
     onlyWhenOnline: boolean;
 }
 
-const getTimezoneInfo = (serverTimezone: string) => {
+const getTimezoneInfo = (serverTimezone: string, t: Translate, dateFnsLocale: Locale) => {
     const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const now = new Date();
 
-    const userOffsetString = format(now, 'xxx');
+    const userOffsetString = format(now, 'xxx', { locale: dateFnsLocale });
     let serverOffsetString: string;
     let offsetDifferenceMinutes = 0;
 
@@ -43,7 +45,7 @@ const getTimezoneInfo = (serverTimezone: string) => {
     try {
         const serverDate = new TZDate(now, serverTimezone);
         const userDate = new TZDate(now, userTimezone);
-        serverOffsetString = format(serverDate, 'xxx');
+        serverOffsetString = format(serverDate, 'xxx', { locale: dateFnsLocale });
 
         // offset difference in minutes
         const serverOffsetValue = serverDate.getTimezoneOffset();
@@ -53,32 +55,55 @@ const getTimezoneInfo = (serverTimezone: string) => {
         // - values mean ahead of UTC
         offsetDifferenceMinutes = userOffsetValue - serverOffsetValue;
     } catch {
-        serverOffsetString = 'Unknown';
+        serverOffsetString = t('common.unknown');
         isServerTimezoneValid = false;
     }
 
     let differenceDescription = '';
+    let hasDifference = false;
     if (!isServerTimezoneValid) {
-        differenceDescription = 'at an unknown difference to';
-    } else if (offsetDifferenceMinutes === 0) {
-        differenceDescription = 'same time';
-    } else {
+        differenceDescription = t('server.schedules.timezone.unknown_difference');
+        hasDifference = true;
+    } else if (offsetDifferenceMinutes !== 0) {
+        hasDifference = true;
+
         const offsetDifferenceHours = offsetDifferenceMinutes / 60;
         const absDifferenceHours = Math.abs(offsetDifferenceHours);
         const isAhead = offsetDifferenceMinutes > 0;
 
         if (absDifferenceHours === Math.floor(absDifferenceHours)) {
             // whole hours
-            differenceDescription = `${absDifferenceHours} hour${absDifferenceHours !== 1 ? 's' : ''} ${isAhead ? 'ahead of' : 'behind'}`;
+            const wholeHourKey = isAhead
+                ? absDifferenceHours === 1
+                    ? 'server.schedules.timezone.ahead_one'
+                    : 'server.schedules.timezone.ahead_other'
+                : absDifferenceHours === 1
+                  ? 'server.schedules.timezone.behind_one'
+                  : 'server.schedules.timezone.behind_other';
+
+            differenceDescription = t(wholeHourKey, { count: absDifferenceHours });
         } else {
             // hours & minutes
             const hours = Math.floor(absDifferenceHours);
             const minutes = Math.abs(offsetDifferenceMinutes % 60);
 
             if (hours > 0) {
-                differenceDescription = `${hours}h ${minutes}m ${isAhead ? 'ahead of' : 'behind'}`;
+                differenceDescription = t(
+                    isAhead
+                        ? 'server.schedules.timezone.hours_minutes_ahead'
+                        : 'server.schedules.timezone.hours_minutes_behind',
+                    { hours, minutes },
+                );
             } else {
-                differenceDescription = `${minutes} minute${minutes !== 1 ? 's' : ''} ${isAhead ? 'ahead of' : 'behind'}`;
+                const minuteKey = isAhead
+                    ? minutes === 1
+                        ? 'server.schedules.timezone.minutes_ahead_one'
+                        : 'server.schedules.timezone.minutes_ahead_other'
+                    : minutes === 1
+                      ? 'server.schedules.timezone.minutes_behind_one'
+                      : 'server.schedules.timezone.minutes_behind_other';
+
+                differenceDescription = t(minuteKey, { count: minutes });
             }
         }
     }
@@ -88,6 +113,7 @@ const getTimezoneInfo = (serverTimezone: string) => {
         server: { timezone: serverTimezone, offset: serverOffsetString },
         difference: differenceDescription,
         isDifferent: userTimezone !== serverTimezone,
+        hasDifference,
     };
 };
 
@@ -96,6 +122,8 @@ const formatTimezoneDisplay = (timezone: string, offset: string) => {
 };
 
 const getCronDescription = (
+    t: Translate,
+    locale: string,
     minute: string,
     hour: string,
     dayOfMonth: string,
@@ -105,35 +133,38 @@ const getCronDescription = (
     try {
         // Build cron expression: minute hour dayOfMonth month dayOfWeek
         const cronExpression = `${minute} ${hour} ${dayOfMonth} ${month} ${dayOfWeek}`;
-        const description = cronToString(cronExpression, {
+        const options = {
             throwExceptionOnParseError: false,
             verbose: true,
-        });
+            locale,
+        };
 
-        // Check if cronstrue returned an error message
-        if (
-            description ===
-            'An error occurred when generating the expression description. Check the cron expression syntax.'
-        ) {
-            return 'Invalid cron expression';
+        const description = cronstrue.toString(cronExpression, options);
+
+        // cronstrue returns the same localized parse-error message for any
+        // invalid expression; detect it without hardcoding English copy.
+        if (description === cronstrue.toString('invalid', options)) {
+            return t('server.schedules.cron.invalid');
         }
 
         return description;
     } catch {
-        return 'Invalid cron expression.';
+        return t('server.schedules.cron.invalid_period');
     }
 };
 
 const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) => {
     const { addError, clearFlashes } = useFlash();
+    const { t, locale, dateFnsLocale } = useTranslation();
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const appendSchedule = ServerContext.useStoreActions((actions) => actions.schedules.appendSchedule);
-    const serverTimezone = useStoreState((state) => state.settings.data?.timezone || 'Unknown');
+    const storedTimezone = useStoreState((state) => state.settings.data?.timezone);
+    const serverTimezone = storedTimezone || t('common.unknown');
 
     const timezoneInfo = useMemo(() => {
-        return getTimezoneInfo(serverTimezone);
-    }, [serverTimezone]);
+        return getTimezoneInfo(serverTimezone, t, dateFnsLocale);
+    }, [serverTimezone, t, dateFnsLocale]);
 
     useEffect(() => {
         clearFlashes('schedule:edit');
@@ -185,6 +216,8 @@ const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) 
         >
             {({ isSubmitting, values }) => {
                 const cronDescription = getCronDescription(
+                    t,
+                    cronstrueLocales[locale],
                     values.minute,
                     values.hour,
                     values.dayOfMonth,
@@ -198,21 +231,21 @@ const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) 
                         onDismissed={onDismissed}
                         {...props}
                         showSpinnerOverlay={isSubmitting}
-                        title={schedule ? 'Edit schedule' : 'Create new schedule'}
+                        title={schedule ? t('server.schedules.edit_title') : t('server.schedules.create_title')}
                     >
                         <Form>
                             <FlashMessageRender byKey={'schedule:edit'} />
                             <Field
                                 name={'name'}
-                                label={'Schedule name'}
-                                description={'A human readable identifier for this schedule.'}
+                                label={t('server.schedules.name_label')}
+                                description={t('server.schedules.name_description')}
                             />
                             <div className={`grid grid-cols-2 sm:grid-cols-5 gap-4 mt-6`}>
-                                <Field name={'minute'} label={'Minute'} />
-                                <Field name={'hour'} label={'Hour'} />
-                                <Field name={'dayOfWeek'} label={'Day of week'} />
-                                <Field name={'dayOfMonth'} label={'Day of month'} />
-                                <Field name={'month'} label={'Month'} />
+                                <Field name={'minute'} label={t('server.schedules.cron.minute')} />
+                                <Field name={'hour'} label={t('server.schedules.cron.hour')} />
+                                <Field name={'dayOfWeek'} label={t('server.schedules.field_day_of_week')} />
+                                <Field name={'dayOfMonth'} label={t('server.schedules.field_day_of_month')} />
+                                <Field name={'month'} label={t('server.schedules.cron.month')} />
                             </div>
                             <a
                                 href='https://crontab.guru/'
@@ -220,7 +253,7 @@ const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) 
                                 rel='noreferrer'
                                 className='text-zinc-500 text-xs hover:text-zinc-300 transition-colors'
                             >
-                                Need help with cron syntax? Use Crontab Guru
+                                {t('server.schedules.cron_help')}
                             </a>
 
                             <div className={`mt-1 p-3 rounded-lg bg-zinc-800/50 border border-zinc-700/50`}>
@@ -228,16 +261,24 @@ const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) 
                             </div>
 
                             <p className={`text-zinc-400 text-xs mt-2`}>
-                                The schedule system uses Cronjob syntax when defining when tasks should begin running.
-                                Use the fields above to specify when these tasks should begin running.
+                                {t('server.schedules.cron_syntax_description')}
                             </p>
 
                             {timezoneInfo.isDifferent && (
                                 <p className={'text-zinc-500 text-xs my-2'}>
-                                    Times are in server timezone (
-                                    {formatTimezoneDisplay(timezoneInfo.server.timezone, timezoneInfo.server.offset)})
-                                    {timezoneInfo.difference !== 'same time' && (
-                                        <> — the server is {timezoneInfo.difference} your timezone</>
+                                    {t('server.schedules.timezone.notice', {
+                                        timezone: formatTimezoneDisplay(
+                                            timezoneInfo.server.timezone,
+                                            timezoneInfo.server.offset,
+                                        ),
+                                    })}
+                                    {timezoneInfo.hasDifference && (
+                                        <>
+                                            {' '}
+                                            {t('server.schedules.timezone.difference_suffix', {
+                                                difference: timezoneInfo.difference,
+                                            })}
+                                        </>
                                     )}
                                 </p>
                             )}
@@ -245,13 +286,13 @@ const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) 
                             <div className='my-3'>
                                 <FormikSwitchV2
                                     name={'onlyWhenOnline'}
-                                    description={'Only execute this schedule when the server is running.'}
-                                    label={'Only When Server Is Online'}
+                                    description={t('server.schedules.only_when_online_description')}
+                                    label={t('server.schedules.only_when_online_label')}
                                 />
                                 <FormikSwitchV2
                                     name={'enabled'}
-                                    description={'This schedule will be executed automatically if enabled.'}
-                                    label={'Schedule Enabled'}
+                                    description={t('server.schedules.enabled_description')}
+                                    label={t('server.schedules.enabled_label')}
                                 />
                             </div>
                             <div className={`mb-6 text-right`}>
@@ -261,7 +302,7 @@ const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) 
                                     type={'submit'}
                                     disabled={isSubmitting}
                                 >
-                                    {schedule ? 'Save changes' : 'Create schedule'}
+                                    {schedule ? t('server.schedules.save_changes') : t('server.schedules.create')}
                                 </Button>
                             </div>
                         </Form>

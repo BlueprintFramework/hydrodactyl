@@ -4,16 +4,19 @@ import isEqual from 'react-fast-compare';
 
 import Input from '@/components/elements/Input';
 import TitledGreyBox from '@/components/elements/TitledGreyBox';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 
 interface Props {
     isEditable?: boolean;
-    title: string;
+    title: TranslationKey;
     permissions: string[];
     className?: string;
     children: React.ReactNode;
 }
 
 const PermissionTitleBox: React.FC<Props> = memo(({ isEditable, title, permissions, className, children }) => {
+    const { t } = useTranslation();
     const [{ value }, , { setValue }] = useField<string[]>('permissions');
 
     const onCheckboxClicked = useCallback(
@@ -31,7 +34,7 @@ const PermissionTitleBox: React.FC<Props> = memo(({ isEditable, title, permissio
         <TitledGreyBox
             title={
                 <div className={`flex items-center justify-between w-full`}>
-                    <p className={`text-sm capitalize`}>{title}</p>
+                    <p className={`text-sm capitalize`}>{t(title)}</p>
                     {isEditable && (
                         <Input
                             type={'checkbox'}

@@ -13,6 +13,7 @@ import FlashMessageRender from '@/components/FlashMessageRender';
 import { SocketEvent } from '@/components/server/events';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import type { ApplicationStore } from '@/state';
@@ -48,6 +49,7 @@ interface BackupValues {
 }
 
 const BackupContainer = () => {
+    const { t } = useTranslation();
     const { setPage } = useContext(ServerBackupContext);
     const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
     const liveProgress = useContext(LiveProgressContext);
@@ -92,10 +94,10 @@ const BackupContainer = () => {
 
         try {
             await deleteAllServerBackups(uuid, password, hasTwoFactor, totpCode || '');
-            toast.success('All backups and repositories are being deleted. This may take a few minutes.');
+            toast.success(t('server.backups.delete_all_success'));
             setDeleteAllModalVisible(false);
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Failed to delete backups.');
+            toast.error(error instanceof Error ? error.message : t('server.backups.delete_failed'));
         } finally {
             setIsDeleting(false);
         }
@@ -116,7 +118,10 @@ const BackupContainer = () => {
             addFlash({
                 key: 'backups',
                 type: 'success',
-                message: `${selectedBackups.size} backup${selectedBackups.size > 1 ? 's are' : ' is'} being deleted.`,
+                message:
+                    selectedBackups.size > 1
+                        ? t('server.backups.bulk_delete_success_other', { count: selectedBackups.size })
+                        : t('server.backups.bulk_delete_success_one', { count: selectedBackups.size }),
             });
 
             setBulkDeleteModalVisible(false);
@@ -165,7 +170,7 @@ const BackupContainer = () => {
     const isLoading = !backups || (error && isValidating);
 
     return (
-        <ServerContentBlock className='p-0!' title={'Backups'}>
+        <ServerContentBlock className='p-0!' title={t('server.backups.title')}>
             <ServerHeader />
             <FlashMessageRender byKey={'backups'} />
             {isLoading ? (
@@ -189,7 +194,7 @@ const BackupContainer = () => {
                                             viewBox='0 0 24 24'
                                             stroke='currentColor'
                                             role='img'
-                                            aria-label='Delete'
+                                            aria-label={t('common.delete')}
                                         >
                                             <path
                                                 strokeLinecap='round'
@@ -198,7 +203,7 @@ const BackupContainer = () => {
                                                 d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
                                             />
                                         </svg>
-                                        Delete All
+                                        {t('server.backups.delete_all')}
                                     </Button>
                                 )}
                                 {(backupLimit === null || backupLimit > backupCount) &&
@@ -210,7 +215,7 @@ const BackupContainer = () => {
                                             disabled={hasActiveOperation}
                                         >
                                             <Plus width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                                            New Backup
+                                            {t('server.backups.new_backup')}
                                         </Button>
                                     )}
                             </div>
@@ -235,32 +240,42 @@ const BackupContainer = () => {
                         open={deleteAllModalVisible}
                         onClose={() => setDeleteAllModalVisible(false)}
                         onConfirmed={handleDeleteAll}
-                        title='Delete All Backups'
+                        title={t('server.backups.delete_all_title')}
                         flashKey='backups'
                         loading={isDeleting}
-                        description={`You are about to permanently delete ${backupCount} ${backupCount === 1 ? 'backup' : 'backups'} and completely destroy the backup repository for this server.`}
+                        description={
+                            backupCount === 1
+                                ? t('server.backups.delete_all_description_one', { count: backupCount })
+                                : t('server.backups.delete_all_description_other', { count: backupCount })
+                        }
                         warningItems={[
-                            'All backup data will be permanently deleted',
-                            'Locked backups will also be deleted',
-                            'The entire backup repository will be destroyed',
-                            'This operation may take several minutes to complete',
-                            'You will not be able to restore any of these backups',
+                            t('server.backups.delete_all_warning_data'),
+                            t('server.backups.delete_all_warning_locked'),
+                            t('server.backups.delete_all_warning_repository'),
+                            t('server.backups.delete_all_warning_duration'),
+                            t('server.backups.delete_all_warning_restore'),
                         ]}
-                        confirmText='Delete All Backups'
+                        confirmText={t('server.backups.delete_all_confirm')}
                     />
 
                     <ConfirmPasswordModal
                         open={bulkDeleteModalVisible}
                         onClose={() => setBulkDeleteModalVisible(false)}
                         onConfirmed={handleBulkDelete}
-                        title='Delete Selected Backups'
+                        title={t('server.backups.bulk_delete_title')}
                         flashKey='backups:bulk_delete'
                         loading={isBulkDeleting}
-                        description={`You are about to permanently delete ${selectedBackups.size} backup${selectedBackups.size > 1 ? 's' : ''}. This action cannot be undone.`}
-                        warningItems={[
-                            'The selected backup files and their snapshots will be permanently deleted. You will not be able to restore them.',
-                        ]}
-                        confirmText={`Delete ${selectedBackups.size} Backup${selectedBackups.size > 1 ? 's' : ''}`}
+                        description={
+                            selectedBackups.size > 1
+                                ? t('server.backups.bulk_delete_description_other', { count: selectedBackups.size })
+                                : t('server.backups.bulk_delete_description_one', { count: selectedBackups.size })
+                        }
+                        warningItems={[t('server.backups.bulk_delete_warning')]}
+                        confirmText={
+                            selectedBackups.size > 1
+                                ? t('server.backups.bulk_delete_confirm_other', { count: selectedBackups.size })
+                                : t('server.backups.bulk_delete_confirm_one', { count: selectedBackups.size })
+                        }
                     />
 
                     <div className='px-2 sm:px-14'>
@@ -276,12 +291,14 @@ const BackupContainer = () => {
                                         />
                                     </div>
                                     <h3 className='text-lg font-medium text-zinc-200 mb-2'>
-                                        {backupLimit === 0 ? 'Backups unavailable' : 'No backups found'}
+                                        {backupLimit === 0
+                                            ? t('server.backups.unavailable_title')
+                                            : t('server.backups.empty_title')}
                                     </h3>
                                     <p className='text-sm text-zinc-400 max-w-sm'>
                                         {backupLimit === 0
-                                            ? 'Backups cannot be created for this server.'
-                                            : 'Your server does not have any backups. Create one to get started.'}
+                                            ? t('server.backups.unavailable_description')
+                                            : t('server.backups.empty_description')}
                                     </p>
                                 </div>
                             </div>
@@ -318,6 +335,7 @@ const BackupContainer = () => {
 };
 
 const BackupContainerWrapper = () => {
+    const { t } = useTranslation();
     const [page, setPage] = useState<number>(1);
     const { mutate } = getServerBackups();
     const [liveProgress, setLiveProgress] = useState<
@@ -365,7 +383,9 @@ const BackupContainerWrapper = () => {
                 const currentState = prevProgress[backup_uuid];
                 const newProgress = progress || 0;
                 const isCompleted = status === 'completed' && newProgress === 100;
-                const displayMessage = errorMsg ? `${message || 'Operation failed'}: ${errorMsg}` : message || '';
+                const displayMessage = errorMsg
+                    ? `${message || t('server.backups.operation_failed')}: ${errorMsg}`
+                    : message || '';
 
                 if (currentState?.completed && !isCompleted) {
                     return prevProgress;
@@ -450,7 +470,7 @@ const BackupContainerWrapper = () => {
                 }
             }
         },
-        [mutate],
+        [mutate, t],
     );
 
     useWebsocketEvent(SocketEvent.BACKUP_STATUS, handleBackupStatus);

@@ -35,7 +35,7 @@ class BackupDeleteController extends Controller
         /** @var \Pterodactyl\Models\Server $server */
         $server = $model->server;
         if ($server->node_id !== $node->id) {
-            throw new HttpForbiddenException('You do not have permission to access that backup.');
+            throw new HttpForbiddenException(__('exceptions.remote.backups.forbidden_backup'));
         }
 
         try {
@@ -51,7 +51,7 @@ class BackupDeleteController extends Controller
 
             return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
         } catch (BackupLockedException $exception) {
-            throw new BadRequestHttpException('Cannot delete a backup that is marked as locked.');
+            throw new BadRequestHttpException(__('exceptions.backups.locked'));
         }
     }
 }

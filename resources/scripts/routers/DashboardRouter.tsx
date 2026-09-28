@@ -18,11 +18,13 @@ import MainWrapper from '@/components/elements/MainWrapper';
 import { DashboardMobileMenu } from '@/components/elements/MobileFullScreenMenu';
 import MobileTopBar from '@/components/elements/MobileTopBar';
 import { NotFound } from '@/components/elements/ScreenBlock';
+import { useTranslation } from '@/i18n/I18nProvider';
 import routes from '@/routers/routes';
 
 const DashboardRouter = () => {
     const location = useLocation();
     const rootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
+    const { t } = useTranslation();
 
     // Mobile menu state
     const [isMobileMenuVisible, setMobileMenuVisible] = useState(false);
@@ -133,14 +135,14 @@ const DashboardRouter = () => {
                             <DropdownMenuContent className='z-99999' sideOffset={8}>
                                 {rootAdmin && (
                                     <DropdownMenuItem onSelect={onSelectAdminPanel}>
-                                        Admin Panel
+                                        {t('panel.admin_panel')}
                                         <span className='ml-2 z-10 rounded-full bg-brand px-2 py-1 text-xs text-white'>
-                                            Staff
+                                            {t('panel.staff')}
                                         </span>
                                     </DropdownMenuItem>
                                 )}
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onSelect={onTriggerLogout}>Log Out</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={onTriggerLogout}>{t('panel.log_out')}</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -148,19 +150,19 @@ const DashboardRouter = () => {
                     <ul data-hydrodactyl-subnav-routes-wrapper='' className='hydrodactyl-subnav-routes-wrapper'>
                         <NavLink to={'/'} end className='flex flex-row items-center' ref={NavigationHome}>
                             <House width={22} height={22} fill='currentColor' />
-                            <p>Servers</p>
+                            <p>{t('navigation.servers')}</p>
                         </NavLink>
                         <NavLink to={'/account/api'} end className='flex flex-row items-center' ref={NavigationApi}>
                             <Lock width={22} height={22} fill='currentColor' />
-                            <p>API Keys</p>
+                            <p>{t('navigation.api_keys')}</p>
                         </NavLink>
                         <NavLink to={'/account/ssh'} end className='flex flex-row items-center' ref={NavigationSSH}>
                             <Key width={22} height={22} fill='currentColor' />
-                            <p>SSH Keys</p>
+                            <p>{t('navigation.ssh_keys')}</p>
                         </NavLink>
                         <NavLink to={'/account'} end className='flex flex-row items-center' ref={NavigationSettings}>
                             <Gear width={22} height={22} fill='currentColor' />
-                            <p>Settings</p>
+                            <p>{t('navigation.settings')}</p>
                         </NavLink>
                     </ul>
                 </MainSidebar>

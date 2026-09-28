@@ -1,0 +1,65 @@
+<?php
+
+return [
+    'notices' => [
+        'created' => 'Se ha creado correctamente un nuevo Nest, :name.',
+        'deleted' => 'Se eliminó correctamente el Nest solicitado del Panel.',
+        'updated' => 'Se actualizaron correctamente los ajustes de configuración del Nest.',
+    ],
+    'eggs' => [
+        'notices' => [
+            'imported' => 'Se importó correctamente este Egg y sus variables asociadas.',
+            'updated_via_import' => 'Este Egg se ha actualizado usando el archivo proporcionado.',
+            'deleted' => 'Se eliminó correctamente el Egg solicitado del Panel.',
+            'updated' => 'La configuración del Egg se ha actualizado correctamente.',
+            'script_updated' => 'El script de instalación del Egg se ha actualizado y se ejecutará siempre que se instalen servidores.',
+            'egg_created' => 'Se ha creado correctamente un nuevo Egg. Tendrás que reiniciar cualquier daemon en ejecución para aplicar este nuevo Egg.',
+        ],
+    ],
+    'variables' => [
+        'notices' => [
+            'variable_deleted' => 'La variable ":variable" se ha eliminado y ya no estará disponible para los servidores una vez reconstruidos.',
+            'variable_updated' => 'La variable ":variable" se ha actualizado. Tendrás que reconstruir cualquier servidor que use esta variable para aplicar los cambios.',
+            'variable_created' => 'Se ha creado correctamente una nueva variable y se ha asignado a este Egg.',
+        ],
+    ],
+    'index' => [
+        'title' => 'Nests',
+        'subtitle' => 'Todos los Nests disponibles actualmente en este sistema.',
+        'warning' => '<strong>Los Eggs son poderosos</strong> — modificarlos incorrectamente puede romper tus servidores. Evita editar los Eggs predeterminados a menos que sepas lo que haces.',
+        'configured_nests' => 'Nests configurados',
+        'import_egg' => 'Importar Egg',
+        'import_egg_from_url' => 'Importar Egg desde URL',
+        'create_new' => 'Crear nuevo',
+        'table_description' => 'Descripción',
+        'table_eggs' => 'Eggs',
+        'import_modal_title' => 'Importar un Egg',
+        'egg_file' => 'Archivo de Egg',
+        'egg_file_help' => 'Selecciona el archivo <code>.json</code> del nuevo Egg que deseas importar.',
+        'associated_nest' => 'Nest asociado',
+        'associated_nest_help' => 'Selecciona en el desplegable el Nest con el que se asociará este Egg. Si deseas asociarlo con un nuevo Nest, tendrás que crear ese Nest antes de continuar.',
+        'import_button' => 'Importar',
+        'egg_url' => 'URL del Egg',
+        'egg_url_help' => 'Escribe la URL del archivo del nuevo Egg que deseas importar.',
+    ],
+    'new' => [
+        'title' => 'Nuevo Nest',
+        'subtitle' => 'Configura un nuevo Nest para desplegarlo en todos los nodos.',
+        'name_help' => 'Este debería ser un nombre de categoría descriptivo que englobe todos los Eggs del Nest.',
+        'description' => 'Descripción',
+    ],
+    'view' => [
+        'title' => 'Nests &rarr; :name',
+        'name_help' => 'Este debería ser un nombre de categoría descriptivo que englobe todas las opciones del servicio.',
+        'description' => 'Descripción',
+        'nest_id' => 'ID del Nest',
+        'nest_id_help' => 'Un ID único usado para identificar este Nest internamente y a través de la API.',
+        'author' => 'Autor',
+        'author_help' => 'El autor de esta opción de servicio. Dirige tus preguntas y problemas a él, a menos que sea una opción oficial creada por <code>support@pterodactyl.io</code>.',
+        'uuid' => 'UUID',
+        'uuid_help' => 'Un UUID que se asigna a todos los servidores que usan esta opción con fines de identificación.',
+        'nest_eggs' => 'Eggs del Nest',
+        'new_egg' => 'Nuevo Egg',
+        'delete_js' => ' Eliminar Nest',
+    ],
+];

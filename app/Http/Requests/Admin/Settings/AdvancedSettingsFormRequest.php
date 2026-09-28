@@ -35,12 +35,12 @@ class AdvancedSettingsFormRequest extends AdminFormRequest
   public function attributes(): array
   {
     return [
-      'pterodactyl:guzzle:timeout' => 'HTTP Request Timeout',
-      'pterodactyl:guzzle:connect_timeout' => 'HTTP Connection Timeout',
-      'pterodactyl:client_features:allocations:enabled' => 'Auto Create Allocations Enabled',
-      'pterodactyl:client_features:allocations:range_start' => 'Starting Port',
-      'pterodactyl:client_features:allocations:range_end' => 'Ending Port',
-      'pterodactyl:client_features:groups:enabled' => 'Server Groups Enabled',
+      'pterodactyl:guzzle:timeout' => __('validation.attributes.pterodactyl:guzzle:timeout'),
+      'pterodactyl:guzzle:connect_timeout' => __('validation.attributes.pterodactyl:guzzle:connect_timeout'),
+      'pterodactyl:client_features:allocations:enabled' => __('validation.attributes.pterodactyl:client_features:allocations:enabled'),
+      'pterodactyl:client_features:allocations:range_start' => __('validation.attributes.pterodactyl:client_features:allocations:range_start'),
+      'pterodactyl:client_features:allocations:range_end' => __('validation.attributes.pterodactyl:client_features:allocations:range_end'),
+      'pterodactyl:client_features:groups:enabled' => __('validation.attributes.pterodactyl:client_features:groups:enabled'),
     ];
   }
 }

@@ -4,6 +4,7 @@ import { object, string } from 'yup';
 import Field from '@/components/elements/Field';
 import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { ServerContext } from '@/state/server';
 
@@ -16,6 +17,7 @@ interface Values {
 }
 
 const FileNameModal = ({ onFileNamed, onDismissed, ...props }: Props) => {
+    const { t } = useTranslation();
     const directory = ServerContext.useStoreState((state) => state.files.directory);
 
     const submit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
@@ -37,20 +39,20 @@ const FileNameModal = ({ onFileNamed, onDismissed, ...props }: Props) => {
                         resetForm();
                         onDismissed();
                     }}
-                    title='New file'
+                    title={t('server.files.new_file_modal_title')}
                     {...props}
                 >
                     <Form className='m-0 w-full flex flex-col gap-4'>
                         <Field
                             id={'fileName'}
                             name={'fileName'}
-                            label={'File Name'}
-                            description={'Enter the name that this file should be saved as.'}
+                            label={t('server.files.file_name_label')}
+                            description={t('server.files.file_name_description')}
                             autoFocus
                         />
                         <div className={`flex justify-end w-full my-4`}>
                             <Button variant='attention' type='submit'>
-                                Create File
+                                {t('server.files.create_file')}
                             </Button>
                         </div>
                     </Form>

@@ -56,7 +56,7 @@ class NestController extends Controller
     public function store(StoreNestFormRequest $request): RedirectResponse
     {
         $nest = $this->nestCreationService->handle($request->normalize());
-        $this->alert->success(trans('admin/nests.notices.created', ['name' => htmlspecialchars($nest->name)]))->flash();
+        $this->alert->success(__('admin/nests.notices.created', ['name' => htmlspecialchars($nest->name)]))->flash();
 
         return redirect()->route('admin.nests.view', $nest->id);
     }
@@ -82,7 +82,7 @@ class NestController extends Controller
     public function update(StoreNestFormRequest $request, int $nest): RedirectResponse
     {
         $this->nestUpdateService->handle($nest, $request->normalize());
-        $this->alert->success(trans('admin/nests.notices.updated'))->flash();
+        $this->alert->success(__('admin/nests.notices.updated'))->flash();
 
         return redirect()->route('admin.nests.view', $nest);
     }
@@ -95,7 +95,7 @@ class NestController extends Controller
     public function destroy(int $nest): RedirectResponse
     {
         $this->nestDeletionService->handle($nest);
-        $this->alert->success(trans('admin/nests.notices.deleted'))->flash();
+        $this->alert->success(__('admin/nests.notices.deleted'))->flash();
 
         return redirect()->route('admin.nests');
     }

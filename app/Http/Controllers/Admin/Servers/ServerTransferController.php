@@ -51,7 +51,7 @@ class ServerTransferController extends Controller
         // Check if the node is viable for the transfer.
         $node = $this->nodeRepository->getNodeWithResourceUsage($node_id);
         if (!$node->isViable($server->memory, $server->disk)) {
-            $this->alert->danger(trans('admin/server.alerts.transfer_not_viable'))->flash();
+            $this->alert->danger(__('admin/server.alerts.transfer_not_viable'))->flash();
 
             return redirect()->route('admin.servers.view.manage', $server->id);
         }
@@ -88,7 +88,7 @@ class ServerTransferController extends Controller
             return $transfer;
         });
 
-        $this->alert->success(trans('admin/server.alerts.transfer_started'))->flash();
+        $this->alert->success(__('admin/server.alerts.transfer_started'))->flash();
 
         return redirect()->route('admin.servers.view.manage', $server->id);
     }

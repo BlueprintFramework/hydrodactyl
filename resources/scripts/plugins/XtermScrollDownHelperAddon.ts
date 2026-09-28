@@ -1,5 +1,10 @@
 import type { ITerminalAddon, Terminal } from '@xterm/xterm';
 
+export interface ScrollDownHelperLabels {
+    ariaLabel: string;
+    title: string;
+}
+
 /**
  * A "scroll to bottom" helper for the xterm console — a small down-arrow
  * button pinned to the bottom-right of the terminal. It appears when the user
@@ -28,6 +33,8 @@ export class ScrollDownHelperAddon implements ITerminalAddon {
     private viewport: HTMLElement | null = null;
     private element?: HTMLDivElement;
     private waitTimer: ReturnType<typeof setTimeout> | null = null;
+
+    constructor(private readonly getLabels: () => ScrollDownHelperLabels) {}
 
     activate(terminal: Terminal): void {
         this.terminal = terminal;
@@ -86,6 +93,7 @@ export class ScrollDownHelperAddon implements ITerminalAddon {
         if (this.element) {
             this.element.style.opacity = '1';
             this.element.style.pointerEvents = 'auto';
+            this.applyLabels();
             return;
         }
 
@@ -117,8 +125,7 @@ export class ScrollDownHelperAddon implements ITerminalAddon {
             touchAction: 'manipulation',
         } as Partial<CSSStyleDeclaration>);
         this.element.setAttribute('role', 'button');
-        this.element.setAttribute('aria-label', 'Scroll console to bottom');
-        this.element.title = 'Scroll to bottom';
+        this.applyLabels();
 
         this.element.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -130,6 +137,16 @@ export class ScrollDownHelperAddon implements ITerminalAddon {
         });
 
         this.terminal.element.appendChild(this.element);
+    }
+
+    private applyLabels(): void {
+        if (!this.element) {
+            return;
+        }
+
+        const labels = this.getLabels();
+        this.element.setAttribute('aria-label', labels.ariaLabel);
+        this.element.title = labels.title;
     }
 
     private hide(): void {

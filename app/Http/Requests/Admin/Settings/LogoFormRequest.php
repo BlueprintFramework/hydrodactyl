@@ -19,17 +19,17 @@ class LogoFormRequest extends AdminFormRequest
     public function attributes(): array
     {
         return [
-            'logo_file' => 'Logo File',
-            'logo_url' => 'Logo URL',
+            'logo_file' => __('validation.attributes.logo_file'),
+            'logo_url' => __('validation.attributes.logo_url'),
         ];
     }
 
     public function messages(): array
     {
         return [
-            'logo_file.mimes' => 'The logo must be a PNG, JPG, GIF, WEBP, or SVG file.',
-            'logo_file.max' => 'The logo must not exceed 2MB in size.',
-            'logo_url.url' => 'The logo URL must be a valid URL.',
+            'logo_file.mimes' => __('validation.json_api.logo_mimes'),
+            'logo_file.max' => __('validation.json_api.logo_max'),
+            'logo_url.url' => __('validation.json_api.logo_url_invalid'),
         ];
     }
 }

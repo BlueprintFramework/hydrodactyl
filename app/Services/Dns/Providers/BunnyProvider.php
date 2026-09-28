@@ -172,7 +172,7 @@ class BunnyProvider implements DnsProviderInterface
                 }
             }
 
-            throw DnsProviderException::recordDeletionFailed($domain, [(string) $recordId], 'record not found');
+            throw DnsProviderException::recordDeletionFailed($domain, [(string) $recordId], __('exceptions.dns.record_not_found_reason'));
         } catch (GuzzleException $e) {
             throw DnsProviderException::connectionFailed('bunny', $this->parseErrorMessage($e));
         }
@@ -286,7 +286,7 @@ class BunnyProvider implements DnsProviderInterface
                 ++$page;
             } while ($hasMorePages);
 
-            throw new \Exception("DNS zone not found for domain: {$domain}");
+            throw new \Exception(__('exceptions.dns.bunny_zone_not_found', ['domain' => $domain]));
         } catch (GuzzleException $e) {
             throw DnsProviderException::connectionFailed('bunny', $this->parseErrorMessage($e));
         }
@@ -362,15 +362,15 @@ class BunnyProvider implements DnsProviderInterface
     {
         $response = $e->getResponse();
         if (!$response) {
-            return 'DNS service temporarily unavailable.';
+            return __('exceptions.dns.service_unavailable');
         }
 
         $data = json_decode((string) $response->getBody(), true);
         if (!is_array($data)) {
-            return 'DNS provider rejected the record creation request.';
+            return __('exceptions.dns.provider_rejected_creation');
         }
 
-        return $data['Message'] ?? $data['ErrorKey'] ?? 'DNS provider rejected the record creation request.';
+        return $data['Message'] ?? $data['ErrorKey'] ?? __('exceptions.dns.provider_rejected_creation');
     }
 
     private function parseErrorMessage(GuzzleException $e): string
@@ -381,6 +381,6 @@ class BunnyProvider implements DnsProviderInterface
 
         $message = $e->getMessage();
 
-        return strlen($message) > 200 ? 'DNS service temporarily unavailable.' : $message;
+        return strlen($message) > 200 ? __('exceptions.dns.service_unavailable') : $message;
     }
 }

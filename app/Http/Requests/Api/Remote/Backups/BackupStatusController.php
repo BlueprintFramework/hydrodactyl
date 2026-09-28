@@ -43,11 +43,11 @@ class BackupStatusController extends Controller
         /** @var \Pterodactyl\Models\Server $server */
         $server = $model->server;
         if ($server->node_id !== $node->id) {
-            throw new HttpForbiddenException('You do not have permission to access that backup.');
+            throw new HttpForbiddenException(__('exceptions.remote.backups.forbidden_backup'));
         }
 
         if ($model->is_successful) {
-            throw new BadRequestHttpException('Cannot update the status of a backup that is already marked as completed.');
+            throw new BadRequestHttpException(__('exceptions.remote.backups.status_completed'));
         }
 
         $action = $request->boolean('successful') ? 'server:backup.complete' : 'server:backup.fail';
@@ -122,7 +122,7 @@ class BackupStatusController extends Controller
                 return;
             }
 
-            throw new DisplayException('Cannot complete backup request: no upload_id present on model.');
+            throw new DisplayException(__('exceptions.remote.backups.missing_upload_id'));
         }
 
         $params = [

@@ -49,7 +49,7 @@ class VariableValidatorService
                 $rules_string = 'nullable|' . $rules_string;
             }
             $rules['environment.' . $variable->env_variable] = $rules_string;
-            $customAttributes['environment.' . $variable->env_variable] = trans('validation.internal.variable_value', ['env' => $variable->name]);
+            $customAttributes['environment.' . $variable->env_variable] = __('validation.internal.variable_value', ['env' => $variable->name]);
         }
 
         $validator = $this->validator->make($data, $rules, [], $customAttributes);

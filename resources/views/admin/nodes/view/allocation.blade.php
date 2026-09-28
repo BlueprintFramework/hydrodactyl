@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('title')
-    {{ $node->name }}: Allocations
+    {{ __('admin/node.view.allocation.title', ['name' => $node->name]) }}
 @endsection
 
 @section('content-header')
-    <h1>{{ $node->name }}<small>Control allocations available for servers on this node.</small></h1>
+    <h1>{{ $node->name }}<small>{{ __('admin/node.view.allocation.subtitle') }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.nodes') }}">Nodes</a></li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li><a href="{{ route('admin.nodes') }}">{{ __('admin/navigation.sidebar.nodes') }}</a></li>
         <li><a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a></li>
-        <li class="active">Allocations</li>
+        <li class="active">{{ __('admin/node.view.allocation.breadcrumb') }}</li>
     </ol>
 @endsection
 
@@ -19,11 +19,11 @@
     <div class="col-xs-12">
         <div class="nav-tabs-custom nav-tabs-floating">
             <ul class="nav nav-tabs">
-                <li><a href="{{ route('admin.nodes.view', $node->id) }}">About</a></li>
-                <li><a href="{{ route('admin.nodes.view.settings', $node->id) }}">Settings</a></li>
-                <li><a href="{{ route('admin.nodes.view.configuration', $node->id) }}">Configuration</a></li>
-                <li class="active"><a href="{{ route('admin.nodes.view.allocation', $node->id) }}">Allocation</a></li>
-                <li><a href="{{ route('admin.nodes.view.servers', $node->id) }}">Servers</a></li>
+                <li><a href="{{ route('admin.nodes.view', $node->id) }}">{{ __('admin/node.view.tabs.about') }}</a></li>
+                <li><a href="{{ route('admin.nodes.view.settings', $node->id) }}">{{ __('strings.settings') }}</a></li>
+                <li><a href="{{ route('admin.nodes.view.configuration', $node->id) }}">{{ __('strings.configuration') }}</a></li>
+                <li class="active"><a href="{{ route('admin.nodes.view.allocation', $node->id) }}">{{ __('admin/node.view.tabs.allocation') }}</a></li>
+                <li><a href="{{ route('admin.nodes.view.servers', $node->id) }}">{{ __('strings.servers') }}</a></li>
             </ul>
         </div>
     </div>
@@ -32,7 +32,7 @@
     <div class="col-sm-8">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">Existing Allocations</h3>
+                <h3 class="box-title">{{ __('admin/node.view.allocation.existing') }}</h3>
             </div>
             <div class="box-body table-responsive no-padding" style="overflow-x: visible">
                 <table class="table table-hover" style="margin-bottom:0;">
@@ -40,17 +40,17 @@
                         <th>
                             <input type="checkbox" class="select-all-files hidden-xs" data-action="selectAll">
                         </th>
-                        <th>IP Address <i class="fa fa-fw fa-minus-square" style="font-weight:normal;color:#d9534f;cursor:pointer;" data-toggle="modal" data-target="#allocationModal"></i></th>
-                        <th>IP Alias</th>
-                        <th>Port</th>
-                        <th>Assigned To</th>
+                        <th>{{ __('strings.ip') }} <i class="fa fa-fw fa-minus-square" style="font-weight:normal;color:#d9534f;cursor:pointer;" data-toggle="modal" data-target="#allocationModal"></i></th>
+                        <th>{{ __('admin/node.view.allocation.ip_alias') }}</th>
+                        <th>{{ __('strings.port') }}</th>
+                        <th>{{ __('admin/node.view.allocation.assigned_to') }}</th>
                         <th>
                             <div class="btn-group hidden-xs">
                                 <button type="button" id="mass_actions" class="btn btn-sm btn-default dropdown-toggle disabled"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mass Actions <span class="caret"></span>
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ __('admin/node.view.allocation.mass_actions') }} <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-massactions">
-                                    <li><a href="#" id="selective-deletion" data-action="selective-deletion">Delete <i class="fa fa-fw fa-trash-o"></i></a></li>
+                                    <li><a href="#" id="selective-deletion" data-action="selective-deletion">{{ __('strings.delete') }} <i class="fa fa-fw fa-trash-o"></i></a></li>
                                 </ul>
                             </div>
                         </th>
@@ -66,7 +66,7 @@
                             </td>
                             <td class="col-sm-3 middle" data-identifier="ip">{{ $allocation->ip }}</td>
                             <td class="col-sm-3 middle">
-                                <input class="form-control input-sm" type="text" value="{{ $allocation->ip_alias }}" data-action="set-alias" data-id="{{ $allocation->id }}" placeholder="none" />
+                                <input class="form-control input-sm" type="text" value="{{ $allocation->ip_alias }}" data-action="set-alias" data-id="{{ $allocation->id }}" placeholder="{{ __('admin/node.view.allocation.no_alias_placeholder') }}" />
                                 <span class="input-loader"><i class="fa fa-refresh fa-spin fa-fw"></i></span>
                             </td>
                             <td class="col-sm-2 middle" data-identifier="port">{{ $allocation->port }}</td>
@@ -95,38 +95,38 @@
         <form action="{{ route('admin.nodes.view.allocation', $node->id) }}" method="POST">
             <div class="box box-success">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Assign New Allocations</h3>
+                    <h3 class="box-title">{{ __('admin/node.view.allocation.assign_new') }}</h3>
                 </div>
                 <div class="box-body">
                     <div class="form-group">
-                        <label for="pAllocationIP" class="control-label">IP Address</label>
+                        <label for="pAllocationIP" class="control-label">{{ __('strings.ip') }}</label>
                         <div>
                             <select class="form-control" name="allocation_ip" id="pAllocationIP" multiple>
                                 @foreach($allocations as $allocation)
                                     <option value="{{ $allocation->ip }}">{{ $allocation->ip }}</option>
                                 @endforeach
                             </select>
-                            <p class="text-muted small">Enter an IP address to assign ports to here.</p>
+                            <p class="text-muted small">{{ __('admin/node.view.allocation.ip_help') }}</p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="pAllocationIP" class="control-label">IP Alias</label>
+                        <label for="pAllocationIP" class="control-label">{{ __('admin/node.view.allocation.ip_alias') }}</label>
                         <div>
-                            <input type="text" id="pAllocationAlias" class="form-control" name="allocation_alias" placeholder="alias" />
-                            <p class="text-muted small">If you would like to assign a default alias to these allocations enter it here.</p>
+                            <input type="text" id="pAllocationAlias" class="form-control" name="allocation_alias" placeholder="{{ __('admin/node.view.allocation.alias_placeholder') }}" />
+                            <p class="text-muted small">{{ __('admin/node.view.allocation.alias_help') }}</p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="pAllocationPorts" class="control-label">Ports</label>
+                        <label for="pAllocationPorts" class="control-label">{{ __('admin/node.view.allocation.ports') }}</label>
                         <div>
                             <select class="form-control" name="allocation_ports[]" id="pAllocationPorts" multiple></select>
-                            <p class="text-muted small">Enter individual ports or port ranges here separated by commas or spaces.</p>
+                            <p class="text-muted small">{{ __('admin/node.view.allocation.ports_help') }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="box-footer">
                     {!! csrf_field() !!}
-                    <button type="submit" class="btn btn-success btn-sm pull-right">Submit</button>
+                    <button type="submit" class="btn btn-success btn-sm pull-right">{{ __('strings.submit') }}</button>
                 </div>
             </div>
         </form>
@@ -136,8 +136,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Delete Allocations for IP Block</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('strings.close') }}"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">{{ __('admin/node.view.allocation.delete_block_title') }}</h4>
             </div>
             <form action="{{ route('admin.nodes.view.allocation.removeBlock', $node->id) }}" method="POST">
                 <div class="modal-body">
@@ -153,8 +153,8 @@
                 </div>
                 <div class="modal-footer">
                     {{{ csrf_field() }}}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-danger">Delete Allocations</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('strings.close') }}</button>
+                    <button type="submit" class="btn btn-danger">{{ __('admin/node.view.allocation.delete_allocations') }}</button>
                 </div>
             </form>
         </div>
@@ -200,12 +200,12 @@
         var allocation = $(this).data('id');
         swal({
             title: '',
-            text: 'Are you sure you want to delete this allocation?',
+            text: @js(__('admin/node.view.allocation.confirm_delete')),
             type: 'warning',
             showCancelButton: true,
             allowOutsideClick: true,
             closeOnConfirm: false,
-            confirmButtonText: 'Delete',
+            confirmButtonText: @js(__('strings.delete')),
             confirmButtonColor: '#d9534f',
             showLoaderOnConfirm: true
         }, function () {
@@ -215,11 +215,11 @@
                 headers: { 'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content') },
             }).done(function (data) {
                 element.parent().parent().addClass('warning').delay(100).fadeOut();
-                swal({ type: 'success', title: 'Port Deleted!' });
+                swal({ type: 'success', title: @js(__('admin/node.view.allocation.deleted')) });
             }).fail(function (jqXHR) {
                 console.error(jqXHR);
                 swal({
-                    title: 'Whoops!',
+                    title: @js(__('admin/node.view.allocation.whoops')),
                     text: jqXHR.responseJSON.error,
                     type: 'error'
                 });
@@ -299,13 +299,13 @@
 
             formattedItems = formattedItems.slice(0, -2);
             if (selectedItems.length > 5) {
-                formattedItems += ', and ' + (selectedItems.length - 5) + ' other(s)';
+                formattedItems += @js(__('admin/node.view.allocation.more_allocations')).replace(':count', selectedItems.length - 5);
             }
 
             swal({
                 type: 'warning',
                 title: '',
-                text: 'Are you sure you want to delete the following allocations: ' + formattedItems + '?',
+                text: @js(__('admin/node.view.allocation.confirm_delete_multi')).replace(':allocations', formattedItems),
                 html: true,
                 showCancelButton: true,
                 showConfirmButton: true,
@@ -332,15 +332,15 @@
 
                     swal({
                         type: 'success',
-                        title: 'Allocations Deleted'
+                        title: @js(__('admin/node.view.allocation.deleted_multi'))
                     });
                 }).fail(function (jqXHR) {
                     console.error(jqXHR);
                     swal({
                         type: 'error',
-                        title: 'Whoops!',
+                        title: @js(__('admin/node.view.allocation.whoops')),
                         html: true,
-                        text: 'An error occurred while attempting to delete these allocations. Please try again.',
+                        text: @js(__('admin/node.view.allocation.delete_error')),
                     });
                 });
             });
@@ -348,7 +348,7 @@
             swal({
                 type: 'warning',
                 title: '',
-                text: 'Please select allocation(s) to delete.',
+                text: @js(__('admin/node.view.allocation.select_required')),
             });
         }
     }

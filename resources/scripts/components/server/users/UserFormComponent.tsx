@@ -9,6 +9,8 @@ import Field from '@/components/elements/Field';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import PermissionRow from '@/components/server/users/PermissionRow';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 import { useDeepCompareMemo } from '@/plugins/useDeepCompareMemo';
 import { usePermissions } from '@/plugins/usePermissions';
 import type { ApplicationStore } from '@/state';
@@ -45,7 +47,59 @@ const PermissionIcon = ({ name }: { name: string }) => {
     return <Icon width={22} height={22} fill='currentColor' className='text-brand flex-shrink-0 mt-0.5' />;
 };
 
+const CATEGORY_KEYS: Record<string, { description: TranslationKey; title: TranslationKey }> = {
+    activity: {
+        description: 'server.users.permissions.activity.description',
+        title: 'server.users.permissions.activity.title',
+    },
+    allocation: {
+        description: 'server.users.permissions.allocation.description',
+        title: 'server.users.permissions.allocation.title',
+    },
+    backup: {
+        description: 'server.users.permissions.backup.description',
+        title: 'server.users.permissions.backup.title',
+    },
+    control: {
+        description: 'server.users.permissions.control.description',
+        title: 'server.users.permissions.control.title',
+    },
+    database: {
+        description: 'server.users.permissions.database.description',
+        title: 'server.users.permissions.database.title',
+    },
+    file: {
+        description: 'server.users.permissions.file.description',
+        title: 'server.users.permissions.file.title',
+    },
+    mod: {
+        description: 'server.users.permissions.mod.description',
+        title: 'server.users.permissions.mod.title',
+    },
+    schedule: {
+        description: 'server.users.permissions.schedule.description',
+        title: 'server.users.permissions.schedule.title',
+    },
+    settings: {
+        description: 'server.users.permissions.settings.description',
+        title: 'server.users.permissions.settings.title',
+    },
+    startup: {
+        description: 'server.users.permissions.startup.description',
+        title: 'server.users.permissions.startup.title',
+    },
+    user: {
+        description: 'server.users.permissions.user.description',
+        title: 'server.users.permissions.user.title',
+    },
+    websocket: {
+        description: 'server.users.permissions.websocket.description',
+        title: 'server.users.permissions.websocket.title',
+    },
+};
+
 const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmitting, setIsSubmitting }: Props) => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const appendSubuser = ServerContext.useStoreActions((actions) => actions.subusers.appendSubuser);
     const { clearFlashes, clearAndAddHttpError } = useStoreActions(
@@ -130,9 +184,9 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
                 }
                 validationSchema={object().shape({
                     email: string()
-                        .max(191, 'Email addresses must not exceed 191 characters.')
-                        .email('A valid email address must be provided.')
-                        .required('A valid email address must be provided.'),
+                        .max(191, t('server.users.email_max'))
+                        .email(t('server.users.email_invalid'))
+                        .required(t('server.users.email_invalid')),
                     permissions: array().of(string()),
                 })}
             >
@@ -153,12 +207,14 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
                                                 className='w-5 h-5 text-brand'
                                             />
                                         </div>
-                                        <h3 className='text-xl font-semibold text-zinc-100'>User Information</h3>
+                                        <h3 className='text-xl font-semibold text-zinc-100'>
+                                            {t('server.users.user_information')}
+                                        </h3>
                                     </div>
                                     <Field
                                         name='email'
-                                        label='Email Address'
-                                        description='Enter the email address of the user you wish to invite as a subuser for this server.'
+                                        label={t('server.users.email_label')}
+                                        description={t('server.users.email_description')}
                                     />
                                 </div>
                             )}
@@ -174,7 +230,9 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
                                                 className='w-5 h-5 text-brand'
                                             />
                                         </div>
-                                        <h3 className='text-xl font-semibold text-zinc-100'>Detailed Permissions</h3>
+                                        <h3 className='text-xl font-semibold text-zinc-100'>
+                                            {t('server.users.detailed_permissions')}
+                                        </h3>
                                     </div>
                                     {canEditUser && (
                                         <Button
@@ -183,7 +241,9 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
                                             type='button'
                                             onClick={() => toggleAll(values, setFieldValue)}
                                         >
-                                            {allSelected ? 'Deselect All' : 'Select All'}
+                                            {allSelected
+                                                ? t('server.users.deselect_all')
+                                                : t('server.users.select_all')}
                                         </Button>
                                     )}
                                 </div>
@@ -198,11 +258,11 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
                                                 className='w-5 h-5 text-brand'
                                             />
                                             <span className='text-sm font-semibold text-brand'>
-                                                Permission Restriction
+                                                {t('server.users.permission_restriction_title')}
                                             </span>
                                         </div>
                                         <p className='text-sm text-zinc-300 leading-relaxed'>
-                                            You can only assign permissions that you currently have access to.
+                                            {t('server.users.permission_restriction_description')}
                                         </p>
                                     </div>
                                 )}
@@ -210,56 +270,66 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
                                 <div className='space-y-4'>
                                     {Object.keys(permissions)
                                         .filter((key) => key !== 'websocket')
-                                        .map((key) => (
-                                            <div key={key} className='border border-[#ffffff12] rounded-lg p-4'>
-                                                <div className='flex items-start justify-between mb-3'>
-                                                    <div className='flex items-start gap-3 flex-1 min-w-0'>
-                                                        <PermissionIcon name={key} />
-                                                        <div className='flex-1 min-w-0'>
-                                                            <h4 className='font-medium text-zinc-200 capitalize'>
-                                                                {key}
-                                                            </h4>
-                                                            <p className='text-xs text-zinc-400 mt-1 break-words'>
-                                                                {permissions[key]?.description}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    {canEditUser && (
-                                                        <Button
-                                                            variant='secondary'
-                                                            size='sm'
-                                                            type='button'
-                                                            onClick={() => toggleCategory(key, values, setFieldValue)}
-                                                        >
-                                                            {isCategoryAllSelected(key) ? 'Deselect All' : 'Select All'}
-                                                        </Button>
-                                                    )}
-                                                </div>
+                                        .map((key) => {
+                                            const category = CATEGORY_KEYS[key];
 
-                                                <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-                                                    {getCategoryKeys(key).map((pkey) => (
-                                                        <PermissionRow
-                                                            key={`permission_${key}.${pkey}`}
-                                                            permission={`${key}.${pkey}`}
-                                                            disabled={
-                                                                !canEditUser ||
-                                                                !editablePermissions.includes(`${key}.${pkey}`)
-                                                            }
-                                                        />
-                                                    ))}
+                                            return (
+                                                <div key={key} className='border border-[#ffffff12] rounded-lg p-4'>
+                                                    <div className='flex items-start justify-between mb-3'>
+                                                        <div className='flex items-start gap-3 flex-1 min-w-0'>
+                                                            <PermissionIcon name={key} />
+                                                            <div className='flex-1 min-w-0'>
+                                                                <h4 className='font-medium text-zinc-200 capitalize'>
+                                                                    {category ? t(category.title) : key}
+                                                                </h4>
+                                                                <p className='text-xs text-zinc-400 mt-1 break-words'>
+                                                                    {category
+                                                                        ? t(category.description)
+                                                                        : permissions[key]?.description}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        {canEditUser && (
+                                                            <Button
+                                                                variant='secondary'
+                                                                size='sm'
+                                                                type='button'
+                                                                onClick={() =>
+                                                                    toggleCategory(key, values, setFieldValue)
+                                                                }
+                                                            >
+                                                                {isCategoryAllSelected(key)
+                                                                    ? t('server.users.deselect_all')
+                                                                    : t('server.users.select_all')}
+                                                            </Button>
+                                                        )}
+                                                    </div>
+
+                                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                                                        {getCategoryKeys(key).map((pkey) => (
+                                                            <PermissionRow
+                                                                key={`permission_${key}.${pkey}`}
+                                                                permission={`${key}.${pkey}`}
+                                                                disabled={
+                                                                    !canEditUser ||
+                                                                    !editablePermissions.includes(`${key}.${pkey}`)
+                                                                }
+                                                            />
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            );
+                                        })}
                                 </div>
                             </div>
 
                             <Can action={subuser ? 'user.update' : 'user.create'}>
                                 <div className='flex gap-3 justify-end pt-4 border-t border-[#ffffff12]'>
                                     <Button variant='secondary' type='button' onClick={onCancel}>
-                                        Cancel
+                                        {t('common.cancel')}
                                     </Button>
                                     <Button variant='attention' type='submit' disabled={isSubmitting}>
-                                        {subuser ? 'Save Changes' : 'Invite User'}
+                                        {subuser ? t('server.users.save_changes') : t('server.users.invite_user')}
                                     </Button>
                                 </div>
                             </Can>

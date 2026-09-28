@@ -87,7 +87,7 @@ class NodeUpdateService
         });
 
         if ($exception) {
-            throw new ConfigurationNotPersistedException(trans('exceptions.node.daemon_off_config_updated'));
+            throw new ConfigurationNotPersistedException(__('exceptions.node.daemon_off_config_updated'));
         }
 
         return $updated;

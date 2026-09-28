@@ -30,7 +30,7 @@ class CustomNavigationSettingsFormRequest extends AdminFormRequest
                         return;
                     }
 
-                    $fail('The :attribute must be an HTTP(S) URL or internal path.');
+                    $fail(__('validation.json_api.custom_nav_url_invalid'));
                 },
             ],
             'app:custom_nav_items.*.icon' => 'nullable|string|in:link,book,globe,help,home,store,discord,document,terminal,rocket',
@@ -68,9 +68,9 @@ class CustomNavigationSettingsFormRequest extends AdminFormRequest
     public function attributes(): array
     {
         return [
-            'app:custom_nav_items.*.label' => 'Custom Nav Item Label',
-            'app:custom_nav_items.*.url' => 'Custom Nav Item Link',
-            'app:custom_nav_items.*.icon' => 'Custom Nav Item Icon',
+            'app:custom_nav_items.*.label' => __('validation.attributes.app:custom_nav_items.*.label'),
+            'app:custom_nav_items.*.url' => __('validation.attributes.app:custom_nav_items.*.url'),
+            'app:custom_nav_items.*.icon' => __('validation.attributes.app:custom_nav_items.*.icon'),
         ];
     }
 }

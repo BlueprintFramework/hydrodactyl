@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('title')
-    Server — {{ $server->name }}: Build Details
+    {{ __('admin/server.view.build.title', ['server' => $server->name]) }}
 @endsection
 
 @section('content-header')
-    <h1>{{ $server->name }}<small>Control allocations and system resources for this server.</small></h1>
+    <h1>{{ $server->name }}<small>{{ __('admin/server.view.build.description') }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li><a href="{{ route('admin.servers') }}">{{ __('admin/navigation.sidebar.servers') }}</a></li>
         <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
-        <li class="active">Build Configuration</li>
+        <li class="active">{{ __('admin/server.partials.navigation.build_configuration') }}</li>
     </ol>
 @endsection
 
@@ -21,92 +21,92 @@
         <div class="col-sm-5">
             <div class="box">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Resource Management</h3>
+                    <h3 class="box-title">{{ __('admin/server.view.build.resource_management') }}</h3>
                 </div>
                 <div class="box-body">
                 <div class="form-group">
-                        <label for="cpu" class="control-label">CPU Limit</label>
+                        <label for="cpu" class="control-label">{{ __('admin/server.view.build.cpu_limit') }}</label>
                         <div class="input-group">
                             <input type="text" name="cpu" class="form-control" value="{{ old('cpu', $server->cpu) }}"/>
                             <span class="input-group-addon">%</span>
                         </div>
-                        <p class="text-muted small">Each <em>virtual</em> core (thread) on the system is considered to be <code>100%</code>. Setting this value to <code>0</code> will allow a server to use CPU time without restrictions.</p>
+                        <p class="text-muted small">{!! __('admin/server.view.build.cpu_limit_help') !!}</p>
                     </div>
                     <div class="form-group">
-                        <label for="threads" class="control-label">CPU Pinning</label>
+                        <label for="threads" class="control-label">{{ __('admin/server.view.build.cpu_pinning') }}</label>
                         <div>
                             <input type="text" name="threads" class="form-control" value="{{ old('threads', $server->threads) }}"/>
                         </div>
-                        <p class="text-muted small"><strong>Advanced:</strong> Enter the specific CPU cores that this process can run on, or leave blank to allow all cores. This can be a single number, or a comma seperated list. Example: <code>0</code>, <code>0-1,3</code>, or <code>0,1,3,4</code>.</p>
+                        <p class="text-muted small">{!! __('admin/server.view.build.cpu_pinning_help') !!}</p>
                     </div>
                     <div class="form-group">
-                        <label for="memory" class="control-label">Allocated Memory</label>
+                        <label for="memory" class="control-label">{{ __('admin/server.view.build.allocated_memory') }}</label>
                         <div class="input-group">
                             <input type="text" name="memory" data-multiplicator="true" class="form-control" value="{{ old('memory', $server->memory) }}"/>
                             <span class="input-group-addon">MiB</span>
                         </div>
-                        <p class="text-muted small">The maximum amount of memory allowed for this container. Setting this to <code>0</code> will allow unlimited memory in a container.</p>
+                        <p class="text-muted small">{!! __('admin/server.view.build.memory_help') !!}</p>
                     </div>
                     <div class="form-group">
-                        <label for="overhead_memory" class="control-label">Overhead Memory</label>
+                        <label for="overhead_memory" class="control-label">{{ __('admin/server.view.build.overhead_memory') }}</label>
                         <div class="input-group">
                             <input type="text" name="overhead_memory" data-multiplicator="true" class="form-control" value="{{ old('overhead_memory', $server->overhead_memory) }}"/>
                             <span class="input-group-addon">MiB</span>
                         </div>
-                        <p class="text-muted small">Additional memory allocated to the container that doesn't go to the SERVER_MEMORY variable. Setting to <code>0</code> disables overhead memory.</p>
+                        <p class="text-muted small">{!! __('admin/server.view.build.overhead_memory_help') !!}</p>
                     </div>
                     <div class="form-group">
-                        <label for="swap" class="control-label">Allocated Swap</label>
+                        <label for="swap" class="control-label">{{ __('admin/server.view.build.allocated_swap') }}</label>
                         <div class="input-group">
                             <input type="text" name="swap" data-multiplicator="true" class="form-control" value="{{ old('swap', $server->swap) }}"/>
                             <span class="input-group-addon">MiB</span>
                         </div>
-                        <p class="text-muted small">Setting this to <code>0</code> will disable swap space on this server. Setting to <code>-1</code> will allow unlimited swap.</p>
+                        <p class="text-muted small">{!! __('admin/server.view.build.swap_help') !!}</p>
                     </div>
                     <div class="form-group">
-                        <label for="cpu" class="control-label">Disk Space Limit</label>
+                        <label for="cpu" class="control-label">{{ __('admin/server.view.build.disk_space_limit') }}</label>
                         <div class="input-group">
                             <input type="text" name="disk" class="form-control" value="{{ old('disk', $server->disk) }}"/>
                             <span class="input-group-addon">MiB</span>
                         </div>
-                        <p class="text-muted small">This server will not be allowed to boot if it is using more than this amount of space. If a server goes over this limit while running it will be safely stopped and locked until enough space is available. Set to <code>0</code> to allow unlimited disk usage.</p>
+                        <p class="text-muted small">{!! __('admin/server.view.build.disk_space_help') !!}</p>
                     </div>
                     <div class="form-group">
-                        <label for="io" class="control-label">Block IO Proportion</label>
+                        <label for="io" class="control-label">{{ __('admin/server.view.build.block_io_proportion') }}</label>
                         <div>
                             <input type="text" name="io" class="form-control" value="{{ old('io', $server->io) }}"/>
                         </div>
-                        <p class="text-muted small"><strong>Advanced</strong>: The IO performance of this server relative to other <em>running</em> containers on the system. Value should be between <code>10</code> and <code>1000</code>.</code></p>
+                        <p class="text-muted small">{!! __('admin/server.view.build.block_io_help') !!}</p>
                     </div>
                     <div class="form-group">
-                        <label for="cpu" class="control-label">OOM Killer</label>
+                        <label for="cpu" class="control-label">{{ __('admin/server.view.build.oom_killer') }}</label>
                         <div>
                             <div class="radio radio-danger radio-inline">
                                 <input type="radio" id="pOomKillerEnabled" value="0" name="oom_disabled" @if(!$server->oom_disabled)checked @endif>
-                                <label for="pOomKillerEnabled">Enabled</label>
+                                <label for="pOomKillerEnabled">{{ __('admin/server.view.build.enabled') }}</label>
                             </div>
                             <div class="radio radio-success radio-inline">
                                 <input type="radio" id="pOomKillerDisabled" value="1" name="oom_disabled" @if($server->oom_disabled)checked @endif>
-                                <label for="pOomKillerDisabled">Disabled</label>
+                                <label for="pOomKillerDisabled">{{ __('admin/server.view.build.disabled') }}</label>
                             </div>
                             <p class="text-muted small">
-                                Enabling OOM killer may cause server processes to exit unexpectedly.
+                                {{ __('admin/server.view.build.oom_killer_help') }}
                             </p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="exclude_from_resource_calculation" class="control-label">Resource Calculation</label>
+                        <label for="exclude_from_resource_calculation" class="control-label">{{ __('admin/server.view.build.resource_calculation') }}</label>
                         <div>
                             <div class="radio radio-success radio-inline">
                                 <input type="radio" id="pResourceCalcIncluded" value="0" name="exclude_from_resource_calculation" @if(!$server->exclude_from_resource_calculation)checked @endif>
-                                <label for="pResourceCalcIncluded">Included</label>
+                                <label for="pResourceCalcIncluded">{{ __('admin/server.view.build.included') }}</label>
                             </div>
                             <div class="radio radio-warning radio-inline">
                                 <input type="radio" id="pResourceCalcExcluded" value="1" name="exclude_from_resource_calculation" @if($server->exclude_from_resource_calculation)checked @endif>
-                                <label for="pResourceCalcExcluded">Excluded</label>
+                                <label for="pResourceCalcExcluded">{{ __('admin/server.view.build.excluded') }}</label>
                             </div>
                             <p class="text-muted small">
-                                When enabled, this server will not be included in resource calculations when provisioning new servers onto this node. Useful for testing or development servers.
+                                {{ __('admin/server.view.build.resource_calculation_help') }}
                             </p>
                         </div>
                     </div>
@@ -118,38 +118,38 @@
                 <div class="col-xs-12">
                     <div class="box">
                         <div class="box-header with-border">
-                            <h3 class="box-title">Application Feature Limits</h3>
+                            <h3 class="box-title">{{ __('admin/server.view.build.application_feature_limits') }}</h3>
                         </div>
                         <div class="box-body">
                             <div class="row">
                                 <div class="form-group col-xs-6">
-                                    <label for="database_limit" class="control-label">Database Limit</label>
+                                    <label for="database_limit" class="control-label">{{ __('admin/server.view.build.database_limit') }}</label>
                                     <div>
                                         <input type="text" name="database_limit" class="form-control" value="{{ old('database_limit', $server->database_limit) }}"/>
                                     </div>
-                                    <p class="text-muted small">The total number of databases a user is allowed to create for this server. Leave blank for unlimited, set to 0 to disable.</p>
+                                    <p class="text-muted small">{{ __('admin/server.view.build.database_limit_help') }}</p>
                                 </div>
                                 <div class="form-group col-xs-6">
-                                    <label for="allocation_limit" class="control-label">Allocation Limit</label>
+                                    <label for="allocation_limit" class="control-label">{{ __('admin/server.view.build.allocation_limit') }}</label>
                                     <div>
                                         <input type="text" name="allocation_limit" class="form-control" value="{{ old('allocation_limit', $server->allocation_limit) }}"/>
                                     </div>
-                                    <p class="text-muted small">The total number of allocations a user is allowed to create for this server. Leave blank for unlimited, set to 0 to disable.</p>
+                                    <p class="text-muted small">{{ __('admin/server.view.build.allocation_limit_help') }}</p>
                                 </div>
                                 <div class="form-group col-xs-6">
-                                    <label for="backup_limit" class="control-label">Backup Limit</label>
+                                    <label for="backup_limit" class="control-label">{{ __('admin/server.view.build.backup_limit') }}</label>
                                     <div>
                                         <input type="text" name="backup_limit" class="form-control" value="{{ old('backup_limit', $server->backup_limit) }}"/>
                                     </div>
-                                    <p class="text-muted small">The total number of backups that can be created for this server. Leave blank for unlimited, set to 0 to disable.</p>
+                                    <p class="text-muted small">{{ __('admin/server.view.build.backup_limit_help') }}</p>
                                 </div>
                                 <div class="form-group col-xs-6">
-                                    <label for="backup_storage_limit" class="control-label">Backup Storage Limit</label>
+                                    <label for="backup_storage_limit" class="control-label">{{ __('admin/server.view.build.backup_storage_limit') }}</label>
                                     <div class="input-group">
                                         <input type="text" name="backup_storage_limit" data-multiplicator="true" class="form-control" value="{{ old('backup_storage_limit', $server->backup_storage_limit) }}"/>
                                         <span class="input-group-addon">MiB</span>
                                     </div>
-                                    <p class="text-muted small">The total storage space that can be used for backups. Leave blank for unlimited storage.</p>
+                                    <p class="text-muted small">{{ __('admin/server.view.build.backup_storage_limit_help') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -158,11 +158,11 @@
                 <div class="col-xs-12">
                     <div class="box">
                         <div class="box-header with-border">
-                            <h3 class="box-title">Allocation Management</h3>
+                            <h3 class="box-title">{{ __('admin/server.view.build.allocation_management') }}</h3>
                         </div>
                         <div class="box-body">
                             <div class="form-group">
-                                <label for="pAllocation" class="control-label">Game Port</label>
+                                <label for="pAllocation" class="control-label">{{ __('admin/server.view.build.game_port') }}</label>
                                 <select id="pAllocation" name="allocation_id" class="form-control">
                                     @foreach ($assigned as $assignment)
                                         <option value="{{ $assignment->id }}"
@@ -172,10 +172,10 @@
                                         >{{ $assignment->alias }}:{{ $assignment->port }}</option>
                                     @endforeach
                                 </select>
-                                <p class="text-muted small">The default connection address that will be used for this game server.</p>
+                                <p class="text-muted small">{{ __('admin/server.view.build.game_port_help') }}</p>
                             </div>
                             <div class="form-group">
-                                <label for="pAddAllocations" class="control-label">Assign Additional Ports</label>
+                                <label for="pAddAllocations" class="control-label">{{ __('admin/server.view.build.assign_additional_ports') }}</label>
                                 <div>
                                     <select name="add_allocations[]" class="form-control" multiple id="pAddAllocations">
                                         @foreach ($unassigned as $assignment)
@@ -183,10 +183,10 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <p class="text-muted small">Please note that due to software limitations you cannot assign identical ports on different IPs to the same server.</p>
+                                <p class="text-muted small">{{ __('admin/server.view.build.assign_additional_ports_help') }}</p>
                             </div>
                             <div class="form-group">
-                                <label for="pRemoveAllocations" class="control-label">Remove Additional Ports</label>
+                                <label for="pRemoveAllocations" class="control-label">{{ __('admin/server.view.build.remove_additional_ports') }}</label>
                                 <div>
                                     <select name="remove_allocations[]" class="form-control" multiple id="pRemoveAllocations">
                                         @foreach ($assigned as $assignment)
@@ -194,12 +194,12 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <p class="text-muted small">Simply select which ports you would like to remove from the list above. If you want to assign a port on a different IP that is already in use you can select it from the left and delete it here.</p>
+                                <p class="text-muted small">{{ __('admin/server.view.build.remove_additional_ports_help') }}</p>
                             </div>
                         </div>
                         <div class="box-footer">
                             {!! csrf_field() !!}
-                            <button type="submit" class="btn btn-primary pull-right">Update Build Configuration</button>
+                            <button type="submit" class="btn btn-primary pull-right">{{ __('admin/server.view.build.update_button') }}</button>
                         </div>
                     </div>
                 </div>

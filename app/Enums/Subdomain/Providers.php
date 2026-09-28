@@ -24,14 +24,6 @@ enum Providers: string
         self::BUNNY->value => BunnyProvider::class,
     ];
 
-    private const DESCRIPTION_MAP = [
-        self::CLOUDFLARE->value => 'Cloudflare DNS service',
-        self::HETZNER->value => 'Hetzner DNS Console',
-        self::ROUTE53->value => 'AWS Route53 DNS Service',
-        self::DNSIMPLE->value => 'DNSimple Service',
-        self::BUNNY->value => 'Bunny.net DNS Service',
-    ];
-
     public static function all(): array
     {
         $result = [];
@@ -51,7 +43,7 @@ enum Providers: string
         foreach (self::cases() as $case) {
             $result[$case->value] = [
                 'name' => $case->value,
-                'description' => self::DESCRIPTION_MAP[$case->value],
+                'description' => __("admin/domains.providers.{$case->value}"),
             ];
         }
 

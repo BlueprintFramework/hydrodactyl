@@ -1,6 +1,8 @@
-export function formatUptime(uptime: number): string {
+import type { Translate } from '@/i18n/types';
+
+export function formatUptime(uptime: number, t: Translate): string {
     if (uptime <= 0) {
-        return 'Offline';
+        return t('server.status.offline');
     }
 
     const secondsTotal = Math.floor(uptime / 1000);

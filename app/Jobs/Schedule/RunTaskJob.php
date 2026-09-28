@@ -80,7 +80,7 @@ class RunTaskJob extends Job implements ShouldQueue
 
                         // TooManyBackupsException is currently scoped to daemon-level backup services,
                         // therefore BackupFailedException is used here to properly fail the scheduled task.
-                        throw new BackupFailedException('The permitted backup limit has been exceeded.');
+                        throw new BackupFailedException(__('exceptions.schedules.backup_limit_exceeded'));
                     }
 
                     $affectedRows = Task::where('id', $this->task->id)
@@ -111,7 +111,7 @@ class RunTaskJob extends Job implements ShouldQueue
                                     'operation' => 'create',
                                     'adapter' => $server->node->backupDisk,
                                     'ignored' => implode("\n", $ignoredFiles),
-                                    'name' => 'Scheduled Backup - ' . now()->format('Y-m-d H:i'),
+                                    'name' => __('exceptions.schedules.backup_name', ['date' => now()->format('Y-m-d H:i')]),
                                     'is_automatic' => true,
                                 ],
                                 auth()->user() ?? $server->user
@@ -123,7 +123,7 @@ class RunTaskJob extends Job implements ShouldQueue
                     }
                     break;
                 default:
-                    throw new \InvalidArgumentException('Invalid task action provided: ' . $this->task->action);
+                    throw new \InvalidArgumentException(__('exceptions.schedules.invalid_task_action', ['action' => $this->task->action]));
             }
         } catch (\Exception $exception) {
             // If this isn't a DaemonConnectionException on a task that allows for failures

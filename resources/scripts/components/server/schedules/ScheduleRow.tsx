@@ -10,6 +10,7 @@ import Can from '@/components/elements/Can';
 import { Dialog } from '@/components/elements/dialog';
 import ScheduleCronRow from '@/components/server/schedules/ScheduleCronRow';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 
@@ -19,6 +20,7 @@ interface Props {
 }
 
 const ScheduleRow = ({ schedule, onDeleted }: Props) => {
+    const { t, dateFnsLocale } = useTranslation();
     const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -53,13 +55,19 @@ const ScheduleRow = ({ schedule, onDeleted }: Props) => {
                                 <p className='truncate'>{schedule.name}</p>
                             </div>
                             <p className='text-xs text-zinc-400'>
-                                Last run at:{' '}
-                                {schedule.lastRunAt ? format(schedule.lastRunAt, "MMM do 'at' h:mma") : 'N/A'}
+                                {t('server.schedules.last_run_at')}{' '}
+                                {schedule.lastRunAt
+                                    ? format(schedule.lastRunAt, "MMM do 'at' h:mma", { locale: dateFnsLocale })
+                                    : t('common.not_available')}
                             </p>
                         </div>
                         <div className='flex-none w-20 sm:ml-2 flex items-center align-middle justify-center ml-auto'>
                             <p className='rounded-full px-2 py-px text-xs uppercase bg-neutral-600 text-white'>
-                                {schedule.isProcessing ? 'Processing' : schedule.isActive ? 'Active' : 'Inactive'}
+                                {schedule.isProcessing
+                                    ? t('server.schedules.processing')
+                                    : schedule.isActive
+                                      ? t('common.active')
+                                      : t('common.inactive')}
                             </p>
                         </div>
                     </div>
@@ -69,7 +77,7 @@ const ScheduleRow = ({ schedule, onDeleted }: Props) => {
                                 variant='secondary'
                                 size='sm'
                                 className={`p-2 border transition-colors`}
-                                title='Edit Schedule'
+                                title={t('server.schedules.edit_tooltip')}
                                 onClick={() => navigate(`/server/${serverId}/schedules/${schedule.id}`)}
                             >
                                 <Pencil width={22} height={22} fill='currentColor' />
@@ -80,7 +88,7 @@ const ScheduleRow = ({ schedule, onDeleted }: Props) => {
                                 variant='attention'
                                 size='sm'
                                 className={`p-2 border transition-colors`}
-                                title='Delete Schedule'
+                                title={t('server.schedules.delete_title')}
                                 onClick={() => setVisible(true)}
                             >
                                 <TrashBin width={22} height={22} fill='currentColor' />
@@ -94,12 +102,12 @@ const ScheduleRow = ({ schedule, onDeleted }: Props) => {
             <Dialog.Confirm
                 open={visible}
                 onClose={() => setVisible(false)}
-                title={'Delete Schedule'}
-                confirm={'Delete'}
+                title={t('server.schedules.delete_title')}
+                confirm={t('common.delete')}
                 onConfirmed={onDelete}
                 loading={isLoading}
             >
-                All tasks will be removed and any running processes will be terminated.
+                {t('server.schedules.delete_confirm')}
             </Dialog.Confirm>
         </>
     );

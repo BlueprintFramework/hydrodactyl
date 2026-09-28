@@ -174,7 +174,7 @@ class ServerStateService
             
             if (!$nestExists) {
                 $nestName = $state['nest_info']['name'] ?? 'Unknown';
-                $errors[] = "Nest '{$nestName}' (ID: {$state['nest_id']}) no longer exists.";
+                $errors[] = __('exceptions.backups.restore_nest_missing', ['name' => $nestName, 'id' => $state['nest_id']]);
             }
         }
 
@@ -186,7 +186,7 @@ class ServerStateService
             
             if (!$eggExists) {
                 $eggName = $state['egg_info']['name'] ?? 'Unknown';
-                $errors[] = "Egg '{$eggName}' (ID: {$state['egg_id']}) no longer exists.";
+                $errors[] = __('exceptions.backups.restore_egg_missing', ['name' => $eggName, 'id' => $state['egg_id']]);
             }
         }
 
@@ -208,7 +208,7 @@ class ServerStateService
             }
             
             if (!empty($missingVariables)) {
-                $warnings[] = 'Some variables from the backup no longer exist in the current egg: ' . implode(', ', $missingVariables);
+                $warnings[] = __('exceptions.backups.restore_variables_missing', ['variables' => implode(', ', $missingVariables)]);
             }
         }
 

@@ -36,7 +36,7 @@ class CreateServerController extends Controller
     {
         $nodes = Node::all();
         if (count($nodes) < 1) {
-            $this->alert->warning(trans('admin/server.alerts.node_required'))->flash();
+            $this->alert->warning(__('admin/server.alerts.node_required'))->flash();
 
             return redirect()->route('admin.nodes');
         }
@@ -77,7 +77,7 @@ class CreateServerController extends Controller
 
         $server = $this->creationService->handle($data);
 
-        $this->alert->success(trans('admin/server.alerts.server_created'))->flash();
+        $this->alert->success(__('admin/server.alerts.server_created'))->flash();
 
         return new RedirectResponse('/admin/servers/view/' . $server->id);
     }
