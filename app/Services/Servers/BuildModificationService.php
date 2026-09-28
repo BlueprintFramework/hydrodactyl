@@ -108,7 +108,7 @@ class BuildModificationService
                 // will throw an exception back.
                 if ($allocation === ($data['allocation_id'] ?? $server->allocation_id)) {
                     if (empty($freshlyAllocated)) {
-                        throw new DisplayException(__('admin.server.exceptions.no_new_default_allocation'));
+                        throw new DisplayException(__('admin/server.exceptions.no_new_default_allocation'));
                     }
 
                     // Update the default allocation to be the first allocation that we are creating.

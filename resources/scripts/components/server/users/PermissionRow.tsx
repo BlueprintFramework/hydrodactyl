@@ -237,7 +237,7 @@ const PermissionRow = ({ permission, disabled }: Props) => {
                 <p className='text-sm font-medium text-zinc-200'>{details ? t(details.title) : pkey}</p>
                 {(apiDescription?.length ?? 0) > 0 && (
                     <p className='text-xs text-zinc-400 mt-0.5'>
-                        {details ? t(details.description) : apiDescription ?? ''}
+                        {details ? t(details.description) : (apiDescription ?? '')}
                     </p>
                 )}
             </div>

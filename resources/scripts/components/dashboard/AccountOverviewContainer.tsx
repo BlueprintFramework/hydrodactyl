@@ -90,8 +90,8 @@ const AccountOverviewContainer = () => {
                             <p className='text-sm mb-4 text-zinc-300'>{t('account.overview.version_description')}</p>
                             <div className='flex flex-col gap-4'>
                                 <Code>
-                                    {t('account.overview.version_label')}{' '}
-                                    {import.meta.env.VITE_HYDRODACTYL_VERSION} - {import.meta.env.VITE_BRANCH_NAME}
+                                    {t('account.overview.version_label')} {import.meta.env.VITE_HYDRODACTYL_VERSION} -{' '}
+                                    {import.meta.env.VITE_BRANCH_NAME}
                                 </Code>
                                 <Code>
                                     {t('account.overview.commit_label')} {import.meta.env.VITE_COMMIT_HASH.slice(0, 7)}

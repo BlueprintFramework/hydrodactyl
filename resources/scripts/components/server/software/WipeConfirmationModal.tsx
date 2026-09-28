@@ -37,9 +37,7 @@ const WipeConfirmationModal = ({ visible, wipeCountdown, shiftPressed, wipeLoadi
                         className='w-5 h-5 text-red-400 flex-shrink-0 mt-0.5'
                     />
                     <div>
-                        <h4 className='text-red-400 font-semibold mb-2'>
-                            {t('server.software.wipe.danger_title')}
-                        </h4>
+                        <h4 className='text-red-400 font-semibold mb-2'>{t('server.software.wipe.danger_title')}</h4>
                         <p className='text-sm text-neutral-300'>
                             {t('server.software.wipe.warning_prefix')}{' '}
                             <strong>{t('server.software.wipe.warning_no_backup')}</strong>

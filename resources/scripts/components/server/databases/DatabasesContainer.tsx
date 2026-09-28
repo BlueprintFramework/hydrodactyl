@@ -104,7 +104,7 @@ const DatabasesContainer = () => {
                 )}
                 {databaseLimit > 0 && (
                     <p className='text-sm text-zinc-300 text-center sm:text-right'>
-                        {t('server.databases.count_of_limit', { count: databases.length, limit: databaseLimit })}
+                        {t('server.databases.count_of_limit', { count: databases.length, limit: databaseLimit ?? 0 })}
                     </p>
                 )}
                 {databaseLimit === 0 && (

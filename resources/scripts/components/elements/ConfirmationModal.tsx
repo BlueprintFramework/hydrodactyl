@@ -1,9 +1,8 @@
 import { useContext } from 'react';
 import { Button } from '@/components/ui/button';
 import ModalContext from '@/context/ModalContext';
-import { useTranslation } from '@/i18n/I18nProvider';
-
 import asModal from '@/hoc/asModal';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 type Props = {
     title: string;

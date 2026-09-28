@@ -221,10 +221,7 @@ const StartupContainer = () => {
                 <MainPageHeader direction='column' title={t('server.startup.title')}>
                     <p className='text-sm text-neutral-400 leading-relaxed'>
                         {t('server.startup.description')}
-                        <span className='text-amber-400 font-medium'>
-                            {' '}
-                            {t('server.startup.description_warning')}
-                        </span>
+                        <span className='text-amber-400 font-medium'> {t('server.startup.description_warning')}</span>
                     </p>
                 </MainPageHeader>
 

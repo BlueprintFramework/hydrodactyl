@@ -217,11 +217,7 @@ function AdminDashboard() {
                             overflow: 'hidden',
                         }}
                     >
-                        <UsageBar
-                            used={metrics.disk.used}
-                            total={metrics.disk.total}
-                            label={t('admin.metrics.disk')}
-                        />
+                        <UsageBar used={metrics.disk.used} total={metrics.disk.total} label={t('admin.metrics.disk')} />
                     </div>
                 </div>
             </div>

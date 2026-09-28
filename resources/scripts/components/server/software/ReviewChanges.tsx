@@ -59,14 +59,10 @@ const ReviewChanges = ({
                                 </div>
                                 <div>
                                     <span className='text-neutral-400'>{t('server.software.review.category')}</span>
-                                    <div className='text-neutral-200 font-medium'>
-                                        {selectedNest?.attributes.name}
-                                    </div>
+                                    <div className='text-neutral-200 font-medium'>{selectedNest?.attributes.name}</div>
                                 </div>
                                 <div>
-                                    <span className='text-neutral-400'>
-                                        {t('server.software.review.docker_image')}
-                                    </span>
+                                    <span className='text-neutral-400'>{t('server.software.review.docker_image')}</span>
                                     <div className='text-neutral-200 font-medium'>
                                         {selectedDockerImage || t('server.software.review.default')}
                                     </div>
@@ -171,9 +167,7 @@ const ReviewChanges = ({
                                             <div>
                                                 <h4
                                                     className={`font-semibold mb-2 ${
-                                                        warning.severity === 'error'
-                                                            ? 'text-red-400'
-                                                            : 'text-amber-400'
+                                                        warning.severity === 'error' ? 'text-red-400' : 'text-amber-400'
                                                     }`}
                                                 >
                                                     {warning.type === 'subdomain_incompatible'

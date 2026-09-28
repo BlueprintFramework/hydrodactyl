@@ -35,8 +35,7 @@ const DeleteSSHKeyButton = ({ name, fingerprint }: { name: string; fingerprint: 
                 onConfirmed={onClick}
                 onClose={() => setVisible(false)}
             >
-                {t('account.ssh.delete_message_prefix')} <Code>{name}</Code>{' '}
-                {t('account.ssh.delete_message_suffix')}
+                {t('account.ssh.delete_message_prefix')} <Code>{name}</Code> {t('account.ssh.delete_message_suffix')}
             </Dialog.Confirm>
             <button
                 type='button'

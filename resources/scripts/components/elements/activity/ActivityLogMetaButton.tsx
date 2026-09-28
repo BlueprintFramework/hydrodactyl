@@ -34,9 +34,7 @@ const ActivityLogMetaButton = ({ meta }: { meta: Record<string, unknown> }) => {
             >
                 <div className='space-y-4'>
                     <div className='flex items-center justify-between'>
-                        <h4 className='text-sm font-medium text-zinc-300'>
-                            {t('server.activity.formatted_view')}
-                        </h4>
+                        <h4 className='text-sm font-medium text-zinc-300'>{t('server.activity.formatted_view')}</h4>
                         <Button
                             variant='secondary'
                             onClick={copyToClipboard}

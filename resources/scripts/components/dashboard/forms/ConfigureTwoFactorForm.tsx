@@ -33,9 +33,7 @@ const ConfigureTwoFactorForm = () => {
             <RecoveryTokensDialog tokens={tokens} open={tokens.length > 0} onClose={() => setTokens([])} />
             <DisableTOTPDialog open={visible === 'disable'} onClose={() => setVisible(null)} />
             <p className={`text-sm`}>
-                {isEnabled
-                    ? t('account.two_factor.enabled_description')
-                    : t('account.two_factor.disabled_description')}
+                {isEnabled ? t('account.two_factor.enabled_description') : t('account.two_factor.disabled_description')}
             </p>
             <div className={`mt-6`}>
                 {isEnabled ? (

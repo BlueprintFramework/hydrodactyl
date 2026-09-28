@@ -180,15 +180,16 @@ const SoftwareConfiguration = ({
                                                             {t('server.software.configuration.required')}
                                                         </span>
                                                     )}
-                                                    {variable.user_editable &&
-                                                        !variable.rules.includes('required') && (
-                                                            <span className='ml-2 px-2 py-0.5 text-xs bg-neutral-500/20 text-neutral-400 rounded'>
-                                                                {t('common.optional')}
-                                                            </span>
-                                                        )}
+                                                    {variable.user_editable && !variable.rules.includes('required') && (
+                                                        <span className='ml-2 px-2 py-0.5 text-xs bg-neutral-500/20 text-neutral-400 rounded'>
+                                                            {t('common.optional')}
+                                                        </span>
+                                                    )}
                                                 </label>
                                                 {variable.description && (
-                                                    <p className='text-xs text-neutral-400 mb-2'>{variable.description}</p>
+                                                    <p className='text-xs text-neutral-400 mb-2'>
+                                                        {variable.description}
+                                                    </p>
                                                 )}
                                             </div>
 

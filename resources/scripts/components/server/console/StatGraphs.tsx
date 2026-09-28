@@ -168,11 +168,7 @@ const StatGraphs = () => {
                             </div>
                         }
                     >
-                        <Line
-                            aria-label={t('server.console.network_activity_aria')}
-                            role='img'
-                            {...network.props}
-                        />
+                        <Line aria-label={t('server.console.network_activity_aria')} role='img' {...network.props} />
                     </ChartBlock>
                 </div>
             </div>

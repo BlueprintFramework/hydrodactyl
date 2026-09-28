@@ -80,9 +80,7 @@ const EditUserContainer = () => {
                         <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-[#ffffff11] flex items-center justify-center'>
                             <Person width={22} height={22} className='w-8 h-8 text-zinc-400' fill='currentColor' />
                         </div>
-                        <h3 className='text-lg font-medium text-zinc-200 mb-2'>
-                            {t('server.users.not_found_title')}
-                        </h3>
+                        <h3 className='text-lg font-medium text-zinc-200 mb-2'>{t('server.users.not_found_title')}</h3>
                         <p className='text-sm text-zinc-400 max-w-sm'>{t('server.users.not_found_description')}</p>
                     </div>
                 </div>

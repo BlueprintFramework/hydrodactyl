@@ -153,17 +153,15 @@ const VersionPicker = ({
             open={open}
             onClose={onClose}
             title={`${installedEntry ? t('server.installer.manage') : t('server.installer.install')} ${project.title}`}
-            description={
-                `${SOURCE_LABELS[source] ?? source} · ${project.author || t('server.installer.unknown_author')}`
-            }
+            description={`${SOURCE_LABELS[source] ?? source} · ${project.author || t('server.installer.unknown_author')}`}
         >
             <div className='space-y-3'>
                 {installedEntry && (
                     <div className='flex items-center gap-2 rounded-lg border border-brand-400/30 bg-brand-400/10 p-2 text-xs text-brand-400'>
                         <Check width={14} height={14} fill='currentColor' />
                         <span>
-                            {t('server.installer.currently_installed')}{' '}
-                            <strong>{installedEntry.version_name}</strong> ({installedEntry.filename})
+                            {t('server.installer.currently_installed')} <strong>{installedEntry.version_name}</strong> (
+                            {installedEntry.filename})
                         </span>
                     </div>
                 )}

@@ -40,9 +40,7 @@ const SoftwareSelection = ({ selectedNest, isLoading, selectedEggUuid, onSelectE
                                 className='p-4 bg-[#ffffff08] border border-[#ffffff12] rounded-lg hover:border-[#ffffff20] transition-all text-left touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed'
                             >
                                 <div className='flex items-center gap-2 mb-2'>
-                                    {isLoading && selectedEggUuid === egg?.attributes?.uuid && (
-                                        <Spinner size='small' />
-                                    )}
+                                    {isLoading && selectedEggUuid === egg?.attributes?.uuid && <Spinner size='small' />}
                                     <h3 className='font-semibold text-neutral-200 text-sm sm:text-base'>
                                         {egg?.attributes?.name}
                                     </h3>

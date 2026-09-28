@@ -124,7 +124,13 @@ const validateEnvironmentVariables = (
                     if (ruleValue && value) {
                         const [min, max] = ruleValue.split(',').map((v) => parseInt(v.trim(), 10));
                         if (value.length < min || value.length > max) {
-                            errors.push(t('server.software.validation.between', { name: variable.name, min, max }));
+                            errors.push(
+                                t('server.software.validation.between', {
+                                    name: variable.name,
+                                    min: min ?? 0,
+                                    max: max ?? 0,
+                                }),
+                            );
                         }
                     }
                     break;

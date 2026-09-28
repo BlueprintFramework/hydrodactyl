@@ -56,10 +56,7 @@ const DeleteDatabaseModal = ({ database, onDeleted, visible, onDismissed, ...pro
             validationSchema={object().shape({
                 confirm: string()
                     .required(t('server.databases.name_required'))
-                    .oneOf(
-                        [database.name.split('_', 2)[1] || '', database.name],
-                        t('server.databases.name_required'),
-                    ),
+                    .oneOf([database.name.split('_', 2)[1] || '', database.name], t('server.databases.name_required')),
             })}
             isInitialValid={false}
         >

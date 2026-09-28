@@ -239,9 +239,7 @@ const OperationProgressModal: React.FC<Props> = ({
                                         fill='currentColor'
                                         className='w-5 h-5 text-red-400'
                                     />
-                                    <p className='text-sm text-red-300 font-medium'>
-                                        {t('server.operations.failed')}
-                                    </p>
+                                    <p className='text-sm text-red-300 font-medium'>{t('server.operations.failed')}</p>
                                 </div>
                                 {operation.message && (
                                     <p className='text-xs text-red-200 text-center'>{operation.message}</p>
