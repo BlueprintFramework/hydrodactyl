@@ -36,6 +36,7 @@ class RemovedFromServer extends Notification implements ShouldQueue
     {
         return (new MailMessage())
             ->error()
+            ->subject(__('notifications.removed_from_server.subject'))
             ->greeting(__('notifications.removed_from_server.greeting', ['user' => $this->server->user]))
             ->line(__('notifications.removed_from_server.removed'))
             ->line(__('notifications.removed_from_server.server_name', ['server' => $this->server->name]))

@@ -35,6 +35,7 @@ class AddedToServer extends Notification implements ShouldQueue
     public function toMail(): MailMessage
     {
         return (new MailMessage())
+            ->subject(__('notifications.added_to_server.subject'))
             ->greeting(__('notifications.added_to_server.greeting', ['user' => $this->server->user]))
             ->line(__('notifications.added_to_server.added'))
             ->line(__('notifications.added_to_server.server_name', ['server' => $this->server->name]))

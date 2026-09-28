@@ -33,6 +33,7 @@ class AccountCreated extends Notification implements ShouldQueue
     public function toMail(): MailMessage
     {
         $message = (new MailMessage())
+            ->subject(__('notifications.account_created.subject'))
             ->greeting(__('notifications.account_created.greeting', ['user' => $this->user->name]))
             ->line(__('notifications.account_created.created', ['app' => config('app.name')]))
             ->line(__('notifications.account_created.username', ['username' => $this->user->username]))

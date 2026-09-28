@@ -34,6 +34,10 @@ Laravel translation files for the Hydrodactyl panel.
 
 Add new keys to the file that owns the concern; never create a catch-all `misc.php`.
 
+Strings rendered by Laravel itself (the mail template greeting, salutation, footer and the
+"trouble clicking" subcopy) are translated with a JSON file next to the folders,
+`resources/lang/<code>.json`, using Laravel's JSON translation format.
+
 ## Interpolation
 
 Laravel-native `:placeholder` syntax:

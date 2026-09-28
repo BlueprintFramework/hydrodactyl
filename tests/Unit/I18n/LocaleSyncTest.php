@@ -29,4 +29,18 @@ class LocaleSyncTest extends TestCase
             $this->assertIsArray($decoded, sprintf('The dictionary "%s/ui.json" is not valid JSON.', $code));
         }
     }
+
+    /**
+     * Framework strings (mail templates) are translated with a JSON file next
+     * to the locale folders; a malformed file would silently fall back to the
+     * original English key.
+     */
+    public function testLocaleJsonFilesAreValid()
+    {
+        foreach (glob(resource_path('lang/*.json')) as $path) {
+            $decoded = json_decode(file_get_contents($path), true);
+
+            $this->assertIsArray($decoded, sprintf('The translation file "%s" is not valid JSON.', basename($path)));
+        }
+    }
 }
