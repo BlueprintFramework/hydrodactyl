@@ -1,3 +1,4 @@
+import enUSDictionary from '@lang/en-US/ui.json';
 import type { Locale } from 'date-fns';
 import { de } from 'date-fns/locale/de';
 import { enGB } from 'date-fns/locale/en-GB';
@@ -17,8 +18,6 @@ import { uk } from 'date-fns/locale/uk';
 import { zhCN } from 'date-fns/locale/zh-CN';
 import { zhTW } from 'date-fns/locale/zh-TW';
 import { deepmerge } from 'deepmerge-ts';
-
-import enUSDictionary from '@/i18n/locales/en-US.json';
 import type { DeepPartial, LocaleDefinition, Translations } from '@/i18n/types';
 
 /**
@@ -32,19 +31,24 @@ interface LocaleModule {
 }
 
 /**
- * Every `*.json` file dropped into `i18n/locales` is discovered automatically
- * by Vite, so adding a language is just a matter of copying a dictionary in.
- * The backend does the same with the folders in `resources/lang`.
+ * Every `ui.json` dictionary inside a locale folder is discovered
+ * automatically by Vite, so adding a language is just a matter of copying
+ * `resources/lang/en-US` to `resources/lang/<code>` and translating it. The
+ * backend scans the same folders for its PHP dictionaries.
+ *
+ * The canonical locale is excluded from the glob (keep both constants in
+ * sync!) because it is imported statically above; that keeps its dictionary
+ * from being shipped twice.
  */
-const discovered = import.meta.glob<LocaleModule>('./locales/*.json');
+const discovered = import.meta.glob<LocaleModule>(['/resources/lang/*/ui.json', '!/resources/lang/en-US/ui.json']);
 
-const codeFromPath = (path: string): string => path.replace(/^\.\/locales\//, '').replace(/\.json$/, '');
+const codeFromPath = (path: string): string => path.replace(/^\/resources\/lang\//, '').replace(/\/ui\.json$/, '');
 
 export const loaders: Record<string, () => Promise<LocaleModule>> = Object.fromEntries(
     Object.entries(discovered).map(([path, loader]) => [codeFromPath(path), loader]),
 );
 
-export const localeCodes: string[] = Object.keys(loaders).sort((a, b) => a.localeCompare(b));
+export const localeCodes: string[] = [DEFAULT_LOCALE, ...Object.keys(loaders)].sort((a, b) => a.localeCompare(b));
 
 function localeLabel(code: string): string {
     try {
@@ -63,7 +67,7 @@ function localeLabel(code: string): string {
 export const localeDefinitions: LocaleDefinition[] = localeCodes.map((code) => ({ code, label: localeLabel(code) }));
 
 export function isLocaleCode(value: unknown): boolean {
-    return typeof value === 'string' && value in loaders;
+    return typeof value === 'string' && localeCodes.includes(value);
 }
 
 /**

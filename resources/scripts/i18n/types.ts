@@ -1,4 +1,4 @@
-import type enUS from '@/i18n/locales/en-US.json';
+import type enUS from '@lang/en-US/ui.json';
 
 /**
  * The canonical dictionary shape. Every locale must be assignable to a deep
@@ -8,8 +8,9 @@ export type Translations = typeof enUS;
 
 /**
  * Locale codes are plain BCP-47-ish strings ("en-US", "es-ES", "fr-FR", ...).
- * The concrete set is discovered at runtime from the JSON dictionaries in
- * `i18n/locales`, so adding a language never requires touching this type.
+ * The concrete set is discovered at runtime from the `ui.json` dictionaries
+ * shipped inside each `resources/lang/<code>/` folder, so adding a language
+ * never requires touching this type.
  */
 export type LocaleCode = string;
 

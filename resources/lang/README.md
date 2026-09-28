@@ -11,11 +11,13 @@ Laravel translation files for the Hydrodactyl panel.
 2. **Use `__()` in all new code.** Existing `trans()` calls are functionally identical and remain
    until the unification task; do not mix new `trans()` into new code.
 3. **One owner per key.** API error text, validation, activity entries, emails, and CLI messages
-   live here. UI-chrome strings live in `resources/scripts/i18n/locales/*.json`.
-4. **Adding a locale directory auto-registers it.** `AvailableLanguages` scans `resource_path('lang')`
-   and builds display names with the `intl` extension (ISO 639-1 fallback). Full codes such as
-   `en-US`, `es-ES` or `fr-FR` are supported; the list also feeds `User` validation and the admin
-   settings / user edit language selectors.
+   live in the PHP files. UI-chrome strings live in `ui.json` inside the same locale folder. A few
+   short labels appear on both sides with independent keys; that is expected.
+4. **One folder per language, auto-discovered.** Everything for a locale lives in
+   `resources/lang/<code>/` — the PHP dictionaries and the frontend `ui.json`. The backend scans
+   the folders for display names with the `intl` extension (ISO 639-1 fallback) and feeds `User`
+   validation and the admin selectors; the frontend discovers `ui.json` via `import.meta.glob`.
+   `tests/Unit/I18n/LocaleSyncTest.php` guards that every folder ships a valid `ui.json`.
 
 ## File layout
 
@@ -27,6 +29,7 @@ Laravel translation files for the Hydrodactyl panel.
 | `auth.php`, `passwords.php` | authentication + password reset |
 | `activity.php` | activity-log descriptions (rendered via `ActivityLogTransformer`) |
 | `admin/`, `dashboard/`, `server/`, `command/` | panel-area and CLI messages |
+| `ui.json` | panel UI dictionary consumed by the React frontend; not read by Laravel |
 
 Add new keys to the file that owns the concern; never create a catch-all `misc.php`.
 

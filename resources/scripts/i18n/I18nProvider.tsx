@@ -1,9 +1,8 @@
+import enUSDictionary from '@lang/en-US/ui.json';
 import { useStoreState } from 'easy-peasy';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-
 import { interpolate } from '@/i18n/interpolate';
 import { DEFAULT_LOCALE, getDateFnsLocale, loadLocale, localeDefinitions, matchLocale } from '@/i18n/loader';
-import enUSDictionary from '@/i18n/locales/en-US.json';
 import type { DeepPartial, I18nContextValue, LocaleCode, Translate, Translations } from '@/i18n/types';
 import { usePersistedState } from '@/plugins/usePersistedState';
 

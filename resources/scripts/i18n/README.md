@@ -2,41 +2,39 @@
 
 Typed, dynamic translations for the Hydrodactyl React panel.
 
+## Single source of truth
+
+Every language lives in exactly one place: `resources/lang/<code>/`.
+
+- `*.php` — backend messages read by Laravel `__()`. See `resources/lang/README.md`.
+- `ui.json` — the panel UI dictionary this module consumes.
+
+`resources/lang/en-US` is canonical: its `ui.json` defines the `TranslationKey`
+type at compile time. Other locales are deep-partial and fall back to English
+per key. The `@lang` alias (tsconfig, vite and vitest) points at
+`resources/lang`.
+
 ## Golden rules
 
 1. **No hardcoded user-facing English in components.** Every label, heading, toast, modal, empty
    state, aria-label, and help text must come from `t()`.
-2. **`en.json` is canonical.** It defines the `TranslationKey` type at compile time. Other locales
-   are deep-partial and fall back to `en` per key.
+2. **`en-US` is canonical.** Changing its keys or English copy is a breaking change for the type
+   system and for tests that pin copy.
 3. **Never re-translate backend strings.** API error details already arrive localized
    (`errors.0.detail` -> `httpErrorToHuman()`); render them as-is.
-4. **English copy changes are forbidden** unless the same task updates every spec/assertion that
-   depends on it. PHPUnit and vitest both assert on existing English copy.
-5. **No new npm dependencies.** The system is hand-rolled on React Context.
+4. **No new npm dependencies.** The system is hand-rolled on React Context.
+5. **Don't edit `ui.json` in a non-canonical locale for keys you don't understand** — partial
+   dictionaries are fine, missing keys fall back to English.
 
 ## Key ownership
 
 | Namespace | Owner | Where |
 |---|---|---|
-| `common.*` | Frontend | `i18n/locales/en.json` |
-| `navigation.*` | Frontend | `i18n/locales/en.json` |
-| `panel.*` | Frontend | `i18n/locales/en.json` |
-| `server.<module>.*` | Frontend | `i18n/locales/en.json` |
-| `account.*` | Frontend | `i18n/locales/en.json` |
-| `errors.*` (UI-level only) | Frontend | `i18n/locales/en.json` |
-| `validation.*`, `exceptions.*`, `activity.*`, `auth.*`, `strings.*`, `command/*`, `dashboard/*`, `server/*`, `admin/*` | Backend | `resources/lang/<locale>/*.php` |
+| `common.*`, `navigation.*`, `panel.*`, `errors.*` (UI), `setup.*`, `auth.*` (UI), `dashboard.*` (UI), `account.*`, `server.<module>.*`, `admin.*` (UI widget) | Frontend | `resources/lang/<locale>/ui.json` |
+| `validation.*`, `exceptions.*`, `activity.*`, `strings.*`, `auth.*` (backend), `command/*`, `dashboard/*`, `server/*`, `admin/*` | Backend | `resources/lang/<locale>/*.php` |
 
-If a string is rendered from data the backend produced (activity log entries, validation errors,
-exception details), it is backend-owned. Do not add a frontend key for it.
-
-## Naming convention
-
-- Lowercase `snake_case` segments; dots mirror the nested JSON path:
-  `server.backups.delete_confirm`, `panel.navigation.files`, `errors.not_found.title`.
-- Labels are nouns (`backups.title`), actions are verbs (`common.delete`), outcome messages are
-  verb + state (`files.copy_success`), paired copy uses `_title` / `_description`.
-- Interpolation params are `{{snake_case}}` and must be declared in the same task that adds the key:
-  `"files.saved": "Saved {{name}}!"`.
+A handful of short labels are legitimately used by both sides with independent keys (a React label
+and a validation attribute name can translate differently); that is expected.
 
 ## Usage
 
@@ -50,34 +48,42 @@ return <h2>{t('server.backups.title')}</h2>;
 
 `t()` is strictly typed: `t('server.backups.titl')` is a compile error.
 
+## Interpolation
+
+Placeholders use `{{snake_case}}` and must be declared where the key is added:
+`"files.saved": "Saved {{name}}!"` -> `t('files.saved', { name: file.name })`.
+
 ## Locale resolution
 
-`localStorage` override -> `user.language` -> site locale -> browser languages -> `en-US`.
+`localStorage` override -> `user.language` -> site default (admin setting) -> browser languages -> `en-US`.
 
 - `setLocale(code)` persists the override, updates `document.documentElement.lang`, and lazily
   imports the locale chunk.
 - Only `en-US` is bundled up front; every other dictionary is code-split on demand.
-- The default locale is treated as "no opinion" so a fresh visitor gets whichever shipped
-  language their browser asks for, with no setup on their side.
-- date-fns and cronstrue locales are resolved through `i18n/loader.ts`.
+- New accounts are created with the admin-selected default language, and every user can override
+  it from their account settings.
+- The default site locale is treated as "no opinion" only when it is the canonical `en-US`, so a
+  fresh visitor gets whichever shipped language their browser asks for.
+- date-fns and cronstrue locales are resolved through `i18n/loader.ts` (best effort for dates).
 
 ## Adding a locale (no code changes)
 
-1. Copy `i18n/locales/en-US.json` to `i18n/locales/<code>.json` (e.g. `fr-FR`) and translate the values.
-2. Copy `resources/lang/en-US/` to `resources/lang/<code>/` and translate the PHP files.
-3. Done. Both dictionaries are auto-discovered: the language shows up in the account selector,
-   the first-run setup wizard and the admin default-language dropdown with no further wiring.
-4. Dates are best-effort through the `date-fns` map in `i18n/loader.ts`; cron descriptions
-   localize automatically from the language part of the code.
+1. `cp -r resources/lang/en-US resources/lang/fr-FR`
+2. Translate `resources/lang/fr-FR/*.php` and `resources/lang/fr-FR/ui.json`.
+3. Done. Both layers auto-discover the folder: the language shows up in the account selector, the
+   first-run setup wizard and the admin default-language dropdown.
+4. Optional: add the language to the date-fns map in `i18n/loader.ts` for localized dates; cron
+   descriptions localize automatically.
 
-Codes are validated against the discovered files, so any `xx` or `xx-YY` folder works.
+A PHPUnit guard (`tests/Unit/I18n/LocaleSyncTest.php`) fails if a locale folder is missing its
+`ui.json` or the JSON is malformed.
 
-## Locale content rules (es)
+## Locale content rules (es-ES)
 
 - Castilian Spanish from Spain, following RAE orthography (<https://www.rae.es/ortografia/>).
 - Address the user impersonally or with `tú`; do not use `vosotros` outside explanatory prose.
 - Use Spanish technical vocabulary: "contraseña" (password), "servidor" (server),
-  "copia de seguridad" (backup), "programador" is deprecated - prefer "tarea programada" (schedule).
+  "copia de seguridad" (backup), "tarea programada" (schedule).
 - Keep placeholders and product names (`Hydrodactyl`, egg names, file names) untranslated.
 
 ## Verification

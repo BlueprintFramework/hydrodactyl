@@ -7,46 +7,26 @@ use Pterodactyl\Tests\TestCase;
 class LocaleSyncTest extends TestCase
 {
     /**
-     * Every language must exist on both sides: the PHP dictionaries Laravel
-     * reads from resources/lang, and the JSON dictionaries Vite bundles from
-     * resources/scripts/i18n/locales. Adding a language is a copy/paste in
-     * both places, so this fails loudly whenever one of them is forgotten.
+     * Every locale folder under resources/lang must ship a valid ui.json
+     * dictionary next to its PHP files. The panel UI keys (and their compile
+     * time types) are built from it, so copying a language folder without the
+     * dictionary, or vice versa, fails loudly here.
      */
-    public function testEveryLocaleExistsOnBothSides()
+    public function testEveryLocaleHasAValidUiDictionary()
     {
-        $backend = collect(glob(resource_path('lang/*'), GLOB_ONLYDIR))
-            ->map(function ($path) {
-                return basename($path);
-            })
-            ->sort()
-            ->values()
-            ->all();
+        $locales = glob(resource_path('lang/*'), GLOB_ONLYDIR);
 
-        $frontend = collect(glob(resource_path('scripts/i18n/locales/*.json')))
-            ->map(function ($path) {
-                return basename($path, '.json');
-            })
-            ->sort()
-            ->values()
-            ->all();
+        $this->assertNotEmpty($locales, 'No locale folders were found in resources/lang.');
 
-        $this->assertSame(
-            $backend,
-            $frontend,
-            'Locales in resources/lang and resources/scripts/i18n/locales are out of sync.'
-        );
-    }
+        foreach ($locales as $directory) {
+            $code = basename($directory);
+            $path = $directory . '/ui.json';
 
-    /**
-     * A malformed dictionary would only surface at runtime in the browser, so
-     * catch broken JSON here instead.
-     */
-    public function testEveryFrontendDictionaryIsValidJson()
-    {
-        foreach (glob(resource_path('scripts/i18n/locales/*.json')) as $path) {
+            $this->assertFileExists($path, sprintf('The locale "%s" is missing its ui.json dictionary.', $code));
+
             $decoded = json_decode(file_get_contents($path), true);
 
-            $this->assertIsArray($decoded, sprintf('The dictionary %s is not valid JSON.', basename($path)));
+            $this->assertIsArray($decoded, sprintf('The dictionary "%s/ui.json" is not valid JSON.', $code));
         }
     }
 }

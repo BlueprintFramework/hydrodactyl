@@ -14,7 +14,7 @@ interface LocaleDropdownProps {
 
 /**
  * Presentational language picker backed by the discovered locales. Anything
- * dropped into `i18n/locales` shows up here without further wiring.
+ * dropped into `resources/lang/<code>/` shows up here without further wiring.
  */
 const LocaleDropdown = ({ className }: LocaleDropdownProps) => {
     const { t, locale, locales, setLocale } = useTranslation();
