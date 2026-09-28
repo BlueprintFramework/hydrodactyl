@@ -374,9 +374,7 @@ const SoftwareContainer = () => {
                 {currentStep !== 'overview' && (
                     <div className='p-4 bg-[#ffffff08] border border-[#ffffff12] rounded-lg'>
                         <div className='flex items-center justify-between mb-2'>
-                            <span className='text-sm font-medium text-neutral-200 capitalize'>
-                                {t(STEP_LABELS[currentStep])}
-                            </span>
+                            <span className='text-sm font-medium text-neutral-200'>{t(STEP_LABELS[currentStep])}</span>
                             <span className='text-sm text-neutral-400'>
                                 {t('server.software.step_indicator', { step: steps.indexOf(currentStep), total: 4 })}
                             </span>

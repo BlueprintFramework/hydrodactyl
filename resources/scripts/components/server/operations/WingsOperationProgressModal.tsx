@@ -181,9 +181,7 @@ const WingsOperationProgressModal: React.FC<Props> = ({
                         {/* Status Header */}
                         <div className='flex items-center justify-center space-x-3'>
                             {renderStatusIcon(operation.status)}
-                            <span
-                                className={`font-semibold capitalize text-lg ${statusStyling?.color || 'text-zinc-300'}`}
-                            >
+                            <span className={`font-semibold text-lg ${statusStyling?.color || 'text-zinc-300'}`}>
                                 {t(STATUS_LABEL_KEYS[operation.status])}
                             </span>
                         </div>

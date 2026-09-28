@@ -83,7 +83,7 @@ const ForgotPasswordContainer = () => {
 
                     <div className='flex w-full flex-col gap-3 mt-6 sm:flex-row sm:justify-between sm:items-center'>
                         <Button
-                            className={`bg-mocha-100 text-black p-2 px-4 rounded-full border-0 ring-0 outline-hidden capitalize w-full sm:w-auto`}
+                            className={`bg-mocha-100 text-black p-2 px-4 rounded-full border-0 ring-0 outline-hidden w-full sm:w-auto`}
                             type='submit'
                             size='xlarge'
                             isLoading={isSubmitting}

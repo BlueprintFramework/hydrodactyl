@@ -435,7 +435,7 @@ const InstallerContainer = () => {
                             type='button'
                             onClick={() => setView(v)}
                             className={cn(
-                                'rounded-lg px-4 py-2 text-sm font-medium capitalize transition',
+                                'rounded-lg px-4 py-2 text-sm font-medium transition',
                                 view === v
                                     ? 'bg-brand-400/70 text-mocha-500'
                                     : 'text-cream-400/70 hover:bg-mocha-300/40',

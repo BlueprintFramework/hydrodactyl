@@ -279,7 +279,7 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
                                                         <div className='flex items-start gap-3 flex-1 min-w-0'>
                                                             <PermissionIcon name={key} />
                                                             <div className='flex-1 min-w-0'>
-                                                                <h4 className='font-medium text-zinc-200 capitalize'>
+                                                                <h4 className='font-medium text-zinc-200'>
                                                                     {category ? t(category.title) : key}
                                                                 </h4>
                                                                 <p className='text-xs text-zinc-400 mt-1 break-words'>

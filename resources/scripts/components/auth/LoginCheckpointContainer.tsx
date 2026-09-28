@@ -76,7 +76,7 @@ function LoginCheckpointForm() {
                 </button>
             </div>
             <div
-                className={`text-right w-full rounded-b-lg border-0 ring-0 outline-hidden capitalize font-bold text-sm py-2 hover:cursor-pointer `}
+                className={`text-right w-full rounded-b-lg border-0 ring-0 outline-hidden font-bold text-sm py-2 hover:cursor-pointer `}
             >
                 <SecondaryLink to='/auth/login'>{t('auth.two_factor.return_to_login')}</SecondaryLink>
             </div>
