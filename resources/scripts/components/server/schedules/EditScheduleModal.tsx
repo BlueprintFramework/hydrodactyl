@@ -240,7 +240,7 @@ const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) 
                                 label={t('server.schedules.name_label')}
                                 description={t('server.schedules.name_description')}
                             />
-                            <div className={`grid grid-cols-2 sm:grid-cols-5 gap-4 mt-6`}>
+                            <div className={`grid grid-cols-2 sm:grid-cols-5 gap-4 mt-6 [&_label]:min-h-10`}>
                                 <Field name={'minute'} label={t('server.schedules.cron.minute')} />
                                 <Field name={'hour'} label={t('server.schedules.cron.hour')} />
                                 <Field name={'dayOfWeek'} label={t('server.schedules.field_day_of_week')} />
