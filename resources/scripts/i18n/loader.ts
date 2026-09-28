@@ -18,7 +18,7 @@ import { uk } from 'date-fns/locale/uk';
 import { zhCN } from 'date-fns/locale/zh-CN';
 import { zhTW } from 'date-fns/locale/zh-TW';
 import { deepmerge } from 'deepmerge-ts';
-import type { DeepPartial, LocaleDefinition, Translations } from '@/i18n/types';
+import type { DeepPartial, Translations } from '@/i18n/types';
 
 /**
  * Locale used when nothing else has a preference. Also the dictionary every
@@ -26,31 +26,13 @@ import type { DeepPartial, LocaleDefinition, Translations } from '@/i18n/types';
  */
 export const DEFAULT_LOCALE = 'en-US';
 
-interface LocaleModule {
-    default: DeepPartial<Translations>;
-}
+const cache = new Map<string, Translations>();
 
 /**
- * Every `ui.json` dictionary inside a locale folder is discovered
- * automatically by Vite, so adding a language is just a matter of copying
- * `resources/lang/en-US` to `resources/lang/<code>` and translating it. The
- * backend scans the same folders for its PHP dictionaries.
- *
- * The canonical locale is excluded from the glob (keep both constants in
- * sync!) because it is imported statically above; that keeps its dictionary
- * from being shipped twice.
+ * Human label for a locale code. The backend ships intl-resolved names for
+ * every discovered language; this is the fallback for anything else.
  */
-const discovered = import.meta.glob<LocaleModule>(['/resources/lang/*/ui.json', '!/resources/lang/en-US/ui.json']);
-
-const codeFromPath = (path: string): string => path.replace(/^\/resources\/lang\//, '').replace(/\/ui\.json$/, '');
-
-export const loaders: Record<string, () => Promise<LocaleModule>> = Object.fromEntries(
-    Object.entries(discovered).map(([path, loader]) => [codeFromPath(path), loader]),
-);
-
-export const localeCodes: string[] = [DEFAULT_LOCALE, ...Object.keys(loaders)].sort((a, b) => a.localeCompare(b));
-
-function localeLabel(code: string): string {
+export function localeLabel(code: string): string {
     try {
         const display = new Intl.DisplayNames([code], { type: 'language' }).of(code);
 
@@ -64,28 +46,22 @@ function localeLabel(code: string): string {
     return code;
 }
 
-export const localeDefinitions: LocaleDefinition[] = localeCodes.map((code) => ({ code, label: localeLabel(code) }));
-
-export function isLocaleCode(value: unknown): boolean {
-    return typeof value === 'string' && localeCodes.includes(value);
-}
-
 /**
  * Match an arbitrary locale-ish value ("fr-FR", "fr", "FR-fr") against the
- * discovered dictionaries: exact first, then case-insensitive, then by the
- * language part alone so a "fr-CA" browser still lands on "fr-FR".
+ * available codes: exact first, then case-insensitive, then by the language
+ * part alone so a "fr-CA" browser still lands on "fr-FR".
  */
-export function matchLocale(value: string | null | undefined): string | undefined {
+export function matchLocale(value: string | null | undefined, codes: string[]): string | undefined {
     if (typeof value !== 'string' || value.length === 0) {
         return undefined;
     }
 
-    if (isLocaleCode(value)) {
+    if (codes.includes(value)) {
         return value;
     }
 
     const lower = value.toLowerCase();
-    const exact = localeCodes.find((code) => code.toLowerCase() === lower);
+    const exact = codes.find((code) => code.toLowerCase() === lower);
 
     if (exact) {
         return exact;
@@ -93,7 +69,7 @@ export function matchLocale(value: string | null | undefined): string | undefine
 
     const language = lower.split('-')[0];
 
-    return localeCodes.find((code) => code.toLowerCase().split('-')[0] === language);
+    return codes.find((code) => code.toLowerCase().split('-')[0] === language);
 }
 
 const dateFnsLocales: Record<string, Locale> = {
@@ -139,15 +115,38 @@ export function getCronstrueLocale(code: string): string {
 /**
  * Load a locale dictionary merged over the canonical English dictionary, so
  * partially translated locales fall back per key instead of rendering blanks.
+ *
+ * Dictionaries are served straight from `resources/lang` by the panel (see
+ * `LocaleDictionaryController`), so a translated folder dropped on the server
+ * shows up on the next page load without rebuilding the frontend.
  */
 export async function loadLocale(code: string): Promise<Translations> {
-    const loader = loaders[code];
-
-    if (code === DEFAULT_LOCALE || !loader) {
+    if (code === DEFAULT_LOCALE) {
         return enUSDictionary;
     }
 
-    const overrides = await loader();
+    const cached = cache.get(code);
 
-    return deepmerge(enUSDictionary, overrides.default) as Translations;
+    if (cached) {
+        return cached;
+    }
+
+    try {
+        const response = await fetch(`/locales/${encodeURIComponent(code)}/ui.json`, {
+            headers: { Accept: 'application/json' },
+        });
+
+        if (!response.ok) {
+            return enUSDictionary;
+        }
+
+        const overrides = (await response.json()) as DeepPartial<Translations>;
+        const translations = deepmerge(enUSDictionary, overrides) as Translations;
+
+        cache.set(code, translations);
+
+        return translations;
+    } catch {
+        return enUSDictionary;
+    }
 }

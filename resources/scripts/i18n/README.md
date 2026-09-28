@@ -57,9 +57,12 @@ Placeholders use `{{snake_case}}` and must be declared where the key is added:
 
 `localStorage` override -> `user.language` -> site default (admin setting) -> browser languages -> `en-US`.
 
-- `setLocale(code)` persists the override, updates `document.documentElement.lang`, and lazily
-  imports the locale chunk.
-- Only `en-US` is bundled up front; every other dictionary is code-split on demand.
+- `setLocale(code)` persists the override, updates `document.documentElement.lang`, and fetches
+  the locale dictionary from the panel (cached in memory for the session).
+- Only `en-US` is bundled up front; every other dictionary is requested from
+  `/locales/<code>/ui.json` on demand.
+- The list of languages is injected into the page by the backend, so a folder dropped into
+  `resources/lang` appears after a refresh with no frontend rebuild.
 - New accounts are created with the admin-selected default language, and every user can override
   it from their account settings.
 - The default site locale is treated as "no opinion" only when it is the canonical `en-US`, so a
@@ -70,8 +73,9 @@ Placeholders use `{{snake_case}}` and must be declared where the key is added:
 
 1. `cp -r resources/lang/en-US resources/lang/fr-FR`
 2. Translate `resources/lang/fr-FR/*.php` and `resources/lang/fr-FR/ui.json`.
-3. Done. Both layers auto-discover the folder: the language shows up in the account selector, the
-   first-run setup wizard and the admin default-language dropdown.
+3. Done. The backend discovers the folder and injects the language list; the dictionary is served
+   by the panel. Refresh the page and it appears in the account selector, the first-run setup
+   wizard and the admin default-language dropdown. No frontend rebuild required.
 4. Optional: add the language to the date-fns map in `i18n/loader.ts` for localized dates; cron
    descriptions localize automatically.
 

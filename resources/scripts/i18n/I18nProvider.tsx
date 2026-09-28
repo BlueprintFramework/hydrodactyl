@@ -2,8 +2,15 @@ import enUSDictionary from '@lang/en-US/ui.json';
 import { useStoreState } from 'easy-peasy';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { interpolate } from '@/i18n/interpolate';
-import { DEFAULT_LOCALE, getDateFnsLocale, loadLocale, localeDefinitions, matchLocale } from '@/i18n/loader';
-import type { DeepPartial, I18nContextValue, LocaleCode, Translate, Translations } from '@/i18n/types';
+import { DEFAULT_LOCALE, getDateFnsLocale, loadLocale, localeLabel, matchLocale } from '@/i18n/loader';
+import type {
+    DeepPartial,
+    I18nContextValue,
+    LocaleCode,
+    LocaleDefinition,
+    Translate,
+    Translations,
+} from '@/i18n/types';
 import { usePersistedState } from '@/plugins/usePersistedState';
 
 const STORAGE_KEY = 'hydrodactyl:i18n:locale';
@@ -39,9 +46,9 @@ function browserLocales(): string[] {
     return languages.filter((value): value is string => typeof value === 'string' && value.length > 0);
 }
 
-function resolveLocale(...candidates: (string | null | undefined)[]): LocaleCode {
+function resolveLocale(codes: string[], ...candidates: (string | null | undefined)[]): LocaleCode {
     for (const candidate of candidates) {
-        const match = matchLocale(candidate);
+        const match = matchLocale(candidate, codes);
 
         if (match) {
             return match;
@@ -58,12 +65,30 @@ interface I18nProviderProps {
 const I18nProvider = ({ children }: I18nProviderProps) => {
     const userLanguage = useStoreState((state) => state.user.data?.language);
     const siteLocale = useStoreState((state) => state.settings.data?.locale);
+    const configuredLocales = useStoreState((state) => state.settings.data?.locales);
     const [persistedLocale, setPersistedLocale] = usePersistedState<LocaleCode | null>(STORAGE_KEY, null);
+
+    // Languages are discovered by the backend and injected into the page, so a
+    // folder dropped into resources/lang shows up on the next page load.
+    const locales = useMemo<LocaleDefinition[]>(() => {
+        const definitions = (configuredLocales ?? []).map((entry) => ({
+            code: entry.code,
+            label: entry.name || localeLabel(entry.code),
+        }));
+
+        if (!definitions.some((entry) => entry.code === DEFAULT_LOCALE)) {
+            definitions.unshift({ code: DEFAULT_LOCALE, label: localeLabel(DEFAULT_LOCALE) });
+        }
+
+        return definitions;
+    }, [configuredLocales]);
+    const codes = useMemo(() => locales.map((entry) => entry.code), [locales]);
 
     // Stored/user/site preferences win. The default locale is treated as "no
     // opinion" so the browser can pick one of the shipped languages instead.
     const [locale, setLocaleState] = useState<LocaleCode>(() =>
         resolveLocale(
+            codes,
             persistedLocale,
             userLanguage,
             siteLocale === DEFAULT_LOCALE ? undefined : siteLocale,
@@ -115,13 +140,13 @@ const I18nProvider = ({ children }: I18nProviderProps) => {
     const value = useMemo<I18nContextValue>(
         () => ({
             locale,
-            locales: localeDefinitions,
+            locales,
             ready,
             dateFnsLocale,
             setLocale,
             t,
         }),
-        [locale, ready, dateFnsLocale, setLocale, t],
+        [locale, locales, ready, dateFnsLocale, setLocale, t],
     );
 
     return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

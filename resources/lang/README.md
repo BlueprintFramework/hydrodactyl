@@ -16,7 +16,8 @@ Laravel translation files for the Hydrodactyl panel.
 4. **One folder per language, auto-discovered.** Everything for a locale lives in
    `resources/lang/<code>/` — the PHP dictionaries and the frontend `ui.json`. The backend scans
    the folders for display names with the `intl` extension (ISO 639-1 fallback) and feeds `User`
-   validation and the admin selectors; the frontend discovers `ui.json` via `import.meta.glob`.
+   validation and the admin selectors; the frontend receives the language list from the panel and
+   fetches each dictionary through `/locales/<code>/ui.json`, so no frontend rebuild is needed.
    `tests/Unit/I18n/LocaleSyncTest.php` guards that every folder ships a valid `ui.json`.
 
 ## File layout
