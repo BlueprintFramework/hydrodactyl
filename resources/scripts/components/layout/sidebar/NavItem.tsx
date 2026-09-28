@@ -38,7 +38,15 @@ const NavItem = memo(({ to, icon, text, itemRef, end, permission, onNavClick }: 
             {content}
         </a>
     ) : (
-        <NavLink to={to} end={end} className={className} ref={itemRef} draggable={false} onClick={onNavClick} title={text}>
+        <NavLink
+            to={to}
+            end={end}
+            className={className}
+            ref={itemRef}
+            draggable={false}
+            onClick={onNavClick}
+            title={text}
+        >
             {content}
         </NavLink>
     );

@@ -25,12 +25,12 @@ interface StatsData {
 }
 
 const StatGraphs = () => {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const status = ServerContext.useStoreState((state) => state.status.value);
     const limits = ServerContext.useStoreState((state) => state.server.data?.limits);
     const previous = useRef<Record<'tx' | 'rx', number>>({ tx: -1, rx: -1 });
 
-    const cpu = useChartTickLabel(t('server.console.cpu'), limits.cpu, '%', 2);
+    const cpu = useChartTickLabel(t('server.console.cpu'), limits.cpu, '%', 2, locale);
     const [uptime, setUptime] = useState(0);
     const memory = useChartTickLabel(t('server.console.memory'), limits.memory, 'MiB');
     const network = useChart(t('server.console.network_activity'), {
@@ -40,7 +40,7 @@ const StatGraphs = () => {
                 y: {
                     ticks: {
                         callback(value) {
-                            return bytesToString(typeof value === 'string' ? parseInt(value, 10) : value);
+                            return bytesToString(typeof value === 'string' ? parseInt(value, 10) : value, 2, locale);
                         },
                     },
                 },

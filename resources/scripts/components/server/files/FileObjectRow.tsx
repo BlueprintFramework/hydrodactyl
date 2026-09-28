@@ -49,7 +49,7 @@ const icon = (fileName: string) => {
 const MemoizedClickable = memo(Clickable, isEqual);
 
 const FileObjectRow = ({ file }: { file: FileObject }) => {
-    const { dateFnsLocale } = useTranslation();
+    const { dateFnsLocale, locale } = useTranslation();
 
     return (
         <ContextMenu>
@@ -69,7 +69,7 @@ const FileObjectRow = ({ file }: { file: FileObject }) => {
                         <div className='flex-1 truncate font-bold text-sm'>{file.name}</div>
                         {file.isFile && (
                             <div className='w-1/6 text-right mr-4 hidden sm:block text-xs'>
-                                {bytesToString(file.size)}
+                                {bytesToString(file.size, 2, locale)}
                             </div>
                         )}
                         <div

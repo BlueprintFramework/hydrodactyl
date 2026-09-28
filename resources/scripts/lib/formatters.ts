@@ -8,17 +8,26 @@ function mbToBytes(megabytes: number): number {
 }
 
 /**
+ * Format a number for display using the given locale. Grouping separators are
+ * disabled so byte counts and compact counters keep their current shape and
+ * only the decimal separator follows the locale.
+ */
+function formatNumber(value: number, locale = 'en-US', options: Intl.NumberFormatOptions = {}): string {
+    return new Intl.NumberFormat(locale, { useGrouping: false, ...options }).format(value);
+}
+
+/**
  * Given an amount of bytes, converts them into a human readable string format
  * using "1024" as the divisor.
  */
-function bytesToString(bytes: number, decimals = 2): string {
+function bytesToString(bytes: number, decimals = 2, locale = 'en-US'): string {
     const k = _CONVERSION_UNIT;
 
     if (bytes < 1) return '0 Bytes';
 
     decimals = Math.floor(Math.max(0, decimals));
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    const value = Number((bytes / k ** i).toFixed(decimals));
+    const value = formatNumber(bytes / k ** i, locale, { maximumFractionDigits: decimals });
 
     return `${value} ${['Bytes', 'KiB', 'MiB', 'GiB', 'TiB'][i]}`;
 }
@@ -31,4 +40,4 @@ function ip(value: string): string {
     return /([a-f0-9:]+:+)+[a-f0-9]+/.test(value) ? `[${value}]` : value;
 }
 
-export { bytesToString, ip, mbToBytes };
+export { bytesToString, formatNumber, ip, mbToBytes };

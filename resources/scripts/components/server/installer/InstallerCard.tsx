@@ -5,6 +5,7 @@ import { useState } from 'react';
 import type { MarketplaceProject } from '@/api/server/marketplace';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
+import { formatNumber } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 import type { InstalledEntry } from './installedState';
@@ -17,14 +18,20 @@ interface InstallerCardProps {
     installing?: boolean;
 }
 
-const formatNumber = (n: number): string => {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+const formatCount = (n: number, locale: string): string => {
+    if (n >= 1_000_000) {
+        return `${formatNumber(n / 1_000_000, locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`;
+    }
+
+    if (n >= 1_000) {
+        return `${formatNumber(n / 1_000, locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}K`;
+    }
+
     return String(n);
 };
 
 const InstallerCard = ({ project, installedEntry, onInstall, installing }: InstallerCardProps) => {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const isInstalled = Boolean(installedEntry);
     // Some marketplace projects have no usable icon (Hangar projects without a
     // custom avatar 404 on the CDN; some Spiget resources have none at all).
@@ -118,7 +125,7 @@ const InstallerCard = ({ project, installedEntry, onInstall, installing }: Insta
 
             <div className='mt-auto flex items-center justify-between pt-4'>
                 <span className='text-[11px] text-cream-400/50'>
-                    {t('server.installer.downloads', { count: formatNumber(project.downloads) })}
+                    {t('server.installer.downloads', { count: formatCount(project.downloads, locale) })}
                 </span>
                 <Button
                     size='sm'

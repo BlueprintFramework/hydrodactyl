@@ -22,7 +22,7 @@ interface Props {
 }
 
 const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable = false, retryBackup }: Props) => {
-    const { t, dateFnsLocale } = useTranslation();
+    const { t, dateFnsLocale, locale } = useTranslation();
     const { addFlash, clearFlashes } = useFlash();
 
     const handleRetry = async () => {
@@ -170,7 +170,7 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
                 {backup.completedAt && backup.isSuccessful && backup.bytes ? (
                     <>
                         <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>{t('server.backups.size')}</p>
-                        <p className='text-sm text-zinc-300 font-medium'>{bytesToString(backup.bytes)}</p>
+                        <p className='text-sm text-zinc-300 font-medium'>{bytesToString(backup.bytes, 2, locale)}</p>
                     </>
                 ) : (
                     <>

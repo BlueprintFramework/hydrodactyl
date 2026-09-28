@@ -14,6 +14,7 @@ import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
 import type { TranslationKey } from '@/i18n/types';
+import { formatNumber } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 import { destinationFolder } from './eggFeatures';
@@ -35,10 +36,16 @@ interface VersionPickerProps {
     onInstalled?: (filename: string, directory: string) => void;
 }
 
-const formatBytes = (bytes: number | null | undefined): string => {
+const formatBytes = (bytes: number | null | undefined, locale: string): string => {
     if (!bytes) return '—';
-    if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
-    if (bytes >= 1_000) return `${(bytes / 1_000).toFixed(0)} KB`;
+    if (bytes >= 1_000_000) {
+        return `${formatNumber(bytes / 1_000_000, locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} MB`;
+    }
+
+    if (bytes >= 1_000) {
+        return `${formatNumber(bytes / 1_000, locale, { maximumFractionDigits: 0 })} KB`;
+    }
+
     return `${bytes} B`;
 };
 
@@ -65,7 +72,7 @@ const VersionPicker = ({
     installedEntry,
     onInstalled,
 }: VersionPickerProps) => {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const [versions, setVersions] = useState<MarketplaceVersion[]>([]);
     const [loading, setLoading] = useState(false);
     const [installingId, setInstallingId] = useState<string | null>(null);
@@ -220,7 +227,7 @@ const VersionPicker = ({
                                                 </span>
                                             )}
                                             {version.loaders.length > 0 && <span>{version.loaders.join(', ')}</span>}
-                                            <span>{formatBytes(version.size)}</span>
+                                            <span>{formatBytes(version.size, locale)}</span>
                                         </div>
                                     </div>
                                     <Button

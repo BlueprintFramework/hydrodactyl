@@ -4,7 +4,7 @@ import { SocketEvent, SocketRequest } from '@/components/server/events';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from '@/i18n/I18nProvider';
 
-import { bytesToString } from '@/lib/formatters';
+import { bytesToString, formatNumber } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { ServerContext } from '@/state/server';
@@ -15,7 +15,7 @@ type Stats = Record<'memory' | 'cpu' | 'disk' | 'uptime' | 'rx' | 'tx', number>;
 const _Limit = ({ children }: { limit: string | null; children: React.ReactNode }) => <>{children}</>;
 
 const ServerDetailsHeader = ({ className }: { className?: string }) => {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const [stats, setStats] = useState<Stats>({
         memory: 0,
         cpu: 0,
@@ -92,13 +92,13 @@ const ServerDetailsHeader = ({ className }: { className?: string }) => {
     return (
         <div className={cn('flex md:flex-row gap-4 flex-col text-nowrap', className)}>
             <Detail label={t('server.header.cpu')} className='w-14' loading={loading}>
-                {`${stats.cpu.toFixed(2)}%`}
+                {`${formatNumber(stats.cpu, locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`}
             </Detail>
             <Detail label={t('server.header.ram')} className='w-14' loading={loading}>
-                {bytesToString(stats.memory, 0)}
+                {bytesToString(stats.memory, 0, locale)}
             </Detail>
             <Detail label={t('server.header.disk')} className='w-20' loading={loading}>
-                {bytesToString(stats.disk)}
+                {bytesToString(stats.disk, 2, locale)}
             </Detail>
         </div>
     );

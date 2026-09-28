@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import type { Server } from '@/api/server/getServer';
 import getServerResourceUsage, { type ServerPowerState, type ServerStats } from '@/api/server/getServerResourceUsage';
 import { useTranslation } from '@/i18n/I18nProvider';
-import { bytesToString, ip } from '@/lib/formatters';
+import { bytesToString, formatNumber, ip } from '@/lib/formatters';
 
 // Determines if the current value is in an alarm threshold so we can show it in red rather
 // than the more faded default style.
@@ -65,7 +65,7 @@ position: relative;
 `;
 
 const ServerRow = ({ server, className, hideGroup }: { server: Server; className?: string; hideGroup?: boolean }) => {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const [isSuspended, setIsSuspended] = useState(server.status === 'suspended');
     const [isInstalling, setIsInstalling] = useState(server.status === 'installing');
     const [stats, setStats] = useState<ServerStats | null>(null);
@@ -173,7 +173,12 @@ const ServerRow = ({ server, className, hideGroup }: { server: Server; className
                                 <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>
                                     {t('dashboard.server_row.cpu')}
                                 </p>
-                                <p className='font-bold w-fit whitespace-nowrap'>{stats.cpuUsagePercent.toFixed(2)}%</p>
+                                <p className='font-bold w-fit whitespace-nowrap'>
+                                    {`${formatNumber(stats.cpuUsagePercent, locale, {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                    })}%`}
+                                </p>
                             </div>
                         </div>
                         <div className={`sm:flex hidden`}>
@@ -182,7 +187,7 @@ const ServerRow = ({ server, className, hideGroup }: { server: Server; className
                                     {t('dashboard.server_row.ram')}
                                 </p>
                                 <p className='font-bold w-fit whitespace-nowrap'>
-                                    {bytesToString(stats.memoryUsageInBytes, 0)}
+                                    {bytesToString(stats.memoryUsageInBytes, 0, locale)}
                                 </p>
                             </div>
                         </div>
@@ -192,7 +197,7 @@ const ServerRow = ({ server, className, hideGroup }: { server: Server; className
                                     {t('dashboard.server_row.storage')}
                                 </p>
                                 <p className='font-bold w-fit whitespace-nowrap'>
-                                    {bytesToString(stats.diskUsageInBytes, 0)}
+                                    {bytesToString(stats.diskUsageInBytes, 0, locale)}
                                 </p>
                             </div>
                         </div>
