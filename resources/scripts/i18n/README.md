@@ -23,8 +23,9 @@ per key. The `@lang` alias (tsconfig, vite and vitest) points at
 3. **Never re-translate backend strings.** API error details already arrive localized
    (`errors.0.detail` -> `httpErrorToHuman()`); render them as-is.
 4. **No new npm dependencies.** The system is hand-rolled on React Context.
-5. **Don't edit `ui.json` in a non-canonical locale for keys you don't understand** — partial
-   dictionaries are fine, missing keys fall back to English.
+5. **Mirror the canonical keys.** Every locale ships the same files and keys as `en-US`, so a
+   folder can be copied to start a new language; `LocaleParityTest` enforces it. Missing keys do
+   still fall back to English per key, but that is a safety net, not the goal.
 
 ## Key ownership
 

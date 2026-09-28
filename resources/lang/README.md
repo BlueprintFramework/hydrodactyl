@@ -19,6 +19,9 @@ Laravel translation files for the Hydrodactyl panel.
    validation and the admin selectors; the frontend receives the language list from the panel and
    fetches each dictionary through `/locales/<code>/ui.json`, so no frontend rebuild is needed.
    `tests/Unit/I18n/LocaleSyncTest.php` guards that every folder ships a valid `ui.json`.
+5. **Mirror the canonical keys.** Every locale ships the same files and the same keys as `en-US`
+   (PHP dictionaries, `ui.json` and the framework `.json`), so a folder can be copied to start a
+   new language. `tests/Unit/I18n/LocaleParityTest.php` enforces this.
 
 ## File layout
 
