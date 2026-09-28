@@ -8,7 +8,6 @@ use Illuminate\Http\Response;
 use Illuminate\Contracts\Console\Kernel;
 use Pterodactyl\Notifications\MailTested;
 use Illuminate\View\Factory as ViewFactory;
-use Illuminate\Support\Facades\Notification;
 use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Contracts\Encryption\Encrypter;
@@ -79,8 +78,7 @@ class MailController extends Controller
     public function test(Request $request): Response
     {
         try {
-            Notification::route('mail', $request->user()->email)
-                ->notify(new MailTested($request->user()));
+            $request->user()->notify(new MailTested($request->user()));
         } catch (\Exception $exception) {
             return response($exception->getMessage(), 500);
         }

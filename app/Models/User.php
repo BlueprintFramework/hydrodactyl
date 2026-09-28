@@ -195,7 +195,7 @@ class User extends Model implements
      */
     public function preferredLocale(): ?string
     {
-        return $this->language;
+        return $this->language ?: config('app.locale', 'en-US');
     }
 
     /**
