@@ -11,6 +11,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import KeyboardShortcut from '@/components/ui/keyboard-shortcut';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/plugins/usePermissions';
@@ -52,6 +53,7 @@ const terminalProps: ITerminalOptions = {
 };
 
 const Console = () => {
+    const { t } = useTranslation();
     const TERMINAL_PRELUDE = '\u001b[1m\u001b[33mcontainer@hydrodactyl~ \u001b[0m';
     const ref = useRef<HTMLDivElement>(null);
     const resizeObserverRef = useRef<ResizeObserver | null>(null);
@@ -59,7 +61,18 @@ const Console = () => {
     const fitAddon = useMemo(() => new FitAddon(), []);
     const searchAddon = useMemo(() => new SearchAddon(), []);
     const webLinksAddon = useMemo(() => new WebLinksAddon(), []);
-    const scrollDownHelperAddon = useMemo(() => new ScrollDownHelperAddon(), []);
+    const latestT = useRef(t);
+    useEffect(() => {
+        latestT.current = t;
+    }, [t]);
+    const scrollDownHelperAddon = useMemo(
+        () =>
+            new ScrollDownHelperAddon(() => ({
+                ariaLabel: latestT.current('server.console.scroll_aria'),
+                title: latestT.current('server.console.scroll_title'),
+            })),
+        [],
+    );
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
     const [canSendCommands] = usePermissions(['control.console']);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.id);
@@ -113,11 +126,11 @@ const Console = () => {
             switch (status) {
                 // Sent by either the source or target node if a failure occurs.
                 case 'failure':
-                    terminal.writeln(`${TERMINAL_PRELUDE}Transfer has failed.\u001b[0m`);
+                    terminal.writeln(`${TERMINAL_PRELUDE}${t('server.console.transfer_failed')}\u001b[0m`);
                     return;
             }
         },
-        [terminal],
+        [terminal, t],
     );
 
     const handleDaemonErrorOutput = useCallback(
@@ -127,8 +140,9 @@ const Console = () => {
     );
 
     const handlePowerChangeEvent = useCallback(
-        (state: string) => terminal.writeln(`${TERMINAL_PRELUDE}Server marked as ${state}...\u001b[0m`),
-        [terminal],
+        (state: string) =>
+            terminal.writeln(`${TERMINAL_PRELUDE}${t('server.console.server_marked_as', { state })}\u001b[0m`),
+        [terminal, t],
     );
 
     const handleCommandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -354,8 +368,8 @@ const Console = () => {
                             ref={inputRef}
                             className='w-full'
                             type={'text'}
-                            placeholder={'Enter a command'}
-                            aria-label={'Console command input.'}
+                            placeholder={t('server.console.enter_command')}
+                            aria-label={t('server.console.command_input_aria')}
                             disabled={!instance || !connected}
                             onKeyDown={handleCommandKeyDown}
                             autoCorrect={'off'}

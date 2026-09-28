@@ -231,13 +231,13 @@ class ModrinthSource extends AbstractMarketplaceSource
         $file = $this->pickPrimaryFile(Arr::get($payload, 'files', []));
 
         if ($file === null) {
-            throw MarketplaceException::upstream($this->key(), 'No downloadable file is available for this version.');
+            throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.no_downloadable_file'));
         }
 
         $url = Arr::get($file, 'url');
         $filename = Arr::get($file, 'filename');
         if (!is_string($url) || $url === '' || !is_string($filename) || $filename === '') {
-            throw MarketplaceException::upstream($this->key(), 'The version file is missing a download URL.');
+            throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.missing_download_url'));
         }
 
         $this->assertSafeDownloadUrl($url, $this->downloadHosts());

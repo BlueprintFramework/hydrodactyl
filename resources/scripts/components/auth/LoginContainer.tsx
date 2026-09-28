@@ -7,6 +7,7 @@ import LoginFormContainer, { TitleSection } from '@/components/auth/LoginFormCon
 import Button from '@/components/elements/Button';
 import Captcha, { getCaptchaResponse } from '@/components/elements/Captcha';
 import Field from '@/components/elements/Field';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import CaptchaManager from '@/lib/captcha';
 
@@ -29,6 +30,7 @@ interface ErrorResponse {
 function LoginContainer() {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
         // clearFlashes();
@@ -44,7 +46,7 @@ function LoginContainer() {
                 } else {
                     console.error('Captcha enabled but no response available');
                     clearAndAddHttpError({
-                        error: new Error('Please complete the captcha verification.'),
+                        error: new Error(t('auth.captcha.verification_required')),
                     });
                     setSubmitting(false);
                     return;
@@ -70,7 +72,7 @@ function LoginContainer() {
 
                 if (error.code === 'InvalidCredentials') {
                     clearAndAddHttpError({
-                        error: new Error('Invalid username or password. Please try again.'),
+                        error: new Error(t('auth.login.invalid_credentials')),
                     });
                 } else if (error.code === 'DisplayException') {
                     clearAndAddHttpError({
@@ -87,18 +89,18 @@ function LoginContainer() {
             onSubmit={onSubmit}
             initialValues={{ user: '', password: '' }}
             validationSchema={object().shape({
-                user: string().required('A username or email must be provided.'),
-                password: string().required('Please enter your account password.'),
+                user: string().required(t('auth.login.username_required')),
+                password: string().required(t('auth.login.password_required')),
             })}
         >
             {({ isSubmitting }) => (
                 <LoginFormContainer className='mx-auto flex w-full max-w-md flex-col gap-6 rounded-2xl border border-cream-500/10 bg-bg-raised p-8 shadow-xl shadow-black/40'>
-                    <TitleSection title='Login' />
+                    <TitleSection title={t('auth.login.title')} />
                     <div className=''>
                         <Field
                             id='user'
                             type={'text'}
-                            label={'Username or Email'}
+                            label={t('auth.login.username_label')}
                             name={'user'}
                             disabled={isSubmitting}
                         />
@@ -108,7 +110,7 @@ function LoginContainer() {
                         <Field
                             id='password'
                             type={'password'}
-                            label={'Password'}
+                            label={t('auth.login.password_label')}
                             name={'password'}
                             disabled={isSubmitting}
                         />
@@ -119,7 +121,7 @@ function LoginContainer() {
                         onError={(error) => {
                             console.error('Captcha error:', error);
                             clearAndAddHttpError({
-                                error: new Error('Captcha verification failed. Please try again.'),
+                                error: new Error(t('auth.captcha.verification_failed')),
                             });
                         }}
                     />
@@ -132,10 +134,10 @@ function LoginContainer() {
                             isLoading={isSubmitting}
                             disabled={isSubmitting}
                         >
-                            Sign in
+                            {t('auth.login.sign_in')}
                         </Button>
                         <SecondaryLink to='/auth/password' className='text-center sm:text-right'>
-                            Forgot your password?
+                            {t('auth.login.forgot_password')}
                         </SecondaryLink>
                     </div>
                 </LoginFormContainer>

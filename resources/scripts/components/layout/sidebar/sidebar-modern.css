@@ -124,7 +124,7 @@ body[data-sidebar-minimized="false"] .nav-item .nav-icon {
 
 /* Text adjustments */
 body[data-sidebar-minimized="true"] .nav-item .nav-text {
-    @apply origin-bottom transition-all duration-200;
+    @apply origin-bottom transition-all duration-200 max-w-full;
     transform: scale(var(--sidebar-text-scale-small));
 }
 

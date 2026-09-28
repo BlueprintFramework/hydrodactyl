@@ -45,7 +45,7 @@ class ServerOperationRateLimit
             if ($activeOperations > 0) {
                 throw new TooManyRequestsHttpException(
                     300,
-                    'Another operation is currently in progress for this server. Please wait for it to complete.'
+                    __('exceptions.middleware.operation_in_progress')
                 );
             }
         } catch (\Exception $e) {

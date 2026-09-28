@@ -196,7 +196,7 @@ class DNSimpleProvider implements DnsProviderInterface
         $data = json_decode($response->getBody()->getContents(), true);
 
         if (!isset($data['data']['account']['id'])) {
-            throw new \Exception('Unable to determine Account ID from DNSimple API.');
+            throw new \Exception(__('exceptions.dns.dnsimple_account_id'));
         }
 
         $this->accountId = (string) $data['data']['account']['id'];

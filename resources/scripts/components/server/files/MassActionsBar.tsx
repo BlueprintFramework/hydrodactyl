@@ -7,11 +7,13 @@ import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import FadeTransition from '@/components/elements/transitions/FadeTransition';
 import RenameFileModal from '@/components/server/files/RenameFileModal';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
 const MassActionsBar = () => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
 
     const { mutate } = useFileManagerSwr();
@@ -32,7 +34,7 @@ const MassActionsBar = () => {
     const onClickCompress = () => {
         setLoading(true);
         clearFlashes('files');
-        setLoadingMessage('Archiving files...');
+        setLoadingMessage(t('server.files.archiving'));
 
         compressFiles(uuid, directory, selectedFiles)
             .then(() => mutate())
@@ -45,7 +47,7 @@ const MassActionsBar = () => {
         setLoading(true);
         setShowConfirm(false);
         clearFlashes('files');
-        setLoadingMessage('Deleting files...');
+        setLoadingMessage(t('server.files.deleting'));
 
         deleteFiles(uuid, directory, selectedFiles)
             .then(async () => {
@@ -65,22 +67,26 @@ const MassActionsBar = () => {
                 {loadingMessage}
             </SpinnerOverlay>
             <Dialog.Confirm
-                title={'Delete Files'}
+                title={t('server.files.delete_files_title')}
                 open={showConfirm}
-                confirm={'Delete'}
+                confirm={t('common.delete')}
                 onClose={() => setShowConfirm(false)}
                 onConfirmed={onClickConfirmDeletion}
                 loading={loading}
             >
                 <p className={'mb-2'}>
-                    Are you sure you want to delete&nbsp;
-                    <span className={'font-semibold text-zinc-50'}>{selectedFiles.length} files</span>? This is a
-                    permanent action and the files cannot be recovered.
+                    {t('server.files.delete_confirm_prefix')}&nbsp;
+                    <span className={'font-semibold text-zinc-50'}>
+                        {t('server.files.files_count', { count: selectedFiles.length })}
+                    </span>
+                    {t('server.files.delete_confirm_suffix')}
                 </p>
                 {selectedFiles.slice(0, 15).map((file) => (
                     <li key={file}>{file}</li>
                 ))}
-                {selectedFiles.length > 15 && <li>and {selectedFiles.length - 15} others</li>}
+                {selectedFiles.length > 15 && (
+                    <li>{t('server.files.delete_others', { count: selectedFiles.length - 15 })}</li>
+                )}
             </Dialog.Confirm>
             {showMove && (
                 <RenameFileModal
@@ -99,16 +105,16 @@ const MassActionsBar = () => {
                 >
                     <div className={`flex items-center space-x-4 pointer-events-auto rounded-sm p-4 bg-black/50`}>
                         <Button onClick={() => setShowMove(true)} disabled={loading}>
-                            {loading && loadingMessage.includes('Moving') && <Spinner size='small' />}
-                            Move
+                            {loading && loadingMessage === t('server.files.moving') && <Spinner size='small' />}
+                            {t('server.files.move')}
                         </Button>
                         <Button onClick={onClickCompress} disabled={loading}>
-                            {loading && loadingMessage.includes('Archiving') && <Spinner size='small' />}
-                            Archive
+                            {loading && loadingMessage === t('server.files.archiving') && <Spinner size='small' />}
+                            {t('server.files.archive')}
                         </Button>
                         <Button variant='attention' onClick={() => setShowConfirm(true)} disabled={loading}>
-                            {loading && loadingMessage.includes('Deleting') && <Spinner size='small' />}
-                            Delete
+                            {loading && loadingMessage === t('server.files.deleting') && <Spinner size='small' />}
+                            {t('common.delete')}
                         </Button>
                     </div>
                 </div>

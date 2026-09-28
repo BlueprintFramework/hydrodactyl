@@ -22,12 +22,14 @@ import FileManagerBreadcrumbs from '@/components/server/files/FileManagerBreadcr
 import FileNameModal from '@/components/server/files/FileNameModal';
 import { Button } from '@/components/ui/button';
 import { encodePathSegments } from '@/helpers';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
 const Editor = lazy(() => import('@/components/elements/editor/Editor'));
 
 const FileEditContainer = () => {
+    const { t } = useTranslation();
     const [error, setError] = useState('');
     const { action, '*': rawFilename } = useParams<{
         action: 'edit' | 'new';
@@ -78,7 +80,7 @@ const FileEditContainer = () => {
     const save = (name?: string) => {
         return new Promise<void>((resolve, reject) => {
             setLoading(true);
-            toast.success(`Saving ${name ?? filename}...`);
+            toast.success(t('server.files.saving', { name: name ?? filename }));
             clearFlashes('files:view');
             if (fetchFileContent) {
                 fetchFileContent()
@@ -87,7 +89,7 @@ const FileEditContainer = () => {
                     )
                     .then((savedContent) => {
                         setContent(savedContent);
-                        toast.success(`Saved ${name ?? filename}!`);
+                        toast.success(t('server.files.saved', { name: name ?? filename }));
                         if (name) {
                             navigate(`/server/${id}/files/edit/${encodePathSegments(name)}`);
                         }
@@ -109,7 +111,7 @@ const FileEditContainer = () => {
             if (instance) {
                 // they'll stack immediately, so this'll ease that
                 setTimeout(() => {
-                    toast.success('Your server is restarting.');
+                    toast.success(t('server.console.power_restarting'));
                 }, 500);
                 instance.send('set state', 'restart');
             }
@@ -119,11 +121,14 @@ const FileEditContainer = () => {
     };
 
     if (error) {
-        return <div>An error occurred.</div>;
+        return <div>{t('server.files.error')}</div>;
     }
 
     return (
-        <PageContentBlock title={action === 'edit' ? `Editing ${filename}` : `New File`} className='p-0! h-full'>
+        <PageContentBlock
+            title={action === 'edit' ? t('server.files.editing', { filename }) : t('server.files.new_file')}
+            className='p-0! h-full'
+        >
             <FlashMessageRender byKey={'files:view'} />
 
             <ErrorBoundary>
@@ -138,13 +143,13 @@ const FileEditContainer = () => {
             {['.hydroignore', '.pteroignore'].includes(filename) ? (
                 <div className={`mb-4 p-4 border-l-4 bg-neutral-900 rounded-sm border-cyan-400`}>
                     <p className={`text-neutral-300 text-sm`}>
-                        You&apos;re editing a{' '}
-                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>{filename}</code> file. Any files
-                        or directories listed in here will be excluded from backups. Wildcards are supported by using an
-                        asterisk (<code className={`font-mono bg-black rounded-sm py-px px-1`}>*</code>
-                        ). You can negate a prior rule by prepending an exclamation point (
+                        {t('server.files.ignore_notice_prefix')}{' '}
+                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>{filename}</code>{' '}
+                        {t('server.files.ignore_notice_middle')}
+                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>*</code>
+                        {t('server.files.ignore_notice_after_asterisk')}
                         <code className={`font-mono bg-black rounded-sm py-px px-1`}>!</code>
-                        ).
+                        {t('server.files.ignore_notice_suffix')}
                     </p>
                 </div>
             ) : null}
@@ -213,7 +218,7 @@ const FileEditContainer = () => {
                                 strokeLinejoin='round'
                             />
                         </svg>
-                        <span className='block'>{language?.name ?? 'Language'}</span>
+                        <span className='block'>{language?.name ?? t('server.files.language')}</span>
                         <svg
                             xmlns='http://www.w3.org/2000/svg'
                             width='13'
@@ -255,7 +260,7 @@ const FileEditContainer = () => {
                                 className='rounded-l-full rounded-r-none px-4 sm:pl-8 sm:pr-6'
                                 onClick={() => save()}
                             >
-                                Save{' '}
+                                {t('common.save')}{' '}
                                 <span className='ml-2 font-mono text-xs font-bold uppercase lg:inline-block hidden'>
                                     CTRL + S
                                 </span>
@@ -285,7 +290,7 @@ const FileEditContainer = () => {
                                     sideOffset={8}
                                 >
                                     <DropdownMenuItem onSelect={() => saveAndRestart()}>
-                                        Save & Restart
+                                        {t('server.files.save_and_restart')}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -294,7 +299,7 @@ const FileEditContainer = () => {
                 ) : (
                     <Can action={'file.create'}>
                         <Button variant='secondary' size='lg' onClick={() => setModalVisible(true)}>
-                            Create File
+                            {t('server.files.create_file')}
                         </Button>
                     </Can>
                 )}

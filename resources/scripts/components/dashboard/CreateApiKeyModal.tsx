@@ -1,9 +1,11 @@
 import { Field, Form, Formik, type FormikHelpers } from 'formik';
+import { useMemo } from 'react';
 import { object, string } from 'yup';
 import { Dialog } from '@/components/elements/dialog';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import Input from '@/components/elements/Input';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 interface CreateValues {
     description: string;
@@ -17,18 +19,26 @@ interface CreateApiKeyModalProps {
     isSubmitting?: boolean;
 }
 
-const validationSchema = object().shape({
-    description: string().required('Description is required').min(4, 'Must be at least 4 characters'),
-    allowedIps: string(),
-});
-
 export default function CreateApiKeyModal({ open, onClose, onSubmit, isSubmitting = false }: CreateApiKeyModalProps) {
+    const { t } = useTranslation();
+
+    const validationSchema = useMemo(
+        () =>
+            object().shape({
+                description: string()
+                    .required(t('account.api_keys.description_required'))
+                    .min(4, t('account.api_keys.description_min')),
+                allowedIps: string(),
+            }),
+        [t],
+    );
+
     return (
         <Dialog.Confirm
             open={open}
             onClose={onClose}
-            title='Create API Key'
-            confirm='Create Key'
+            title={t('account.api_keys.create')}
+            confirm={t('account.api_keys.create_confirm')}
             onConfirmed={() => {
                 // Trigger form submission programmatically
                 const form = document.getElementById('create-api-form') as HTMLFormElement;
@@ -50,20 +60,17 @@ export default function CreateApiKeyModal({ open, onClose, onSubmit, isSubmittin
                         <SpinnerOverlay visible={formikIsSubmitting || isSubmitting} />
 
                         <FormikFieldWrapper
-                            label='Description'
+                            label={t('account.api_keys.description_label')}
                             name='description'
-                            description='A description of this API key.'
+                            description={t('account.api_keys.description_helper')}
                         >
                             <Field name='description' as={Input} className='w-full' autoFocus />
                         </FormikFieldWrapper>
 
                         <FormikFieldWrapper
-                            label='Allowed IPs'
+                            label={t('account.api_keys.allowed_ips_label')}
                             name='allowedIps'
-                            description={
-                                'Leave blank to allow any IP address. ' +
-                                'Otherwise provide each IP or CIDR range on a new line (e.g. 192.168.1.1, 10.0.0.0/24).'
-                            }
+                            description={t('account.api_keys.allowed_ips_helper')}
                         >
                             <Field
                                 name='allowedIps'

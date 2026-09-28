@@ -3,6 +3,7 @@ import copy from 'copy-to-clipboard';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 interface CopyOnClickProps {
     text: string | number | null | undefined;
@@ -11,6 +12,7 @@ interface CopyOnClickProps {
 }
 
 const CopyOnClick = ({ text, children, showInNotification }: CopyOnClickProps) => {
+    const { t } = useTranslation();
     const [copied, setCopied] = useState(false);
     let truncatedText: string;
     if (showInNotification === false) {
@@ -23,7 +25,7 @@ const CopyOnClick = ({ text, children, showInNotification }: CopyOnClickProps) =
 
     useEffect(() => {
         if (!copied) return;
-        toast(`Copied ${truncatedText} to clipboard.`);
+        toast(t('common.copied_with_text', { text: truncatedText }));
 
         const timeout = setTimeout(() => {
             setCopied(false);
@@ -32,7 +34,7 @@ const CopyOnClick = ({ text, children, showInNotification }: CopyOnClickProps) =
         return () => {
             clearTimeout(timeout);
         };
-    }, [copied, truncatedText]);
+    }, [copied, truncatedText, t]);
 
     if (!React.isValidElement(children)) {
         throw new Error('Component passed to <CopyOnClick/> must be a valid React element.');

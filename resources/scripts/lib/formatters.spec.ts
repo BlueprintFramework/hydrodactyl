@@ -40,6 +40,12 @@ describe('@/lib/formatters.ts', () => {
         ])('should format %d bytes as "%s"', (input, output) => {
             expect(bytesToString(input)).toBe(output);
         });
+
+        it('should use the decimal separator of the given locale', () => {
+            expect(bytesToString(11_864, 2, 'es-ES')).toBe('11,59 KiB');
+            expect(bytesToString(1_356_000, 2, 'es-ES')).toBe('1,29 MiB');
+            expect(bytesToString(11_864, 2, 'en-US')).toBe('11.59 KiB');
+        });
     });
 
     describe('ip()', () => {

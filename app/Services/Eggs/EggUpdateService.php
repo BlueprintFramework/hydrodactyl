@@ -31,7 +31,7 @@ class EggUpdateService
             ]);
 
             if ($results !== 1) {
-                throw new NoParentConfigurationFoundException(trans('exceptions.nest.egg.must_be_child'));
+                throw new NoParentConfigurationFoundException(__('exceptions.nest.egg.must_be_child'));
             }
         }
 

@@ -2,15 +2,15 @@
 @include('partials/admin.settings.nav', ['activeTab' => 'domains'])
 
 @section('title')
-  Edit Domain
+  {{ __('admin/domains.edit_title') }}
 @endsection
 
 @section('content-header')
-  <h1>Edit Domain<small>Update DNS domain configuration.</small></h1>
+  <h1>{{ __('admin/domains.edit_title') }}<small>{{ __('admin/domains.edit_description') }}</small></h1>
   <ol class="breadcrumb">
     <li><a href="{{ route('admin.index') }}">Admin</a></li>
     <li><a href="{{ route('admin.settings') }}">Settings</a></li>
-    <li><a href="{{ route('admin.settings.domains.index') }}">Domains</a></li>
+    <li><a href="{{ route('admin.settings.domains.index') }}">{{ __('admin/domains.breadcrumb_domains') }}</a></li>
     <li class="active">{{ $domain->name }}</li>
   </ol>
 @endsection
@@ -22,23 +22,23 @@
       <form action="{{ route('admin.settings.domains.update', $domain) }}" method="POST" id="domain-form">
         <div class="box">
           <div class="box-header with-border">
-            <h3 class="box-title">Domain Information</h3>
+            <h3 class="box-title">{{ __('admin/domains.domain_information') }}</h3>
           </div>
           <div class="box-body">
             <div class="row">
               <div class="form-group col-md-6">
-                <label for="name" class="control-label">Domain Name <span class="field-required"></span></label>
+                <label for="name" class="control-label">{{ __('admin/domains.domain_name') }} <span class="field-required"></span></label>
                 <div>
                   <input type="text" name="name" id="name" class="form-control" 
                          value="{{ old('name', $domain->name) }}" placeholder="example.com" required />
-                  <p class="text-muted small">The domain name that will be used for subdomains (e.g., example.com).</p>
+                  <p class="text-muted small">{{ __('admin/domains.domain_name_help') }}</p>
                 </div>
               </div>
               <div class="form-group col-md-6">
-                <label for="dns_provider" class="control-label">DNS Provider <span class="field-required"></span></label>
+                <label for="dns_provider" class="control-label">{{ __('admin/domains.dns_provider') }} <span class="field-required"></span></label>
                 <div>
                   <select name="dns_provider" id="dns_provider" class="form-control" required>
-                    <option value="">Select a DNS provider...</option>
+                    <option value="">{{ __('admin/domains.select_provider') }}</option>
                     @foreach($providers as $key => $provider)
                       <option value="{{ $key }}" 
                               @if(old('dns_provider', $domain->dns_provider) === $key) selected @endif>
@@ -46,7 +46,7 @@
                       </option>
                     @endforeach
                   </select>
-                  <p class="text-muted small">The DNS service provider that manages this domain.</p>
+                  <p class="text-muted small">{{ __('admin/domains.dns_provider_help') }}</p>
                 </div>
               </div>
             </div>
@@ -55,7 +55,7 @@
 
         <div class="box" id="dns-config-box" style="display: none;">
           <div class="box-header with-border">
-            <h3 class="box-title">DNS Provider Configuration</h3>
+            <h3 class="box-title">{{ __('admin/domains.provider_configuration') }}</h3>
           </div>
           <div class="box-body" id="dns-config-content">
             <!-- Dynamic content will be loaded here -->
@@ -64,48 +64,48 @@
 
         <div class="box">
           <div class="box-header with-border">
-            <h3 class="box-title">Additional Settings</h3>
+            <h3 class="box-title">{{ __('admin/domains.additional_settings') }}</h3>
           </div>
           <div class="box-body">
             <div class="row">
               <div class="form-group col-md-4">
-                <label class="control-label">Status</label>
+                <label class="control-label">{{ __('admin/domains.status') }}</label>
                 <div>
                   <div class="btn-group" data-toggle="buttons">
                     <label class="btn btn-primary @if(old('is_active', $domain->is_active)) active @endif">
                       <input type="radio" name="is_active" value="1" 
-                             @if(old('is_active', $domain->is_active)) checked @endif> Active
+                             @if(old('is_active', $domain->is_active)) checked @endif> {{ __('admin/domains.active') }}
                     </label>
                     <label class="btn btn-primary @if(!old('is_active', $domain->is_active)) active @endif">
                       <input type="radio" name="is_active" value="0" 
-                             @if(!old('is_active', $domain->is_active)) checked @endif> Inactive
+                             @if(!old('is_active', $domain->is_active)) checked @endif> {{ __('admin/domains.inactive') }}
                     </label>
                   </div>
-                  <p class="text-muted small">Whether this domain should be available for subdomain creation.</p>
+                  <p class="text-muted small">{{ __('admin/domains.status_help') }}</p>
                 </div>
               </div>
               <div class="form-group col-md-4">
-                <label class="control-label">Default Domain</label>
+                <label class="control-label">{{ __('admin/domains.default_domain') }}</label>
                 <div>
                   <div class="btn-group" data-toggle="buttons">
                     <label class="btn btn-primary @if(old('is_default', $domain->is_default)) active @endif">
                       <input type="radio" name="is_default" value="1"
-                             @if(old('is_default', $domain->is_default)) checked @endif> Yes
+                             @if(old('is_default', $domain->is_default)) checked @endif> {{ __('strings.yes') }}
                     </label>
                     <label class="btn btn-primary @if(!old('is_default', $domain->is_default)) active @endif">
                       <input type="radio" name="is_default" value="0"
-                             @if(!old('is_default', $domain->is_default)) checked @endif> No
+                             @if(!old('is_default', $domain->is_default)) checked @endif> {{ __('strings.no') }}
                     </label>
                   </div>
-                  <p class="text-muted small">Whether this domain should be used as the default for automatic subdomain generation.</p>
+                  <p class="text-muted small">{{ __('admin/domains.default_help') }}</p>
                 </div>
               </div>
               <div class="form-group col-md-4">
-                <label class="control-label">Active Subdomains</label>
+                <label class="control-label">{{ __('admin/domains.active_subdomains') }}</label>
                 <div>
                   <p class="form-control-static">
                     <span class="label label-default">{{ $domain->serverSubdomains->where('is_active', true)->count() }}</span>
-                    subdomain(s) currently using this domain
+                    {{ __('admin/domains.subdomains_using') }}
                   </p>
                 </div>
               </div>
@@ -118,10 +118,10 @@
             {{ csrf_field() }}
             @method('PATCH')
             <button type="button" id="test-connection" class="btn btn-sm btn-info" disabled>
-              <i class="fa fa-refresh fa-spin" style="display: none;"></i> Test Connection
+              <i class="fa fa-refresh fa-spin" style="display: none;"></i> {{ __('admin/domains.test_connection') }}
             </button>
-            <a href="{{ route('admin.settings.domains.index') }}" class="btn btn-sm btn-default">Cancel</a>
-            <button type="submit" class="btn btn-sm btn-success pull-right">Update Domain</button>
+            <a href="{{ route('admin.settings.domains.index') }}" class="btn btn-sm btn-default">{{ __('strings.cancel') }}</a>
+            <button type="submit" class="btn btn-sm btn-success pull-right">{{ __('admin/domains.edit_submit') }}</button>
           </div>
         </div>
       </form>
@@ -184,13 +184,13 @@
           if (response.success) {
             swal({
               type: 'success',
-              title: 'Connection Successful',
+              title: @js(__('admin/domains.connection_successful_title')),
               text: response.message
             });
           } else {
             swal({
               type: 'error',
-              title: 'Connection Failed',
+              title: @js(__('admin/domains.connection_failed_title')),
               text: response.message
             });
           }
@@ -199,8 +199,8 @@
           const response = xhr.responseJSON || {};
           swal({
             type: 'error',
-            title: 'Connection Failed',
-            text: response.message || 'An unexpected error occurred.'
+            title: @js(__('admin/domains.connection_failed_title')),
+            text: response.message || @js(__('admin/domains.unexpected_error'))
           });
         })
         .always(function() {

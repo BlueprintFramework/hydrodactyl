@@ -15,6 +15,8 @@ import {
 import type { ComponentType, LazyExoticComponent, SVGProps } from 'react';
 import { lazy } from 'react';
 
+import type { TranslationKey } from '@/i18n/types';
+
 // Every route-level page container is lazy-loaded so each screen is split into
 // its own chunk and only fetched when that route is actually visited.
 const AccountApiContainer = lazy(() => import('@/components/dashboard/AccountApiContainer'));
@@ -59,7 +61,7 @@ interface RouteDefinition {
     path?: string;
     // If undefined is passed this route is still rendered into the router itself
     // but no navigation link is displayed in the sub-navigation menu.
-    name: string | undefined;
+    name: TranslationKey | undefined;
     component: RouteComponent;
     end?: boolean;
 }
@@ -106,26 +108,26 @@ const routes: Routes = {
         {
             route: '',
             path: '',
-            name: 'Account',
+            name: 'navigation.account',
             component: AccountOverviewContainer,
             end: true,
         },
         {
             route: 'api',
             path: 'api',
-            name: 'API Credentials',
+            name: 'navigation.api_credentials',
             component: AccountApiContainer,
         },
         {
             route: 'ssh',
             path: 'ssh',
-            name: 'SSH Keys',
+            name: 'navigation.ssh_keys',
             component: AccountSSHContainer,
         },
         {
             route: 'activity',
             path: 'activity',
-            name: 'Activity',
+            name: 'navigation.activity',
             component: ActivityLogContainer,
         },
     ],
@@ -134,7 +136,7 @@ const routes: Routes = {
             route: '',
             path: '',
             permission: null,
-            name: 'Home',
+            name: 'navigation.home',
             component: ServerConsoleContainer,
             icon: House,
             end: true,
@@ -143,7 +145,7 @@ const routes: Routes = {
             route: 'files/*',
             path: 'files',
             permission: 'file.*',
-            name: 'Files',
+            name: 'navigation.files',
             component: FileManagerContainer,
             icon: FolderOpen,
             highlightPatterns: [/^\/server\/[^/]+\/files(\/.*)?$/],
@@ -159,7 +161,7 @@ const routes: Routes = {
             route: 'databases/*',
             path: 'databases',
             permission: 'database.*',
-            name: 'Databases',
+            name: 'navigation.databases',
             component: DatabasesContainer,
             icon: Database,
             featureLimit: 'databases',
@@ -169,7 +171,7 @@ const routes: Routes = {
             route: 'backups/*',
             path: 'backups',
             permission: 'backup.*',
-            name: 'Backups',
+            name: 'navigation.backups',
             component: BackupContainer,
             icon: CloudArrowUpIn,
             featureLimit: 'backups',
@@ -179,7 +181,7 @@ const routes: Routes = {
             route: 'network/*',
             path: 'network',
             permission: 'allocation.*',
-            name: 'Networking',
+            name: 'navigation.networking',
             component: NetworkContainer,
             icon: BranchesDown,
             featureLimit: 'network',
@@ -189,7 +191,7 @@ const routes: Routes = {
             route: 'users/*',
             path: 'users',
             permission: 'user.*',
-            name: 'Users',
+            name: 'navigation.users',
             component: UsersContainer,
             icon: Persons,
             end: true,
@@ -212,7 +214,7 @@ const routes: Routes = {
             route: 'startup/*',
             path: 'startup',
             permission: ['startup.read', 'startup.update', 'startup.docker-image'],
-            name: 'Startup',
+            name: 'navigation.startup',
             component: StartupContainer,
             icon: Terminal,
             end: true,
@@ -221,7 +223,7 @@ const routes: Routes = {
             route: 'schedules/*',
             path: 'schedules',
             permission: 'schedule.*',
-            name: 'Schedules',
+            name: 'navigation.schedules',
             component: ScheduleContainer,
             icon: ClockArrowRotateLeft,
             highlightPatterns: [/^\/server\/[^/]+\/schedules(\/\d+)?$/],
@@ -237,7 +239,7 @@ const routes: Routes = {
             route: 'settings/*',
             path: 'settings',
             permission: ['settings.*', 'file.sftp'],
-            name: 'Settings',
+            name: 'navigation.settings',
             component: SettingsContainer,
             icon: Gear,
             end: true,
@@ -246,7 +248,7 @@ const routes: Routes = {
             route: 'activity/*',
             path: 'activity',
             permission: 'activity.*',
-            name: 'Activity',
+            name: 'navigation.activity',
             component: ServerActivityLogContainer,
             icon: PencilToLine,
             end: true,
@@ -255,7 +257,7 @@ const routes: Routes = {
             route: 'shell/*',
             path: 'shell',
             permission: 'startup.software',
-            name: 'Software',
+            name: 'navigation.software',
             component: SoftwareContainer,
             icon: Box,
             end: true,
@@ -264,7 +266,7 @@ const routes: Routes = {
             route: 'installer/*',
             path: 'installer',
             permission: 'mod.download',
-            name: 'Installer',
+            name: 'navigation.installer',
             component: InstallerContainer,
             icon: ArrowDownToLine,
             end: true,

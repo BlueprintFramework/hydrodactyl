@@ -1,5 +1,5 @@
 import { Form, Formik, Field as FormikField, type FormikHelpers, useFormikContext } from 'formik';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { boolean, object, string } from 'yup';
 import Can from '@/components/elements/Can';
 import Field from '@/components/elements/Field';
@@ -10,6 +10,7 @@ import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import Spinner from '@/components/elements/Spinner';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 
 interface BackupValues {
@@ -23,28 +24,24 @@ interface CreateBackupModalProps extends RequiredModalProps {
 }
 
 const ModalContent = ({ ...props }: RequiredModalProps) => {
+    const { t } = useTranslation();
     const { isSubmitting } = useFormikContext<BackupValues>();
 
     return (
-        <Modal {...props} showSpinnerOverlay={isSubmitting} title='Create server backup'>
+        <Modal {...props} showSpinnerOverlay={isSubmitting} title={t('server.backups.create_title')}>
             <Form>
                 <FlashMessageRender byKey={'backups:create'} />
                 <Field
                     name={'name'}
-                    label={'Backup name'}
-                    description={'If provided, the name that should be used to reference this backup.'}
+                    label={t('server.backups.backup_name_label')}
+                    description={t('server.backups.backup_name_description')}
                 />
                 <div className={`mt-6 flex flex-col`}>
                     <FormikFieldWrapper
                         className='flex flex-col gap-2'
                         name={'ignored'}
-                        label={'Ignored Files & Directories'}
-                        description={`
-              Enter the files or folders to ignore while generating this backup. Leave blank to use
-              the contents of the .pteroignore file in the root of the server directory if present.
-              Wildcard matching of files and folders is supported in addition to negating a rule by
-              prefixing the path with an exclamation point.
-            `}
+                        label={t('server.backups.ignored_label')}
+                        description={t('server.backups.ignored_description')}
                     >
                         <FormikField
                             as={Textarea}
@@ -58,15 +55,15 @@ const ModalContent = ({ ...props }: RequiredModalProps) => {
                     <div className={`my-6`}>
                         <FormikSwitchV2
                             name={'isLocked'}
-                            label={'Locked'}
-                            description={'Prevents this backup from being deleted until explicitly unlocked.'}
+                            label={t('server.backups.locked_label')}
+                            description={t('server.backups.locked_description')}
                         />
                     </div>
                 </Can>
                 <div className={`flex justify-end mb-6`}>
                     <Button variant='attention' type={'submit'} disabled={isSubmitting}>
                         {isSubmitting && <Spinner size='small' />}
-                        {isSubmitting ? 'Creating backup...' : 'Start backup'}
+                        {isSubmitting ? t('server.backups.creating') : t('server.backups.start_backup')}
                     </Button>
                 </div>
             </Form>
@@ -76,6 +73,17 @@ const ModalContent = ({ ...props }: RequiredModalProps) => {
 
 const CreateBackupModal = ({ visible, onDismissed, onSubmit }: CreateBackupModalProps) => {
     const { clearFlashes } = useFlash();
+    const { t } = useTranslation();
+
+    const schema = useMemo(
+        () =>
+            object().shape({
+                name: string().max(191, t('common.max_length', { max: 191 })),
+                ignored: string(),
+                isLocked: boolean(),
+            }),
+        [t],
+    );
 
     useEffect(() => {
         clearFlashes('backups:create');
@@ -85,11 +93,7 @@ const CreateBackupModal = ({ visible, onDismissed, onSubmit }: CreateBackupModal
         <Formik
             onSubmit={onSubmit}
             initialValues={{ name: '', ignored: '', isLocked: false }}
-            validationSchema={object().shape({
-                name: string().max(191),
-                ignored: string(),
-                isLocked: boolean(),
-            })}
+            validationSchema={schema}
         >
             <ModalContent visible={visible} onDismissed={onDismissed} />
         </Formik>

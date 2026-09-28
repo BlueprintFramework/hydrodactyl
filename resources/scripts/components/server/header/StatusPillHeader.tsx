@@ -1,8 +1,10 @@
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 import { ServerContext } from '@/state/server';
 
 export const StatusPillHeader = () => {
+    const { t } = useTranslation();
     const status = ServerContext.useStoreState((state) => state.status.value);
 
     return (
@@ -21,14 +23,14 @@ export const StatusPillHeader = () => {
             ></div>
             <div className={`text-sm font-bold hidden`}>
                 {status === 'offline'
-                    ? 'Offline'
+                    ? t('server.status.offline')
                     : status === 'running'
-                      ? 'Online'
+                      ? t('server.status.online')
                       : status === 'stopping'
-                        ? 'Stopping'
+                        ? t('server.status.stopping')
                         : status === 'starting'
-                          ? 'Starting'
-                          : 'Fetching'}
+                          ? t('server.status.starting')
+                          : t('server.status.fetching')}
             </div>
         </div>
     );

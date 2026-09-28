@@ -5,6 +5,7 @@ import deleteSchedule from '@/api/server/schedules/deleteSchedule';
 import { Dialog } from '@/components/elements/dialog';
 import { Button } from '@/components/ui/button';
 
+import { useTranslation } from '@/i18n/I18nProvider';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const DeleteScheduleButton = ({ scheduleId, onDeleted }: Props) => {
+    const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
@@ -41,15 +43,15 @@ const DeleteScheduleButton = ({ scheduleId, onDeleted }: Props) => {
             <Dialog.Confirm
                 open={visible}
                 onClose={() => setVisible(false)}
-                title={'Delete Schedule'}
-                confirm={'Delete'}
+                title={t('server.schedules.delete_title')}
+                confirm={t('common.delete')}
                 onConfirmed={onDelete}
                 loading={isLoading}
             >
-                All tasks will be removed and any running processes will be terminated.
+                {t('server.schedules.delete_confirm')}
             </Dialog.Confirm>
             <Button variant='destructive' className={'flex-1 sm:flex-none'} onClick={() => setVisible(true)}>
-                Delete
+                {t('common.delete')}
             </Button>
         </>
     );

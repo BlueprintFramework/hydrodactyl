@@ -1,6 +1,6 @@
 import { Database, Plus } from '@gravity-ui/icons';
 import { Form, Formik, type FormikHelpers } from 'formik';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
 import createServerDatabase from '@/api/server/databases/createServerDatabase';
@@ -14,6 +14,7 @@ import FlashMessageRender from '@/components/FlashMessageRender';
 import DatabaseRow from '@/components/server/databases/DatabaseRow';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useDeepMemoize } from '@/plugins/useDeepMemoize';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
@@ -23,19 +24,8 @@ interface DatabaseValues {
     connectionsFrom: string;
 }
 
-const databaseSchema = object().shape({
-    databaseName: string()
-        .required('A database name must be provided.')
-        .min(3, 'Database name must be at least 3 characters.')
-        .max(48, 'Database name must not exceed 48 characters.')
-        .matches(
-            /^[\w\-.]{3,48}$/,
-            'Database name should only contain alphanumeric characters, underscores, dashes, and/or periods.',
-        ),
-    connectionsFrom: string().matches(/^[\w\-/.%:]+$/, 'A valid host address must be provided.'),
-});
-
 const DatabasesContainer = () => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const databaseLimit = ServerContext.useStoreState((state) => state.server.data?.featureLimits.databases);
 
@@ -46,6 +36,19 @@ const DatabasesContainer = () => {
     const databases = useDeepMemoize(ServerContext.useStoreState((state) => state.databases.data));
     const setDatabases = ServerContext.useStoreActions((state) => state.databases.setDatabases);
     const appendDatabase = ServerContext.useStoreActions((actions) => actions.databases.appendDatabase);
+
+    const databaseSchema = useMemo(
+        () =>
+            object().shape({
+                databaseName: string()
+                    .required(t('server.databases.name_required'))
+                    .min(3, t('server.databases.name_min'))
+                    .max(48, t('server.databases.name_max'))
+                    .matches(/^[\w\-.]{3,48}$/, t('server.databases.name_format')),
+                connectionsFrom: string().matches(/^[\w\-./%:]+$/, t('server.databases.host_invalid')),
+            }),
+        [t],
+    );
 
     const submitDatabase = (values: DatabaseValues, { setSubmitting, resetForm }: FormikHelpers<DatabaseValues>) => {
         clearFlashes('database:create');
@@ -79,7 +82,7 @@ const DatabasesContainer = () => {
     }, [clearFlashes, uuid, setDatabases, databases.length, addError]);
 
     return (
-        <ServerContentBlock className='p-0!' title={'Databases'} showFlashKey={'databases'}>
+        <ServerContentBlock className='p-0!' title={t('server.databases.title')} showFlashKey={'databases'}>
             <ServerHeader />
             <div className='px-2 pt-2 sm:px-14 sm:pt-14 flex flex-col sm:flex-row items-center gap-4'>
                 {(databaseLimit === null || (databaseLimit > 0 && databaseLimit !== databases.length)) && (
@@ -90,22 +93,22 @@ const DatabasesContainer = () => {
                             className='flex items-center gap-2'
                         >
                             <Plus width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                            New Database
+                            {t('server.databases.new_database')}
                         </Button>
                     </Can>
                 )}
                 {databaseLimit === null && (
                     <p className='text-sm text-zinc-300 text-center sm:text-right'>
-                        {databases.length} databases (unlimited)
+                        {t('server.databases.unlimited_count', { count: databases.length })}
                     </p>
                 )}
                 {databaseLimit > 0 && (
                     <p className='text-sm text-zinc-300 text-center sm:text-right'>
-                        {databases.length} of {databaseLimit} databases
+                        {t('server.databases.count_of_limit', { count: databases.length, limit: databaseLimit ?? 0 })}
                     </p>
                 )}
                 {databaseLimit === 0 && (
-                    <p className='text-sm text-red-400 text-center sm:text-right'>Databases disabled</p>
+                    <p className='text-sm text-red-400 text-center sm:text-right'>{t('server.databases.disabled')}</p>
                 )}
             </div>
             <Formik
@@ -122,7 +125,7 @@ const DatabasesContainer = () => {
                             resetForm();
                             setCreateModalVisible(false);
                         }}
-                        title='Create new database'
+                        title={t('server.databases.create_title')}
                     >
                         <div className='flex flex-col'>
                             <FlashMessageRender byKey={'database:create'} />
@@ -131,23 +134,21 @@ const DatabasesContainer = () => {
                                     type={'string'}
                                     id={'database_name'}
                                     name={'databaseName'}
-                                    label={'Database Name'}
-                                    description={'A descriptive name for your database instance.'}
+                                    label={t('server.databases.name_label')}
+                                    description={t('server.databases.name_description')}
                                 />
                                 <div className={`mt-6`}>
                                     <Field
                                         type={'string'}
                                         id={'connections_from'}
                                         name={'connectionsFrom'}
-                                        label={'Connections From'}
-                                        description={
-                                            'Where connections should be allowed from. Leave blank to allow connections from anywhere.'
-                                        }
+                                        label={t('server.databases.connections_from_label')}
+                                        description={t('server.databases.connections_from_description')}
                                     />
                                 </div>
                                 <div className={`flex gap-3 justify-end my-6`}>
                                     <Button variant='attention' type={'submit'}>
-                                        Create Database
+                                        {t('server.databases.create_confirm')}
                                     </Button>
                                 </div>
                             </Form>
@@ -176,12 +177,14 @@ const DatabasesContainer = () => {
                             <Database className='w-8 h-8 text-zinc-400' fill='currentColor' />
                         </div>
                         <h3 className='text-lg font-medium text-zinc-200 mb-2'>
-                            {databaseLimit === 0 ? 'Databases unavailable' : 'No databases found'}
+                            {databaseLimit === 0
+                                ? t('server.databases.unavailable_title')
+                                : t('server.databases.empty_title')}
                         </h3>
                         <p className='text-sm text-zinc-400 max-w-sm'>
                             {databaseLimit === 0
-                                ? 'Databases cannot be created for this server.'
-                                : 'Your server does not have any databases. Create one to get started.'}
+                                ? t('server.databases.unavailable_description')
+                                : t('server.databases.empty_description')}
                         </p>
                     </div>
                 </div>

@@ -13,11 +13,13 @@ import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { useFlashKey } from '@/plugins/useFlash';
 import useLocationHash from '@/plugins/useLocationHash';
 
 const ServerActivityLogContainer = () => {
+    const { t } = useTranslation();
     const { hash } = useLocationHash();
     const { clearAndAddHttpError } = useFlashKey('server:activity');
     const [filters, setFilters] = useState<ActivityLogFilters>({
@@ -91,12 +93,18 @@ const ServerActivityLogContainer = () => {
         if (!filteredData?.items) return;
 
         const csvContent = [
-            ['Timestamp', 'Event', 'Actor', 'IP Address', 'Properties'].join(','),
+            [
+                t('server.activity.csv_timestamp'),
+                t('server.activity.csv_event'),
+                t('server.activity.csv_actor'),
+                t('server.activity.csv_ip_address'),
+                t('server.activity.csv_properties'),
+            ].join(','),
             ...filteredData.items.map((item) =>
                 [
                     new Date(item.timestamp).toISOString(),
                     item.event,
-                    item.relationships.actor?.username || 'System',
+                    item.relationships.actor?.username || t('server.activity.system'),
                     item.ip || '',
                     JSON.stringify(item.properties).replace(/"/g, '""'),
                 ]
@@ -158,7 +166,7 @@ const ServerActivityLogContainer = () => {
     }, [error, clearAndAddHttpError]);
 
     return (
-        <ServerContentBlock title={'Activity Log'} showFlashKey={'activity'}>
+        <ServerContentBlock title={t('server.activity.title')} showFlashKey={'activity'}>
             <ServerHeader />
             <div className='w-full h-full min-h-full flex-1 flex flex-col px-2 sm:px-0'>
                 <FlashMessageRender byKey={'server:activity'} />
@@ -174,17 +182,17 @@ const ServerActivityLogContainer = () => {
                     >
                         <MainPageHeader
                             direction='column'
-                            title={'Activity Log'}
+                            title={t('server.activity.title')}
                             titleChildren={
                                 <div className='flex gap-2 items-center flex-wrap'>
                                     <Button
                                         variant='secondary'
                                         onClick={() => setShowFilters(!showFilters)}
                                         className='flex items-center gap-2'
-                                        title='Toggle Filters (Ctrl+F)'
+                                        title={t('server.activity.toggle_filters')}
                                     >
                                         <Funnel width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                                        Filters
+                                        {t('server.activity.filters')}
                                         {hasActiveFilters && <span className='w-2 h-2 bg-brand rounded-full'></span>}
                                     </Button>
                                     <Button
@@ -192,7 +200,7 @@ const ServerActivityLogContainer = () => {
                                         onClick={exportLogs}
                                         disabled={!filteredData?.items?.length}
                                         className='flex items-center gap-2'
-                                        title='Export CSV (Ctrl+E)'
+                                        title={t('server.activity.export_csv')}
                                     >
                                         <ArrowDownToLine
                                             width={22}
@@ -200,14 +208,13 @@ const ServerActivityLogContainer = () => {
                                             className='w-4 h-4'
                                             fill='currentColor'
                                         />
-                                        Export
+                                        {t('server.activity.export')}
                                     </Button>
                                 </div>
                             }
                         >
                             <p className='text-sm text-neutral-400 leading-relaxed'>
-                                Monitor all server activity and track user actions. Filter events, search for specific
-                                activities, and export logs for audit purposes.
+                                {t('server.activity.description')}
                             </p>
                         </MainPageHeader>
                     </div>
@@ -233,7 +240,9 @@ const ServerActivityLogContainer = () => {
                                             fill='currentColor'
                                         />
                                     </div>
-                                    <h3 className='text-base font-semibold text-zinc-100'>Filters</h3>
+                                    <h3 className='text-base font-semibold text-zinc-100'>
+                                        {t('server.activity.filters')}
+                                    </h3>
                                 </div>
 
                                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -242,7 +251,7 @@ const ServerActivityLogContainer = () => {
                                             htmlFor='server-activity-search'
                                             className='block text-sm font-medium text-zinc-300 mb-2'
                                         >
-                                            Search
+                                            {t('common.search')}
                                         </label>
                                         <div className='relative'>
                                             <Magnifier
@@ -254,7 +263,7 @@ const ServerActivityLogContainer = () => {
                                             <Input.Text
                                                 id='server-activity-search'
                                                 type='text'
-                                                placeholder='Search events, IPs, users...'
+                                                placeholder={t('server.activity.search_placeholder')}
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
                                                 style={{ paddingLeft: '2.5rem' }}
@@ -267,7 +276,7 @@ const ServerActivityLogContainer = () => {
                                             htmlFor='server-activity-event-type'
                                             className='block text-sm font-medium text-zinc-300 mb-2'
                                         >
-                                            Event Type
+                                            {t('server.activity.event_type')}
                                         </label>
                                         <Select
                                             id='server-activity-event-type'
@@ -276,7 +285,7 @@ const ServerActivityLogContainer = () => {
                                             className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-brand focus:ring-1 focus:ring-brand hover:border-zinc-500 transition-colors duration-150'
                                         >
                                             <option value='' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                                All Events
+                                                {t('server.activity.all_events')}
                                             </option>
                                             {eventTypes.map((type) => (
                                                 <option
@@ -295,7 +304,7 @@ const ServerActivityLogContainer = () => {
                                             htmlFor='server-activity-time-range'
                                             className='block text-sm font-medium text-zinc-300 mb-2'
                                         >
-                                            Time Range
+                                            {t('server.activity.time_range')}
                                         </label>
                                         <Select
                                             id='server-activity-time-range'
@@ -307,25 +316,25 @@ const ServerActivityLogContainer = () => {
                                                 value='all'
                                                 style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
                                             >
-                                                All Time
+                                                {t('server.activity.all_time')}
                                             </option>
                                             <option value='1h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                                Last Hour
+                                                {t('server.activity.last_hour')}
                                             </option>
                                             <option
                                                 value='24h'
                                                 style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
                                             >
-                                                Last 24 Hours
+                                                {t('server.activity.last_24_hours')}
                                             </option>
                                             <option value='7d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                                Last 7 Days
+                                                {t('server.activity.last_7_days')}
                                             </option>
                                             <option
                                                 value='30d'
                                                 style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
                                             >
-                                                Last 30 Days
+                                                {t('server.activity.last_30_days')}
                                             </option>
                                         </Select>
                                     </div>
@@ -338,7 +347,7 @@ const ServerActivityLogContainer = () => {
                                                 className='flex items-center gap-2 w-full'
                                             >
                                                 <Xmark width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                                                Clear All Filters
+                                                {t('server.activity.clear_filters')}
                                             </Button>
                                         )}
                                     </div>
@@ -365,11 +374,17 @@ const ServerActivityLogContainer = () => {
                                         fill='currentColor'
                                     />
                                 </div>
-                                <h3 className='text-base font-semibold text-zinc-100'>Events</h3>
+                                <h3 className='text-base font-semibold text-zinc-100'>
+                                    {t('server.activity.events_title')}
+                                </h3>
                                 {filteredData?.items && (
                                     <span className='text-sm text-zinc-400'>
-                                        ({filteredData.items.length}{' '}
-                                        {filteredData.items.length === 1 ? 'event' : 'events'})
+                                        {t(
+                                            filteredData.items.length === 1
+                                                ? 'server.activity.events_count_one'
+                                                : 'server.activity.events_count_other',
+                                            { count: filteredData.items.length },
+                                        )}
                                     </span>
                                 )}
                             </div>
@@ -379,20 +394,22 @@ const ServerActivityLogContainer = () => {
                             ) : !filteredData?.items?.length ? (
                                 <div className='text-center py-12'>
                                     <h3 className='text-lg font-semibold text-zinc-300 mb-2'>
-                                        {hasActiveFilters ? 'No Matching Activity' : 'No Server Activity Yet'}
+                                        {hasActiveFilters
+                                            ? t('server.activity.empty_filtered_title')
+                                            : t('server.activity.empty_title')}
                                     </h3>
                                     <p className='text-sm text-zinc-400 mb-4 max-w-lg mx-auto leading-relaxed'>
                                         {hasActiveFilters
-                                            ? "Try adjusting your filters or search terms to find the activity you're looking for."
-                                            : 'Server activity logs will appear here as you manage your server. Start your server or perform actions to see them here.'}
+                                            ? t('server.activity.empty_filtered_description')
+                                            : t('server.activity.empty_description')}
                                     </p>
                                     {hasActiveFilters && (
                                         <div className='flex gap-2 justify-center'>
                                             <Button variant='secondary' onClick={clearAllFilters}>
-                                                Clear All Filters
+                                                {t('server.activity.clear_filters')}
                                             </Button>
                                             <Button variant='secondary' onClick={() => setShowFilters(true)}>
-                                                Adjust Filters
+                                                {t('server.activity.adjust_filters')}
                                             </Button>
                                         </div>
                                     )}

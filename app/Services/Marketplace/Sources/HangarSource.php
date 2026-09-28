@@ -138,7 +138,7 @@ class HangarSource extends AbstractMarketplaceSource
     {
         $namespace = $this->namespace($projectId);
         if ($namespace === null) {
-            throw MarketplaceException::upstream($this->key(), 'Invalid project namespace.');
+            throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.invalid_project_namespace'));
         }
 
         // Reuse the version list to discover which platforms this version

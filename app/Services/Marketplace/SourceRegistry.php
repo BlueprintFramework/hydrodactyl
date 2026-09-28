@@ -53,7 +53,7 @@ class SourceRegistry
     {
         $source = $this->get($key);
         if ($source === null) {
-            throw MarketplaceException::upstream($key, 'This marketplace source is not enabled.');
+            throw MarketplaceException::upstream($key, __('exceptions.client.marketplace.source_disabled'));
         }
 
         return $source;

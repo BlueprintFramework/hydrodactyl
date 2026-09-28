@@ -60,9 +60,9 @@ class StartupController extends ClientApiController
         $original = $variable->server_value;
 
         if (is_null($variable) || !$variable->user_viewable) {
-            throw new BadRequestHttpException('The environment variable you are trying to edit does not exist.');
+            throw new BadRequestHttpException(__('exceptions.client.startup.variable_missing'));
         } elseif (!$variable->user_editable) {
-            throw new BadRequestHttpException('The environment variable you are trying to edit is read-only.');
+            throw new BadRequestHttpException(__('exceptions.client.startup.variable_read_only'));
         }
 
         // Revalidate the variable value using the egg variable specific validation rules for it.

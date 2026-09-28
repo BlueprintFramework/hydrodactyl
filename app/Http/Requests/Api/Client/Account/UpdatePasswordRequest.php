@@ -22,7 +22,7 @@ class UpdatePasswordRequest extends ClientApiRequest
 
         // Verify password matches when changing password or email.
         if (!$hasher->check($this->input('current_password'), $this->user()->password)) {
-            throw new InvalidPasswordProvidedException(trans('validation.internal.invalid_password'));
+            throw new InvalidPasswordProvidedException(__('validation.internal.invalid_password'));
         }
 
         return true;

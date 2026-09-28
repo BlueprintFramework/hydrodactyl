@@ -137,7 +137,7 @@ public function index(Request $request): View
             ->setUserLevel(User::USER_LEVEL_ADMIN)
             ->handle($user, $request->normalize());
 
-        $this->alert->success(trans('admin/user.notices.account_updated'))->flash();
+        $this->alert->success(__('admin/user.notices.account_updated'))->flash();
 
         return redirect()->route('admin.users.view', $user->id);
     }

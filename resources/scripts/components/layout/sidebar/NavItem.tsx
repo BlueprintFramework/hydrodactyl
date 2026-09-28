@@ -21,7 +21,7 @@ const NavItem = memo(({ to, icon, text, itemRef, end, permission, onNavClick }: 
     const content = (
         <>
             <HugeiconsIcon className='nav-icon size-5 shrink-0 transition-transform' strokeWidth={2} icon={icon} />
-            <p className='nav-text text-sm text-nowrap transition-transform'>{text}</p>
+            <p className='nav-text min-w-0 truncate text-sm transition-transform'>{text}</p>
         </>
     );
     const navLink = isExternal ? (
@@ -33,11 +33,20 @@ const NavItem = memo(({ to, icon, text, itemRef, end, permission, onNavClick }: 
             onClick={onNavClick}
             target='_blank'
             rel='noreferrer'
+            title={text}
         >
             {content}
         </a>
     ) : (
-        <NavLink to={to} end={end} className={className} ref={itemRef} draggable={false} onClick={onNavClick}>
+        <NavLink
+            to={to}
+            end={end}
+            className={className}
+            ref={itemRef}
+            draggable={false}
+            onClick={onNavClick}
+            title={text}
+        >
             {content}
         </NavLink>
     );

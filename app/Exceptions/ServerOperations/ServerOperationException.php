@@ -19,7 +19,7 @@ class ServerOperationException extends Exception
      */
     public static function serverBusy(string $serverUuid): self
     {
-        return new self("Server {$serverUuid} is currently busy and cannot accept new operations.");
+        return new self(__('exceptions.operations.server_busy', ['server' => $serverUuid]));
     }
 
     /**
@@ -27,7 +27,7 @@ class ServerOperationException extends Exception
      */
     public static function operationTimedOut(string $operationId): self
     {
-        return new self("Operation {$operationId} has timed out.");
+        return new self(__('exceptions.operations.timed_out', ['operation' => $operationId]));
     }
 
     /**
@@ -35,7 +35,7 @@ class ServerOperationException extends Exception
      */
     public static function invalidOperationState(string $operationId, string $currentState): self
     {
-        return new self("Operation {$operationId} is in an invalid state: {$currentState}");
+        return new self(__('exceptions.operations.invalid_state', ['operation' => $operationId, 'state' => $currentState]));
     }
 
     /**
@@ -43,7 +43,7 @@ class ServerOperationException extends Exception
      */
     public static function operationNotFound(string $operationId): self
     {
-        return new self("Operation {$operationId} was not found.");
+        return new self(__('exceptions.operations.not_found', ['operation' => $operationId]));
     }
 
     /**
@@ -52,6 +52,6 @@ class ServerOperationException extends Exception
     public static function rateLimitExceeded(string $operationType, int $windowSeconds): self
     {
         $minutes = ceil($windowSeconds / 60);
-        return new self("Rate limit exceeded for {$operationType} operations. Please wait {$minutes} minutes before trying again.");
+        return new self(__('exceptions.operations.rate_limited', ['type' => $operationType, 'minutes' => $minutes]));
     }
 }

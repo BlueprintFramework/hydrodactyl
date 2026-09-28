@@ -1,22 +1,29 @@
 import { Xmark } from '@gravity-ui/icons';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import Code from '@/components/elements/Code';
-import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
+import { Dialog, type DialogProps, DialogWrapperContext } from '@/components/elements/dialog';
 import { Button } from '@/components/ui/button';
 
 import asDialog from '@/hoc/asDialog';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { ServerContext } from '@/state/server';
 
 // TODO: Make it more pretty
 const CircleProgress = ({ progress, className }: { progress: number; className?: string }) => {
+    const { t } = useTranslation();
     const radius = 12;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (progress / 100) * circumference;
 
     return (
-        <svg className={className} viewBox='0 0 32 32' role='img' aria-label={`${progress.toFixed(0)}% complete`}>
+        <svg
+            className={className}
+            viewBox='0 0 32 32'
+            role='img'
+            aria-label={t('server.files.progress_complete', { percent: progress.toFixed(0) })}
+        >
             <circle
                 stroke='currentColor'
                 strokeWidth='4'
@@ -44,6 +51,7 @@ const CircleProgress = ({ progress, className }: { progress: number; className?:
 };
 
 const FileUploadList = () => {
+    const { t } = useTranslation();
     const { close } = useContext(DialogWrapperContext);
     const cancelFileUpload = ServerContext.useStoreActions((actions) => actions.files.cancelFileUpload);
     const clearFileUploads = ServerContext.useStoreActions((actions) => actions.files.clearFileUploads);
@@ -91,7 +99,7 @@ const FileUploadList = () => {
                                     className='px-2 py-1 text-sm bg-gray-800 text-red-400 rounded shadow-lg z-9999'
                                     sideOffset={5}
                                 >
-                                    Cancel
+                                    {t('common.cancel')}
                                     <Tooltip.Arrow className='fill-gray-800' />
                                 </Tooltip.Content>
                             </Tooltip.Portal>
@@ -100,10 +108,10 @@ const FileUploadList = () => {
                 ))}
                 <Dialog.Footer>
                     <Button variant='destructive' onClick={() => clearFileUploads()}>
-                        Cancel Uploads
+                        {t('server.files.cancel_uploads')}
                     </Button>
                     <Button variant='secondary' onClick={close}>
-                        Close
+                        {t('common.close')}
                     </Button>
                 </Dialog.Footer>
             </div>
@@ -111,12 +119,22 @@ const FileUploadList = () => {
     );
 };
 
-const FileUploadListDialog = asDialog({
-    title: 'File Uploads',
-    description: 'The following files are being uploaded to your server.',
-})(FileUploadList);
+const FileUploadListDialog = ({ open, onClose }: DialogProps) => {
+    const { t } = useTranslation();
+    const DialogComponent = useMemo(
+        () =>
+            asDialog({
+                title: t('server.files.uploads_title'),
+                description: t('server.files.uploads_description'),
+            })(FileUploadList),
+        [t],
+    );
+
+    return <DialogComponent open={open} onClose={onClose} />;
+};
 
 const FileManagerStatus = () => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
 
     const count = ServerContext.useStoreState((state) => Object.keys(state.files.uploads).length);
@@ -169,7 +187,7 @@ const FileManagerStatus = () => {
                             className='px-2 py-1 text-sm bg-gray-800 text-gray-100 rounded shadow-lg'
                             sideOffset={5}
                         >
-                            {`${count} files are uploading, click to view`}
+                            {t('server.files.uploading_status', { count })}
                         </Tooltip.Content>
                     </Tooltip.Portal>
                 </Tooltip.Root>

@@ -2,14 +2,14 @@
 @include('partials/admin.settings.nav', ['activeTab' => 'captcha'])
 
 @section('title')
-  Captcha Settings
+  {{ __('admin/settings.captcha.title') }}
 @endsection
 
 @section('content-header')
-  <h1>Captcha Settings<small>Configure captcha protection for authentication forms.</small></h1>
+  <h1>{{ __('admin/settings.captcha.title') }}<small>{{ __('admin/settings.captcha.subtitle') }}</small></h1>
   <ol class="breadcrumb">
-    <li><a href="{{ route('admin.index') }}">Admin</a></li>
-    <li class="active">Settings</li>
+    <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+    <li class="active">{{ __('admin/navigation.breadcrumb.settings') }}</li>
   </ol>
 @endsection
 
@@ -20,19 +20,19 @@
       <form action="{{ route('admin.settings.captcha') }}" method="POST">
         <div class="box">
           <div class="box-header with-border">
-            <h3 class="box-title">Captcha Provider</h3>
+            <h3 class="box-title">{{ __('admin/settings.captcha.provider_box') }}</h3>
           </div>
           <div class="box-body">
             <div class="row">
               <div class="form-group col-md-4">
-                <label class="control-label">Provider</label>
+                <label class="control-label">{{ __('admin/settings.captcha.provider') }}</label>
                 <div>
                   <select name="pterodactyl:captcha:provider" class="form-control" id="captcha-provider">
                     @foreach($providers as $key => $name)
                       <option value="{{ $key }}" @if(old('pterodactyl:captcha:provider', config('pterodactyl.captcha.provider', 'none')) === $key) selected @endif>{{ $name }}</option>
                     @endforeach
                   </select>
-                  <p class="text-muted"><small>Select the captcha provider to use for authentication forms.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.provider_help') }}</small></p>
                 </div>
               </div>
             </div>
@@ -41,37 +41,37 @@
 
         <div class="box" id="turnstile-settings" style="display: none;">
           <div class="box-header with-border">
-            <h3 class="box-title">Cloudflare Turnstile Configuration</h3>
+            <h3 class="box-title">{{ __('admin/settings.captcha.turnstile.title') }}</h3>
           </div>
           <div class="box-body">
             <div class="row">
               <div class="form-group col-md-6">
-                <label class="control-label">Site Key</label>
+                <label class="control-label">{{ __('admin/settings.captcha.site_key') }}</label>
                 <div>
                   <input type="text" class="form-control" name="pterodactyl:captcha:turnstile:site_key"
                     value="{{ old('pterodactyl:captcha:turnstile:site_key', config('pterodactyl.captcha.turnstile.site_key', '')) }}" />
-                  <p class="text-muted"><small>The site key provided by Cloudflare Turnstile. This is used in the frontend widget.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.turnstile.site_key_help') }}</small></p>
                 </div>
               </div>
               <div class="form-group col-md-6">
-                <label class="control-label">Secret Key</label>
+                <label class="control-label">{{ __('admin/settings.captcha.secret_key') }}</label>
                 <div>
                   <input type="password" class="form-control" name="pterodactyl:captcha:turnstile:secret_key"
                     value="{{ old('pterodactyl:captcha:turnstile:secret_key', config('pterodactyl.captcha.turnstile.secret_key', '')) }}" />
-                  <p class="text-muted"><small>The secret key provided by Cloudflare Turnstile. This is used for server-side verification.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.turnstile.secret_key_help') }}</small></p>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-md-12">
                 <div class="alert alert-info">
-                  <strong>Setup Instructions:</strong>
+                  <strong>{{ __('admin/settings.captcha.setup_instructions') }}</strong>
                   <ol>
-                    <li>Visit the <a href="https://dash.cloudflare.com/?to=/:account/turnstile" target="_blank">Cloudflare Turnstile dashboard</a></li>
-                    <li>Create a new site or select an existing one</li>
-                    <li>Add your domain to the site configuration</li>
-                    <li>Copy the Site Key and Secret Key from the dashboard</li>
-                    <li>Paste them into the fields above</li>
+                    <li>{!! __('admin/settings.captcha.turnstile.step_1') !!}</li>
+                    <li>{{ __('admin/settings.captcha.turnstile.step_2') }}</li>
+                    <li>{{ __('admin/settings.captcha.turnstile.step_3') }}</li>
+                    <li>{{ __('admin/settings.captcha.turnstile.step_4') }}</li>
+                    <li>{{ __('admin/settings.captcha.turnstile.step_5') }}</li>
                   </ol>
                 </div>
               </div>
@@ -81,37 +81,37 @@
 
         <div class="box" id="hcaptcha-settings" style="display: none;">
           <div class="box-header with-border">
-            <h3 class="box-title">hCaptcha Configuration</h3>
+            <h3 class="box-title">{{ __('admin/settings.captcha.hcaptcha.title') }}</h3>
           </div>
           <div class="box-body">
             <div class="row">
               <div class="form-group col-md-6">
-                <label class="control-label">Site Key</label>
+                <label class="control-label">{{ __('admin/settings.captcha.site_key') }}</label>
                 <div>
                   <input type="text" class="form-control" name="pterodactyl:captcha:hcaptcha:site_key"
                     value="{{ old('pterodactyl:captcha:hcaptcha:site_key', config('pterodactyl.captcha.hcaptcha.site_key', '')) }}" />
-                  <p class="text-muted"><small>The site key provided by hCaptcha. This is used in the frontend widget.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.hcaptcha.site_key_help') }}</small></p>
                 </div>
               </div>
               <div class="form-group col-md-6">
-                <label class="control-label">Secret Key</label>
+                <label class="control-label">{{ __('admin/settings.captcha.secret_key') }}</label>
                 <div>
                   <input type="password" class="form-control" name="pterodactyl:captcha:hcaptcha:secret_key"
                     value="{{ old('pterodactyl:captcha:hcaptcha:secret_key', config('pterodactyl.captcha.hcaptcha.secret_key', '')) }}" />
-                  <p class="text-muted"><small>The secret key provided by hCaptcha. This is used for server-side verification.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.hcaptcha.secret_key_help') }}</small></p>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-md-12">
                 <div class="alert alert-info">
-                  <strong>Setup Instructions:</strong>
+                  <strong>{{ __('admin/settings.captcha.setup_instructions') }}</strong>
                   <ol>
-                    <li>Visit the <a href="https://dashboard.hcaptcha.com/sites" target="_blank">hCaptcha dashboard</a></li>
-                    <li>Create a new site or select an existing one</li>
-                    <li>Add your domain to the site configuration</li>
-                    <li>Copy the Site Key and Secret Key from the dashboard</li>
-                    <li>Paste them into the fields above</li>
+                    <li>{!! __('admin/settings.captcha.hcaptcha.step_1') !!}</li>
+                    <li>{{ __('admin/settings.captcha.hcaptcha.step_2') }}</li>
+                    <li>{{ __('admin/settings.captcha.hcaptcha.step_3') }}</li>
+                    <li>{{ __('admin/settings.captcha.hcaptcha.step_4') }}</li>
+                    <li>{{ __('admin/settings.captcha.hcaptcha.step_5') }}</li>
                   </ol>
                 </div>
               </div>
@@ -121,39 +121,39 @@
 
         <div class="box" id="recaptcha-settings" style="display: none;">
           <div class="box-header with-border">
-            <h3 class="box-title">Google reCAPTCHA v3 Configuration</h3>
+            <h3 class="box-title">{{ __('admin/settings.captcha.recaptcha.title') }}</h3>
           </div>
           <div class="box-body">
             <div class="row">
               <div class="form-group col-md-6">
-                <label class="control-label">Site Key</label>
+                <label class="control-label">{{ __('admin/settings.captcha.site_key') }}</label>
                 <div>
                   <input type="text" class="form-control" name="pterodactyl:captcha:recaptcha:site_key"
                     value="{{ old('pterodactyl:captcha:recaptcha:site_key', config('pterodactyl.captcha.recaptcha.site_key', '')) }}" />
-                  <p class="text-muted"><small>The site key provided by Google reCAPTCHA v3. This is used in the frontend integration.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.recaptcha.site_key_help') }}</small></p>
                 </div>
               </div>
               <div class="form-group col-md-6">
-                <label class="control-label">Secret Key</label>
+                <label class="control-label">{{ __('admin/settings.captcha.secret_key') }}</label>
                 <div>
                   <input type="password" class="form-control" name="pterodactyl:captcha:recaptcha:secret_key"
                     value="{{ old('pterodactyl:captcha:recaptcha:secret_key', config('pterodactyl.captcha.recaptcha.secret_key', '')) }}" />
-                  <p class="text-muted"><small>The secret key provided by Google reCAPTCHA v3. This is used for server-side verification.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.recaptcha.secret_key_help') }}</small></p>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-md-12">
                 <div class="alert alert-info">
-                  <strong>reCAPTCHA v3 Setup Instructions:</strong>
+                  <strong>{{ __('admin/settings.captcha.recaptcha.setup_instructions') }}</strong>
                   <ol>
-                    <li>Visit the <a href="https://www.google.com/recaptcha/admin" target="_blank">Google reCAPTCHA admin console</a></li>
-                    <li>Create a new site and select <strong>reCAPTCHA v3</strong></li>
-                    <li>Add your domain(s) to the site configuration</li>
-                    <li>Copy the Site Key and Secret Key from the dashboard</li>
-                    <li>Paste them into the fields above</li>
+                    <li>{!! __('admin/settings.captcha.recaptcha.step_1') !!}</li>
+                    <li>{!! __('admin/settings.captcha.recaptcha.step_2') !!}</li>
+                    <li>{{ __('admin/settings.captcha.recaptcha.step_3') }}</li>
+                    <li>{{ __('admin/settings.captcha.recaptcha.step_4') }}</li>
+                    <li>{{ __('admin/settings.captcha.recaptcha.step_5') }}</li>
                   </ol>
-                  <p><strong>Note:</strong> reCAPTCHA v3 runs invisibly in the background and returns a score (0.0-1.0) based on user interactions. A threshold of 0.5 is used by default.</p>
+                  <p><strong>{{ __('admin/settings.captcha.recaptcha.note_label') }}</strong> {{ __('admin/settings.captcha.recaptcha.note') }}</p>
                 </div>
               </div>
             </div>
@@ -163,45 +163,45 @@
 
         <div class="box" id="cap-settings" style="display: none;">
           <div class="box-header with-border">
-            <h3 class="box-title">Cap Configuration</h3>
+            <h3 class="box-title">{{ __('admin/settings.captcha.cap.title') }}</h3>
           </div>
           <div class="box-body">
             <div class="row">
               <div class="form-group col-md-4">
-                <label class="control-label">Server URL</label>
+                <label class="control-label">{{ __('admin/settings.captcha.cap.server_url') }}</label>
                 <div>
                   <input type="text" class="form-control" name="pterodactyl:captcha:cap:server_url"
                     value="{{ old('pterodactyl:captcha:cap:server_url', config('pterodactyl.captcha.cap.server_url', '')) }}" />
-                  <p class="text-muted"><small>The base URL of your Cap instance, e.g. https://cap.example.com. This is used for server-side verification.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.cap.server_url_help') }}</small></p>
                 </div>
               </div>
               <div class="form-group col-md-4">
-                <label class="control-label">Site Key</label>
+                <label class="control-label">{{ __('admin/settings.captcha.site_key') }}</label>
                 <div>
                   <input type="text" class="form-control" name="pterodactyl:captcha:cap:site_key"
                     value="{{ old('pterodactyl:captcha:cap:site_key', config('pterodactyl.captcha.cap.site_key', '')) }}" />
-                  <p class="text-muted"><small>The site key provided by Cap. This is used in the frontend widget.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.cap.site_key_help') }}</small></p>
                 </div>
               </div>
               <div class="form-group col-md-4">
-                <label class="control-label">Secret Key</label>
+                <label class="control-label">{{ __('admin/settings.captcha.secret_key') }}</label>
                 <div>
                   <input type="password" class="form-control" name="pterodactyl:captcha:cap:secret_key"
                     value="{{ old('pterodactyl:captcha:cap:secret_key', config('pterodactyl.captcha.cap.secret_key', '')) }}" />
-                  <p class="text-muted"><small>The secret key provided by Cap. This is used for server-side verification.</small></p>
+                  <p class="text-muted"><small>{{ __('admin/settings.captcha.cap.secret_key_help') }}</small></p>
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-md-12">
                 <div class="alert alert-info">
-                  <strong>Setup Instructions:</strong>
+                  <strong>{{ __('admin/settings.captcha.setup_instructions') }}</strong>
                   <ol>
-                    <li>Set up a Cap server or use the hosted one — see the <a href="https://trycap.dev" target="_blank">Cap website</a> and <a href="https://docs.cap.js.org" target="_blank">Cap documentation</a></li>
-                    <li>Create a new site in your Cap instance</li>
-                    <li>Add your panel domain to the site configuration</li>
-                    <li>Copy the Site Key and Secret Key from the dashboard</li>
-                    <li>Enter your Cap instance base URL, then paste the keys into the fields above</li>
+                    <li>{!! __('admin/settings.captcha.cap.step_1') !!}</li>
+                    <li>{{ __('admin/settings.captcha.cap.step_2') }}</li>
+                    <li>{{ __('admin/settings.captcha.cap.step_3') }}</li>
+                    <li>{{ __('admin/settings.captcha.cap.step_4') }}</li>
+                    <li>{{ __('admin/settings.captcha.cap.step_5') }}</li>
                   </ol>
                 </div>
               </div>
@@ -212,7 +212,7 @@
         <div class="box box-primary">
           <div class="box-footer">
             {{ csrf_field() }}
-            <button type="submit" name="_method" value="PATCH" class="btn btn-sm btn-primary pull-right">Save</button>
+            <button type="submit" name="_method" value="PATCH" class="btn btn-sm btn-primary pull-right">{{ __('strings.save') }}</button>
           </div>
         </div>
       </form>

@@ -28,12 +28,12 @@ class EggDeletionService
     {
         $servers = $this->serverRepository->findCountWhere([['egg_id', '=', $egg]]);
         if ($servers > 0) {
-            throw new HasActiveServersException(trans('exceptions.nest.egg.delete_has_servers'));
+            throw new HasActiveServersException(__('exceptions.nest.egg.delete_has_servers'));
         }
 
         $children = $this->repository->findCountWhere([['config_from', '=', $egg]]);
         if ($children > 0) {
-            throw new HasChildrenException(trans('exceptions.nest.egg.has_children'));
+            throw new HasChildrenException(__('exceptions.nest.egg.has_children'));
         }
 
         return $this->repository->delete($egg);

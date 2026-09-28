@@ -2,14 +2,14 @@
 @extends('layouts.admin')
 
 @section('title')
-    Mounts
+    {{ __('admin/navigation.sidebar.mounts') }}
 @endsection
 
 @section('content-header')
-    <h1>Mounts<small>Configure and manage additional mount points for servers.</small></h1>
+    <h1>{{ __('admin/navigation.sidebar.mounts') }}<small>{{ __('admin/mounts.index.subtitle') }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li class="active">Mounts</li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li class="active">{{ __('admin/navigation.sidebar.mounts') }}</li>
     </ol>
 @endsection
 
@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="callout callout-info">
-                <i class="fa fa-info-circle"></i> <strong>What are mounts?</strong> Mounts allow you to attach directories from the host machine into a server's container. They are useful for shared resources, persistent storage, or configuration files. <a href="https://pterodactyl.io/community/mounts.html" target="_blank" rel="noopener">Learn more in the Pterodactyl docs <i class="fa fa-external-link"></i></a>.
+                <i class="fa fa-info-circle"></i> {!! __('admin/mounts.index.what_are_mounts') !!}
             </div>
         </div>
     </div>
@@ -25,10 +25,10 @@
         <div class="col-xs-12">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Mount List</h3>
+                    <h3 class="box-title">{{ __('admin/mounts.index.list') }}</h3>
 
                     <div class="box-tools">
-                        <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#newMountModal">Create New</button>
+                        <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#newMountModal">{{ __('admin/mounts.index.create_new') }}</button>
                     </div>
                 </div>
 
@@ -36,13 +36,13 @@
                     <table class="table table-hover">
                         <tbody>
                             <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Source</th>
-                                <th>Target</th>
-                                <th class="text-center">Eggs</th>
-                                <th class="text-center">Nodes</th>
-                                <th class="text-center">Servers</th>
+                                <th>{{ __('strings.id') }}</th>
+                                <th>{{ __('strings.name') }}</th>
+                                <th>{{ __('admin/mounts.index.source') }}</th>
+                                <th>{{ __('admin/mounts.index.target') }}</th>
+                                <th class="text-center">{{ __('admin/mounts.index.eggs') }}</th>
+                                <th class="text-center">{{ __('admin/mounts.index.nodes') }}</th>
+                                <th class="text-center">{{ __('strings.servers') }}</th>
                             </tr>
 
                             @foreach ($mounts as $mount)
@@ -68,81 +68,81 @@
             <div class="modal-content">
                 <form action="{{ route('admin.mounts') }}" method="POST">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('strings.close') }}">
                             <span aria-hidden="true" style="color: #FFFFFF">&times;</span>
                         </button>
 
-                        <h4 class="modal-title">Create Mount</h4>
+                        <h4 class="modal-title">{{ __('admin/mounts.index.create_title') }}</h4>
                     </div>
 
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-12">
-                                <label for="pName" class="form-label">Name</label>
+                                <label for="pName" class="form-label">{{ __('strings.name') }}</label>
                                 <input type="text" id="pName" name="name" class="form-control" />
-                                <p class="text-muted small">Unique name used to separate this mount from another.</p>
+                                <p class="text-muted small">{{ __('admin/mounts.index.name_help') }}</p>
                             </div>
 
                             <div class="col-md-12">
-                                <label for="pDescription" class="form-label">Description</label>
+                                <label for="pDescription" class="form-label">{{ __('admin/mounts.index.description') }}</label>
                                 <textarea id="pDescription" name="description" class="form-control" rows="4"></textarea>
-                                <p class="text-muted small">A longer description for this mount, must be less than 191 characters.</p>
+                                <p class="text-muted small">{{ __('admin/mounts.index.description_help') }}</p>
                             </div>
 
                             <div class="col-md-6">
-                                <label for="pSource" class="form-label">Source</label>
+                                <label for="pSource" class="form-label">{{ __('admin/mounts.index.source') }}</label>
                                 <input type="text" id="pSource" name="source" class="form-control" />
-                                <p class="text-muted small">File path on the host system to mount to a container.</p>
+                                <p class="text-muted small">{{ __('admin/mounts.index.source_help') }}</p>
                             </div>
 
                             <div class="col-md-6">
-                                <label for="pTarget" class="form-label">Target</label>
+                                <label for="pTarget" class="form-label">{{ __('admin/mounts.index.target') }}</label>
                                 <input type="text" id="pTarget" name="target" class="form-control" />
-                                <p class="text-muted small">Where the mount will be accessible inside a container.</p>
+                                <p class="text-muted small">{{ __('admin/mounts.index.target_help') }}</p>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">Read Only</label>
+                                <label class="form-label">{{ __('strings.read_only') }}</label>
 
                                 <div>
                                     <div class="radio radio-success radio-inline">
                                         <input type="radio" id="pReadOnlyFalse" name="read_only" value="0" checked>
-                                        <label for="pReadOnlyFalse">False</label>
+                                        <label for="pReadOnlyFalse">{{ __('admin/mounts.index.false') }}</label>
                                     </div>
 
                                     <div class="radio radio-warning radio-inline">
                                         <input type="radio" id="pReadOnly" name="read_only" value="1">
-                                        <label for="pReadOnly">True</label>
+                                        <label for="pReadOnly">{{ __('admin/mounts.index.true') }}</label>
                                     </div>
                                 </div>
 
-                                <p class="text-muted small">Is the mount read only inside the container?</p>
+                                <p class="text-muted small">{{ __('admin/mounts.index.read_only_help') }}</p>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">User Mountable</label>
+                                <label class="form-label">{{ __('admin/mounts.index.user_mountable') }}</label>
 
                                 <div>
                                     <div class="radio radio-success radio-inline">
                                         <input type="radio" id="pUserMountableFalse" name="user_mountable" value="0" checked>
-                                        <label for="pUserMountableFalse">False</label>
+                                        <label for="pUserMountableFalse">{{ __('admin/mounts.index.false') }}</label>
                                     </div>
 
                                     <div class="radio radio-warning radio-inline">
                                         <input type="radio" id="pUserMountable" name="user_mountable" value="1">
-                                        <label for="pUserMountable">True</label>
+                                        <label for="pUserMountable">{{ __('admin/mounts.index.true') }}</label>
                                     </div>
                                 </div>
 
-                                <p class="text-muted small">Should users be able to mount this themselves?</p>
+                                <p class="text-muted small">{{ __('admin/mounts.index.user_mountable_help') }}</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
                         {!! csrf_field() !!}
-                        <button type="button" class="btn btn-default btn-sm pull-left" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success btn-sm">Create</button>
+                        <button type="button" class="btn btn-default btn-sm pull-left" data-dismiss="modal">{{ __('strings.cancel') }}</button>
+                        <button type="submit" class="btn btn-success btn-sm">{{ __('strings.create') }}</button>
                     </div>
                 </form>
             </div>

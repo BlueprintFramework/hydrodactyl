@@ -59,13 +59,13 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
                     ->timeout($this->timeout())
                     ->get($url, $query);
             } catch (ConnectionException $e) {
-                throw MarketplaceException::upstream($this->key(), 'Could not reach the marketplace provider.', $e);
+                throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.provider_unreachable'), $e);
             }
 
             if ($response->failed()) {
                 throw MarketplaceException::upstream(
                     $this->key(),
-                    sprintf('Provider responded with HTTP %d.', $response->status()),
+                    __('exceptions.client.marketplace.provider_http_error', ['code' => $response->status()]),
                 );
             }
 
@@ -98,13 +98,13 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
                     ->timeout($this->timeout())
                     ->get($url, $query);
             } catch (ConnectionException $e) {
-                throw MarketplaceException::upstream($this->key(), 'Could not reach the marketplace provider.', $e);
+                throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.provider_unreachable'), $e);
             }
 
             if ($response->failed()) {
                 throw MarketplaceException::upstream(
                     $this->key(),
-                    sprintf('Provider responded with HTTP %d.', $response->status()),
+                    __('exceptions.client.marketplace.provider_http_error', ['code' => $response->status()]),
                 );
             }
 
@@ -130,11 +130,11 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
     {
         $parts = parse_url($url);
         if ($parts === false || empty($parts['scheme']) || empty($parts['host'])) {
-            throw MarketplaceException::upstream($this->key(), 'The download URL is invalid.');
+            throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.download_url_invalid'));
         }
 
         if (strtolower((string) $parts['scheme']) !== 'https') {
-            throw MarketplaceException::upstream($this->key(), 'The download URL must use https.');
+            throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.download_url_insecure'));
         }
 
         $host = strtolower((string) $parts['host']);
@@ -142,7 +142,7 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
         if ($enforceHostAllowlist) {
             $allowed = array_map('strtolower', $allowedHosts);
             if (!in_array($host, $allowed, true)) {
-                throw MarketplaceException::upstream($this->key(), 'The download URL host is not allowed.');
+                throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.download_host_not_allowed'));
             }
         }
 
@@ -165,7 +165,7 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
         foreach ($ips as $ip) {
             $validated = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
             if ($validated === false) {
-                throw MarketplaceException::upstream($this->key(), 'The download host resolves to a blocked address.');
+                throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.download_host_blocked'));
             }
         }
     }
@@ -199,7 +199,7 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
                         ->get($current);
                 }
             } catch (ConnectionException $e) {
-                throw MarketplaceException::upstream($this->key(), 'Could not resolve the download redirect.', $e);
+                throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.redirect_resolution_failed'), $e);
             }
 
             $status = $response->status();
@@ -244,7 +244,7 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
         if ($basename === '' || !str_ends_with(strtolower($basename), '.jar')) {
             throw MarketplaceException::upstream(
                 $this->key(),
-                'This resource is externally hosted and cannot be auto-installed. Please download it manually from the provider.',
+                __('exceptions.client.marketplace.externally_hosted'),
             );
         }
 

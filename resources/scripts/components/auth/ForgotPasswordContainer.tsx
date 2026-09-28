@@ -6,6 +6,7 @@ import LoginFormContainer, { TitleSection } from '@/components/auth/LoginFormCon
 import Button from '@/components/elements/Button';
 import Captcha, { getCaptchaResponse } from '@/components/elements/Captcha';
 import Field from '@/components/elements/Field';
+import { useTranslation } from '@/i18n/I18nProvider';
 import CaptchaManager from '@/lib/captcha';
 import useFlash from '@/plugins/useFlash';
 import SecondaryLink from '../ui/secondary-link';
@@ -16,6 +17,7 @@ interface Values {
 
 const ForgotPasswordContainer = () => {
     const { clearFlashes, addFlash } = useFlash();
+    const { t } = useTranslation();
 
     const handleSubmission = ({ email }: Values, { setSubmitting, resetForm }: FormikHelpers<Values>) => {
         clearFlashes();
@@ -36,15 +38,15 @@ const ForgotPasswordContainer = () => {
                 resetForm();
                 addFlash({
                     type: 'success',
-                    title: 'Success',
-                    message: response.data.status || 'Email sent!',
+                    title: t('auth.forgot_password.success_title'),
+                    message: response.data.status || t('auth.forgot_password.email_sent'),
                 });
             })
             .catch((error) => {
                 console.error(error);
                 addFlash({
                     type: 'error',
-                    title: 'Error',
+                    title: t('common.error'),
                     message: httpErrorToHuman(error),
                 });
             })
@@ -58,14 +60,14 @@ const ForgotPasswordContainer = () => {
             onSubmit={handleSubmission}
             initialValues={{ email: '' }}
             validationSchema={object().shape({
-                email: string().email('Enter a valid email address.').required('Email is required.'),
+                email: string().email(t('auth.email_invalid')).required(t('auth.email_required')),
             })}
         >
             {({ isSubmitting }) => (
                 <LoginFormContainer className={`w-full flex flex-col`}>
-                    <TitleSection title='Forgot Password' />
-                    <div className='text-sm mb-6'>We&apos;ll send you an email with a link to reset your password.</div>
-                    <Field id='email' label={'Email'} name={'email'} type={'email'} />
+                    <TitleSection title={t('auth.forgot_password.heading')} />
+                    <div className='text-sm mb-6'>{t('auth.forgot_password.description')}</div>
+                    <Field id='email' label={t('auth.email_label')} name={'email'} type={'email'} />
 
                     <Captcha
                         className='mt-6'
@@ -73,25 +75,25 @@ const ForgotPasswordContainer = () => {
                             console.error('Captcha error:', error);
                             addFlash({
                                 type: 'error',
-                                title: 'Error',
-                                message: 'Captcha verification failed. Please try again.',
+                                title: t('common.error'),
+                                message: t('auth.captcha.verification_failed'),
                             });
                         }}
                     />
 
                     <div className='flex w-full flex-col gap-3 mt-6 sm:flex-row sm:justify-between sm:items-center'>
                         <Button
-                            className={`bg-mocha-100 text-black p-2 px-4 rounded-full border-0 ring-0 outline-hidden capitalize w-full sm:w-auto`}
+                            className={`bg-mocha-100 text-black p-2 px-4 rounded-full border-0 ring-0 outline-hidden w-full sm:w-auto`}
                             type='submit'
                             size='xlarge'
                             isLoading={isSubmitting}
                             disabled={isSubmitting}
                         >
-                            Send Email
+                            {t('auth.forgot_password.submit')}
                         </Button>
 
                         <SecondaryLink to='/auth/login' className='text-center sm:text-right'>
-                            Return to Login?
+                            {t('auth.forgot_password.return_to_login')}
                         </SecondaryLink>
                     </div>
                 </LoginFormContainer>

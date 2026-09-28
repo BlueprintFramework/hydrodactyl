@@ -152,7 +152,7 @@ class MarketplaceController extends ClientApiController
         return $this->guard(function () use ($type, $sourceKey, $projectId, $versionId): JsonResponse {
             $source = $this->sources->resolve((string) $sourceKey);
             if (!$source->supports($type)) {
-                return response()->json(['error' => 'This source cannot serve that content type.'], 422);
+                return response()->json(['error' => __('exceptions.client.marketplace.unsupported_content_type')], 422);
             }
 
             $download = $source->resolve($type, (string) $projectId, (string) $versionId);
@@ -280,7 +280,7 @@ class MarketplaceController extends ClientApiController
         } catch (MarketplaceException $e) {
             Log::warning('Marketplace request failed', ['source' => $e->getMessage()]);
 
-            return response()->json(['error' => 'Marketplace request failed.'], 502);
+            return response()->json(['error' => __('exceptions.client.marketplace.request_failed')], 502);
         }
     }
 

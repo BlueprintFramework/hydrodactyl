@@ -1,6 +1,12 @@
+import { StoreProvider } from 'easy-peasy';
 import { useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
+
+import I18nProvider, { useTranslation } from '@/i18n/I18nProvider';
+import type { Translate } from '@/i18n/types';
+import { store } from '@/state';
+import { hydrateStore } from '@/state/bootstrap';
 
 interface SystemMetrics {
     status: string;
@@ -20,19 +26,22 @@ interface SystemMetrics {
     };
 }
 
-function formatBytes(bytes: number): string {
+function formatBytes(bytes: number, locale: string): string {
     if (!bytes) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`;
+    const value = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(bytes / k ** i);
+
+    return `${value} ${sizes[i]}`;
 }
 
-function formatUptime(seconds: number): string {
+function formatUptime(seconds: number, t: Translate): string {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    return `${days}d ${hours}h ${minutes}m`;
+
+    return t('admin.metrics.uptime_format', { days, hours, minutes });
 }
 
 const COLORS = { used: '#52A9FF', free: '#2D5A8A', bg: '#1E3A5A' };
@@ -50,10 +59,12 @@ function UsageBar({
     unit?: string;
     title?: string;
 }) {
+    const { t, locale } = useTranslation();
     const pct = total > 0 ? (used / total) * 100 : 0;
     const data = [{ name: label, used, free: total - used }];
     const isPercent = unit === '%';
-    const fmt = (v: number) => (isPercent ? `${v.toFixed(1)}%` : formatBytes(v));
+    const numberFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+    const fmt = (v: number) => (isPercent ? `${numberFormat.format(v)}%` : formatBytes(v, locale));
 
     return (
         <div style={{ marginBottom: 16 }} title={title}>
@@ -78,28 +89,54 @@ function UsageBar({
                         contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: 6, fontSize: 12 }}
                         formatter={(v: number) => fmt(v)}
                     />
-                    <Bar dataKey='used' fill={COLORS.used} radius={[4, 0, 0, 4]} stackId='a' maxBarSize={24} />
-                    <Bar dataKey='free' fill={COLORS.bg} radius={[0, 4, 4, 0]} stackId='a' maxBarSize={24} />
+                    <Bar
+                        dataKey='used'
+                        name={t('admin.metrics.used')}
+                        fill={COLORS.used}
+                        radius={[4, 0, 0, 4]}
+                        stackId='a'
+                        maxBarSize={24}
+                    />
+                    <Bar
+                        dataKey='free'
+                        name={t('admin.metrics.free')}
+                        fill={COLORS.bg}
+                        radius={[0, 4, 4, 0]}
+                        stackId='a'
+                        maxBarSize={24}
+                    />
                 </BarChart>
             </ResponsiveContainer>
-            <div style={{ fontSize: 11, color: '#777', marginTop: 2 }}>{pct.toFixed(1)}% used</div>
+            <div style={{ fontSize: 11, color: '#777', marginTop: 2 }}>
+                {t('admin.metrics.percent_used', { percent: numberFormat.format(pct) })}
+            </div>
         </div>
     );
 }
 
 function LoadGraph({ loads }: { loads: number[] }) {
-    const data = loads.map((v, i) => ({ name: `${i + 1}m`, value: parseFloat(v.toFixed(2)) }));
+    const { t } = useTranslation();
+    const data = loads.map((v, i) => ({
+        name: t('admin.load.axis_label', { count: i + 1 }),
+        value: parseFloat(v.toFixed(2)),
+    }));
 
     return (
         <div>
-            <div style={{ fontSize: 12, color: '#ccc', marginBottom: 4 }}>Load Average</div>
+            <div style={{ fontSize: 12, color: '#ccc', marginBottom: 4 }}>{t('admin.load.title')}</div>
             <ResponsiveContainer width='100%' height={60}>
                 <BarChart data={data} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                     <XAxis dataKey='name' tick={{ fontSize: 10, fill: '#777' }} axisLine={false} tickLine={false} />
                     <Tooltip
                         contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: 6, fontSize: 12 }}
                     />
-                    <Bar dataKey='value' fill={COLORS.used} radius={[3, 3, 0, 0]} maxBarSize={32} />
+                    <Bar
+                        dataKey='value'
+                        name={t('admin.load.title')}
+                        fill={COLORS.used}
+                        radius={[3, 3, 0, 0]}
+                        maxBarSize={32}
+                    />
                 </BarChart>
             </ResponsiveContainer>
         </div>
@@ -107,6 +144,7 @@ function LoadGraph({ loads }: { loads: number[] }) {
 }
 
 function AdminDashboard() {
+    const { t } = useTranslation();
     const [data, setData] = useState<SystemMetrics | null>(null);
 
     const fetchMetrics = useCallback(() => {
@@ -126,7 +164,7 @@ function AdminDashboard() {
         return (
             <div style={{ padding: 40, textAlign: 'center', color: '#999' }}>
                 <i className='fa fa-spinner fa-spin' style={{ fontSize: 24 }}></i>
-                <p style={{ marginTop: 8, fontSize: 13 }}>Loading system metrics...</p>
+                <p style={{ marginTop: 8, fontSize: 13 }}>{t('admin.loading')}</p>
             </div>
         );
     }
@@ -151,7 +189,9 @@ function AdminDashboard() {
                     >
                         <div style={{ textAlign: 'center', paddingTop: 40 }}>
                             <div style={{ fontSize: 28, fontWeight: 700, color: '#eee' }}>{cpuCores}</div>
-                            <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>CPU Cores</div>
+                            <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>
+                                {t('admin.metrics.cpu_cores')}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -169,9 +209,9 @@ function AdminDashboard() {
                     >
                         <div style={{ textAlign: 'center', paddingTop: 40 }}>
                             <div style={{ fontSize: 28, fontWeight: 700, color: '#eee' }}>
-                                {formatUptime(metrics.uptime)}
+                                {formatUptime(metrics.uptime, t)}
                             </div>
-                            <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>Uptime</div>
+                            <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>{t('admin.metrics.uptime')}</div>
                         </div>
                     </div>
                 </div>
@@ -187,7 +227,11 @@ function AdminDashboard() {
                             overflow: 'hidden',
                         }}
                     >
-                        <UsageBar used={metrics.memory.used} total={metrics.memory.total} label='Memory' />
+                        <UsageBar
+                            used={metrics.memory.used}
+                            total={metrics.memory.total}
+                            label={t('admin.metrics.memory')}
+                        />
                     </div>
                 </div>
                 <div className='col-md-3 col-sm-6 col-xs-12'>
@@ -202,7 +246,7 @@ function AdminDashboard() {
                             overflow: 'hidden',
                         }}
                     >
-                        <UsageBar used={metrics.disk.used} total={metrics.disk.total} label='Disk' />
+                        <UsageBar used={metrics.disk.used} total={metrics.disk.total} label={t('admin.metrics.disk')} />
                     </div>
                 </div>
             </div>
@@ -210,16 +254,19 @@ function AdminDashboard() {
                 <div className='col-md-6'>
                     <div className='box' style={{ borderTop: '3px solid #52A9FF', minHeight: 140 }}>
                         <div className='box-header with-border'>
-                            <h3 className='box-title'>System Info</h3>
+                            <h3 className='box-title'>{t('admin.system_info.title')}</h3>
                         </div>
                         <div className='box-body'>
                             <table style={{ width: '100%', fontSize: 13 }}>
                                 <tbody>
                                     {[
-                                        ['Hostname', system.hostname],
-                                        ['OS', system.os],
-                                        ['PHP Version', system.php_version],
-                                        ['CPU Cores', navigator.hardwareConcurrency?.toString() || 'N/A'],
+                                        [t('admin.system_info.hostname'), system.hostname],
+                                        [t('admin.system_info.os'), system.os],
+                                        [t('admin.system_info.php_version'), system.php_version],
+                                        [
+                                            t('admin.system_info.cpu_cores'),
+                                            navigator.hardwareConcurrency?.toString() || 'N/A',
+                                        ],
                                     ].map(([k, v]) => (
                                         <tr key={k}>
                                             <td style={{ color: '#999', padding: '6px 0', width: 120 }}>{k}</td>
@@ -234,7 +281,7 @@ function AdminDashboard() {
                 <div className='col-md-6'>
                     <div className='box' style={{ borderTop: '3px solid #52A9FF' }}>
                         <div className='box-header with-border'>
-                            <h3 className='box-title'>Load Average</h3>
+                            <h3 className='box-title'>{t('admin.load.title')}</h3>
                         </div>
                         <div className='box-body'>
                             <LoadGraph loads={system.load_average} />
@@ -248,6 +295,13 @@ function AdminDashboard() {
 
 const container = document.getElementById('admin-dashboard');
 if (container) {
+    hydrateStore();
     const root = createRoot(container);
-    root.render(<AdminDashboard />);
+    root.render(
+        <StoreProvider store={store}>
+            <I18nProvider>
+                <AdminDashboard />
+            </I18nProvider>
+        </StoreProvider>,
+    );
 }

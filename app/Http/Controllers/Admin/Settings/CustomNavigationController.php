@@ -42,7 +42,7 @@ class CustomNavigationController extends Controller
     }
 
     $this->kernel->call('queue:restart');
-    $this->alert->success('Custom navigation settings have been updated successfully and the queue worker was restarted to apply these changes.')->flash();
+    $this->alert->success(__('admin/settings.notices.custom_navigation'))->flash();
 
     return redirect()->route('admin.settings.custom-navigation');
   }

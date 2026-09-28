@@ -15,6 +15,7 @@ import {
 import { Dialog } from '@/components/elements/dialog';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
@@ -27,6 +28,7 @@ interface Props {
 }
 
 const BackupContextMenu = ({ backup }: Props) => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const daemonType = getGlobalDaemonType();
     const setServerFromState = ServerContext.useStoreActions((actions) => actions.server.setServerFromState);
@@ -151,11 +153,11 @@ const BackupContextMenu = ({ backup }: Props) => {
     return (
         <>
             {/* Rename Dialog */}
-            <Dialog open={modal === 'rename'} onClose={() => setModal('')} title='Rename Backup'>
+            <Dialog open={modal === 'rename'} onClose={() => setModal('')} title={t('server.backups.rename_title')}>
                 <div className='space-y-4'>
                     <div>
                         <label htmlFor='backup-name' className='block text-sm font-medium text-zinc-200 mb-2'>
-                            Backup Name
+                            {t('server.backups.rename_name_label')}
                         </label>
                         <input
                             id='backup-name'
@@ -163,7 +165,7 @@ const BackupContextMenu = ({ backup }: Props) => {
                             value={newName}
                             onChange={(e) => setNewName(e.target.value)}
                             className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 placeholder-zinc-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
-                            placeholder='Enter backup name...'
+                            placeholder={t('server.backups.backup_name_placeholder')}
                             maxLength={191}
                         />
                     </div>
@@ -171,10 +173,10 @@ const BackupContextMenu = ({ backup }: Props) => {
 
                 <Dialog.Footer>
                     <Button onClick={() => setModal('')} variant='secondary'>
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button onClick={doRename} disabled={!newName.trim() || newName.trim() === backup.name}>
-                        Rename Backup
+                        {t('server.backups.rename_confirm')}
                     </Button>
                 </Dialog.Footer>
             </Dialog>
@@ -183,10 +185,10 @@ const BackupContextMenu = ({ backup }: Props) => {
             <Dialog.Confirm
                 open={modal === 'unlock'}
                 onClose={() => setModal('')}
-                title={`Unlock "${backup.name}"`}
+                title={t('server.backups.unlock_title', { name: backup.name })}
                 onConfirmed={onLockToggle}
             >
-                This backup will no longer be protected from automated or accidental deletions.
+                {t('server.backups.unlock_description')}
             </Dialog.Confirm>
 
             {/* Restore Modal */}
@@ -194,15 +196,16 @@ const BackupContextMenu = ({ backup }: Props) => {
                 open={modal === 'restore'}
                 onClose={() => setModal('')}
                 onConfirmed={doRestorationAction}
-                title='Restore Backup'
+                title={t('server.backups.restore_title')}
                 flashKey='backup:restore'
                 loading={loading}
-                description={`"${backup.name}" - Your server will be stopped during the restoration process. You will not be able to control the power state, access the file manager, or create additional backups until completed.`}
-                warningItems={[
-                    'All current files and server configuration will be deleted and replaced with the backup data.',
-                    'This action cannot be undone.',
-                ]}
-                confirmText={countdown > 0 ? `Delete All & Restore (${countdown}s)` : 'Delete All & Restore Backup'}
+                description={t('server.backups.restore_description', { name: backup.name })}
+                warningItems={[t('server.backups.restore_warning_data'), t('server.backups.restore_warning_undo')]}
+                confirmText={
+                    countdown > 0
+                        ? t('server.backups.restore_confirm_countdown', { countdown })
+                        : t('server.backups.restore_confirm')
+                }
             />
 
             {/* Delete Modal */}
@@ -210,12 +213,12 @@ const BackupContextMenu = ({ backup }: Props) => {
                 open={modal === 'delete'}
                 onClose={() => setModal('')}
                 onConfirmed={doDeletion}
-                title={`Delete "${backup.name}"`}
+                title={t('server.backups.delete_title', { name: backup.name })}
                 flashKey='backup:delete'
                 loading={loading}
-                description='This is a permanent operation. The backup cannot be recovered once deleted.'
-                warningItems={['The backup file and its snapshot will be permanently deleted.']}
-                confirmText='Delete Backup'
+                description={t('server.backups.delete_description')}
+                warningItems={[t('server.backups.delete_warning')]}
+                confirmText={t('server.backups.delete_confirm')}
             />
 
             <SpinnerOverlay visible={loading} fixed />
@@ -237,24 +240,24 @@ const BackupContextMenu = ({ backup }: Props) => {
                         <Can action={'backup.download'}>
                             <DropdownMenuItem onClick={doDownload} className='cursor-pointer'>
                                 <ArrowDownToLine width={22} height={22} className='mr-2' fill='currentColor' />
-                                Download
+                                {t('common.download')}
                             </DropdownMenuItem>
                         </Can>
                         <Can action={'backup.restore'}>
                             <DropdownMenuItem onClick={() => setModal('restore')} className='cursor-pointer'>
                                 <CloudArrowUpIn width={22} height={22} className=' mr-2' fill='currentColor' />
-                                Restore
+                                {t('server.backups.restore')}
                             </DropdownMenuItem>
                         </Can>
                         <Can action={'backup.delete'}>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => setModal('rename')} className='cursor-pointer'>
                                 <Pencil width={22} height={22} className=' mr-2' fill='currentColor' />
-                                Rename
+                                {t('server.backups.rename')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={onLockToggle} className='cursor-pointer'>
                                 <Shield width={22} height={22} className=' mr-2' fill='currentColor' />
-                                {backup.isLocked ? 'Unlock' : 'Lock'}
+                                {backup.isLocked ? t('server.backups.unlock') : t('server.backups.lock')}
                             </DropdownMenuItem>
                             {!backup.isLocked && (
                                 <>
@@ -264,7 +267,7 @@ const BackupContextMenu = ({ backup }: Props) => {
                                         className='cursor-pointer text-red-400 focus:text-red-300'
                                     >
                                         <TrashBin width={22} height={22} className=' mr-2' fill='currentColor' />
-                                        Delete
+                                        {t('common.delete')}
                                     </DropdownMenuItem>
                                 </>
                             )}
@@ -280,7 +283,7 @@ const BackupContextMenu = ({ backup }: Props) => {
                     className='flex items-center gap-2'
                 >
                     <TrashBin width={22} height={22} fill='currentColor' />
-                    <span className='hidden sm:inline'>Delete</span>
+                    <span className='hidden sm:inline'>{t('common.delete')}</span>
                 </Button>
             )}
         </>

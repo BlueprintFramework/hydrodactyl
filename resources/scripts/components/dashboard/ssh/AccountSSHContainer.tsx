@@ -16,6 +16,7 @@ import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import ServerHeader from '@/components/HeaderManger';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useFlashKey } from '@/plugins/useFlash';
 import type { ApplicationStore } from '@/state';
 
@@ -25,6 +26,7 @@ interface CreateValues {
 }
 
 const AccountSSHContainer = () => {
+    const { t, dateFnsLocale } = useTranslation();
     const [deleteKey, setDeleteKey] = useState<{
         name: string;
         fingerprint: string;
@@ -84,17 +86,17 @@ const AccountSSHContainer = () => {
     };
 
     return (
-        <PageContentBlock title={'SSH Keys'}>
+        <PageContentBlock title={t('account.ssh.title')}>
             <FlashMessageRender byKey='account:ssh-keys' />
-            <ServerHeader title='SSH Keys' />
+            <ServerHeader title={t('account.ssh.title')} />
 
             {/* Create SSH Key Modal */}
             {showCreateModal && (
                 <Dialog.Confirm
                     open={showCreateModal}
                     onClose={() => setShowCreateModal(false)}
-                    title='Add SSH Key'
-                    confirm='Add Key'
+                    title={t('account.ssh.add')}
+                    confirm={t('account.ssh.add_confirm')}
                     onConfirmed={() => {
                         const form = document.getElementById('create-ssh-form') as HTMLFormElement;
                         if (form) {
@@ -107,8 +109,8 @@ const AccountSSHContainer = () => {
                         onSubmit={submitCreate}
                         initialValues={{ name: '', publicKey: '' }}
                         validationSchema={object().shape({
-                            name: string().required('SSH Key Name is required'),
-                            publicKey: string().required('Public Key is required'),
+                            name: string().required(t('account.ssh.name_required')),
+                            publicKey: string().required(t('account.ssh.public_key_required')),
                         })}
                     >
                         {({ isSubmitting }) => (
@@ -116,17 +118,17 @@ const AccountSSHContainer = () => {
                                 <SpinnerOverlay visible={isSubmitting} />
 
                                 <FormikFieldWrapper
-                                    label='SSH Key Name'
+                                    label={t('account.ssh.name_label')}
                                     name='name'
-                                    description='A name to identify this SSH key.'
+                                    description={t('account.ssh.name_helper')}
                                 >
                                     <Field name='name' as={Input} className='w-full' />
                                 </FormikFieldWrapper>
 
                                 <FormikFieldWrapper
-                                    label='Public Key'
+                                    label={t('account.ssh.public_key_label')}
                                     name='publicKey'
-                                    description='Enter your public SSH key.'
+                                    description={t('account.ssh.public_key_helper')}
                                 >
                                     <Field name='publicKey' as={Input} className='w-full' />
                                 </FormikFieldWrapper>
@@ -159,14 +161,14 @@ const AccountSSHContainer = () => {
                     <div className='rounded-xl p-6 md:p-4 shadow-sm'>
                         <SpinnerOverlay visible={!data && isValidating} />
                         <Dialog.Confirm
-                            title={'Delete SSH Key'}
-                            confirm={'Delete Key'}
+                            title={t('account.ssh.delete_title')}
+                            confirm={t('account.ssh.delete_confirm')}
                             open={!!deleteKey}
                             onClose={() => setDeleteKey(null)}
                             onConfirmed={doDeletion}
                         >
-                            Removing the <Code>{deleteKey?.name}</Code> SSH key will invalidate its usage across the
-                            Panel.
+                            {t('account.ssh.delete_message_prefix')} <Code>{deleteKey?.name}</Code>{' '}
+                            {t('account.ssh.delete_message_suffix')}
                         </Dialog.Confirm>
                         <div className='mb-4'>
                             <Button
@@ -175,7 +177,7 @@ const AccountSSHContainer = () => {
                                 className='flex items-center gap-2'
                             >
                                 <Plus width={22} height={22} fill='currentColor' />
-                                Add SSH Key
+                                {t('account.ssh.add')}
                             </Button>
                         </div>
 
@@ -184,11 +186,11 @@ const AccountSSHContainer = () => {
                                 <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-[#ffffff11] flex items-center justify-center'>
                                     <Key width={22} height={22} className='text-zinc-400' fill='currentColor' />
                                 </div>
-                                <h3 className='text-lg font-medium text-zinc-200 mb-2'>No SSH Keys</h3>
+                                <h3 className='text-lg font-medium text-zinc-200 mb-2'>
+                                    {t('account.ssh.empty_title')}
+                                </h3>
                                 <p className='text-sm text-zinc-400 max-w-sm mx-auto'>
-                                    {!data
-                                        ? 'Loading your SSH keys...'
-                                        : "You haven't added any SSH keys yet. Add one to securely access your servers."}
+                                    {!data ? t('account.ssh.loading') : t('account.ssh.empty_description')}
                                 </p>
                             </div>
                         ) : (
@@ -212,9 +214,14 @@ const AccountSSHContainer = () => {
                                                         </h4>
                                                     </div>
                                                     <div className='flex items-center gap-4 text-xs text-zinc-400'>
-                                                        <span>Added: {format(key.createdAt, 'MMM d, yyyy HH:mm')}</span>
+                                                        <span>
+                                                            {t('account.ssh.added')}{' '}
+                                                            {format(key.createdAt, 'MMM d, yyyy HH:mm', {
+                                                                locale: dateFnsLocale,
+                                                            })}
+                                                        </span>
                                                         <div className='flex items-center gap-2'>
-                                                            <span>Fingerprint:</span>
+                                                            <span>{t('account.ssh.fingerprint')}</span>
                                                             <code className='flex gap-1 font-mono px-2 py-1 bg-mocha-400 border border-mocha-200 rounded text-zinc-300'>
                                                                 {showKeys[key.fingerprint] ? (
                                                                     <EyeSlash

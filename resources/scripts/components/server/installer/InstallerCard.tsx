@@ -4,6 +4,8 @@ import { useState } from 'react';
 
 import type { MarketplaceProject } from '@/api/server/marketplace';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import { formatNumber } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 import type { InstalledEntry } from './installedState';
@@ -16,13 +18,20 @@ interface InstallerCardProps {
     installing?: boolean;
 }
 
-const formatNumber = (n: number): string => {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+const formatCount = (n: number, locale: string): string => {
+    if (n >= 1_000_000) {
+        return `${formatNumber(n / 1_000_000, locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}M`;
+    }
+
+    if (n >= 1_000) {
+        return `${formatNumber(n / 1_000, locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}K`;
+    }
+
     return String(n);
 };
 
 const InstallerCard = ({ project, installedEntry, onInstall, installing }: InstallerCardProps) => {
+    const { t, locale } = useTranslation();
     const isInstalled = Boolean(installedEntry);
     // Some marketplace projects have no usable icon (Hangar projects without a
     // custom avatar 404 on the CDN; some Spiget resources have none at all).
@@ -61,7 +70,11 @@ const InstallerCard = ({ project, installedEntry, onInstall, installing }: Insta
                     <div className='flex flex-wrap items-center gap-2'>
                         <h3
                             className='truncate text-sm font-semibold'
-                            title={project.url ? `${project.title} — open project page` : project.title}
+                            title={
+                                project.url
+                                    ? t('server.installer.open_project_page', { title: project.title })
+                                    : project.title
+                            }
                         >
                             {project.url ? (
                                 <a
@@ -85,16 +98,18 @@ const InstallerCard = ({ project, installedEntry, onInstall, installing }: Insta
                                 className='flex items-center gap-1 rounded-md bg-brand-400/20 px-1.5 py-0.5 text-[10px] font-medium text-brand-400'
                             >
                                 <Check width={11} height={11} fill='currentColor' />
-                                Installed
+                                {t('server.installer.installed')}
                             </span>
                         )}
                     </div>
-                    <p className='mt-0.5 truncate text-xs text-cream-400/60'>by {project.author || 'Unknown'}</p>
+                    <p className='mt-0.5 truncate text-xs text-cream-400/60'>
+                        {t('server.installer.by_author', { author: project.author || t('common.unknown') })}
+                    </p>
                 </div>
             </div>
 
             <p className='mt-3 line-clamp-2 min-h-[2.5rem] text-xs leading-relaxed text-cream-400/70'>
-                {project.description || 'No description provided.'}
+                {project.description || t('server.installer.no_description')}
             </p>
 
             <div className='mt-3 flex flex-wrap gap-1.5'>
@@ -109,7 +124,9 @@ const InstallerCard = ({ project, installedEntry, onInstall, installing }: Insta
             </div>
 
             <div className='mt-auto flex items-center justify-between pt-4'>
-                <span className='text-[11px] text-cream-400/50'>{formatNumber(project.downloads)} downloads</span>
+                <span className='text-[11px] text-cream-400/50'>
+                    {t('server.installer.downloads', { count: formatCount(project.downloads, locale) })}
+                </span>
                 <Button
                     size='sm'
                     variant={isInstalled ? 'attention' : 'secondary'}
@@ -122,7 +139,11 @@ const InstallerCard = ({ project, installedEntry, onInstall, installing }: Insta
                     ) : (
                         <ArrowDownToLine width={16} height={16} fill='currentColor' />
                     )}
-                    {installing ? 'Installing…' : isInstalled ? 'Manage' : 'Install'}
+                    {installing
+                        ? t('server.installer.installing_ellipsis')
+                        : isInstalled
+                          ? t('server.installer.manage')
+                          : t('server.installer.install')}
                 </Button>
             </div>
         </div>

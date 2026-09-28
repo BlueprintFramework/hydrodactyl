@@ -35,7 +35,7 @@ class LogoController extends Controller
         $this->logoService->handle($request->validated());
 
         $this->kernel->call('queue:restart');
-        $this->alert->success('Logo settings have been updated successfully.')->flash();
+        $this->alert->success(__('admin/settings.notices.logo'))->flash();
 
         return redirect()->route('admin.settings.logo');
     }

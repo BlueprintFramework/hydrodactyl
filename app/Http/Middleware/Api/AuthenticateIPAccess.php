@@ -43,6 +43,6 @@ class AuthenticateIPAccess
             ->property('identifier', $token->identifier)
             ->log();
 
-        throw new AccessDeniedHttpException('This IP address (' . $request->ip() . ') does not have permission to access the API using these credentials.');
+        throw new AccessDeniedHttpException(__('exceptions.middleware.ip_not_allowed', ['ip' => $request->ip()]));
     }
 }

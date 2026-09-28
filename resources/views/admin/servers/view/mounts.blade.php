@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('title')
-    Server — {{ $server->name }}: Mounts
+    {{ __('admin/server.view.mounts.title', ['server' => $server->name]) }}
 @endsection
 
 @section('content-header')
-    <h1>{{ $server->name }}<small>Manage server mounts.</small></h1>
+    <h1>{{ $server->name }}<small>{{ __('admin/server.view.mounts.description') }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li><a href="{{ route('admin.servers') }}">{{ __('admin/navigation.sidebar.servers') }}</a></li>
         <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
-        <li class="active">Mounts</li>
+        <li class="active">{{ __('admin/server.partials.navigation.mounts') }}</li>
     </ol>
 @endsection
 
@@ -21,17 +21,17 @@
         <div class="col-sm-12">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Available Mounts</h3>
+                    <h3 class="box-title">{{ __('admin/server.view.mounts.available_mounts') }}</h3>
                 </div>
 
                 <div class="box-body table-responsible no-padding">
                     <table class="table table-hover">
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Source</th>
-                            <th>Target</th>
-                            <th>Status</th>
+                            <th>{{ __('strings.id') }}</th>
+                            <th>{{ __('strings.name') }}</th>
+                            <th>{{ __('admin/server.view.mounts.source') }}</th>
+                            <th>{{ __('admin/server.view.mounts.target') }}</th>
+                            <th>{{ __('strings.status') }}</th>
                             <th></th>
                         </tr>
 
@@ -44,7 +44,7 @@
 
                                 @if (! in_array($mount->id, $server->mounts->pluck('id')->toArray()))
                                     <td class="col-sm-2 middle">
-                                        <span class="label label-primary">Unmounted</span>
+                                        <span class="label label-primary">{{ __('admin/server.view.mounts.unmounted') }}</span>
                                     </td>
 
                                     <td class="col-sm-1 middle">
@@ -56,7 +56,7 @@
                                     </td>
                                 @else
                                     <td class="col-sm-2 middle">
-                                        <span class="label label-success">Mounted</span>
+                                        <span class="label label-success">{{ __('admin/server.view.mounts.mounted') }}</span>
                                     </td>
 
                                     <td class="col-sm-1 middle">

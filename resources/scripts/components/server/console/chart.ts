@@ -4,7 +4,7 @@ import { Chart as ChartJS, Filler, LinearScale, LineController, LineElement, Poi
 import { deepmerge, deepmergeCustom } from 'deepmerge-ts';
 import { useState } from 'react';
 import type { DeepPartial } from 'ts-essentials';
-
+import { formatNumber } from '@/lib/formatters';
 import { hexToRgba } from '@/lib/helpers';
 
 ChartJS.register(LineController, LineElement, PointElement, LinearScale, Filler);
@@ -129,7 +129,7 @@ function useChart(label: string, opts?: UseChartOptions) {
     return { props: { data, options }, push, clear };
 }
 
-function useChartTickLabel(label: string, max: number, tickLabel: string, roundTo?: number) {
+function useChartTickLabel(label: string, max: number, tickLabel: string, roundTo?: number, locale = 'en-US') {
     return useChart(label, {
         sets: 1,
         options: {
@@ -138,7 +138,14 @@ function useChartTickLabel(label: string, max: number, tickLabel: string, roundT
                     suggestedMax: max,
                     ticks: {
                         callback(value) {
-                            return `${roundTo ? Number(value).toFixed(roundTo) : value}${tickLabel}`;
+                            const tick = roundTo
+                                ? formatNumber(Number(value), locale, {
+                                      minimumFractionDigits: roundTo,
+                                      maximumFractionDigits: roundTo,
+                                  })
+                                : value;
+
+                            return `${tick}${tickLabel}`;
                         },
                     },
                 },

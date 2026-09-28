@@ -53,7 +53,7 @@ class EggShareController extends Controller
     public function import(EggImportFormRequest $request): RedirectResponse
     {
         $egg = $this->importerService->handle($request->file('import_file'), $request->input('import_to_nest'));
-        $this->alert->success(trans('admin/nests.eggs.notices.imported'))->flash();
+        $this->alert->success(__('admin/nests.eggs.notices.imported'))->flash();
 
         return redirect()->route('admin.nests.egg.view', ['egg' => $egg->id]);
     }
@@ -75,23 +75,23 @@ class EggShareController extends Controller
             $parsed_url = parse_url($request->input('import_file_url'));
 
             if (!is_array($parsed_url) || !isset($parsed_url['host']) || !in_array($parsed_url['host'], $allowed_hosts)) {
-                $this->alert->danger('The Egg import URL is not from an allowed host.')->flash();
+                $this->alert->danger(__('admin/nests.eggs.notices.import_url_host'))->flash();
                 return redirect()->back();
             }
             if (!isset($parsed_url['scheme']) || !in_array($parsed_url['scheme'], ['http', 'https'])) {
-                $this->alert->danger('The Egg import URL scheme is invalid.')->flash();
+                $this->alert->danger(__('admin/nests.eggs.notices.import_url_scheme'))->flash();
                 return redirect()->back();
             }
 
             $response = @file_get_contents($request->input('import_file_url'));
 
             if ($response === false) {
-                $this->alert->danger('Fetching the Egg from the URL failed.')->flash();
+                $this->alert->danger(__('admin/nests.eggs.notices.import_fetch_failed'))->flash();
                 return redirect()->back();
             }
 
             $egg = $this->importerService->handleFromString($response, $request->input('import_to_nest'));
-            $this->alert->success(trans('admin/nests.eggs.notices.imported'))->flash();
+            $this->alert->success(__('admin/nests.eggs.notices.imported'))->flash();
 
             return redirect()->route('admin.nests.egg.view', ['egg' => $egg->id]);
         } catch (\Throwable $e) {
@@ -111,7 +111,7 @@ class EggShareController extends Controller
     public function update(EggImportFormRequest $request, Egg $egg): RedirectResponse
     {
         $this->updateImporterService->handle($egg, $request->file('import_file'));
-        $this->alert->success(trans('admin/nests.eggs.notices.updated_via_import'))->flash();
+        $this->alert->success(__('admin/nests.eggs.notices.updated_via_import'))->flash();
 
         return redirect()->route('admin.nests.egg.view', ['egg' => $egg]);
     }

@@ -1,6 +1,7 @@
 import Can from '@/components/elements/Can';
 import { Checkbox } from '@/components/elements/CheckboxNew';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import type { UnifiedBackup } from '../types';
 
 interface BulkActionBarProps {
@@ -18,6 +19,8 @@ const BulkActionBar = ({
     onClear,
     onDeleteSelected,
 }: BulkActionBarProps) => {
+    const { t } = useTranslation();
+
     if (selectableBackups.length === 0) return null;
 
     const allSelected = selectedBackups.size === selectableBackups.length && selectableBackups.length > 0;
@@ -29,10 +32,10 @@ const BulkActionBar = ({
                 <span className='text-sm text-zinc-300'>
                     {selectedBackups.size > 0 ? (
                         <>
-                            <span className='font-medium'>{selectedBackups.size}</span> selected
+                            <span className='font-medium'>{selectedBackups.size}</span> {t('server.backups.selected')}
                         </>
                     ) : (
-                        'Select backups'
+                        t('server.backups.select_backups')
                     )}
                 </span>
             </div>
@@ -41,11 +44,11 @@ const BulkActionBar = ({
                 className={`flex items-center gap-3 transition-opacity ${selectedBackups.size > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             >
                 <Button variant='secondary' onClick={onClear}>
-                    Clear
+                    {t('common.clear')}
                 </Button>
                 <Can action='backup.delete'>
                     <Button variant='destructive' onClick={onDeleteSelected}>
-                        Delete Selected ({selectedBackups.size})
+                        {t('server.backups.delete_selected', { count: selectedBackups.size })}
                     </Button>
                 </Can>
             </div>

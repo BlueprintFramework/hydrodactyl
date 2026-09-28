@@ -6,6 +6,7 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { Link } from 'react-router-dom';
 
 import ActivityLogMetaButton from '@/components/elements/activity/ActivityLogMetaButton';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { formatObjectToIdentString } from '@/lib/objects';
 
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const ActivityLogEntry = ({ activity, children }: Props) => {
+    const { t, dateFnsLocale } = useTranslation();
     const { pathTo } = useLocationHash();
     const actor = activity.relationships.actor;
 
@@ -25,10 +27,14 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
             {/* Compact Avatar */}
             <div className='flex-shrink-0 w-8 h-8 rounded-full bg-zinc-600 overflow-hidden mr-3'>
                 {actor?.image ? (
-                    <img src={actor.image} alt={actor.username || 'System'} className='w-full h-full object-cover' />
+                    <img
+                        src={actor.image}
+                        alt={actor.username || t('server.activity.system')}
+                        className='w-full h-full object-cover'
+                    />
                 ) : (
                     <div className='w-full h-full flex items-center justify-center text-zinc-300 text-xs font-semibold'>
-                        {(actor?.username || 'S').charAt(0).toUpperCase()}
+                        {(actor?.username || t('server.activity.system')).charAt(0).toUpperCase()}
                     </div>
                 )}
             </div>
@@ -36,7 +42,9 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
             {/* Main Content - Compact Layout */}
             <div className='flex-1 min-w-0'>
                 <div className='flex items-center gap-2 text-sm'>
-                    <span className='font-medium text-zinc-100 truncate'>{actor?.username || 'System'}</span>
+                    <span className='font-medium text-zinc-100 truncate'>
+                        {actor?.username || t('server.activity.system')}
+                    </span>
                     <span className='text-zinc-500'>•</span>
                     <Link
                         to={`#${pathTo({ event: activity.event })}`}
@@ -62,7 +70,9 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
                     {activity.ip && (
                         <span className='font-mono bg-zinc-800/30 px-1.5 py-0.5 rounded'>{activity.ip}</span>
                     )}
-                    <span>{formatDistanceToNowStrict(activity.timestamp, { addSuffix: true })}</span>
+                    <span>
+                        {formatDistanceToNowStrict(activity.timestamp, { addSuffix: true, locale: dateFnsLocale })}
+                    </span>
 
                     {/* Inline properties for compact view */}
                     {!activity.hasAdditionalMetadata &&

@@ -37,7 +37,7 @@ class SubdomainController extends ClientApiController
             if (!$feature) {
                 return response()->json([
                     'supported' => false,
-                    'message' => 'This server does not support subdomains.'
+                    'message' => __('exceptions.client.subdomains.unsupported')
                 ]);
             }
 
@@ -60,7 +60,7 @@ class SubdomainController extends ClientApiController
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Unable to retrieve subdomain information.'
+                'error' => __('exceptions.client.subdomains.retrieve_failed')
             ], 500);
         }
     }
@@ -88,7 +88,7 @@ class SubdomainController extends ClientApiController
 
             if (!$domain) {
                 return response()->json([
-                    'error' => 'Selected domain is not available.'
+                    'error' => __('exceptions.client.subdomains.domain_unavailable')
                 ], 422);
             }
 
@@ -100,7 +100,7 @@ class SubdomainController extends ClientApiController
                     } catch (\Exception $e) {
                         Log::error("Failed to delete existing subdomain {$existingSubdomain->full_domain} during replacement: {$e->getMessage()}");
                         return response()->json([
-                            'error' => 'Failed to remove existing subdomain. Please try again.'
+                            'error' => __('exceptions.client.subdomains.remove_failed')
                         ], 422);
                     }
                 }
@@ -115,7 +115,7 @@ class SubdomainController extends ClientApiController
             );
 
             return response()->json([
-                'message' => $existingSubdomains->isNotEmpty() ? 'Subdomain replaced successfully.' : 'Subdomain created successfully.',
+                'message' => $existingSubdomains->isNotEmpty() ? __('exceptions.client.subdomains.replaced') : __('exceptions.client.subdomains.created'),
                 'subdomain' => [
                     'object' => 'server_subdomain',
                     'attributes' => [
@@ -137,7 +137,7 @@ class SubdomainController extends ClientApiController
                 'existing_subdomains_count' => $existingSubdomains->count()
             ]);
             return response()->json([
-                'error' => $existingSubdomains->isNotEmpty() ? 'Failed to replace subdomain.' : 'Failed to create subdomain.'
+                'error' => $existingSubdomains->isNotEmpty() ? __('exceptions.client.subdomains.replace_failed') : __('exceptions.client.subdomains.create_failed')
             ], 422);
         }
     }
@@ -155,7 +155,7 @@ class SubdomainController extends ClientApiController
             $serverSubdomains = $server->subdomains()->where('is_active', true)->get();
             if ($serverSubdomains->isEmpty()) {
                 return response()->json([
-                    'error' => 'Server does not have any active subdomains.'
+                    'error' => __('exceptions.client.subdomains.none_active')
                 ], 404);
             }
 
@@ -165,7 +165,7 @@ class SubdomainController extends ClientApiController
             }
 
             return response()->json([
-                'message' => 'Subdomain(s) deleted successfully.'
+                'message' => __('exceptions.client.subdomains.deleted')
             ]);
         } catch (\Exception $e) {
             Log::error('Subdomain creation failed', [
@@ -177,7 +177,7 @@ class SubdomainController extends ClientApiController
                 'existing_subdomains_count' => $existingSubdomains->count()
             ]);
             return response()->json([
-                'error' => 'Failed to delete subdomain(s).'
+                'error' => __('exceptions.client.subdomains.delete_failed')
             ], 422);
         }
     }
@@ -203,7 +203,7 @@ class SubdomainController extends ClientApiController
 
             if (!$domain) {
                 return response()->json([
-                    'error' => 'Selected domain is not available.'
+                    'error' => __('exceptions.client.subdomains.domain_unavailable')
                 ], 422);
             }
 
@@ -216,7 +216,7 @@ class SubdomainController extends ClientApiController
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Unable to check subdomain availability.'
+                'error' => __('exceptions.client.subdomains.check_failed')
             ], 422);
         }
     }

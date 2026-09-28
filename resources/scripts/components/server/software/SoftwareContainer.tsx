@@ -16,6 +16,8 @@ import Spinner from '@/components/elements/Spinner';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import OperationProgressModal from '@/components/server/operations/OperationProgressModal';
 import WingsOperationProgressModal from '@/components/server/operations/WingsOperationProgressModal';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 import { ServerContext } from '@/state/server';
 import GameSelection from './GameSelection';
@@ -27,7 +29,16 @@ import type { Egg, FlowStep, Nest } from './types';
 import { validateEnvironmentVariables } from './types';
 import WipeConfirmationModal from './WipeConfirmationModal';
 
+const STEP_LABELS: Record<FlowStep, TranslationKey> = {
+    overview: 'server.software.steps.overview',
+    'select-game': 'server.software.steps.select_game',
+    'select-software': 'server.software.steps.select_software',
+    configure: 'server.software.steps.configure',
+    review: 'server.software.steps.review',
+};
+
 const SoftwareContainer = () => {
+    const { t } = useTranslation();
     const serverData = ServerContext.useStoreState((state) => state.server.data);
     const daemonType = getGlobalDaemonType();
     const uuid = serverData?.uuid;
@@ -216,9 +227,13 @@ const SoftwareContainer = () => {
         if (eggPreview) {
             const variable = eggPreview.variables.find((v) => v.env_variable === envVariable);
             if (variable) {
-                const errors = validateEnvironmentVariables([variable], {
-                    [envVariable]: value,
-                });
+                const errors = validateEnvironmentVariables(
+                    [variable],
+                    {
+                        [envVariable]: value,
+                    },
+                    t,
+                );
                 setVariableErrors((prev) => {
                     const newErrors = { ...prev };
                     if (errors.length > 0 && errors[0]) {
@@ -253,10 +268,10 @@ const SoftwareContainer = () => {
         setIsLoading(true);
 
         try {
-            const validationErrors = validateEnvironmentVariables(eggPreview.variables, pendingVariables);
+            const validationErrors = validateEnvironmentVariables(eggPreview.variables, pendingVariables, t);
 
             if (validationErrors.length > 0) {
-                throw new Error(`Validation failed:\n${validationErrors.join('\n')}`);
+                throw new Error(`${t('server.software.validation.failed')}:\n${validationErrors.join('\n')}`);
             }
 
             const actualDockerImage =
@@ -298,7 +313,7 @@ const SoftwareContainer = () => {
                 });
             }
 
-            toast.success('Software change operation started successfully');
+            toast.success(t('server.software.operation_started'));
 
             resetFlow();
         } catch (error) {
@@ -317,15 +332,15 @@ const SoftwareContainer = () => {
 
     const handleOperationComplete = (operation: ServerOperation) => {
         if (operation.is_completed) {
-            toast.success('Your software configuration has been applied successfully');
+            toast.success(t('server.software.operation_success'));
             mutate();
         } else if (operation.has_failed) {
-            toast.error(operation.message || 'The software configuration change failed');
+            toast.error(operation.message || t('server.software.operation_failed'));
         }
     };
 
     const handleOperationError = (error: Error) => {
-        toast.error(error.message || 'An error occurred while monitoring the operation');
+        toast.error(error.message || t('server.software.operation_monitor_error'));
     };
 
     const closeOperationModal = () => {
@@ -337,11 +352,11 @@ const SoftwareContainer = () => {
 
     if (!serverData) {
         return (
-            <ServerContentBlock title='Software Management'>
+            <ServerContentBlock title={t('server.software.title')}>
                 <div className='flex items-center justify-center h-64'>
                     <div className='flex flex-col items-center text-center'>
                         <Spinner size='large' />
-                        <p className='text-neutral-400 mt-4'>Loading server information...</p>
+                        <p className='text-neutral-400 mt-4'>{t('server.software.loading')}</p>
                     </div>
                 </div>
             </ServerContentBlock>
@@ -349,22 +364,20 @@ const SoftwareContainer = () => {
     }
 
     return (
-        <ServerContentBlock title='Software Management'>
+        <ServerContentBlock title={t('server.software.title')}>
             <ServerHeader />
             <div className='space-y-6'>
-                <MainPageHeader direction='column' title='Software Management'>
-                    <p className='text-neutral-400 leading-relaxed'>
-                        Change your server&apos;s game or software with our guided configuration wizard
-                    </p>
+                <MainPageHeader direction='column' title={t('server.software.title')}>
+                    <p className='text-neutral-400 leading-relaxed'>{t('server.software.description')}</p>
                 </MainPageHeader>
 
                 {currentStep !== 'overview' && (
                     <div className='p-4 bg-[#ffffff08] border border-[#ffffff12] rounded-lg'>
                         <div className='flex items-center justify-between mb-2'>
-                            <span className='text-sm font-medium text-neutral-200 capitalize'>
-                                {currentStep.replace('-', ' ')}
+                            <span className='text-sm font-medium text-neutral-200'>{t(STEP_LABELS[currentStep])}</span>
+                            <span className='text-sm text-neutral-400'>
+                                {t('server.software.step_indicator', { step: steps.indexOf(currentStep), total: 4 })}
                             </span>
-                            <span className='text-sm text-neutral-400'>Step {steps.indexOf(currentStep)} of 4</span>
                         </div>
                         <div className='w-full bg-[#ffffff12] rounded-full h-2'>
                             <div
@@ -453,7 +466,7 @@ const SoftwareContainer = () => {
                 <OperationProgressModal
                     visible={showOperationModal}
                     operationId={currentOperationId}
-                    operationType='Software Change'
+                    operationType={t('server.software.operation_type')}
                     onClose={closeOperationModal}
                     onComplete={handleOperationComplete}
                     onError={handleOperationError}
@@ -463,14 +476,14 @@ const SoftwareContainer = () => {
                 <WingsOperationProgressModal
                     visible={showOperationModal}
                     operationId={currentOperationId}
-                    operationType='Software Change'
+                    operationType={t('server.software.operation_type')}
                     onClose={closeOperationModal}
                     onComplete={handleOperationComplete}
                     onError={handleOperationError}
                 />
             )}
             {daemonType !== 'elytra' && daemonType !== 'wings' && (
-                <div>Could not find Operation Modal for this daemon: Using ${daemonType}</div>
+                <div>{t('server.software.operation_modal_missing', { daemon: daemonType ?? '' })}</div>
             )}
         </ServerContentBlock>
     );

@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('title')
-    Server — {{ $server->name }}: Details
+    {{ __('admin/server.view.details.title', ['server' => $server->name]) }}
 @endsection
 
 @section('content-header')
-    <h1>{{ $server->name }}<small>Edit details for this server including owner and container.</small></h1>
+    <h1>{{ $server->name }}<small>{{ __('admin/server.view.details.description') }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.servers') }}">Servers</a></li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li><a href="{{ route('admin.servers') }}">{{ __('admin/navigation.sidebar.servers') }}</a></li>
         <li><a href="{{ route('admin.servers.view', $server->id) }}">{{ $server->name }}</a></li>
-        <li class="active">Details</li>
+        <li class="active">{{ __('admin/server.partials.navigation.details') }}</li>
     </ol>
 @endsection
 
@@ -20,37 +20,37 @@
     <div class="col-xs-12">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">Base Information</h3>
+                <h3 class="box-title">{{ __('admin/server.view.details.base_information') }}</h3>
             </div>
             <form action="{{ route('admin.servers.view.details', $server->id) }}" method="POST">
                 <div class="box-body">
                     <div class="form-group">
-                        <label for="name" class="control-label">Server Name <span class="field-required"></span></label>
+                        <label for="name" class="control-label">{{ __('admin/server.view.details.server_name') }} <span class="field-required"></span></label>
                         <input type="text" name="name" value="{{ old('name', $server->name) }}" class="form-control" />
-                        <p class="text-muted small">Character limits: <code>a-zA-Z0-9_-</code> and <code>[Space]</code>.</p>
+                        <p class="text-muted small">{!! __('admin/server.view.details.character_limits') !!}</p>
                     </div>
                     <div class="form-group">
-                        <label for="external_id" class="control-label">External Identifier</label>
+                        <label for="external_id" class="control-label">{{ __('admin/server.view.details.external_identifier') }}</label>
                         <input type="text" name="external_id" value="{{ old('external_id', $server->external_id) }}" class="form-control" />
-                        <p class="text-muted small">Leave empty to not assign an external identifier for this server. The external ID should be unique to this server and not be in use by any other servers.</p>
+                        <p class="text-muted small">{{ __('admin/server.view.details.external_identifier_help') }}</p>
                     </div>
                     <div class="form-group">
-                        <label for="pUserId" class="control-label">Server Owner <span class="field-required"></span></label>
+                        <label for="pUserId" class="control-label">{{ __('admin/server.view.details.server_owner') }} <span class="field-required"></span></label>
                         <select name="owner_id" class="form-control" id="pUserId">
                             <option value="{{ $server->owner_id }}" selected>{{ $server->user->email }}</option>
                         </select>
-                        <p class="text-muted small">You can change the owner of this server by changing this field to an email matching another use on this system. If you do this a new daemon security token will be generated automatically.</p>
+                        <p class="text-muted small">{{ __('admin/server.view.details.server_owner_help') }}</p>
                     </div>
                     <div class="form-group">
-                        <label for="description" class="control-label">Server Description</label>
+                        <label for="description" class="control-label">{{ __('admin/server.view.details.server_description') }}</label>
                         <textarea name="description" rows="3" class="form-control">{{ old('description', $server->description) }}</textarea>
-                        <p class="text-muted small">A brief description of this server.</p>
+                        <p class="text-muted small">{{ __('admin/server.view.details.server_description_help') }}</p>
                     </div>
                 </div>
                 <div class="box-footer">
                     {!! csrf_field() !!}
                     {!! method_field('PATCH') !!}
-                    <input type="submit" class="btn btn-sm btn-primary" value="Update Details" />
+                    <input type="submit" class="btn btn-sm btn-primary" value="{{ __('admin/server.view.details.update_button') }}" />
                 </div>
             </form>
         </div>
@@ -89,7 +89,7 @@
             if (data.loading) return escapeHtml(data.text);
 
             return '<div class="user-block"> \
-                <img class="img-circle img-bordered-xs" src="https://www.gravatar.com/avatar/' + escapeHtml(data.md5) + '?s=120" alt="User Image"> \
+                <img class="img-circle img-bordered-xs" src="https://www.gravatar.com/avatar/' + escapeHtml(data.md5) + '?s=120" alt="' + @js(__('admin/server.view.details.user_image')) + '"> \
                 <span class="username"> \
                     <a href="#">' + escapeHtml(data.name_first) + ' ' + escapeHtml(data.name_last) +'</a> \
                 </span> \
@@ -109,7 +109,7 @@
 
             return '<div> \
                 <span> \
-                    <img class="img-rounded img-bordered-xs" src="https://www.gravatar.com/avatar/' + escapeHtml(data.md5) + '?s=120" style="height:28px;margin-top:-4px;" alt="User Image"> \
+                    <img class="img-rounded img-bordered-xs" src="https://www.gravatar.com/avatar/' + escapeHtml(data.md5) + '?s=120" style="height:28px;margin-top:-4px;" alt="' + @js(__('admin/server.view.details.user_image')) + '"> \
                 </span> \
                 <span style="padding-left:5px;"> \
                     ' + escapeHtml(data.name_first) + ' ' + escapeHtml(data.name_last) + ' (<strong>' + escapeHtml(data.email) + '</strong>) \

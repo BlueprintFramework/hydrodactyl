@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('title')
-    {{ $node->name }}: Servers
+    {{ __('admin/node.view.servers.title', ['name' => $node->name]) }}
 @endsection
 
 @section('content-header')
-    <h1>{{ $node->name }}<small>All servers currently assigned to this node.</small></h1>
+    <h1>{{ $node->name }}<small>{{ __('admin/node.view.servers.subtitle') }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.nodes') }}">Nodes</a></li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li><a href="{{ route('admin.nodes') }}">{{ __('admin/navigation.sidebar.nodes') }}</a></li>
         <li><a href="{{ route('admin.nodes.view', $node->id) }}">{{ $node->name }}</a></li>
-        <li class="active">Servers</li>
+        <li class="active">{{ __('strings.servers') }}</li>
     </ol>
 @endsection
 
@@ -19,11 +19,11 @@
     <div class="col-xs-12">
         <div class="nav-tabs-custom nav-tabs-floating">
             <ul class="nav nav-tabs">
-                <li><a href="{{ route('admin.nodes.view', $node->id) }}">About</a></li>
-                <li><a href="{{ route('admin.nodes.view.settings', $node->id) }}">Settings</a></li>
-                <li><a href="{{ route('admin.nodes.view.configuration', $node->id) }}">Configuration</a></li>
-                <li><a href="{{ route('admin.nodes.view.allocation', $node->id) }}">Allocation</a></li>
-                <li class="active"><a href="{{ route('admin.nodes.view.servers', $node->id) }}">Servers</a></li>
+                <li><a href="{{ route('admin.nodes.view', $node->id) }}">{{ __('admin/node.view.tabs.about') }}</a></li>
+                <li><a href="{{ route('admin.nodes.view.settings', $node->id) }}">{{ __('strings.settings') }}</a></li>
+                <li><a href="{{ route('admin.nodes.view.configuration', $node->id) }}">{{ __('strings.configuration') }}</a></li>
+                <li><a href="{{ route('admin.nodes.view.allocation', $node->id) }}">{{ __('admin/node.view.tabs.allocation') }}</a></li>
+                <li class="active"><a href="{{ route('admin.nodes.view.servers', $node->id) }}">{{ __('strings.servers') }}</a></li>
             </ul>
         </div>
     </div>
@@ -32,15 +32,15 @@
     <div class="col-sm-12">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">Process Manager</h3>
+                <h3 class="box-title">{{ __('admin/node.view.servers.process_manager') }}</h3>
             </div>
             <div class="box-body table-responsive no-padding">
                 <table class="table table-hover">
                     <tr>
-                        <th>ID</th>
-                        <th>Server Name</th>
-                        <th>Owner</th>
-                        <th>Service</th>
+                        <th>{{ __('strings.id') }}</th>
+                        <th>{{ __('admin/node.view.servers.server_name') }}</th>
+                        <th>{{ __('strings.owner') }}</th>
+                        <th>{{ __('admin/node.view.servers.service') }}</th>
                     </tr>
                     @foreach($servers as $server)
                         <tr data-server="{{ $server->uuid }}">

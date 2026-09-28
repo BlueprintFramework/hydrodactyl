@@ -3,6 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { forwardRef } from 'react';
 
 import FlashMessageRender from '@/components/FlashMessageRender';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import SecondaryLink from '../ui/secondary-link';
 
@@ -19,7 +20,9 @@ const TitleSection = ({ title, subtitle }: { title?: string; subtitle?: string }
 );
 
 const ReturnToLogin = () => {
-    return <SecondaryLink to='/auth/login'>Return to login</SecondaryLink>;
+    const { t } = useTranslation();
+
+    return <SecondaryLink to='/auth/login'>{t('auth.return_to_login')}</SecondaryLink>;
 };
 
 const LoginFormContainer = forwardRef<HTMLFormElement, PropsWithChildren<Props>>(

@@ -16,6 +16,7 @@ import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import VirtualizedList from '@/components/elements/VirtualizedList';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useFlashKey } from '@/plugins/useFlash';
 import type { ApplicationStore } from '@/state';
 import ServerHeader from '../HeaderManger';
@@ -28,6 +29,7 @@ interface CreateValues {
 }
 
 const AccountApiContainer = () => {
+    const { t, dateFnsLocale } = useTranslation();
     const [deleteIdentifier, setDeleteIdentifier] = useState('');
     const [keys, setKeys] = useState<ApiKey[]>([]);
     const [loading, setLoading] = useState(true);
@@ -82,10 +84,10 @@ const AccountApiContainer = () => {
     };
 
     return (
-        <PageContentBlock title={'API Key'}>
+        <PageContentBlock title={t('account.api_keys.title')}>
             <FlashMessageRender byKey='account:api-keys' />
             <ApiKeyModal visible={apiKey.length > 0} onModalDismissed={() => setApiKey('')} apiKey={apiKey} />
-            <ServerHeader title='API Keys' />
+            <ServerHeader title={t('account.api_keys.heading')} />
 
             <CreateApiKeyModal
                 open={showCreateModal}
@@ -105,13 +107,14 @@ const AccountApiContainer = () => {
                     <div className='rounded-xl p-4 sm:p-6 shadow-sm'>
                         <SpinnerOverlay visible={loading} />
                         <Dialog.Confirm
-                            title={'Delete API Key'}
-                            confirm={'Delete Key'}
+                            title={t('account.api_keys.delete_title')}
+                            confirm={t('account.api_keys.delete_confirm')}
                             open={!!deleteIdentifier}
                             onClose={() => setDeleteIdentifier('')}
                             onConfirmed={() => doDeletion(deleteIdentifier)}
                         >
-                            All requests using the <Code>{deleteIdentifier}</Code> key will be invalidated.
+                            {t('account.api_keys.delete_message_prefix')} <Code>{deleteIdentifier}</Code>{' '}
+                            {t('account.api_keys.delete_message_suffix')}
                         </Dialog.Confirm>
                         <div className='mb-4'>
                             <Button
@@ -120,7 +123,7 @@ const AccountApiContainer = () => {
                                 className='flex items-center gap-2'
                             >
                                 <Plus width={22} height={22} fill='currentColor' />
-                                Create API Key
+                                {t('account.api_keys.create')}
                             </Button>
                         </div>
 
@@ -136,11 +139,15 @@ const AccountApiContainer = () => {
                                         </div>
                                         <div className='flex items-center gap-4 text-xs font-large text-text/20'>
                                             <span>
-                                                Last used:{' '}
-                                                {key.lastUsedAt ? format(key.lastUsedAt, 'MMM d, yyyy HH:mm') : 'Never'}
+                                                {t('account.api_keys.last_used')}{' '}
+                                                {key.lastUsedAt
+                                                    ? format(key.lastUsedAt, 'MMM d, yyyy HH:mm', {
+                                                          locale: dateFnsLocale,
+                                                      })
+                                                    : t('common.never')}
                                             </span>
                                             <div className='flex items-center gap-2 hover:cursor-pointer'>
-                                                <span>Key:</span>
+                                                <span>{t('account.api_keys.key_label')}</span>
 
                                                 <code className='font-mono px-2 py-1 bg-mocha-400 border border-mocha-200 rounded text-zinc-300 flex'>
                                                     <span className='flex items-center gap-1'>
@@ -196,9 +203,11 @@ const AccountApiContainer = () => {
                                     <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-mocha-400 flex items-center justify-center'>
                                         <Key width={22} height={22} className='text-zinc-400' fill='currentColor' />
                                     </div>
-                                    <h3 className='text-lg font-medium text-zinc-200 mb-2'>No API Keys</h3>
+                                    <h3 className='text-lg font-medium text-zinc-200 mb-2'>
+                                        {t('account.api_keys.empty_title')}
+                                    </h3>
                                     <p className='text-sm text-zinc-400 max-w-sm mx-auto'>
-                                        You haven't created any API keys yet. Create one to get started with the API.
+                                        {t('account.api_keys.empty_description')}
                                     </p>
                                 </div>
                             }

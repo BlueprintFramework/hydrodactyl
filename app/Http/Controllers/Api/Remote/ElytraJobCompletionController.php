@@ -23,7 +23,7 @@ class ElytraJobCompletionController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Job status updated successfully',
+                'message' => __('exceptions.remote.jobs.status_updated'),
             ]);
 
         } catch (\Exception $e) {

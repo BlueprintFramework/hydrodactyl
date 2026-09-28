@@ -7,6 +7,7 @@ export interface SetupData {
     name_last?: string;
     password: string;
     password_confirmation: string;
+    language?: string;
 }
 
 export interface SetupResponse {

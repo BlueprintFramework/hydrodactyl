@@ -83,7 +83,7 @@ class FindViableNodesService
         }
 
         if ($results->isEmpty()) {
-            throw new NoViableNodeException(trans('exceptions.deployment.no_viable_nodes'));
+            throw new NoViableNodeException(__('exceptions.deployment.no_viable_nodes'));
         }
 
         return $results;

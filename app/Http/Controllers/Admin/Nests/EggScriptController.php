@@ -58,7 +58,7 @@ class EggScriptController extends Controller
     public function update(EggScriptFormRequest $request, Egg $egg): RedirectResponse
     {
         $this->installScriptService->handle($egg, $request->normalize());
-        $this->alert->success(trans('admin/nests.eggs.notices.script_updated'))->flash();
+        $this->alert->success(__('admin/nests.eggs.notices.script_updated'))->flash();
 
         return redirect()->route('admin.nests.egg.scripts', $egg);
     }

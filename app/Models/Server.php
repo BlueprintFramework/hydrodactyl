@@ -252,14 +252,14 @@ class Server extends Model
     {
         // Ensure we have egg data and docker images
         if (!$this->egg || !is_array($this->egg->docker_images) || empty($this->egg->docker_images)) {
-            throw new \RuntimeException('Server egg has no docker images configured.');
+            throw new \RuntimeException(__('exceptions.servers.no_docker_images'));
         }
 
         $eggDockerImages = $this->egg->docker_images;
         $defaultImage = reset($eggDockerImages);
 
         if (empty($defaultImage)) {
-            throw new \RuntimeException('Server egg has no valid default docker image.');
+            throw new \RuntimeException(__('exceptions.servers.no_default_docker_image'));
         }
 
         return $defaultImage;

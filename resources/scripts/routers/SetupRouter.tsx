@@ -1,6 +1,8 @@
 import { Navigate } from 'react-router-dom';
 import Logo from '@/components/elements/HydroLogo';
+import LocaleDropdown from '@/components/elements/LocaleDropdown';
 import SetupContainer from '@/components/setup/SetupContainer';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 // `window.SetupRequired` is injected by the backend (templates/wrapper.blade.php)
 // only when the panel is unauthenticated and has zero users. Once any user
@@ -8,6 +10,8 @@ import SetupContainer from '@/components/setup/SetupContainer';
 const setupRequired = () => !!(window as { SetupRequired?: boolean }).SetupRequired;
 
 const SetupRouter = () => {
+    const { t } = useTranslation();
+
     if (!setupRequired()) {
         return <Navigate to='/' replace />;
     }
@@ -25,7 +29,8 @@ const SetupRouter = () => {
                 className='pointer-events-none fixed inset-0 z-1 opacity-[0.4]'
             />
             <div className='flex size-full'>
-                <div className='w-full max-w-4xl z-2 flex items-start sm:items-center bg-bg-lowered px-5 py-8 sm:px-[calc(var(--page-padding)*3)] sm:py-[calc(var(--page-padding)*2)] overflow-y-auto'>
+                <div className='relative w-full max-w-4xl z-2 flex items-start sm:items-center bg-bg-lowered px-5 py-8 sm:px-[calc(var(--page-padding)*3)] sm:py-[calc(var(--page-padding)*2)] overflow-y-auto'>
+                    <LocaleDropdown className='absolute top-5 right-5 z-10' />
                     <SetupContainer />
                 </div>
 
@@ -39,11 +44,10 @@ const SetupRouter = () => {
 
                     <div className='absolute inset-0 flex flex-col justify-end p-(--page-padding) gap-3'>
                         <h1 className='text-4xl font-semibold text-cream-200 text-wrap-pretty max-w-sm leading-tight'>
-                            Set up your panel.
+                            {t('setup.shell.title')}
                         </h1>
                         <p className='text-sm text-secondary max-w-sm leading-relaxed'>
-                            A fresh install has no administrator yet — let&apos;s create your first account and get you
-                            signed in.
+                            {t('setup.shell.description')}
                         </p>
                     </div>
 

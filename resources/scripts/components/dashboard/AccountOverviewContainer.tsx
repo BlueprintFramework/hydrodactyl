@@ -2,17 +2,20 @@ import { useLocation } from 'react-router-dom';
 import ConfigureTwoFactorForm from '@/components/dashboard/forms/ConfigureTwoFactorForm';
 import UpdateEmailAddressForm from '@/components/dashboard/forms/UpdateEmailAddressForm';
 import UpdatePasswordForm from '@/components/dashboard/forms/UpdatePasswordForm';
+import LanguageSelector from '@/components/dashboard/LanguageSelector';
 import ContentBox from '@/components/elements/ContentBox';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import MessageBox from '@/components/MessageBox';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import Code from '../elements/Code';
 
 const AccountOverviewContainer = () => {
+    const { t } = useTranslation();
     const { state } = useLocation();
 
     return (
-        <PageContentBlock title={'Account Settings'}>
+        <PageContentBlock title={t('account.overview.title')}>
             <div className='w-full h-full min-h-full flex-1 flex flex-col px-2 sm:px-0'>
                 {state?.twoFactorRedirect && (
                     <div
@@ -23,8 +26,8 @@ const AccountOverviewContainer = () => {
                                 'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
                         }}
                     >
-                        <MessageBox title={'2-Factor Required'} type={'error'}>
-                            Your account must have two-factor authentication enabled in order to continue.
+                        <MessageBox title={t('account.overview.two_factor_required_title')} type={'error'}>
+                            {t('account.overview.two_factor_required_description')}
                         </MessageBox>
                     </div>
                 )}
@@ -38,7 +41,7 @@ const AccountOverviewContainer = () => {
                                 'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
                         }}
                     >
-                        <ContentBox title={'Account Email'} showFlashes={'account:email'}>
+                        <ContentBox title={t('account.overview.email_title')} showFlashes={'account:email'}>
                             <UpdateEmailAddressForm />
                         </ContentBox>
                     </div>
@@ -52,13 +55,27 @@ const AccountOverviewContainer = () => {
                         }}
                     >
                         <div className='space-y-4'>
-                            <ContentBox title={'Account Password'} showFlashes={'account:password'}>
+                            <ContentBox title={t('account.overview.password_title')} showFlashes={'account:password'}>
                                 <UpdatePasswordForm />
                             </ContentBox>
-                            <ContentBox title={'Multi-Factor Authentication'}>
+                            <ContentBox title={t('account.overview.two_factor_title')}>
                                 <ConfigureTwoFactorForm />
                             </ContentBox>
                         </div>
+                    </div>
+
+                    <div
+                        className='transform-gpu skeleton-anim-2'
+                        style={{
+                            animationDelay: '90ms',
+                            animationTimingFunction:
+                                'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
+                        }}
+                    >
+                        <ContentBox title={t('panel.language')}>
+                            <p className='text-sm mb-4 text-zinc-300'>{t('account.language.description')}</p>
+                            <LanguageSelector />
+                        </ContentBox>
                     </div>
 
                     <div
@@ -69,16 +86,16 @@ const AccountOverviewContainer = () => {
                                 'linear(0,0.01,0.04 1.6%,0.161 3.3%,0.816 9.4%,1.046,1.189 14.4%,1.231,1.254 17%,1.259,1.257 18.6%,1.236,1.194 22.3%,1.057 27%,0.999 29.4%,0.955 32.1%,0.942,0.935 34.9%,0.933,0.939 38.4%,1 47.3%,1.011,1.017 52.6%,1.016 56.4%,1 65.2%,0.996 70.2%,1.001 87.2%,1)',
                         }}
                     >
-                        <ContentBox title={'Panel Version'}>
-                            <p className='text-sm mb-4 text-zinc-300'>
-                                This is useful to provide Service Administrators if you run into an unexpected issue.
-                            </p>
+                        <ContentBox title={t('account.overview.version_title')}>
+                            <p className='text-sm mb-4 text-zinc-300'>{t('account.overview.version_description')}</p>
                             <div className='flex flex-col gap-4'>
                                 <Code>
-                                    Version: {import.meta.env.VITE_HYDRODACTYL_VERSION} -{' '}
+                                    {t('account.overview.version_label')} {import.meta.env.VITE_HYDRODACTYL_VERSION} -{' '}
                                     {import.meta.env.VITE_BRANCH_NAME}
                                 </Code>
-                                <Code>Commit : {import.meta.env.VITE_COMMIT_HASH.slice(0, 7)}</Code>
+                                <Code>
+                                    {t('account.overview.commit_label')} {import.meta.env.VITE_COMMIT_HASH.slice(0, 7)}
+                                </Code>
                             </div>
                         </ContentBox>
                     </div>

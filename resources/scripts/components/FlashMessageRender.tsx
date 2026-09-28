@@ -2,12 +2,14 @@ import { useStoreState } from 'easy-peasy';
 import { Fragment } from 'react';
 
 import Code from '@/components/elements/Code';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 type Props = Readonly<{
     byKey?: string;
 }>;
 
 const FlashMessageRender = ({ byKey }: Props) => {
+    const { t } = useTranslation();
     const flashes = useStoreState((state) =>
         state.flashes.items.filter((flash) => (byKey ? flash.key === byKey : true)),
     );
@@ -45,6 +47,7 @@ const FlashMessageRender = ({ byKey }: Props) => {
         <div className='space-y-3'>
             {flashes.map((flash) => {
                 const styles = getFlashStyles(flash.type);
+                const flashTitle = flash.title ?? (flash.type === 'error' ? t('common.error') : undefined);
 
                 return (
                     <Fragment key={flash.id || flash.type + flash.message}>
@@ -69,14 +72,14 @@ const FlashMessageRender = ({ byKey }: Props) => {
                             </span>
 
                             <div className='flex-1 min-w-0'>
-                                {flash.title && (
+                                {flashTitle && (
                                     <h3
                                         className={`
                                         font-bold text-base mb-1
                                         text-cream-400
                                     `}
                                     >
-                                        {flash.title}
+                                        {flashTitle}
                                     </h3>
                                 )}
                                 <div className='text-sm text-cream-400/80 break-words'>

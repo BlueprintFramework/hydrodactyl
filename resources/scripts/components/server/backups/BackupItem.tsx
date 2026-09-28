@@ -4,6 +4,7 @@ import { format, formatDistanceToNow } from 'date-fns';
 import Can from '@/components/elements/Can';
 import { Checkbox } from '@/components/elements/CheckboxNew';
 import Spinner from '@/components/elements/Spinner';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { bytesToString } from '@/lib/formatters';
 
@@ -21,6 +22,7 @@ interface Props {
 }
 
 const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable = false, retryBackup }: Props) => {
+    const { t, dateFnsLocale, locale } = useTranslation();
     const { addFlash, clearFlashes } = useFlash();
 
     const handleRetry = async () => {
@@ -31,16 +33,16 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
             await retryBackup(backup.uuid);
             addFlash({
                 type: 'success',
-                title: 'Success',
+                title: t('common.success'),
                 key: 'backup',
-                message: 'Backup is being retried.',
+                message: t('server.backups.retry_success'),
             });
         } catch (error) {
             addFlash({
                 type: 'error',
-                title: 'Error',
+                title: t('common.error'),
                 key: 'backup',
-                message: error instanceof Error ? error.message : 'Failed to retry backup.',
+                message: error instanceof Error ? error.message : t('server.backups.retry_failed'),
             });
         }
     };
@@ -64,19 +66,19 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
             case 'failed':
                 return (
                     <span className='bg-red-500/20 border border-red-500/30 py-0.5 px-2 rounded text-red-300 text-xs font-medium'>
-                        Failed
+                        {t('server.backups.status_failed')}
                     </span>
                 );
             case 'pending':
                 return (
                     <span className='bg-yellow-500/20 border border-yellow-500/30 py-0.5 px-2 rounded text-yellow-300 text-xs font-medium'>
-                        Pending
+                        {t('server.backups.status_pending')}
                     </span>
                 );
             case 'running':
                 return (
                     <span className='bg-blue-500/20 border border-blue-500/30 py-0.5 px-2 rounded text-blue-300 text-xs font-medium'>
-                        Running ({backup.progress}%)
+                        {t('server.backups.status_running', { progress: backup.progress })}
                     </span>
                 );
             case 'completed':
@@ -85,13 +87,13 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
                 }
                 return backup.isLiveOnly ? (
                     <span className='bg-green-500/20 border border-green-500/30 py-0.5 px-2 rounded text-green-300 text-xs font-medium'>
-                        Completed
+                        {t('server.backups.status_completed')}
                     </span>
                 ) : null;
             case 'cancelled':
                 return (
                     <span className='bg-gray-500/20 border border-gray-500/30 py-0.5 px-2 rounded text-gray-300 text-xs font-medium'>
-                        Cancelled
+                        {t('server.backups.status_cancelled')}
                     </span>
                 );
             default:
@@ -127,12 +129,12 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
                     <h3 className='text-sm font-medium text-zinc-100 truncate'>{backup.name}</h3>
                     {backup.isAutomatic && (
                         <span className='text-xs text-blue-400 font-medium bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded'>
-                            Automatic
+                            {t('server.backups.automatic')}
                         </span>
                     )}
                     {backup.isLocked && (
                         <span className='text-xs text-red-400 font-medium bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded'>
-                            Locked
+                            {t('server.backups.locked')}
                         </span>
                     )}
                 </div>
@@ -141,7 +143,7 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
                 {showProgressBar && (
                     <div className='mb-2'>
                         <div className='flex justify-between text-xs text-zinc-400 mb-1.5'>
-                            <span>{backup.message || 'Processing...'}</span>
+                            <span>{backup.message || t('server.backups.processing')}</span>
                             <span>{backup.progress}%</span>
                         </div>
                         <div className='w-full bg-zinc-700 rounded-full h-2'>
@@ -167,12 +169,14 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
             <div className='hidden sm:block flex-shrink-0 text-right min-w-[90px]'>
                 {backup.completedAt && backup.isSuccessful && backup.bytes ? (
                     <>
-                        <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>Size</p>
-                        <p className='text-sm text-zinc-300 font-medium'>{bytesToString(backup.bytes)}</p>
+                        <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>{t('server.backups.size')}</p>
+                        <p className='text-sm text-zinc-300 font-medium'>{bytesToString(backup.bytes, 2, locale)}</p>
                     </>
                 ) : (
                     <>
-                        <p className='text-xs text-transparent uppercase tracking-wide mb-1'>Size</p>
+                        <p className='text-xs text-transparent uppercase tracking-wide mb-1'>
+                            {t('server.backups.size')}
+                        </p>
                         <p className='text-sm text-transparent font-medium'>-</p>
                     </>
                 )}
@@ -180,14 +184,15 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
 
             {/* Created time */}
             <div className='hidden sm:block flex-shrink-0 text-right min-w-[130px]'>
-                <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>Created</p>
+                <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>{t('server.backups.created')}</p>
                 <p
                     className='text-sm text-zinc-300 font-medium'
-                    title={format(backup.createdAt, 'ddd, MMMM do, yyyy HH:mm:ss')}
+                    title={format(backup.createdAt, 'ddd, MMMM do, yyyy HH:mm:ss', { locale: dateFnsLocale })}
                 >
                     {formatDistanceToNow(backup.createdAt, {
                         includeSeconds: true,
                         addSuffix: true,
+                        locale: dateFnsLocale,
                     })}
                 </p>
             </div>
@@ -201,7 +206,7 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
                             type='button'
                             onClick={handleRetry}
                             className='p-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-colors'
-                            title='Retry backup'
+                            title={t('server.backups.retry_backup')}
                         >
                             <CloudArrowUpIn width={22} height={22} />
                         </button>

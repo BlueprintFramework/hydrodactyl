@@ -1,11 +1,13 @@
 import { useCallback, useContext } from 'react';
 import { getGlobalDaemonType } from '@/api/server/getServer';
 import getServerBackups from '@/api/swr/getServerBackups';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { ServerContext } from '@/state/server';
 import { LiveProgressContext } from './BackupContainer';
 import type { UnifiedBackup } from './types';
 
 export const useUnifiedBackups = () => {
+    const { t } = useTranslation();
     const { data: backups, error, isValidating, mutate } = getServerBackups();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const daemonType = getGlobalDaemonType();
@@ -86,7 +88,11 @@ export const useUnifiedBackups = () => {
                 name: live?.backupName || backup.name,
                 status: live ? (live.status as string) : backup.isSuccessful ? 'completed' : 'failed',
                 progress: live ? live.progress : backup.isSuccessful ? 100 : 0,
-                message: live ? live.message : backup.isSuccessful ? 'Completed' : 'Failed',
+                message: live
+                    ? live.message
+                    : backup.isSuccessful
+                      ? t('server.backups.status_completed')
+                      : t('server.backups.status_failed'),
                 isSuccessful: backup.isSuccessful,
                 isLocked: backup.isLocked,
                 isAutomatic: backup.isAutomatic,
@@ -111,7 +117,7 @@ export const useUnifiedBackups = () => {
         if (!existsInSwr && !live.isDeletion) {
             unifiedBackups.push({
                 uuid: backupUuid,
-                name: live.backupName || live.message || 'Processing...',
+                name: live.backupName || live.message || t('server.backups.processing'),
                 status: live.status as string,
                 progress: live.progress,
                 message: live.message,

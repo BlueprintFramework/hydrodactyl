@@ -32,7 +32,7 @@ class LocationDeletionService
 
         $count = $this->nodeRepository->findCountWhere([['location_id', '=', $location]]);
         if ($count > 0) {
-            throw new HasActiveNodesException(trans('exceptions.locations.has_nodes'));
+            throw new HasActiveNodesException(__('exceptions.locations.has_nodes'));
         }
 
         return $this->repository->delete($location);

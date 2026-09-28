@@ -8,7 +8,6 @@ use Illuminate\Http\Response;
 use Illuminate\Contracts\Console\Kernel;
 use Pterodactyl\Notifications\MailTested;
 use Illuminate\View\Factory as ViewFactory;
-use Illuminate\Support\Facades\Notification;
 use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Contracts\Encryption\Encrypter;
@@ -52,7 +51,7 @@ class MailController extends Controller
     public function update(MailSettingsFormRequest $request): Response
     {
         if ($this->config->get('mail.default') !== 'smtp') {
-            throw new DisplayException('This feature is only available if SMTP is the selected email driver for the Panel.');
+            throw new DisplayException(__('exceptions.admin.mail_smtp_only'));
         }
 
         $values = $request->normalize();
@@ -79,8 +78,7 @@ class MailController extends Controller
     public function test(Request $request): Response
     {
         try {
-            Notification::route('mail', $request->user()->email)
-                ->notify(new MailTested($request->user()));
+            $request->user()->notify(new MailTested($request->user()));
         } catch (\Exception $exception) {
             return response($exception->getMessage(), 500);
         }

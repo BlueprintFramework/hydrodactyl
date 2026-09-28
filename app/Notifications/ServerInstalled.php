@@ -52,9 +52,10 @@ class ServerInstalled extends Notification implements ShouldQueue, ReceivesEvent
     public function toMail(): MailMessage
     {
         return (new MailMessage())
-            ->greeting('Hello ' . $this->user->username . '.')
-            ->line('Your server has finished installing and is now ready for you to use.')
-            ->line('Server Name: ' . $this->server->name)
-            ->action('Login and Begin Using', route('index'));
+            ->subject(__('notifications.server_installed.subject'))
+            ->greeting(__('notifications.server_installed.greeting', ['user' => $this->user->username]))
+            ->line(__('notifications.server_installed.installed'))
+            ->line(__('notifications.server_installed.server_name', ['server' => $this->server->name]))
+            ->action(__('notifications.server_installed.action'), route('index'));
     }
 }

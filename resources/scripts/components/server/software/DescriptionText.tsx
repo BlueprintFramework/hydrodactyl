@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { MAX_DESCRIPTION_LENGTH } from './types';
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const DescriptionText = ({ description, id: _id }: Props) => {
+    const { t } = useTranslation();
     const [showFull, setShowFull] = useState(false);
     const isLong = description.length > MAX_DESCRIPTION_LENGTH;
 
@@ -18,7 +20,7 @@ const DescriptionText = ({ description, id: _id }: Props) => {
                 <>
                     {description.slice(0, MAX_DESCRIPTION_LENGTH)}...{' '}
                     <button type='button' onClick={toggle} className='text-brand hover:underline font-medium'>
-                        Show more
+                        {t('server.software.show_more')}
                     </button>
                 </>
             ) : (
@@ -28,7 +30,7 @@ const DescriptionText = ({ description, id: _id }: Props) => {
                         <>
                             {' '}
                             <button type='button' onClick={toggle} className='text-brand hover:underline font-medium'>
-                                Show less
+                                {t('server.software.show_less')}
                             </button>
                         </>
                     )}

@@ -5,6 +5,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 
 import Logo from '@/components/elements/HydroLogo';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 import NavItem from './NavItem';
@@ -31,6 +32,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
     ({ navItems, bottomNavItems }) => {
         const { setMobileOpen, isMobileOpen } = useSidebar();
         const location = useLocation();
+        const { t } = useTranslation();
 
         // biome-ignore lint/correctness/useExhaustiveDependencies: close menu on route change; setMobileOpen is stable
         useEffect(() => {
@@ -59,7 +61,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                     type='button'
                     className='absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default transition-opacity duration-300'
                     onClick={() => setMobileOpen(false)}
-                    aria-label='Close menu'
+                    aria-label={t('panel.close_menu')}
                     aria-hidden='true'
                     tabIndex={-1}
                 />
@@ -78,7 +80,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                         <NavLink
                             to='/'
                             className='flex h-8 w-fit shrink-0 items-center hydrodactyl-logo'
-                            aria-label='Hydrodactyl home page'
+                            aria-label={t('panel.home_page', { name: 'Hydrodactyl' })}
                         >
                             <Logo className='h-8 w-8 shrink-0 object-contain' />
                         </NavLink>
@@ -128,13 +130,14 @@ MobileSidebarPanel.displayName = 'MobileSidebarPanel';
 
 const MobileSidebarToggle = memo(() => {
     const { toggleMobile } = useSidebar();
+    const { t } = useTranslation();
 
     return (
         <button
             type='button'
             onClick={toggleMobile}
             className='lg:hidden p-1 rounded-full hover:bg-mocha-400 transition shrink-0'
-            aria-label='Open menu'
+            aria-label={t('panel.open_menu')}
         >
             <HugeiconsIcon size={20} strokeWidth={2} icon={Menu02Icon} />
         </button>

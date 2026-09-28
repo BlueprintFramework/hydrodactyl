@@ -16,6 +16,7 @@ import InputSpinner from '@/components/elements/InputSpinner';
 import { Switch } from '@/components/elements/SwitchV2';
 import { Input } from '@/components/elements/TextInput';
 import FlashMessageRender from '@/components/FlashMessageRender';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import { usePermissions } from '@/plugins/usePermissions';
 import { ServerContext } from '@/state/server';
@@ -27,6 +28,7 @@ interface Props {
 const VariableBox = ({ variable }: Props) => {
     const FLASH_KEY = `server:startup:${variable.envVariable}`;
 
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const [loading, setLoading] = useState(false);
     const [canEdit] = usePermissions(['startup.update']);
@@ -94,11 +96,11 @@ const VariableBox = ({ variable }: Props) => {
                         <span className='text-sm font-medium text-neutral-300'>
                             {isStringSwitch
                                 ? variable.serverValue === 'true'
-                                    ? 'Enabled'
-                                    : 'Disabled'
+                                    ? t('common.enabled')
+                                    : t('common.disabled')
                                 : variable.serverValue === '1'
-                                  ? 'On'
-                                  : 'Off'}
+                                  ? t('server.startup.variables.on')
+                                  : t('server.startup.variables.off')}
                         </span>
                         <Switch
                             disabled={!canEdit || !variable.isEditable}
@@ -169,7 +171,7 @@ const VariableBox = ({ variable }: Props) => {
                         readOnly={!canEdit || !variable.isEditable}
                         name={variable.envVariable}
                         defaultValue={variable.serverValue ?? ''}
-                        placeholder={variable.defaultValue || 'Enter value...'}
+                        placeholder={variable.defaultValue || t('server.startup.variables.placeholder')}
                         disabled={!canEdit || !variable.isEditable}
                     />
                 )}

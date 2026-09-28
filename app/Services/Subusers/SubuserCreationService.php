@@ -43,12 +43,12 @@ class SubuserCreationService
                 $user = $this->userRepository->findFirstWhere([['email', '=', $email]]);
 
                 if ($server->owner_id === $user->id) {
-                    throw new UserIsServerOwnerException(trans('exceptions.subusers.user_is_owner'));
+                    throw new UserIsServerOwnerException(__('exceptions.subusers.user_is_owner'));
                 }
 
                 $subuserCount = $this->subuserRepository->findCountWhere([['user_id', '=', $user->id], ['server_id', '=', $server->id]]);
                 if ($subuserCount !== 0) {
-                    throw new ServerSubuserExistsException(trans('exceptions.subusers.subuser_exists'));
+                    throw new ServerSubuserExistsException(__('exceptions.subusers.subuser_exists'));
                 }
             } catch (RecordNotFoundException) {
                 // Just cap the username generated at 64 characters at most and then append a random string

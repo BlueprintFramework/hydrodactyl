@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
 @section('title')
-    S3 — {{ $s3->name }}: Delete
+    {{ __('admin/s3.view.delete.title', ['name' => $s3->name]) }}
 @endsection
 
 @section('content-header')
-    <h1>{{ $s3->name }}<small>Delete this S3 configuration.</small></h1>
+    <h1>{{ $s3->name }}<small>{{ __('admin/s3.view.delete.subtitle') }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li><a href="{{ route('admin.buckets') }}">S3 Configurations</a></li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li><a href="{{ route('admin.buckets') }}">{{ __('admin/s3.configurations') }}</a></li>
         <li><a href="{{ route('admin.buckets.view', $s3->id) }}">{{ $s3->name }}</a></li>
-        <li class="active">Delete</li>
+        <li class="active">{{ __('admin/s3.view.nav.delete') }}</li>
     </ol>
 @endsection
 
@@ -20,16 +20,16 @@
     <div class="col-md-6">
         <div class="box box-danger">
             <div class="box-header with-border">
-                <h3 class="box-title">Delete S3 Configuration</h3>
+                <h3 class="box-title">{{ __('admin/s3.view.delete.box_title') }}</h3>
             </div>
             <div class="box-body">
-                <p>This action will permanently delete this S3 bucket configuration.</p>
+                <p>{{ __('admin/s3.view.delete.warning') }}</p>
                 @if($s3->servers_count > 0)
                     <div class="callout callout-danger">
-                        <p><strong>{{ $s3->servers_count }} server(s)</strong> are currently using this S3 configuration. You must reassign them to another bucket before deleting.</p>
+                        <p>{!! __('admin/s3.view.delete.in_use', ['count' => $s3->servers_count]) !!}</p>
                     </div>
                 @else
-                    <p class="text-danger small">Deleting an S3 configuration is irreversible. Any backups stored in this bucket will become inaccessible from the panel.</p>
+                    <p class="text-danger small">{{ __('admin/s3.view.delete.irreversible_help') }}</p>
                 @endif
             </div>
             <div class="box-footer">
@@ -37,7 +37,7 @@
                     @csrf
                     @method('DELETE')
                     <button id="deletebtn" class="btn btn-danger" {{ $s3->servers_count > 0 ? 'disabled' : '' }}>
-                        Delete This Configuration
+                        {{ __('admin/s3.view.delete.button') }}
                     </button>
                 </form>
             </div>
@@ -55,9 +55,9 @@
         swal({
             title: '',
             type: 'warning',
-            text: 'Are you sure that you want to delete this S3 configuration? There is no going back.',
+            text: @js(__('admin/s3.view.delete.confirm')),
             showCancelButton: true,
-            confirmButtonText: 'Delete',
+            confirmButtonText: @js(__('strings.delete')),
             confirmButtonColor: '#d9534f',
             closeOnConfirm: false
         }, function () {

@@ -52,7 +52,7 @@ class EggVariableController extends Controller
     public function store(EggVariableFormRequest $request, Egg $egg): RedirectResponse
     {
         $this->creationService->handle($egg->id, $request->normalize());
-        $this->alert->success(trans('admin/nests.variables.notices.variable_created'))->flash();
+        $this->alert->success(__('admin/nests.variables.notices.variable_created'))->flash();
 
         return redirect()->route('admin.nests.egg.variables', $egg->id);
     }
@@ -68,7 +68,7 @@ class EggVariableController extends Controller
     public function update(EggVariableFormRequest $request, Egg $egg, EggVariable $variable): RedirectResponse
     {
         $this->updateService->handle($variable, $request->normalize());
-        $this->alert->success(trans('admin/nests.variables.notices.variable_updated', [
+        $this->alert->success(__('admin/nests.variables.notices.variable_updated', [
             'variable' => htmlspecialchars($variable->name),
         ]))->flash();
 
@@ -81,7 +81,7 @@ class EggVariableController extends Controller
     public function destroy(int $egg, EggVariable $variable): RedirectResponse
     {
         $this->variableRepository->delete($variable->id);
-        $this->alert->success(trans('admin/nests.variables.notices.variable_deleted', [
+        $this->alert->success(__('admin/nests.variables.notices.variable_deleted', [
             'variable' => htmlspecialchars($variable->name),
         ]))->flash();
 

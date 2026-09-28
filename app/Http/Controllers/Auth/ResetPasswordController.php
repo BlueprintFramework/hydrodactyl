@@ -59,7 +59,7 @@ class ResetPasswordController extends Controller
             return $this->sendResetResponse();
         }
 
-        throw new DisplayException(trans($response));
+        throw new DisplayException(__($response));
     }
 
     /**

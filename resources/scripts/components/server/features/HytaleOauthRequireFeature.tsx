@@ -4,10 +4,12 @@ import Modal from '@/components/elements/Modal';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { SocketEvent } from '@/components/server/events';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
 const HytaleOauthRequireFeature = () => {
+    const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
     const [userCode, setUserCode] = useState('');
     const [verificationUri, setVerificationUri] = useState('');
@@ -59,21 +61,19 @@ const HytaleOauthRequireFeature = () => {
             }}
             closeOnBackground={false}
             showSpinnerOverlay={false}
-            title='Hytale Authentication'
+            title={t('server.features.hytale_oauth.title')}
         >
             <FlashMessageRender key='feature:hytaleOauth' />
             <div>
                 <div className='text-center text-zinc-300 mb-6'>
-                    <p className='mb-4 text-md'>
-                        Server requires authentication to start. Click below to verify this device.
-                    </p>
+                    <p className='mb-4 text-md'>{t('server.features.hytale_oauth.description')}</p>
                 </div>
 
                 <Button
                     onClick={handleAuthenticate}
                     className='w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded mb-6 flex items-center justify-center gap-2'
                 >
-                    Authenticate Server
+                    {t('server.features.hytale_oauth.authenticate')}
                 </Button>
                 <div className='relative my-6'>
                     <div className='absolute inset-0 flex items-center'>
@@ -81,12 +81,12 @@ const HytaleOauthRequireFeature = () => {
                     </div>
 
                     <div className='relative flex justify-center text-zinc-400 uppercase text-sm tracking-wider'>
-                        <span className='bg-zinc-900 px-5'>OR ENTER CODE MANUALLY</span>
+                        <span className='bg-zinc-900 px-5'>{t('server.features.hytale_oauth.divider')}</span>
                     </div>
                 </div>
 
                 <div className='bg-zinc-900 border border-zinc-700 rounded p-4 text-center'>
-                    <div className='text-zinc-400 text-sm mb-2'>DEVICE CODE</div>
+                    <div className='text-zinc-400 text-sm mb-2'>{t('server.features.hytale_oauth.device_code')}</div>
                     {userCode ? (
                         <button
                             type='button'
@@ -100,7 +100,7 @@ const HytaleOauthRequireFeature = () => {
                     )}
                 </div>
 
-                <p className='text-zinc-500 text-xs text-center mt-4'>Only required once per server</p>
+                <p className='text-zinc-500 text-xs text-center mt-4'>{t('server.features.hytale_oauth.only_once')}</p>
             </div>
         </Modal>
     );

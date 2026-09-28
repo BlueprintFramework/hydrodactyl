@@ -6,6 +6,7 @@ import ChartBlock from '@/components/server/console/ChartBlock';
 import { useChart, useChartTickLabel } from '@/components/server/console/chart';
 import { SocketEvent } from '@/components/server/events';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { bytesToString, ip } from '@/lib/formatters';
 import { hexToRgba } from '@/lib/helpers';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
@@ -24,21 +25,22 @@ interface StatsData {
 }
 
 const StatGraphs = () => {
+    const { t, locale } = useTranslation();
     const status = ServerContext.useStoreState((state) => state.status.value);
     const limits = ServerContext.useStoreState((state) => state.server.data?.limits);
     const previous = useRef<Record<'tx' | 'rx', number>>({ tx: -1, rx: -1 });
 
-    const cpu = useChartTickLabel('CPU', limits.cpu, '%', 2);
+    const cpu = useChartTickLabel(t('server.console.cpu'), limits.cpu, '%', 2, locale);
     const [uptime, setUptime] = useState(0);
-    const memory = useChartTickLabel('Memory', limits.memory, 'MiB');
-    const network = useChart('Network', {
+    const memory = useChartTickLabel(t('server.console.memory'), limits.memory, 'MiB');
+    const network = useChart(t('server.console.network_activity'), {
         sets: 2,
         options: {
             scales: {
                 y: {
                     ticks: {
                         callback(value) {
-                            return bytesToString(typeof value === 'string' ? parseInt(value, 10) : value);
+                            return bytesToString(typeof value === 'string' ? parseInt(value, 10) : value, 2, locale);
                         },
                     },
                 },
@@ -47,7 +49,7 @@ const StatGraphs = () => {
         callback(opts, index) {
             return {
                 ...opts,
-                label: !index ? 'Network In' : 'Network Out',
+                label: !index ? t('server.console.network_in') : t('server.console.network_out'),
                 borderColor: !index ? '#facc15' : '#60a5fa',
                 backgroundColor: hexToRgba(!index ? '#facc15' : '#60a5fa', 0.09),
             };
@@ -95,49 +97,51 @@ const StatGraphs = () => {
     const allocation = ServerContext.useStoreState((state) => {
         const match = state.server.data?.allocations.find((allocation) => allocation.isDefault);
 
-        return !match ? 'n/a' : `${match.alias || ip(match.ip)}:${match.port}`;
+        return !match ? null : `${match.alias || ip(match.ip)}:${match.port}`;
     });
 
     const description = ServerContext.useStoreState((state) => state.server.data?.description);
+
+    const allocationText = allocation ?? t('server.console.not_available');
 
     return (
         <TooltipProvider>
             <div className='flex h-full flex-col gap-4 overflow-y-auto flex-none'>
                 <div>
                     <div className='group p-4 justify-between relative rounded-xl border border-[#ffffff11] bg-[#110f0d] flex gap-4 text-sm'>
-                        <h3 className='font-extrabold'>IP Address</h3>
-                        <CopyOnClick text={allocation}>
-                            <div className='font-medium'>{allocation}</div>
+                        <h3 className='font-extrabold'>{t('server.console.ip_address')}</h3>
+                        <CopyOnClick text={allocationText}>
+                            <div className='font-medium'>{allocationText}</div>
                         </CopyOnClick>
                     </div>
                 </div>
                 <div>
                     <div className='group p-4 justify-between relative rounded-xl border border-[#ffffff11] bg-[#110f0d] flex gap-4 text-sm'>
-                        <h3 className='font-extrabold'>Uptime</h3>
-                        <div className='font-medium'>{formatUptime(uptime)}</div>
+                        <h3 className='font-extrabold'>{t('server.console.uptime')}</h3>
+                        <div className='font-medium'>{formatUptime(uptime, t)}</div>
                     </div>
                 </div>
                 {description && (
                     <div>
                         <div className='group p-4 justify-between relative rounded-xl border border-[#ffffff11] flex-col bg-[#110f0d] flex gap-4 text-sm'>
-                            <h3 className='font-extrabold'>Description</h3>
+                            <h3 className='font-extrabold'>{t('server.console.description')}</h3>
                             <div className='font-medium'>{description}</div>
                         </div>
                     </div>
                 )}
                 <div>
-                    <ChartBlock title={'CPU'}>
-                        <Line aria-label='CPU Usage' role='img' {...cpu.props} />
+                    <ChartBlock title={t('server.console.cpu')}>
+                        <Line aria-label={t('server.console.cpu_usage')} role='img' {...cpu.props} />
                     </ChartBlock>
                 </div>
                 <div>
-                    <ChartBlock title={'RAM'}>
-                        <Line aria-label='Memory Usage' role='img' {...memory.props} />
+                    <ChartBlock title={t('server.console.ram')}>
+                        <Line aria-label={t('server.console.memory_usage')} role='img' {...memory.props} />
                     </ChartBlock>
                 </div>
                 <div>
                     <ChartBlock
-                        title={'Network Activity'}
+                        title={t('server.console.network_activity')}
                         legend={
                             <div className='flex gap-2'>
                                 <Tooltip delayDuration={200}>
@@ -147,7 +151,7 @@ const StatGraphs = () => {
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent side='top' sideOffset={5}>
-                                        Inbound
+                                        {t('server.console.inbound')}
                                     </TooltipContent>
                                 </Tooltip>
 
@@ -158,17 +162,13 @@ const StatGraphs = () => {
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent side='top' sideOffset={5}>
-                                        Outbound
+                                        {t('server.console.outbound')}
                                     </TooltipContent>
                                 </Tooltip>
                             </div>
                         }
                     >
-                        <Line
-                            aria-label='Network Activity. Download and upload activity'
-                            role='img'
-                            {...network.props}
-                        />
+                        <Line aria-label={t('server.console.network_activity_aria')} role='img' {...network.props} />
                     </ChartBlock>
                 </div>
             </div>

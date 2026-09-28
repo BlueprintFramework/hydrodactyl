@@ -65,7 +65,7 @@ class ProcessRunnableCommand extends Command
         try {
             $this->getLaravel()->make(ProcessScheduleService::class)->handle($schedule);
 
-            $this->line(trans('command/messages.schedule.output_line', [
+            $this->line(__('command/messages.schedule.output_line', [
                 'schedule' => $schedule->name,
                 'hash' => $schedule->hashid,
             ]));

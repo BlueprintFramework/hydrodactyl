@@ -6,6 +6,7 @@ import CopyOnClick from '@/components/elements/CopyOnClick';
 import DatabaseConnectionModal from '@/components/server/databases/DatabaseConnectionModal';
 import DeleteDatabaseModal from '@/components/server/databases/DeleteDatabaseModal';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { ServerContext } from '@/state/server';
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const DatabaseRow = ({ database }: Props) => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const [visible, setVisible] = useState(false);
     const [connectionVisible, setConnectionVisible] = useState(false);
@@ -56,7 +58,11 @@ const DatabaseRow = ({ database }: Props) => {
                     </div>
                     <CopyOnClick text={`${database.username}@${database.connectionString}`}>
                         <p className='text-xs text-zinc-400 font-mono truncate'>
-                            {database.username}@{database.connectionString} · from {database.allowConnectionsFrom}
+                            {t('server.databases.connection_info', {
+                                username: database.username,
+                                connection_string: database.connectionString,
+                                host: database.allowConnectionsFrom,
+                            })}
                         </p>
                     </CopyOnClick>
                 </div>
@@ -67,7 +73,7 @@ const DatabaseRow = ({ database }: Props) => {
                         size='sm'
                         className='p-2 h-10'
                         onClick={() => setConnectionVisible(true)}
-                        title='Database connection details'
+                        title={t('server.databases.connection_details')}
                     >
                         <Eye width={22} height={22} fill='currentColor' />
                     </Button>
@@ -77,7 +83,7 @@ const DatabaseRow = ({ database }: Props) => {
                             size='sm'
                             className='p-2 h-10'
                             onClick={() => setVisible(true)}
-                            title='Delete database'
+                            title={t('server.databases.delete_database')}
                         >
                             <TrashBin width={22} height={22} fill='currentColor' />
                         </Button>

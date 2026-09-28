@@ -5,6 +5,7 @@ import Logo from '@/components/elements/HydroLogo';
 import { Button } from '@/components/ui/button';
 import { useHeader } from '@/contexts/HeaderContext';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { MobileSidebarToggle } from '../sidebar/MobileSidebar';
 import '../sidebar/sidebar-modern.css';
@@ -42,12 +43,13 @@ const getSiteName = () => {
 
 const LogoSection = memo(() => {
     const siteName = getSiteName();
+    const { t } = useTranslation();
 
     return (
         <NavLink
             to={'/'}
             className='sidebar-logo-link flex items-center shrink-0 h-8 min-w-0 gap-3 hydrodactyl'
-            aria-label={`${siteName} home page`}
+            aria-label={t('panel.home_page', { name: siteName })}
         >
             <Logo className='flex h-8 w-8 shrink-0 object-contain' />
             <span className='sidebar-logo-name hydrodactyl-logo content-center truncate text-sm font-semibold leading-none tracking-wide text-cream-50'>
@@ -60,13 +62,14 @@ LogoSection.displayName = 'LogoSection';
 
 const ToggleButton = memo(() => {
     const { toggleMinimized } = useSidebar();
+    const { t } = useTranslation();
 
     return (
         <Button
             variant={'secondary'}
             size={'sm'}
             className='sidebar-toggle-button p-1 gap-1 rounded-full size-8'
-            aria-label='Toggle sidebar'
+            aria-label={t('panel.toggle_sidebar')}
             onClick={toggleMinimized}
         >
             <LayoutSideContent width={16} height={16} />

@@ -2,16 +2,17 @@
 // import Tooltip from '@/components/elements/tooltip/Tooltip';
 import { type Actions, useStoreActions } from 'easy-peasy';
 import { QRCodeSVG } from 'qrcode.react';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import enableAccountTwoFactor from '@/api/account/enableAccountTwoFactor';
 import getTwoFactorTokenData, { type TwoFactorTokenData } from '@/api/account/getTwoFactorTokenData';
 import CopyOnClick from '@/components/elements/CopyOnClick';
-import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
+import { Dialog, type DialogProps, DialogWrapperContext } from '@/components/elements/dialog';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
 import asDialog from '@/hoc/asDialog';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useFlashKey } from '@/plugins/useFlash';
 import type { ApplicationStore } from '@/state';
 
@@ -19,7 +20,8 @@ interface Props {
     onTokens: (tokens: string[]) => void;
 }
 
-const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
+const SetupTOTPDialogContent = ({ onTokens }: Props) => {
+    const { t } = useTranslation();
     const [submitting, setSubmitting] = useState(false);
     const [value, setValue] = useState('');
     const [password, setPassword] = useState('');
@@ -70,12 +72,11 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
             </div>
             <CopyOnClick text={token?.secret}>
                 <p className={'font-mono text-sm text-zinc-100 text-center mt-2'}>
-                    {token?.secret.match(/.{1,4}/g)?.join(' ') || 'Loading...'}
+                    {token?.secret.match(/.{1,4}/g)?.join(' ') || t('common.loading')}
                 </p>
             </CopyOnClick>
             <p id={'totp-code-description'} className={'mt-6'}>
-                Scan the QR code above using an authenticator app, or enter the secret code above. Then, enter the
-                6-digit code it generates below.
+                {t('account.two_factor.scan_description')}
             </p>
             <Input.Text
                 aria-labelledby={'totp-code-description'}
@@ -90,7 +91,7 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
                 pattern={'\\d{6}'}
             />
             <label htmlFor={'totp-password'} className={'block mt-3'}>
-                Account Password
+                {t('account.two_factor.account_password_label')}
             </label>
             <Input.Text
                 variant={Input.Text.Variants.Loose}
@@ -101,7 +102,7 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
             />
             <Dialog.Footer>
                 <Button variant='secondary' onClick={close}>
-                    Cancel
+                    {t('common.cancel')}
                 </Button>
                 {/* <Tooltip
           disabled={password.length > 0 && value.length === 6}
@@ -117,7 +118,7 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
                     type={'submit'}
                     form={'enable-totp-form'}
                 >
-                    Enable
+                    {t('common.enable')}
                 </Button>
                 {/* </Tooltip> */}
             </Dialog.Footer>
@@ -125,7 +126,18 @@ const ConfigureTwoFactorForm = ({ onTokens }: Props) => {
     );
 };
 
-export default asDialog({
-    title: 'Enable Authenticator App',
-    description: "You'll be required to enter a verification code each time you sign in.",
-})(ConfigureTwoFactorForm);
+const SetupTOTPDialog = ({ open, onClose, onTokens }: Props & DialogProps) => {
+    const { t } = useTranslation();
+    const DialogComponent = useMemo(
+        () =>
+            asDialog({
+                title: t('account.two_factor.enable'),
+                description: t('account.two_factor.enable_description'),
+            })(SetupTOTPDialogContent),
+        [t],
+    );
+
+    return <DialogComponent open={open} onClose={onClose} onTokens={onTokens} />;
+};
+
+export default SetupTOTPDialog;

@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
 @section('title')
-    List S3 Buckets
+    {{ __('admin/s3.index.title') }}
 @endsection
 
 @section('content-header')
-    <h1>S3 Configurations<small>All S3 bucket configurations on the system.</small></h1>
+    <h1>{{ __('admin/s3.configurations') }}<small>{{ __('admin/s3.index.subtitle') }}</small></h1>
     <ol class="breadcrumb">
-        <li><a href="{{ route('admin.index') }}">Admin</a></li>
-        <li class="active">S3</li>
+        <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+        <li class="active">{{ __('admin/s3.breadcrumb') }}</li>
     </ol>
 @endsection
 
@@ -17,14 +17,14 @@
     <div class="col-xs-12">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">S3 Bucket List</h3>
+                <h3 class="box-title">{{ __('admin/s3.index.bucket_list') }}</h3>
                 <div class="box-tools search01">
                     <form action="{{ route('admin.buckets') }}" method="GET">
                         <div class="input-group input-group-sm">
-                            <input type="text" name="filter[name]" class="form-control pull-right" value="{{ request()->input()['filter']['name'] ?? '' }}" placeholder="Search Buckets">
+                            <input type="text" name="filter[name]" class="form-control pull-right" value="{{ request()->input()['filter']['name'] ?? '' }}" placeholder="{{ __('admin/s3.index.search_placeholder') }}">
                             <div class="input-group-btn">
                                 <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                                <a href="{{ route('admin.buckets.new') }}"><button type="button" class="btn btn-sm btn-primary" style="border-radius: 0 3px 3px 0;margin-left:-1px;">Create New</button></a>
+                                <a href="{{ route('admin.buckets.new') }}"><button type="button" class="btn btn-sm btn-primary" style="border-radius: 0 3px 3px 0;margin-left:-1px;">{{ __('admin/s3.index.create_new') }}</button></a>
                             </div>
                         </div>
                     </form>
@@ -34,11 +34,11 @@
                 <table class="table table-hover">
                     <tbody>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Bucket Name</th>
-                            <th>Enabled</th>
-                            <th>Connected Servers</th>
+                            <th>{{ __('strings.id') }}</th>
+                            <th>{{ __('strings.name') }}</th>
+                            <th>{{ __('admin/s3.index.bucket_name') }}</th>
+                            <th>{{ __('admin/s3.index.enabled') }}</th>
+                            <th>{{ __('admin/s3.index.connected_servers') }}</th>
                         </tr>
                         @foreach ($buckets as $bucket)
                             <tr data-server="{{ $bucket->id }}">
@@ -47,9 +47,9 @@
                                 <td><code>{{ $bucket->bucket_name }}</code></td>
                                 <td>
                                     @if($bucket->enabled)
-                                        <span class="label label-success">Enabled</span>
+                                        <span class="label label-success">{{ __('admin/s3.index.enabled') }}</span>
                                     @else
-                                        <span class="label label-danger">Disabled</span>
+                                        <span class="label label-danger">{{ __('admin/s3.index.disabled') }}</span>
                                     @endif
                                 </td>
                                 <td>{{ $bucket->server_count }}</td>
