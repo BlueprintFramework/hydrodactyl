@@ -36,6 +36,16 @@
   @include('layouts.scripts')
 
   @section('scripts')
+  @if(!is_null(Auth::user()))
+  <script>
+    window.HydrodactylUser = {!! json_encode(Auth::user()->toVueObject()) !!};
+  </script>
+  @endif
+  @if(!empty($siteConfiguration))
+  <script>
+    window.SiteConfiguration = {!! json_encode($siteConfiguration) !!};
+  </script>
+  @endif
   @if(file_exists(public_path('build/manifest.json')))
   @vite('resources/scripts/admin/index.tsx')
   @endif

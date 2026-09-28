@@ -4,7 +4,9 @@ import { createRoot } from 'react-dom/client';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 
 import I18nProvider, { useTranslation } from '@/i18n/I18nProvider';
+import type { Translate } from '@/i18n/types';
 import { store } from '@/state';
+import { hydrateStore } from '@/state/bootstrap';
 
 interface SystemMetrics {
     status: string;
@@ -24,19 +26,22 @@ interface SystemMetrics {
     };
 }
 
-function formatBytes(bytes: number): string {
+function formatBytes(bytes: number, locale: string): string {
     if (!bytes) return '0 B';
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`;
+    const value = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(bytes / k ** i);
+
+    return `${value} ${sizes[i]}`;
 }
 
-function formatUptime(seconds: number): string {
+function formatUptime(seconds: number, t: Translate): string {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    return `${days}d ${hours}h ${minutes}m`;
+
+    return t('admin.metrics.uptime_format', { days, hours, minutes });
 }
 
 const COLORS = { used: '#52A9FF', free: '#2D5A8A', bg: '#1E3A5A' };
@@ -54,11 +59,12 @@ function UsageBar({
     unit?: string;
     title?: string;
 }) {
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const pct = total > 0 ? (used / total) * 100 : 0;
     const data = [{ name: label, used, free: total - used }];
     const isPercent = unit === '%';
-    const fmt = (v: number) => (isPercent ? `${v.toFixed(1)}%` : formatBytes(v));
+    const numberFormat = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+    const fmt = (v: number) => (isPercent ? `${numberFormat.format(v)}%` : formatBytes(v, locale));
 
     return (
         <div style={{ marginBottom: 16 }} title={title}>
@@ -88,7 +94,7 @@ function UsageBar({
                 </BarChart>
             </ResponsiveContainer>
             <div style={{ fontSize: 11, color: '#777', marginTop: 2 }}>
-                {t('admin.metrics.percent_used', { percent: pct.toFixed(1) })}
+                {t('admin.metrics.percent_used', { percent: numberFormat.format(pct) })}
             </div>
         </div>
     );
@@ -96,7 +102,10 @@ function UsageBar({
 
 function LoadGraph({ loads }: { loads: number[] }) {
     const { t } = useTranslation();
-    const data = loads.map((v, i) => ({ name: `${i + 1}m`, value: parseFloat(v.toFixed(2)) }));
+    const data = loads.map((v, i) => ({
+        name: t('admin.load.axis_label', { count: i + 1 }),
+        value: parseFloat(v.toFixed(2)),
+    }));
 
     return (
         <div>
@@ -180,7 +189,7 @@ function AdminDashboard() {
                     >
                         <div style={{ textAlign: 'center', paddingTop: 40 }}>
                             <div style={{ fontSize: 28, fontWeight: 700, color: '#eee' }}>
-                                {formatUptime(metrics.uptime)}
+                                {formatUptime(metrics.uptime, t)}
                             </div>
                             <div style={{ fontSize: 12, color: '#999', marginTop: 4 }}>{t('admin.metrics.uptime')}</div>
                         </div>
@@ -266,6 +275,7 @@ function AdminDashboard() {
 
 const container = document.getElementById('admin-dashboard');
 if (container) {
+    hydrateStore();
     const root = createRoot(container);
     root.render(
         <StoreProvider store={store}>

@@ -132,6 +132,7 @@
     },
     "admin": {
         "load": {
+            "axis_label": "{{count}} min",
             "title": "Carga media"
         },
         "loading": "Cargando métricas del sistema...",
@@ -140,7 +141,8 @@
             "disk": "Disco",
             "memory": "Memoria",
             "percent_used": "{{percent}} % usado",
-            "uptime": "Tiempo de actividad"
+            "uptime": "Tiempo de actividad",
+            "uptime_format": "{{days}} d {{hours}} h {{minutes}} min"
         },
         "system_info": {
             "cpu_cores": "Núcleos de CPU",

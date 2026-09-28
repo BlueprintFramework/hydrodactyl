@@ -132,6 +132,7 @@
     },
     "admin": {
         "load": {
+            "axis_label": "{{count}}m",
             "title": "Load Average"
         },
         "loading": "Loading system metrics...",
@@ -140,7 +141,8 @@
             "disk": "Disk",
             "memory": "Memory",
             "percent_used": "{{percent}}% used",
-            "uptime": "Uptime"
+            "uptime": "Uptime",
+            "uptime_format": "{{days}}d {{hours}}h {{minutes}}m"
         },
         "system_info": {
             "cpu_cores": "CPU Cores",

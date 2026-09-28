@@ -16,8 +16,8 @@ import Spinner from '@/components/elements/Spinner';
 import I18nProvider from '@/i18n/I18nProvider';
 
 import { store } from '@/state';
+import { hydrateStore } from '@/state/bootstrap';
 import { ServerContext } from '@/state/server';
-import type { SiteSettings } from '@/state/settings';
 
 import HydrodactylProvider from './HydrodactylProvider';
 
@@ -27,42 +27,8 @@ const UnifiedRouter = lazy(() => import('@/routers/UnifiedRouter'));
 const AuthenticationRouter = lazy(() => import('@/routers/AuthenticationRouter'));
 const SetupRouter = lazy(() => import('@/routers/SetupRouter'));
 
-interface ExtendedWindow extends Window {
-    SiteConfiguration?: SiteSettings;
-    SetupRequired?: boolean;
-    HydrodactylUser?: {
-        uuid: string;
-        username: string;
-        email: string;
-
-        root_admin: boolean;
-        use_totp: boolean;
-        language: string;
-        updated_at: string;
-        created_at: string;
-    };
-}
-
 const App = () => {
-    const { HydrodactylUser, SiteConfiguration } = window as ExtendedWindow;
-    if (HydrodactylUser && !store.getState().user.data) {
-        store.getActions().user.setUserData({
-            uuid: HydrodactylUser.uuid,
-            username: HydrodactylUser.username,
-            email: HydrodactylUser.email,
-            language: HydrodactylUser.language,
-            rootAdmin: HydrodactylUser.root_admin,
-            useTotp: HydrodactylUser.use_totp,
-            createdAt: new Date(HydrodactylUser.created_at),
-            updatedAt: new Date(HydrodactylUser.updated_at),
-        });
-    }
-
-    if (!store.getState().settings.data) {
-        if (SiteConfiguration) {
-            store.getActions().settings.setSettings(SiteConfiguration);
-        }
-    }
+    hydrateStore();
 
     return (
         <>
