@@ -5,7 +5,7 @@ return [
         'admin' => 'Admin',
         'settings' => 'Ajustes',
     ],
-    'copyright' => 'Copyright &copy; 2015 - :year <a href="https://blueprint.zip/">BlueprintFramework</a> y <a href="https://hydrodactyl.dev">Hydrodactyl</a>.',
+    'copyright' => 'Copyright &copy; 2015 - :year <a href="https://blueprint.zip/">BlueprintFramework</a> e <a href="https://hydrodactyl.dev">Hydrodactyl</a>.',
     'exit_admin_control' => 'Salir del panel de administración',
     'logout' => 'Cerrar sesión',
     'logout_confirm_button' => 'Cerrar sesión',
