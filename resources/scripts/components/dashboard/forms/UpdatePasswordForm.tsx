@@ -26,8 +26,10 @@ const UpdatePasswordForm = () => {
     const schema = useMemo(
         () =>
             Yup.object().shape({
-                current: Yup.string().min(1).required(t('account.password.current_required')),
-                password: Yup.string().min(8).required(),
+                current: Yup.string().required(t('account.password.current_required')),
+                password: Yup.string()
+                    .required(t('account.password.required'))
+                    .min(8, t('common.min_length', { min: 8 })),
                 confirmPassword: Yup.string().test(
                     'password',
                     t('account.password.confirmation_mismatch'),

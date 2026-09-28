@@ -1,5 +1,5 @@
 import { Form, Formik, Field as FormikField, type FormikHelpers, useFormikContext } from 'formik';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { boolean, object, string } from 'yup';
 import Can from '@/components/elements/Can';
 import Field from '@/components/elements/Field';
@@ -73,6 +73,17 @@ const ModalContent = ({ ...props }: RequiredModalProps) => {
 
 const CreateBackupModal = ({ visible, onDismissed, onSubmit }: CreateBackupModalProps) => {
     const { clearFlashes } = useFlash();
+    const { t } = useTranslation();
+
+    const schema = useMemo(
+        () =>
+            object().shape({
+                name: string().max(191, t('common.max_length', { max: 191 })),
+                ignored: string(),
+                isLocked: boolean(),
+            }),
+        [t],
+    );
 
     useEffect(() => {
         clearFlashes('backups:create');
@@ -82,11 +93,7 @@ const CreateBackupModal = ({ visible, onDismissed, onSubmit }: CreateBackupModal
         <Formik
             onSubmit={onSubmit}
             initialValues={{ name: '', ignored: '', isLocked: false }}
-            validationSchema={object().shape({
-                name: string().max(191),
-                ignored: string(),
-                isLocked: boolean(),
-            })}
+            validationSchema={schema}
         >
             <ModalContent visible={visible} onDismissed={onDismissed} />
         </Formik>

@@ -25,7 +25,7 @@ const UpdateEmailAddressForm = () => {
     const schema = useMemo(
         () =>
             Yup.object().shape({
-                email: Yup.string().email().required(),
+                email: Yup.string().required(t('account.email.required')).email(t('account.email.invalid')),
                 password: Yup.string().required(t('account.password.current_required')),
             }),
         [t],

@@ -30,7 +30,7 @@ const FileNameModal = ({ onFileNamed, onDismissed, ...props }: Props) => {
             onSubmit={submit}
             initialValues={{ fileName: '' }}
             validationSchema={object().shape({
-                fileName: string().required().min(1),
+                fileName: string().required(t('server.files.file_name_required')),
             })}
         >
             {({ resetForm }) => (

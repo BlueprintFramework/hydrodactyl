@@ -45,7 +45,9 @@ interface Values {
 
 const createSchema = (t: Translate) =>
     object().shape({
-        action: string().required().oneOf(['command', 'power', 'backup']),
+            action: string()
+                .required(t('server.schedules.task.action_required'))
+                .oneOf(['command', 'power', 'backup'], t('server.schedules.task.action_invalid')),
         payload: string().when('action', {
             is: (v) => v !== 'backup',
             // biome-ignore lint/suspicious/noThenProperty: yup's when() API uses `then` as property name

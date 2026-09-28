@@ -67,7 +67,7 @@ const RenameServerBox = () => {
                 description: server.description,
             }}
             validationSchema={object().shape({
-                name: string().required().min(1),
+                name: string().required(t('server.settings.rename.name_required')),
                 description: string().nullable(),
             })}
         >

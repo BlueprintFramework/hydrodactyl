@@ -59,8 +59,10 @@
             "title": "Clave de API"
         },
         "email": {
+            "invalid": "Introduce una dirección de correo electrónico válida.",
             "label": "Correo electrónico",
             "password_label": "Contraseña",
+            "required": "El correo electrónico es obligatorio.",
             "submit": "Actualizar correo electrónico",
             "updated": "Tu dirección de correo electrónico se ha actualizado."
         },
@@ -87,6 +89,7 @@
             "current_required": "Debes introducir la contraseña actual de tu cuenta.",
             "new_helper": "Tu nueva contraseña debe tener al menos 8 caracteres y ser única para este sitio web.",
             "new_label": "Nueva contraseña",
+            "required": "La contraseña es obligatoria.",
             "submit": "Actualizar contraseña",
             "updating": "Actualizando..."
         },
@@ -223,6 +226,8 @@
         "error": "Error",
         "inactive": "Inactivo",
         "loading": "Cargando...",
+        "max_length": "No puede superar los {{max}} caracteres.",
+        "min_length": "Debe tener al menos {{min}} caracteres.",
         "never": "Nunca",
         "next": "Siguiente",
         "no": "No",
@@ -743,6 +748,7 @@
             "file_mode_label": "Modo de archivo",
             "file_name_description": "Introduce el nombre con el que se debe guardar este archivo.",
             "file_name_label": "Nombre del archivo",
+            "file_name_required": "Debes indicar un nombre de archivo válido.",
             "files_count": "{{count}} archivos",
             "folder_created_as": "Esta carpeta se creará como",
             "folder_upload_unsupported": "Las subidas de carpetas no son compatibles por el momento.",
@@ -945,8 +951,10 @@
             "task": {
                 "action_backup": "Crear copia de seguridad",
                 "action_command": "Enviar comando",
+                "action_invalid": "La acción seleccionada no es válida.",
                 "action_label": "Acción",
                 "action_power": "Encendido",
+                "action_required": "Se debe indicar una acción para la tarea.",
                 "backup_limit_error": "No se puede crear una tarea de copia de seguridad cuando el límite de copias de seguridad del servidor está establecido en 0.",
                 "continue_on_failure_description": "Las tareas futuras se ejecutarán si esta tarea falla.",
                 "continue_on_failure_label": "Continuar si falla",
@@ -1011,6 +1019,7 @@
             "rename": {
                 "description_label": "Descripción del servidor",
                 "name_label": "Nombre del servidor",
+                "name_required": "Debes indicar un nombre para el servidor.",
                 "title": "Detalles del servidor",
                 "updated": "¡Se han actualizado los detalles del servidor!",
                 "updating": "Actualizando los detalles del servidor..."

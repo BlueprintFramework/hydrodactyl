@@ -45,17 +45,24 @@ const USERNAME_RE = /^[a-z0-9]([\w.-]+)[a-z0-9]$/;
 
 const createSchema = (t: Translate) =>
     object().shape({
-        email: string().required(t('setup.email_required')).email(t('setup.email_invalid')).max(191),
+        email: string()
+            .required(t('setup.email_required'))
+            .email(t('setup.email_invalid'))
+            .max(191, t('common.max_length', { max: 191 })),
         username: string()
             .required(t('setup.username_required'))
-            .max(191)
+            .max(191, t('common.max_length', { max: 191 }))
             .test(
                 'username-format',
                 t('setup.username_format'),
                 (v) => !v || (v.length >= 3 && USERNAME_RE.test(v.toLowerCase())),
             ),
-        name_first: string().required(t('setup.first_name_required')).max(191),
-        name_last: string().max(191).nullable(),
+        name_first: string()
+            .required(t('setup.first_name_required'))
+            .max(191, t('common.max_length', { max: 191 })),
+        name_last: string()
+            .max(191, t('common.max_length', { max: 191 }))
+            .nullable(),
         password: string().required(t('setup.password_required')).min(8, t('setup.password_min')),
         password_confirmation: string()
             .required(t('setup.password_confirmation_required'))
