@@ -40,7 +40,7 @@ class EmailSettingsCommand extends Command
      */
     public function handle()
     {
-        $this->variables['MAIL_DRIVER'] = $this->option('driver') ?? $this->choice(
+        $this->variables['MAIL_MAILER'] = $this->option('driver') ?? $this->choice(
             __('command/messages.environment.mail.ask_driver'),
             [
                 'smtp' => 'SMTP Server',
@@ -52,7 +52,7 @@ class EmailSettingsCommand extends Command
             $this->config->get('mail.default', 'smtp')
         );
 
-        $method = 'setup' . studly_case($this->variables['MAIL_DRIVER']) . 'DriverVariables';
+        $method = 'setup' . studly_case($this->variables['MAIL_MAILER']) . 'DriverVariables';
         if (method_exists($this, $method)) {
             $this->{$method}();
         }
@@ -141,7 +141,7 @@ class EmailSettingsCommand extends Command
      */
     private function setupPostmarkDriverVariables()
     {
-        $this->variables['MAIL_DRIVER'] = 'smtp';
+        $this->variables['MAIL_MAILER'] = 'smtp';
         $this->variables['MAIL_HOST'] = 'smtp.postmarkapp.com';
         $this->variables['MAIL_PORT'] = 587;
         $this->variables['MAIL_USERNAME'] = $this->variables['MAIL_PASSWORD'] = $this->option('username') ?? $this->ask(

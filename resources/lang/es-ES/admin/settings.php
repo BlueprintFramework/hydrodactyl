@@ -146,7 +146,7 @@ return [
         'url_preview' => 'Vista previa de la URL',
     ],
     'mail' => [
-        'driver_required' => 'Esta interfaz requiere el controlador de correo <code>smtp</code>. Usa <code>php artisan p:environment:mail</code> o establece <code>MAIL_DRIVER=smtp</code> en tu archivo de entorno.',
+        'driver_required' => 'Esta interfaz requiere el controlador de correo <code>smtp</code>. Usa <code>php artisan p:environment:mail</code> o establece <code>MAIL_MAILER=smtp</code> en tu archivo de entorno.',
         'encryption' => 'Cifrado',
         'encryption_help' => 'Protocolo de cifrado.',
         'error_attempting_prefix' => 'Se ha producido un error al intentar ',

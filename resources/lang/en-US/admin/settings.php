@@ -146,7 +146,7 @@ return [
         'url_preview' => 'URL Preview',
     ],
     'mail' => [
-        'driver_required' => 'This interface requires the <code>smtp</code> mail driver. Use <code>php artisan p:environment:mail</code> or set <code>MAIL_DRIVER=smtp</code> in your environment file.',
+        'driver_required' => 'This interface requires the <code>smtp</code> mail driver. Use <code>php artisan p:environment:mail</code> or set <code>MAIL_MAILER=smtp</code> in your environment file.',
         'encryption' => 'Encryption',
         'encryption_help' => 'Encryption protocol.',
         'error_attempting_prefix' => 'An error occurred while attempting to ',
