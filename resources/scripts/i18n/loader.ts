@@ -1,57 +1,149 @@
-import { deepmerge } from 'deepmerge-ts';
 import type { Locale } from 'date-fns';
+import { de } from 'date-fns/locale/de';
+import { enGB } from 'date-fns/locale/en-GB';
 import { enUS } from 'date-fns/locale/en-US';
+import { es } from 'date-fns/locale/es';
+import { fr } from 'date-fns/locale/fr';
+import { it } from 'date-fns/locale/it';
+import { ja } from 'date-fns/locale/ja';
+import { ko } from 'date-fns/locale/ko';
+import { nl } from 'date-fns/locale/nl';
+import { pl } from 'date-fns/locale/pl';
+import { pt } from 'date-fns/locale/pt';
+import { ptBR } from 'date-fns/locale/pt-BR';
+import { ru } from 'date-fns/locale/ru';
+import { tr } from 'date-fns/locale/tr';
+import { uk } from 'date-fns/locale/uk';
+import { zhCN } from 'date-fns/locale/zh-CN';
+import { zhTW } from 'date-fns/locale/zh-TW';
+import { deepmerge } from 'deepmerge-ts';
 
-import en from '@/i18n/locales/en.json';
-import type { DeepPartial, LocaleCode, LocaleDefinition, Translations } from '@/i18n/types';
+import enUSDictionary from '@/i18n/locales/en-US.json';
+import type { DeepPartial, LocaleDefinition, Translations } from '@/i18n/types';
+
+/**
+ * Locale used when nothing else has a preference. Also the dictionary every
+ * other locale falls back to, so it is always bundled.
+ */
+export const DEFAULT_LOCALE = 'en-US';
 
 interface LocaleModule {
     default: DeepPartial<Translations>;
 }
 
 /**
- * Locales exposed in the UI. Codes must be two-letter ISO 639-1 values, which
- * is all the backend (`AvailableLanguages`, `LocaleRequest`) accepts.
+ * Every `*.json` file dropped into `i18n/locales` is discovered automatically
+ * by Vite, so adding a language is just a matter of copying a dictionary in.
+ * The backend does the same with the folders in `resources/lang`.
  */
-export const localeDefinitions: LocaleDefinition[] = [
-    { code: 'en', label: 'English' },
-    { code: 'es', label: 'Español (España)' },
-];
+const discovered = import.meta.glob<LocaleModule>('./locales/*.json');
+
+const codeFromPath = (path: string): string => path.replace(/^\.\/locales\//, '').replace(/\.json$/, '');
+
+export const loaders: Record<string, () => Promise<LocaleModule>> = Object.fromEntries(
+    Object.entries(discovered).map(([path, loader]) => [codeFromPath(path), loader]),
+);
+
+export const localeCodes: string[] = Object.keys(loaders).sort((a, b) => a.localeCompare(b));
+
+function localeLabel(code: string): string {
+    try {
+        const display = new Intl.DisplayNames([code], { type: 'language' }).of(code);
+
+        if (display) {
+            return display.charAt(0).toUpperCase() + display.slice(1);
+        }
+    } catch {
+        // Unsupported codes simply show the raw code below.
+    }
+
+    return code;
+}
+
+export const localeDefinitions: LocaleDefinition[] = localeCodes.map((code) => ({ code, label: localeLabel(code) }));
+
+export function isLocaleCode(value: unknown): boolean {
+    return typeof value === 'string' && value in loaders;
+}
 
 /**
- * Static loader map. Vite requires literal specifiers to code-split chunks;
- * never build these paths dynamically.
+ * Match an arbitrary locale-ish value ("fr-FR", "fr", "FR-fr") against the
+ * discovered dictionaries: exact first, then case-insensitive, then by the
+ * language part alone so a "fr-CA" browser still lands on "fr-FR".
  */
-export const loaders: Record<LocaleCode, () => Promise<LocaleModule>> = {
-    en: () => Promise.resolve({ default: en }),
-    es: () => import('@/i18n/locales/es.json'),
+export function matchLocale(value: string | null | undefined): string | undefined {
+    if (typeof value !== 'string' || value.length === 0) {
+        return undefined;
+    }
+
+    if (isLocaleCode(value)) {
+        return value;
+    }
+
+    const lower = value.toLowerCase();
+    const exact = localeCodes.find((code) => code.toLowerCase() === lower);
+
+    if (exact) {
+        return exact;
+    }
+
+    const language = lower.split('-')[0];
+
+    return localeCodes.find((code) => code.toLowerCase().split('-')[0] === language);
+}
+
+const dateFnsLocales: Record<string, Locale> = {
+    de: de,
+    'de-de': de,
+    en: enUS,
+    'en-gb': enGB,
+    'en-us': enUS,
+    es: es,
+    'es-es': es,
+    fr: fr,
+    'fr-fr': fr,
+    it: it,
+    ja: ja,
+    ko: ko,
+    nl: nl,
+    pl: pl,
+    pt: pt,
+    'pt-br': ptBR,
+    ru: ru,
+    tr: tr,
+    uk: uk,
+    'zh-cn': zhCN,
+    'zh-tw': zhTW,
 };
 
-export const dateFnsLoaders: Record<LocaleCode, () => Promise<Locale>> = {
-    en: () => Promise.resolve(enUS),
-    es: async () => (await import('date-fns/locale/es')).es,
-};
+/**
+ * Best-effort date-fns locale lookup based on the language part of the code.
+ * Unknown languages still get translated panel copy, only dates stay English.
+ */
+export function getDateFnsLocale(code: string): Locale {
+    const lower = code.toLowerCase();
+    const language = lower.split('-')[0] ?? lower;
 
-/** Locale identifiers understood by `cronstrue/i18n`. */
-export const cronstrueLocales: Record<LocaleCode, string> = {
-    en: 'en',
-    es: 'es',
-};
+    return dateFnsLocales[lower] ?? dateFnsLocales[language] ?? enUS;
+}
 
-export function isLocaleCode(value: unknown): value is LocaleCode {
-    return typeof value === 'string' && value in loaders;
+/** cronstrue ships per-language bundles keyed by the language part ("es"). */
+export function getCronstrueLocale(code: string): string {
+    return (code.split('-')[0] ?? code).toLowerCase();
 }
 
 /**
  * Load a locale dictionary merged over the canonical English dictionary, so
  * partially translated locales fall back per key instead of rendering blanks.
  */
-export async function loadLocale(code: LocaleCode): Promise<Translations> {
-    const overrides = await loaders[code]();
+export async function loadLocale(code: string): Promise<Translations> {
+    const loader = loaders[code];
 
-    return deepmerge(en, overrides.default) as Translations;
-}
+    if (code === DEFAULT_LOCALE || !loader) {
+        return enUSDictionary;
+    }
 
-export function loadDateFnsLocale(code: LocaleCode): Promise<Locale> {
-    return dateFnsLoaders[code]();
+    const overrides = await loader();
+
+    return deepmerge(enUSDictionary, overrides.default) as Translations;
 }

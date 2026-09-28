@@ -13,7 +13,7 @@ import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
-import { cronstrueLocales } from '@/i18n/loader';
+import { getCronstrueLocale } from '@/i18n/loader';
 import type { Translate } from '@/i18n/types';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
@@ -217,7 +217,7 @@ const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) 
             {({ isSubmitting, values }) => {
                 const cronDescription = getCronDescription(
                     t,
-                    cronstrueLocales[locale],
+                    getCronstrueLocale(locale),
                     values.minute,
                     values.hour,
                     values.dayOfMonth,

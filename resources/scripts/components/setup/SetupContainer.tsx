@@ -5,6 +5,7 @@ import { object, string } from 'yup';
 
 import setupAdmin from '@/api/auth/setup';
 import Field from '@/components/elements/Field';
+import LocaleDropdown from '@/components/elements/LocaleDropdown';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
@@ -204,7 +205,7 @@ const SetupContainer = () => {
     const prefersReducedMotion = useReducedMotion();
     const [step, setStep] = useState(0);
     const [done, setDone] = useState(false);
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const schema = useMemo(() => createSchema(t), [t]);
 
     const stepMotion = {
@@ -230,6 +231,7 @@ const SetupContainer = () => {
             const res = await setupAdmin({
                 ...values,
                 name_last: values.name_last || undefined,
+                language: locale,
             });
             if (res.complete) {
                 setDone(true);
@@ -281,7 +283,10 @@ const SetupContainer = () => {
                     <Form className='w-full max-w-md mx-auto flex flex-col gap-8'>
                         <FlashMessageRender />
 
-                        {!done && <StepTracker current={step} />}
+                        <div className='flex items-center justify-between gap-3'>
+                            {!done && <StepTracker current={step} />}
+                            <LocaleDropdown className='ml-auto' />
+                        </div>
 
                         <AnimatePresence mode='wait' initial={false}>
                             {done ? (
@@ -378,9 +383,7 @@ const SetupContainer = () => {
                                             value={t('setup.review.role_value')}
                                         />
                                     </dl>
-                                    <p className='text-xs text-secondary leading-relaxed'>
-                                        {t('setup.review.notice')}
-                                    </p>
+                                    <p className='text-xs text-secondary leading-relaxed'>{t('setup.review.notice')}</p>
                                 </motion.div>
                             )}
                         </AnimatePresence>

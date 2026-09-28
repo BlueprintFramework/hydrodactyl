@@ -4,7 +4,7 @@ Laravel translation files for the Hydrodactyl panel.
 
 ## Golden rules
 
-1. **`en` is canonical.** Today's exact English copy is preserved byte-for-byte. Backend tests
+1. **`en-US` is canonical.** Today's exact English copy is preserved byte-for-byte. Backend tests
    (PHPUnit `assertJsonPath('errors.0.detail', ...)`, `expectExceptionMessage(...)`) and frontend
    specs depend on it; changing English copy is a breaking change unless every assertion is updated
    in the same commit.
@@ -13,9 +13,9 @@ Laravel translation files for the Hydrodactyl panel.
 3. **One owner per key.** API error text, validation, activity entries, emails, and CLI messages
    live here. UI-chrome strings live in `resources/scripts/i18n/locales/*.json`.
 4. **Adding a locale directory auto-registers it.** `AvailableLanguages` scans `resource_path('lang')`
-   and derives display names via ISO 639-1 (`languageByCode1`). Locale codes must be exactly two
-   lowercase letters (`es`, never `es-ES`); it also feeds `User` validation and the admin settings
-   locale selector.
+   and builds display names with the `intl` extension (ISO 639-1 fallback). Full codes such as
+   `en-US`, `es-ES` or `fr-FR` are supported; the list also feeds `User` validation and the admin
+   settings / user edit language selectors.
 
 ## File layout
 

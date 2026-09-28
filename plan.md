@@ -344,4 +344,28 @@ A full audit after execution found and fixed the following:
 
 The same runtime verification commands from §10 remain pending in a toolchain-enabled environment.
 
+---
+
+## 12. Post-release feature: full locale codes + auto discovery
+
+Added after the initial rollout, at the maintainer's request:
+
+- Locale codes are now full BCP-47-ish strings (`en-US`, `es-ES`, `fr-FR`). The canonical
+  dictionaries moved to `resources/lang/en-US/` and `resources/scripts/i18n/locales/en-US.json`.
+- **Auto discovery**: dropping `resources/lang/<code>/` and `i18n/locales/<code>.json` is all it
+  takes. The backend scans the lang folder (`AvailableLanguages`); the frontend uses
+  `import.meta.glob`, so the language appears in the account selector, the first-run setup wizard
+  and the admin default-language dropdown with no code changes.
+- `AvailableLanguages` names locales with the `intl` extension (ISO 639-1 fallback); the Docker
+  image now installs `intl` so display names work there too.
+- Locale resolution gained browser-language detection as a final fallback, so fresh visitors get a
+  shipped language automatically.
+- The `/setup` wizard has a language picker and stores the chosen language on the admin account it
+  creates.
+- `users.language` widened to 16 chars; a migration upgrades existing `en`/`es` rows and the
+  `settings::app:locale` value.
+- Verified on the Ubuntu VM: Biome 0, typecheck back at the 376-error pre-existing baseline,
+  PHPUnit 694 green, Vitest 130 green, build OK, `es-ES` chunk emitted, panel serving HTTP 200,
+  and a throwaway `fr-FR` folder was auto-discovered by both layers before being removed.
+
 

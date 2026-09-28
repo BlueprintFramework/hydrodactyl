@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\View\View;
+use Illuminate\Validation\Rule;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Validation\ValidationException;
 use Pterodactyl\Facades\Activity;
@@ -63,6 +64,7 @@ class SetupController extends Controller
             'name_first' => ['required', 'string', 'between:1,191'],
             'name_last' => ['nullable', 'string', 'between:0,191'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'language' => ['sometimes', 'string', Rule::in(array_keys((new User())->getAvailableLanguages()))],
         ]);
 
         // The cross-process lock below only serializes on an atomic cache driver
@@ -91,14 +93,15 @@ class SetupController extends Controller
             }
 
             /** @var User $user */
-            $user = $this->creationService->handle([
+            $user = $this->creationService->handle(array_filter([
                 'email' => $data['email'],
                 'username' => $data['username'],
                 'name_first' => $data['name_first'],
                 'name_last' => $data['name_last'] ?? null,
                 'password' => $data['password'],
+                'language' => $data['language'] ?? null,
                 'root_admin' => true,
-            ]);
+            ], fn ($value) => !is_null($value)));
         } finally {
             $lock->release();
         }

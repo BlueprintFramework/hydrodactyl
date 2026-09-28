@@ -1,16 +1,17 @@
-import type en from '@/i18n/locales/en.json';
+import type enUS from '@/i18n/locales/en-US.json';
 
 /**
  * The canonical dictionary shape. Every locale must be assignable to a deep
  * partial of this type; missing keys fall back to English at runtime.
  */
-export type Translations = typeof en;
+export type Translations = typeof enUS;
 
 /**
- * Locale codes are restricted to two-letter ISO 639-1 codes because the
- * backend (`AvailableLanguages`, `LocaleRequest`) only accepts those.
+ * Locale codes are plain BCP-47-ish strings ("en-US", "es-ES", "fr-FR", ...).
+ * The concrete set is discovered at runtime from the JSON dictionaries in
+ * `i18n/locales`, so adding a language never requires touching this type.
  */
-export type LocaleCode = 'en' | 'es';
+export type LocaleCode = string;
 
 export type TranslationParams = Record<string, string | number>;
 
@@ -25,8 +26,8 @@ type Paths<T> = {
 }[keyof T & string];
 
 /**
- * Every dot-separated path that terminates in a string in `en.json`.
- * Using an unknown key is a compile-time error.
+ * Every dot-separated path that terminates in a string in the canonical
+ * dictionary. Using an unknown key is a compile-time error.
  */
 export type TranslationKey = Paths<Translations>;
 

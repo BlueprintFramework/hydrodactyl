@@ -1,11 +1,9 @@
-import type { Locale } from 'date-fns';
-import { enUS } from 'date-fns/locale/en-US';
 import { useStoreState } from 'easy-peasy';
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { interpolate } from '@/i18n/interpolate';
-import { isLocaleCode, loadDateFnsLocale, loadLocale, localeDefinitions } from '@/i18n/loader';
-import en from '@/i18n/locales/en.json';
+import { DEFAULT_LOCALE, getDateFnsLocale, loadLocale, localeDefinitions, matchLocale } from '@/i18n/loader';
+import enUSDictionary from '@/i18n/locales/en-US.json';
 import type { DeepPartial, I18nContextValue, LocaleCode, Translate, Translations } from '@/i18n/types';
 import { usePersistedState } from '@/plugins/usePersistedState';
 
@@ -27,14 +25,31 @@ function lookup(dictionary: DeepPartial<Translations>, key: string): string | un
     return typeof node === 'string' ? node : undefined;
 }
 
+/**
+ * Preferred languages reported by the browser. Used as a last resort so a
+ * visitor with no stored preference gets a locale we actually ship, without
+ * having to configure anything.
+ */
+function browserLocales(): string[] {
+    if (typeof navigator === 'undefined') {
+        return [];
+    }
+
+    const languages = navigator.languages?.length ? navigator.languages : [navigator.language];
+
+    return languages.filter((value): value is string => typeof value === 'string' && value.length > 0);
+}
+
 function resolveLocale(...candidates: (string | null | undefined)[]): LocaleCode {
     for (const candidate of candidates) {
-        if (isLocaleCode(candidate)) {
-            return candidate;
+        const match = matchLocale(candidate);
+
+        if (match) {
+            return match;
         }
     }
 
-    return 'en';
+    return DEFAULT_LOCALE;
 }
 
 interface I18nProviderProps {
@@ -45,17 +60,28 @@ const I18nProvider = ({ children }: I18nProviderProps) => {
     const userLanguage = useStoreState((state) => state.user.data?.language);
     const siteLocale = useStoreState((state) => state.settings.data?.locale);
     const [persistedLocale, setPersistedLocale] = usePersistedState<LocaleCode | null>(STORAGE_KEY, null);
-    const [locale, setLocaleState] = useState<LocaleCode>(() => resolveLocale(persistedLocale, userLanguage, siteLocale));
 
-    const [dictionary, setDictionary] = useState<Translations>(en);
-    const [ready, setReady] = useState(locale === 'en');
-    const [dateFnsLocale, setDateFnsLocale] = useState<Locale>(enUS);
+    // Stored/user/site preferences win. The default locale is treated as "no
+    // opinion" so the browser can pick one of the shipped languages instead.
+    const [locale, setLocaleState] = useState<LocaleCode>(() =>
+        resolveLocale(
+            persistedLocale,
+            userLanguage,
+            siteLocale === DEFAULT_LOCALE ? undefined : siteLocale,
+            ...browserLocales(),
+        ),
+    );
+
+    const [dictionary, setDictionary] = useState<Translations>(enUSDictionary);
+    const [ready, setReady] = useState(locale === DEFAULT_LOCALE);
+
+    const dateFnsLocale = useMemo(() => getDateFnsLocale(locale), [locale]);
 
     useEffect(() => {
         let cancelled = false;
 
-        if (locale === 'en') {
-            setDictionary(en);
+        if (locale === DEFAULT_LOCALE) {
+            setDictionary(enUSDictionary);
             setReady(true);
         } else {
             setReady(false);
@@ -66,12 +92,6 @@ const I18nProvider = ({ children }: I18nProviderProps) => {
                 }
             });
         }
-
-        loadDateFnsLocale(locale).then((loaded) => {
-            if (!cancelled) {
-                setDateFnsLocale(loaded);
-            }
-        });
 
         document.documentElement.lang = locale;
 
@@ -89,7 +109,7 @@ const I18nProvider = ({ children }: I18nProviderProps) => {
     );
 
     const t = useCallback<Translate>(
-        (key, params) => interpolate(lookup(dictionary, key) ?? lookup(en, key) ?? key, params),
+        (key, params) => interpolate(lookup(dictionary, key) ?? lookup(enUSDictionary, key) ?? key, params),
         [dictionary],
     );
 

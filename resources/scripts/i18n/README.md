@@ -52,20 +52,25 @@ return <h2>{t('server.backups.title')}</h2>;
 
 ## Locale resolution
 
-`localStorage` override -> `user.language` -> `settings.locale` -> `en`.
+`localStorage` override -> `user.language` -> site locale -> browser languages -> `en-US`.
 
 - `setLocale(code)` persists the override, updates `document.documentElement.lang`, and lazily
   imports the locale chunk.
-- Non-`en` locales are code-split; `en` is always bundled so first paint never blocks.
+- Only `en-US` is bundled up front; every other dictionary is code-split on demand.
+- The default locale is treated as "no opinion" so a fresh visitor gets whichever shipped
+  language their browser asks for, with no setup on their side.
 - date-fns and cronstrue locales are resolved through `i18n/loader.ts`.
 
-## Adding a locale
+## Adding a locale (no code changes)
 
-1. Add `i18n/locales/<code>.json` (two-letter ISO 639-1 only).
-2. Register it in the static maps in `i18n/loader.ts`: `loaders`, `dateFnsLocales`,
-   `cronstrueLocales`, and `locales`.
-3. Add the matching `resources/lang/<code>/` backend mirror.
-4. Never use template-literal `import()` — Vite requires static specifiers.
+1. Copy `i18n/locales/en-US.json` to `i18n/locales/<code>.json` (e.g. `fr-FR`) and translate the values.
+2. Copy `resources/lang/en-US/` to `resources/lang/<code>/` and translate the PHP files.
+3. Done. Both dictionaries are auto-discovered: the language shows up in the account selector,
+   the first-run setup wizard and the admin default-language dropdown with no further wiring.
+4. Dates are best-effort through the `date-fns` map in `i18n/loader.ts`; cron descriptions
+   localize automatically from the language part of the code.
+
+Codes are validated against the discovered files, so any `xx` or `xx-YY` folder works.
 
 ## Locale content rules (es)
 
