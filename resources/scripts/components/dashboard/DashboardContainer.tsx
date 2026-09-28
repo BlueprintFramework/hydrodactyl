@@ -363,12 +363,13 @@ const DashboardContainer = () => {
                                 {items.map((server, index) => (
                                     <div
                                         key={`${server.uuid}-${dashboardMode}`}
-                                        className={`transform-gpu skeleton-anim-2 ${dashboardMode === 'grid'
+                                        className={`transform-gpu skeleton-anim-2 ${
+                                            dashboardMode === 'grid'
                                                 ? items.length === 1
                                                     ? 'w-[calc(50%-0.5rem)] max-lg:w-full'
                                                     : 'w-[calc(50%-0.5rem)] max-lg:w-full'
                                                 : 'mb-4'
-                                            } max-lg:mb-4`}
+                                        } max-lg:mb-4`}
                                         style={{
                                             animationDelay: `${index * 50 + 50}ms`,
                                             animationTimingFunction:
@@ -394,8 +395,8 @@ const DashboardContainer = () => {
                                     {ownerFilter === 'admin-all'
                                         ? t('dashboard.empty.admin_all_description')
                                         : ownerFilter === 'all'
-                                            ? t('dashboard.empty.shared_description')
-                                            : t('dashboard.empty.description')}
+                                          ? t('dashboard.empty.shared_description')
+                                          : t('dashboard.empty.description')}
                                 </p>
                                 <h3 className='text-lg font-medium text-zinc-200 mb-2'>
                                     {ownerFilter === 'admin-all'
