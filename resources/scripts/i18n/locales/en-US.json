@@ -1514,6 +1514,10 @@
             "title": "Review & create",
             "username_label": "Username"
         },
+        "shell": {
+            "description": "A fresh install has no administrator yet — let's create your first account and get you signed in.",
+            "title": "Set up your panel."
+        },
         "steps": {
             "admin_account": "Admin account",
             "review": "Review",

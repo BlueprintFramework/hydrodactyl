@@ -5,7 +5,6 @@ import { object, string } from 'yup';
 
 import setupAdmin from '@/api/auth/setup';
 import Field from '@/components/elements/Field';
-import LocaleDropdown from '@/components/elements/LocaleDropdown';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
@@ -283,10 +282,7 @@ const SetupContainer = () => {
                     <Form className='w-full max-w-md mx-auto flex flex-col gap-8'>
                         <FlashMessageRender />
 
-                        <div className='flex items-center justify-between gap-3'>
-                            {!done && <StepTracker current={step} />}
-                            <LocaleDropdown className='ml-auto' />
-                        </div>
+                        {!done && <StepTracker current={step} />}
 
                         <AnimatePresence mode='wait' initial={false}>
                             {done ? (

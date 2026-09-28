@@ -1514,6 +1514,10 @@
             "title": "Revisar y crear",
             "username_label": "Nombre de usuario"
         },
+        "shell": {
+            "description": "Una instalación nueva aún no tiene administrador: crea tu primera cuenta y te dejamos con la sesión iniciada.",
+            "title": "Configura tu panel."
+        },
         "steps": {
             "admin_account": "Cuenta de administrador",
             "review": "Revisión",
