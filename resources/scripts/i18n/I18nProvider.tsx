@@ -84,17 +84,31 @@ const I18nProvider = ({ children }: I18nProviderProps) => {
     }, [configuredLocales]);
     const codes = useMemo(() => locales.map((entry) => entry.code), [locales]);
 
-    // Stored/user/site preferences win. The default locale is treated as "no
-    // opinion" so the browser can pick one of the shipped languages instead.
+    // The account language wins: it is the server-side source of truth, so a
+    // change made by an administrator is picked up on the next page load. The
+    // local override is only a fallback for guests (setup wizard, login) and an
+    // instant boot cache. The default locale is treated as "no opinion" so the
+    // browser can pick one of the shipped languages instead.
     const [locale, setLocaleState] = useState<LocaleCode>(() =>
         resolveLocale(
             codes,
-            persistedLocale,
             userLanguage,
+            persistedLocale,
             siteLocale === DEFAULT_LOCALE ? undefined : siteLocale,
             ...browserLocales(),
         ),
     );
+
+    // Keep the local cache in sync with the account preference and follow it
+    // when the data changes at runtime (e.g. a fresh account fetch).
+    useEffect(() => {
+        const match = matchLocale(userLanguage, codes);
+
+        if (match) {
+            setLocaleState((current) => (current === match ? current : match));
+            setPersistedLocale(match);
+        }
+    }, [userLanguage, codes, setPersistedLocale]);
 
     const [dictionary, setDictionary] = useState<Translations>(enUSDictionary);
     const [ready, setReady] = useState(locale === DEFAULT_LOCALE);
