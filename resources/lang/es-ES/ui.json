@@ -1035,7 +1035,7 @@
         },
         "software": {
             "configuration": {
-                "back_to_software": "Volver a Software",
+                "back_to_software": "Volver a software",
                 "backup_auto": "Crear automáticamente una copia de seguridad antes de aplicar los cambios",
                 "backup_disabled": "Las copias de seguridad están desactivadas para este servidor",
                 "backup_limit": "Se ha alcanzado el límite de copias de seguridad",
@@ -1209,7 +1209,7 @@
             "stopping": "Deteniendo"
         },
         "users": {
-            "back_to_users": "Volver a Usuarios",
+            "back_to_users": "Volver a usuarios",
             "count": "{{count}} usuarios",
             "create_heading": "Crear nuevo usuario",
             "create_title": "Crear usuario",
