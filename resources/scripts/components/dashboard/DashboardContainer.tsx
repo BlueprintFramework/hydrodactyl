@@ -368,7 +368,11 @@ const DashboardContainer = () => {
                                     <div
                                         key={`${server.uuid}-${dashboardMode}`}
                                         className={`transform-gpu skeleton-anim-2 ${
-                                            dashboardMode === 'grid' ? 'w-[calc(50%-0.5rem)] max-lg:w-full' : 'mb-4'
+                                            dashboardMode === 'grid'
+                                                ? items.length === 1
+                                                    ? 'w-[calc(50%-0.5rem)] max-lg:w-full'
+                                                    : 'w-[calc(50%-0.5rem)] max-lg:w-full'
+                                                : 'mb-4'
                                         } max-lg:mb-4`}
                                         style={{
                                             animationDelay: `${index * 50 + 50}ms`,
