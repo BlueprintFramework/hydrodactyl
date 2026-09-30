@@ -13,6 +13,10 @@
     $_favVal = config('app.logo.value');
     if ($_favType === 'upload' && $_favVal && Storage::disk('public')->exists($_favVal)) {
       $_favUrl = url('storage/' . $_favVal);
+      $_favPath = Storage::disk('public')->path($_favVal);
+      if (file_exists($_favPath)) {
+        $_favUrl .= '?v=' . filemtime($_favPath);
+      }
     } elseif ($_favType === 'link' && $_favVal) {
       $_favUrl = $_favVal;
     } else {
@@ -22,11 +26,12 @@
   @if($_favUrl)
   <link rel="icon" href="{{ $_favUrl }}" />
   <link rel="apple-touch-icon" href="{{ $_favUrl }}" />
-  @endif
+  @else
   <link rel="icon" type="image/png" href="/favicons/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
   <link rel="shortcut icon" href="/favicons/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+  @endif
   <meta name="apple-mobile-web-app-title" content="Hydrodactyl" />
   <link rel="manifest" href="/favicons/site.webmanifest" />
 
@@ -72,7 +77,7 @@
             <img src="{{ $logoValue }}" alt="{{ config('app.name', 'Panel') }}" style="max-height:30px;vertical-align:middle;">
           @else
             <svg width="30" height="28" viewBox="0 0 100 92" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">
-                <path d="M35.1293 92L39.2242 59.3897L44.8276 60.4695L14.2241 81.2019L0 57.0141L32.7586 45.3521V47.7277L0 33.4742L14.2241 8.85446L45.6896 33.2582L39.2242 34.1221L34.4828 0H65.5172L61.4225 33.9061L56.681 32.8263L85.7759 8.85446L100 33.4742L66.1638 47.7277V45.5681L99.569 57.0141L85.3448 81.2019L57.5431 59.3897H61.638L66.1638 92H35.1293Z" fill="#52A9FF" />
+                <path d="M35.1293 92L39.2242 59.3897L44.8276 60.4695L14.2241 81.2019L0 57.0141L32.7586 45.3521V47.7277L0 33.4742L14.2241 8.85446L45.6896 33.2582L39.2242 34.1221L34.4828 0H65.5172L61.4225 33.9061L56.681 32.8263L85.7759 8.85446L100 33.4742L66.1638 47.7277V45.5681L99.569 57.0141L85.3448 81.2019L57.5431 59.3897H61.638L66.1638 92H35.1293Z" fill="{{ config('app.brand_color', '#52A9FF') }}" />
             </svg>
           @endif
         </span>
@@ -83,7 +88,7 @@
             <img src="{{ $logoValue }}" alt="" style="max-height:30px;vertical-align:middle;margin-right:6px;">
           @else
             <svg width="30" height="28" viewBox="0 0 100 92" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px;">
-                <path d="M35.1293 92L39.2242 59.3897L44.8276 60.4695L14.2241 81.2019L0 57.0141L32.7586 45.3521V47.7277L0 33.4742L14.2241 8.85446L45.6896 33.2582L39.2242 34.1221L34.4828 0H65.5172L61.4225 33.9061L56.681 32.8263L85.7759 8.85446L100 33.4742L66.1638 47.7277V45.5681L99.569 57.0141L85.3448 81.2019L57.5431 59.3897H61.638L66.1638 92H35.1293Z" fill="#52A9FF" />
+                <path d="M35.1293 92L39.2242 59.3897L44.8276 60.4695L14.2241 81.2019L0 57.0141L32.7586 45.3521V47.7277L0 33.4742L14.2241 8.85446L45.6896 33.2582L39.2242 34.1221L34.4828 0H65.5172L61.4225 33.9061L56.681 32.8263L85.7759 8.85446L100 33.4742L66.1638 47.7277V45.5681L99.569 57.0141L85.3448 81.2019L57.5431 59.3897H61.638L66.1638 92H35.1293Z" fill="{{ config('app.brand_color', '#52A9FF') }}" />
             </svg>
           @endif
           <b>{{ config('app.name', 'Hydrodactyl') }}</b>

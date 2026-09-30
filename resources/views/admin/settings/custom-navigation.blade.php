@@ -33,15 +33,12 @@
   @endphp
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
-      <div class="box box-primary">
+      <div class="box">
         <div class="box-header with-border">
-          <i class="fa fa-bars"></i> <h3 class="box-title" style="display:inline;">Custom Navigation Items</h3>
+          <h3 class="box-title">Custom Navigation Items</h3>
         </div>
         <form action="{{ route('admin.settings.custom-navigation') }}" method="POST">
           <div class="box-body">
-            <div class="alert alert-info" style="margin-bottom:20px;">
-              <i class="fa fa-flask"></i> <strong>Experimental:</strong> Custom Navigation Items is a new, experimental feature. Some aspects may change in future updates.
-            </div>
             <p class="text-muted small">Add up to 3 custom links to display at the bottom of the sidebar.</p>
 
             @for($index = 0; $index < 3; $index++)

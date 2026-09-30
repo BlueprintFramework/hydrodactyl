@@ -65,7 +65,7 @@
                     <td class="text-center">
                       <a href="{{ route('admin.settings.domains.edit', $domain) }}" class="btn btn-xs btn-primary">Edit</a>
                       @if($domain->server_subdomains_count == 0)
-                        <form action="{{ route('admin.settings.domains.destroy', $domain) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this domain?')">
+                        <form action="{{ route('admin.settings.domains.destroy', $domain) }}" method="POST" style="display: inline;" class="delete-domain-form">
                           @csrf
                           @method('DELETE')
                           <button type="submit" class="btn btn-xs btn-danger">Delete</button>
@@ -95,11 +95,20 @@
   @parent
   <script>
     $(document).ready(function() {
-      $('.btn-danger').click(function(e) {
-        if (!confirm('Are you sure you want to delete this domain? This action cannot be undone.')) {
-          e.preventDefault();
-          return false;
-        }
+      $('.delete-domain-form').submit(function(e) {
+        e.preventDefault();
+        var form = this;
+        swal({
+          title: '',
+          type: 'warning',
+          text: 'Are you sure you want to delete this domain? This action cannot be undone.',
+          showCancelButton: true,
+          confirmButtonText: 'Delete',
+          confirmButtonColor: '#d9534f',
+          closeOnConfirm: false
+        }, function() {
+          form.submit();
+        });
       });
     });
   </script>

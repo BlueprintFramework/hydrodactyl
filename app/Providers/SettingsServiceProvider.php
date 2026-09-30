@@ -27,6 +27,7 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:auth:2fa_required',
     'app:logo:type',
     'app:logo:value',
+    'app:brand_color',
     'app:custom_nav_items',
     'pterodactyl:client_features:allocations:enabled',
     'pterodactyl:client_features:allocations:range_start',

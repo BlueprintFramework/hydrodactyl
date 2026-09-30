@@ -4,6 +4,7 @@
 .env
 .github/workflows/ci.yaml
 .node-version
+.opencode
 
 # Elytra binary
 elytra

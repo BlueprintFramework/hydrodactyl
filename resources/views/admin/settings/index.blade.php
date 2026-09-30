@@ -24,13 +24,7 @@
         <form action="{{ route('admin.settings') }}" method="POST">
           <div class="box-body">
             <div class="row">
-              <div class="form-group col-md-6">
-                <label class="control-label">Company Name</label>
-                <input type="text" class="form-control" name="app:name"
-                  value="{{ old('app:name', config('app.name')) }}" />
-                <p class="text-muted small" style="margin-top:4px;">Displayed throughout the panel and in outgoing emails.</p>
-              </div>
-              <div class="form-group col-md-6">
+              <div class="form-group col-md-12">
                 <label class="control-label">Default Language</label>
                 <select name="app:locale" class="form-control">
                   @foreach($languages as $key => $value)
