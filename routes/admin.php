@@ -89,6 +89,14 @@ Route::group(['prefix' => 'api'], function () {
 
         Route::get('/{node:id}/servers', [Admin\Api\NodeServersController::class, 'index']);
     });
+
+    Route::group(['prefix' => 'locations'], function () {
+        Route::get('/', [Admin\Api\LocationController::class, 'index'])->name('admin.api.locations');
+        Route::get('/{location:id}', [Admin\Api\LocationController::class, 'view']);
+        Route::post('/', [Admin\Api\LocationController::class, 'store']);
+        Route::patch('/{location:id}', [Admin\Api\LocationController::class, 'update']);
+        Route::delete('/{location:id}', [Admin\Api\LocationController::class, 'destroy']);
+    });
 });
 
 /*
@@ -124,6 +132,9 @@ Route::get('/nodes/{id}/configuration', [Admin\AppController::class, 'index'])->
 Route::get('/nodes/{id}/allocation', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.allocation');
 Route::get('/nodes/{id}/servers', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.servers');
 
+Route::get('/locations', [Admin\AppController::class, 'index'])->name('admin.locations');
+Route::get('/locations/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.locations.view');
+
 /*
 |--------------------------------------------------------------------------
 | Location Controller Routes
@@ -139,22 +150,6 @@ Route::group(['prefix' => 'api'], function () {
     Route::post('/new', [Admin\ApiController::class, 'store']);
 
     Route::delete('/revoke/{identifier}', [Admin\ApiController::class, 'delete'])->name('admin.api.delete');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Location Controller Routes
-|--------------------------------------------------------------------------
-|
-| Endpoint: /admin/locations
-|
-*/
-Route::group(['prefix' => 'locations'], function () {
-    Route::get('/', [Admin\LocationController::class, 'index'])->name('admin.locations');
-    Route::get('/view/{location:id}', [Admin\LocationController::class, 'view'])->name('admin.locations.view');
-
-    Route::post('/', [Admin\LocationController::class, 'create']);
-    Route::patch('/view/{location:id}', [Admin\LocationController::class, 'update']);
 });
 
 /*

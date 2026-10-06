@@ -46,6 +46,9 @@ const NodeConfigurationContainer = lazy(() => import('./nodes/NodeConfigurationC
 const NodeAllocationContainer = lazy(() => import('./nodes/NodeAllocationContainer'));
 const NodeServersContainer = lazy(() => import('./nodes/NodeServersContainer'));
 
+const LocationsContainer = lazy(() => import('./locations/LocationsContainer'));
+const LocationViewContainer = lazy(() => import('./locations/LocationViewContainer'));
+
 const SettingsLayout = lazy(() => import('./settings/SettingsLayout'));
 const GeneralSettings = lazy(() => import('./settings/GeneralSettings'));
 const AdvancedSettings = lazy(() => import('./settings/AdvancedSettings'));
@@ -132,13 +135,12 @@ const AdminShell = () => {
             end: false,
         },
         {
-            to: '/admin/locations',
+            to: '/locations',
             icon: Location01Icon,
             text: 'Locations',
             tabName: 'locations',
             ref: NavigationLocations,
             end: false,
-            hardNav: true,
         },
         {
             to: '/admin/databases',
@@ -222,6 +224,8 @@ const AdminShell = () => {
                                         <Route path='allocation' element={<NodeAllocationContainer />} />
                                         <Route path='servers' element={<NodeServersContainer />} />
                                     </Route>
+                                    <Route path='/locations' element={<LocationsContainer />} />
+                                    <Route path='/locations/:id' element={<LocationViewContainer />} />
                                     <Route path='/settings' element={<SettingsLayout />}>
                                         <Route index element={<GeneralSettings />} />
                                         <Route path='advanced' element={<AdvancedSettings />} />
