@@ -85,6 +85,15 @@ export const getNodes = (query: { page?: number; search?: string } = {}): Promis
 export const getNode = (id: number | string): Promise<AdminNode> =>
     http.get(`/admin/api/nodes/${id}`).then(({ data }) => data.data);
 
+export interface NodeStatus {
+    up: boolean;
+    version: string | null;
+    error: string | null;
+}
+
+export const getNodeStatus = (id: number | string): Promise<NodeStatus> =>
+    http.get(`/admin/api/nodes/${id}/status`).then(({ data }) => data.data);
+
 export const getNodeOptions = (): Promise<NodeOptions> => http.get('/admin/api/nodes/options').then(({ data }) => data);
 
 export const createNode = (values: NodeValues & { reset_secret?: boolean }): Promise<AdminNode> =>

@@ -5,6 +5,7 @@ import {
     getNodeConfiguration,
     getNodeOptions,
     getNodeServers,
+    getNodeStatus,
     getNodes,
 } from '@/api/admin/nodes';
 
@@ -17,6 +18,12 @@ export const useNodes = (query: { page?: number; search?: string }) =>
 export const useNode = (id?: number | string) =>
     useSWR(id ? ['admin:node', id] : null, () => getNode(id as number | string), {
         revalidateOnFocus: false,
+    });
+
+export const useNodeStatus = (id?: number | string) =>
+    useSWR(id ? ['admin:node-status', id] : null, () => getNodeStatus(id as number | string), {
+        revalidateOnFocus: false,
+        refreshInterval: 15000,
     });
 
 export const useNodeOptions = () =>

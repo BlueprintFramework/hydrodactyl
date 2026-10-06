@@ -17,6 +17,7 @@ use Pterodactyl\Services\Nodes\NodeCreationService;
 use Pterodactyl\Services\Nodes\NodeDeletionService;
 use Pterodactyl\Http\Requests\Admin\Node\NodeFormRequest;
 use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
+use Pterodactyl\Repositories\Wings\DaemonConfigurationRepository;
 
 class NodesController extends Controller
 {
@@ -29,6 +30,7 @@ class NodesController extends Controller
         private NodeDeletionService $deletionService,
         private NodeRepository $repository,
         private LocationRepositoryInterface $locationRepository,
+        private DaemonConfigurationRepository $daemonConfigurationRepository,
     ) {
     }
 
@@ -97,6 +99,36 @@ class NodesController extends Controller
                 (int) ($stats['memory']['value'] ?? 0),
                 (int) ($stats['disk']['value'] ?? 0)
             ),
+        ]);
+    }
+
+    /**
+     * Check whether the daemon on a node is reachable.
+     *
+     * This always responds with a 200 so the interface can render an up/down
+     * state for every node; connection failures are reported in the payload
+     * rather than as a transport error.
+     */
+    public function status(Node $node): JsonResponse
+    {
+        try {
+            $data = $this->daemonConfigurationRepository->setNode($node)->getSystemInformation();
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'data' => [
+                    'up' => false,
+                    'version' => null,
+                    'error' => $exception->getMessage(),
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'data' => [
+                'up' => true,
+                'version' => $data['version'] ?? null,
+                'error' => null,
+            ],
         ]);
     }
 

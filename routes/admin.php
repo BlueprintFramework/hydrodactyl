@@ -71,6 +71,7 @@ Route::group(['prefix' => 'api'], function () {
         Route::get('/', [Admin\Api\NodesController::class, 'index'])->name('admin.api.nodes');
         Route::get('/options', [Admin\Api\NodesController::class, 'options']);
         Route::get('/{node:id}', [Admin\Api\NodesController::class, 'view']);
+        Route::get('/{node:id}/status', [Admin\Api\NodesController::class, 'status']);
         Route::post('/', [Admin\Api\NodesController::class, 'store']);
         Route::patch('/{node:id}', [Admin\Api\NodesController::class, 'update']);
         Route::delete('/{node:id}', [Admin\Api\NodesController::class, 'destroy']);

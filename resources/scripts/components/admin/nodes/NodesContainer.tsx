@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
-import { useNodes } from '@/api/admin/useNodes';
+import type { AdminNode } from '@/api/admin/nodes';
+import { useNodeStatus, useNodes } from '@/api/admin/useNodes';
 import { Input } from '@/components/elements/inputs';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
@@ -36,6 +37,104 @@ const UsageBar = ({ percent, allocated, total }: { percent: number; allocated: n
     </div>
 );
 
+const StatusIndicator = ({ state, title }: { state: 'checking' | 'up' | 'down'; title: string }) => {
+    if (state === 'checking') {
+        return (
+            <span className='inline-flex items-center gap-1.5 text-xs text-cream-400/50'>
+                <span className='h-2 w-2 animate-pulse rounded-full bg-cream-400/40' />
+                Checking
+            </span>
+        );
+    }
+
+    const up = state === 'up';
+
+    return (
+        <span
+            title={title}
+            className={cn(
+                'inline-flex items-center gap-1.5 text-xs font-medium',
+                up ? 'text-hydro-400' : 'text-brand-400',
+            )}
+        >
+            <span className={cn('h-2 w-2 rounded-full', up ? 'bg-hydro-500' : 'bg-brand-400')} />
+            {up ? 'Up' : 'Down'}
+        </span>
+    );
+};
+
+/**
+ * Probe the daemon from the visitor's browser. A no-cors request resolves for
+ * any HTTP response (even a 401) and only rejects when the connection itself
+ * fails, which is exactly the reachability signal we want — and it keeps the
+ * daemon's secret out of the page.
+ */
+const useBrowserReachability = (url: string): 'checking' | 'up' | 'down' => {
+    const [state, setState] = useState<'checking' | 'up' | 'down'>('checking');
+
+    useEffect(() => {
+        let active = true;
+
+        const probe = async () => {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 5000);
+
+            try {
+                await fetch(url, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+                if (active) setState('up');
+            } catch {
+                if (active) setState('down');
+            } finally {
+                clearTimeout(timeout);
+            }
+        };
+
+        probe();
+        const interval = setInterval(probe, 15000);
+
+        return () => {
+            active = false;
+            clearInterval(interval);
+        };
+    }, [url]);
+
+    return state;
+};
+
+const BrowserStatus = ({ node }: { node: AdminNode }) => {
+    const state = useBrowserReachability(`${node.scheme}://${node.fqdn}:${node.daemonListen}/api/system`);
+
+    return (
+        <StatusIndicator
+            state={state}
+            title={
+                state === 'down'
+                    ? 'Your browser could not reach the daemon. It may be offline, unreachable from this network, or blocked as mixed content.'
+                    : 'Your browser opened a connection to the daemon.'
+            }
+        />
+    );
+};
+
+const ServerStatus = ({ id }: { id: number }) => {
+    const { data } = useNodeStatus(id);
+
+    return (
+        <StatusIndicator
+            state={!data ? 'checking' : data.up ? 'up' : 'down'}
+            title={
+                !data
+                    ? 'Checking daemon reachability from the panel...'
+                    : data.up
+                      ? data.version
+                          ? `The panel reached the daemon (v${data.version}).`
+                          : 'The panel reached the daemon.'
+                      : (data.error ?? 'The panel could not reach the daemon.')
+            }
+        />
+    );
+};
+
 const NodesContainer = () => {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
@@ -69,6 +168,8 @@ const NodesContainer = () => {
                 <table className='w-full text-sm'>
                     <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                         <tr className='border-b border-mocha-400'>
+                            <th className='px-4 py-3'>Browser</th>
+                            <th className='px-4 py-3'>Server</th>
                             <th className='px-4 py-3'>Name</th>
                             <th className='px-4 py-3'>Location</th>
                             <th className='px-4 py-3'>Memory</th>
@@ -80,6 +181,12 @@ const NodesContainer = () => {
                     <tbody>
                         {nodes.map((node) => (
                             <tr key={node.id} className='border-b border-mocha-400/40 hover:bg-mocha-400/20'>
+                                <td className='px-4 py-3'>
+                                    <BrowserStatus node={node} />
+                                </td>
+                                <td className='px-4 py-3'>
+                                    <ServerStatus id={node.id} />
+                                </td>
                                 <td className='px-4 py-3'>
                                     <Link to={`/nodes/${node.id}`} className='text-cream-50 hover:text-hydro-400'>
                                         {node.name}
@@ -111,7 +218,7 @@ const NodesContainer = () => {
                         ))}
                         {!isValidating && nodes.length === 0 && (
                             <tr>
-                                <td colSpan={6} className='px-4 py-8 text-center text-cream-400/50'>
+                                <td colSpan={8} className='px-4 py-8 text-center text-cream-400/50'>
                                     No nodes found.
                                 </td>
                             </tr>
