@@ -98,6 +98,16 @@ Route::group(['prefix' => 'api'], function () {
         Route::delete('/{location:id}', [Admin\Api\LocationController::class, 'destroy']);
     });
 
+    Route::group(['prefix' => 'database-hosts'], function () {
+        Route::get('/', [Admin\Api\DatabaseHostController::class, 'index'])->name('admin.api.database-hosts');
+        Route::get('/options', [Admin\Api\DatabaseHostController::class, 'options']);
+        Route::post('/test', [Admin\Api\DatabaseHostController::class, 'testConnection']);
+        Route::get('/{host:id}', [Admin\Api\DatabaseHostController::class, 'view']);
+        Route::post('/', [Admin\Api\DatabaseHostController::class, 'store']);
+        Route::patch('/{host:id}', [Admin\Api\DatabaseHostController::class, 'update']);
+        Route::delete('/{host:id}', [Admin\Api\DatabaseHostController::class, 'destroy']);
+    });
+
     Route::group(['prefix' => 'servers'], function () {
         Route::get('/', [Admin\Api\ServerController::class, 'index'])->name('admin.api.servers');
         Route::post('/', [Admin\Api\ServerController::class, 'store']);
@@ -162,6 +172,9 @@ Route::get('/nodes/{id}/servers', [Admin\AppController::class, 'index'])->where(
 Route::get('/locations', [Admin\AppController::class, 'index'])->name('admin.locations');
 Route::get('/locations/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.locations.view');
 
+Route::get('/databases', [Admin\AppController::class, 'index'])->name('admin.databases');
+Route::get('/databases/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.databases.view');
+
 Route::get('/servers', [Admin\AppController::class, 'index'])->name('admin.servers');
 Route::get('/servers/new', [Admin\AppController::class, 'index'])->name('admin.servers.new');
 Route::get('/servers/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view');
@@ -188,24 +201,6 @@ Route::group(['prefix' => 'api'], function () {
     Route::post('/new', [Admin\ApiController::class, 'store']);
 
     Route::delete('/revoke/{identifier}', [Admin\ApiController::class, 'delete'])->name('admin.api.delete');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Database Controller Routes
-|--------------------------------------------------------------------------
-|
-| Endpoint: /admin/databases
-|
-*/
-Route::group(['prefix' => 'databases'], function () {
-    Route::get('/', [Admin\DatabaseController::class, 'index'])->name('admin.databases');
-    Route::get('/view/{host:id}', [Admin\DatabaseController::class, 'view'])->name('admin.databases.view');
-
-    Route::post('/', [Admin\DatabaseController::class, 'create']);
-    Route::post('/test', [Admin\DatabaseController::class, 'testConnection'])->name('admin.databases.test');
-    Route::patch('/view/{host:id}', [Admin\DatabaseController::class, 'update']);
-    Route::delete('/view/{host:id}', [Admin\DatabaseController::class, 'delete']);
 });
 
 /*

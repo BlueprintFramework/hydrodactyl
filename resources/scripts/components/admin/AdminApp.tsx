@@ -49,6 +49,9 @@ const NodeServersContainer = lazy(() => import('./nodes/NodeServersContainer'));
 const LocationsContainer = lazy(() => import('./locations/LocationsContainer'));
 const LocationViewContainer = lazy(() => import('./locations/LocationViewContainer'));
 
+const DatabaseHostsContainer = lazy(() => import('./databases/DatabaseHostsContainer'));
+const DatabaseHostViewContainer = lazy(() => import('./databases/DatabaseHostViewContainer'));
+
 const ServersContainer = lazy(() => import('./servers/ServersContainer'));
 const ServerLayout = lazy(() => import('./servers/ServerLayout'));
 const ServerOverviewContainer = lazy(() => import('./servers/ServerOverviewContainer'));
@@ -154,13 +157,12 @@ const AdminShell = () => {
             end: false,
         },
         {
-            to: '/admin/databases',
+            to: '/databases',
             icon: Database02Icon,
             text: 'Databases',
             tabName: 'databases',
             ref: NavigationDatabases,
             end: false,
-            hardNav: true,
         },
         {
             to: '/admin/buckets',
@@ -237,6 +239,8 @@ const AdminShell = () => {
                                     </Route>
                                     <Route path='/locations' element={<LocationsContainer />} />
                                     <Route path='/locations/:id' element={<LocationViewContainer />} />
+                                    <Route path='/databases' element={<DatabaseHostsContainer />} />
+                                    <Route path='/databases/:id' element={<DatabaseHostViewContainer />} />
                                     <Route path='/servers' element={<ServersContainer />} />
                                     <Route path='/servers/new' element={<ServerCreateContainer />} />
                                     <Route path='/servers/:id' element={<ServerLayout />}>
