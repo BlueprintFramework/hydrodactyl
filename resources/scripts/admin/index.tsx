@@ -118,7 +118,11 @@ function AdminDashboard() {
 
     useEffect(() => {
         fetchMetrics();
-        const interval = setInterval(fetchMetrics, 30000);
+        const interval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                fetchMetrics();
+            }
+        }, 30000);
         return () => clearInterval(interval);
     }, [fetchMetrics]);
 

@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Controllers\Auth\SetupController;
-use Pterodactyl\Http\Middleware\SetupRequired;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +17,5 @@ use Pterodactyl\Http\Middleware\SetupRequired;
 |
 */
 
-Route::middleware(SetupRequired::class)->group(function () {
-    Route::get('/setup', [SetupController::class, 'index'])->name('setup.index');
-    Route::post('/setup', [SetupController::class, 'store'])->name('setup.store');
-});
+Route::get('/setup', [SetupController::class, 'index'])->name('setup.index');
+Route::post('/setup', [SetupController::class, 'store'])->name('setup.store');

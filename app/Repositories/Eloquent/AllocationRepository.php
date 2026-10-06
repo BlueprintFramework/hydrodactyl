@@ -17,15 +17,17 @@ class AllocationRepository extends EloquentRepository implements AllocationRepos
     }
 
     /**
-     * Return all the allocations that exist for a node that are not currently
-     * allocated.
+     * Return all the unassigned allocations for a node, optionally limited to a
+     * set of IDs.
+     *
+     * @param int[] $ids
      */
-    public function getUnassignedAllocationIds(int $node): array
+    public function getUnassignedAllocationIds(int $node, array $ids = []): array
     {
         return Allocation::query()->select('id')
             ->whereNull('server_id')
             ->where('node_id', $node)
-            ->get()
+            ->when(!empty($ids), fn (Builder $query) => $query->whereIn('id', $ids))
             ->pluck('id')
             ->toArray();
     }

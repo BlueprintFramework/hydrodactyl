@@ -72,8 +72,6 @@ class ActivityLog extends Model
         'timestamp' => 'datetime',
     ];
 
-    protected $with = ['subjects'];
-
     public static array $validationRules = [
         'event' => ['required', 'string'],
         'batch' => ['nullable', 'uuid'],

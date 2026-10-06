@@ -122,10 +122,18 @@ php artisan migrate --force
 
 if [ "$SKIP_SEED" != "True" ]; then
   echo -e "Seeding database"
-  php artisan migrate --seed --force
+  php artisan db:seed --force
 else
   echo -e "Skipping database seeding (SKIP_SEED=True)"
 fi
+
+## cache the framework (must run after migrations; settings boot from the database)
+echo -e "Caching configuration, routes, views and events"
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+
 ## start cronjobs for the queue
 echo -e "Starting cron jobs."
 crond -L /var/log/crond -l 5

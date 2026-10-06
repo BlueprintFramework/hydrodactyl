@@ -1,7 +1,7 @@
 import { ArrowDownToLine, Plus } from '@gravity-ui/icons';
 import { useStoreState } from 'easy-peasy';
 import type { FormikHelpers } from 'formik';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import deleteAllServerBackups from '@/api/server/backups/deleteAllServerBackups';
 import getServerBackups, { Context as ServerBackupContext } from '@/api/swr/getServerBackups';
@@ -152,7 +152,11 @@ const BackupContainer = () => {
     };
 
     // Get backups that can be selected (completed and not active)
-    const selectableBackups = backups.filter((b) => b.status === 'completed' && b.isSuccessful && !b.isLiveOnly);
+    const selectableBackups = useMemo(
+        () => backups.filter((b) => b.status === 'completed' && b.isSuccessful && !b.isLiveOnly),
+        [backups],
+    );
+    const selectableBackupUuids = useMemo(() => new Set(selectableBackups.map((b) => b.uuid)), [selectableBackups]);
 
     useEffect(() => {
         if (!error) {
@@ -294,7 +298,7 @@ const BackupContainer = () => {
                                             backup={backup}
                                             isSelected={selectedBackups.has(backup.uuid)}
                                             onToggleSelect={() => toggleBackupSelection(backup.uuid)}
-                                            isSelectable={selectableBackups.some((b) => b.uuid === backup.uuid)}
+                                            isSelectable={selectableBackupUuids.has(backup.uuid)}
                                             retryBackup={retryBackup}
                                         />
                                     )}

@@ -64,12 +64,23 @@ class ServerViewController extends Controller
     {
         $server->load(['node', 'allocation']);
 
-        $allocations = $server->node->allocations->toBase();
+        // Avoid pulling every allocation on the node into memory.
+        $nodeAllocations = $server->node->allocations();
+        $assigned = (clone $nodeAllocations)
+            ->where('server_id', $server->id)
+            ->orderBy('ip')
+            ->orderBy('port')
+            ->get();
+        $unassigned = (clone $nodeAllocations)
+            ->whereNull('server_id')
+            ->orderBy('ip')
+            ->orderBy('port')
+            ->get();
 
         return $this->view->make('admin.servers.view.build', [
             'server' => $server,
-            'assigned' => $allocations->where('server_id', $server->id)->sortBy('port')->sortBy('ip'),
-            'unassigned' => $allocations->where('server_id', null)->sortBy('port')->sortBy('ip'),
+            'assigned' => $assigned,
+            'unassigned' => $unassigned,
         ]);
     }
 

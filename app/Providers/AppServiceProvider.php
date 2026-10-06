@@ -22,8 +22,10 @@ class AppServiceProvider extends ServiceProvider
   {
     Schema::defaultStringLength(191);
 
-    View::share('appVersion', $this->versionData()['version'] ?? 'undefined');
-    View::share('appIsGit', $this->versionData()['is_git'] ?? false);
+    $version = $this->versionData();
+
+    View::share('appVersion', $version['version'] ?? 'undefined');
+    View::share('appIsGit', $version['is_git'] ?? false);
 
     Paginator::useBootstrap();
 

@@ -26,10 +26,9 @@ import {
 } from '@hugeicons/core-free-icons';
 import type { IconSvgElement } from '@hugeicons/react';
 import { useStoreState } from 'easy-peasy';
-import { Fragment, lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Fragment, lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { httpErrorToHuman } from '@/api/http';
-import getNests from '@/api/nests/getNests';
 import CommandMenu from '@/components/elements/commandk/CmdK';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
 import Logo from '@/components/elements/HydroLogo';
@@ -47,6 +46,7 @@ import TransferListener from '@/components/server/TransferListener';
 import WebsocketHandler from '@/components/server/WebsocketHandler';
 import { HeaderProvider } from '@/contexts/HeaderContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
+import { useNests } from '@/plugins/useNests';
 import routes from '@/routers/routes';
 
 import { ServerContext } from '@/state/server';
@@ -55,29 +55,6 @@ import { ServerContext } from '@/state/server';
 const DashboardContainer = lazy(() => import('@/components/dashboard/DashboardContainer'));
 
 const blank_egg_prefix = '@';
-
-interface Egg {
-    object: string;
-    attributes: {
-        uuid: string;
-        name: string;
-        description: string;
-    };
-}
-
-interface Nest {
-    object: string;
-    attributes: {
-        id: number;
-        name: string;
-        relationships: {
-            eggs: {
-                object: string;
-                data: Egg[];
-            };
-        };
-    };
-}
 
 const customNavIconMap: Record<string, IconSvgElement> = {
     link: Link01Icon,
@@ -104,7 +81,7 @@ const UnifiedRouter = () => {
     const rootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
     const customNavItemsConfig = useStoreState((state) => state.settings.data?.customNavItems);
     const [error, setError] = useState('');
-    const [nests, setNests] = useState<Nest[]>();
+    const { data: nests } = useNests();
 
     // server-specific state
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
@@ -129,18 +106,13 @@ const UnifiedRouter = () => {
     //     serverIdFromPath,
     // });
 
-    const egg_name = nests
-        ?.find((nest) => nest.attributes.relationships.eggs.data.find((egg) => egg.attributes.uuid === egg_id))
-        ?.attributes.relationships.eggs.data.find((egg) => egg.attributes.uuid === egg_id)?.attributes.name;
-
-    // fetch nests data when component mounts
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await getNests();
-            setNests(data);
-        };
-        fetchData();
-    }, []);
+    const egg_name = useMemo(
+        () =>
+            nests
+                ?.find((nest) => nest.attributes.relationships.eggs.data.find((egg) => egg.attributes.uuid === egg_id))
+                ?.attributes.relationships.eggs.data.find((egg) => egg.attributes.uuid === egg_id)?.attributes.name,
+        [nests, egg_id],
+    );
 
     // handle server loading when navigating to server routes
     useEffect(() => {
@@ -194,177 +166,186 @@ const UnifiedRouter = () => {
     const CustomNavigationThree = useRef<HTMLAnchorElement>(null);
     const customNavigationRefs = [CustomNavigationOne, CustomNavigationTwo, CustomNavigationThree];
 
-    const customNavItems = (customNavItemsConfig ?? [])
-        .slice(0, 3)
-        .filter((item) => item.label.trim() !== '' && item.url.trim() !== '')
-        .map((item, index) => ({
-            to: item.url,
-            icon: customNavIconMap[item.icon] ?? customNavIconMap.link,
-            text: item.label,
-            tabName: `custom-nav-${index}`,
-            ref: customNavigationRefs[index] ?? CustomNavigationOne,
-            end: true,
-        }));
+    // biome-ignore lint/correctness/useExhaustiveDependencies: customNavigationRefs holds stable refs
+    const customNavItems = useMemo(
+        () =>
+            (customNavItemsConfig ?? [])
+                .slice(0, 3)
+                .filter((item) => item.label.trim() !== '' && item.url.trim() !== '')
+                .map((item, index) => ({
+                    to: item.url,
+                    icon: customNavIconMap[item.icon] ?? customNavIconMap.link,
+                    text: item.label,
+                    tabName: `custom-nav-${index}`,
+                    ref: customNavigationRefs[index] ?? CustomNavigationOne,
+                    end: true,
+                })),
+        [customNavItemsConfig],
+    );
 
     // generate navigation items based on current route
-    const navItems = isServerRoute
-        ? id
-            ? [
-                  {
-                      to: `/server/${id}`,
-                      icon: Cardiogram01Icon,
-                      text: 'Console',
-                      tabName: 'console',
-                      ref: NavigationConsole,
-                      end: true,
-                  },
-                  ...(egg_name && !egg_name?.includes(blank_egg_prefix)
-                      ? [
-                            {
-                                to: `/server/${id}/files`,
-                                icon: FolderIcon,
-                                text: 'Files',
-                                tabName: 'files',
-                                ref: NavigationFiles,
-                                end: false,
-                                permission: 'file.*',
-                            },
-                            ...(showInstaller
-                                ? [
-                                      {
-                                          to: `/server/${id}/installer`,
-                                          icon: Download04Icon,
-                                          text: 'Installer',
-                                          tabName: 'installer',
-                                          ref: NavigationInstaller,
-                                          end: false,
-                                          permission: 'mod.download',
-                                      },
-                                  ]
-                                : []),
-                            {
-                                to: `/server/${id}/databases`,
-                                icon: Database02Icon,
-                                text: 'Database',
-                                minimizedText: 'Database',
-                                tabName: 'databases',
-                                ref: NavigationDatabases,
-                                end: true,
-                                permission: 'database.*',
-                            },
-                            {
-                                to: `/server/${id}/backups`,
-                                icon: CloudUploadIcon,
-                                text: 'Backups',
-                                tabName: 'backups',
-                                ref: NavigationBackups,
-                                end: true,
-                                permission: 'backup.*',
-                            },
-                            {
-                                to: `/server/${id}/network`,
-                                icon: ConnectIcon,
-                                text: 'Network',
-                                minimizedText: 'Network',
-                                tabName: 'networking',
-                                ref: NavigationNetworking,
-                                end: true,
-                                permission: 'allocation.*',
-                            },
-                            {
-                                to: `/server/${id}/users`,
-                                icon: UserMultiple02Icon,
-                                text: 'Users',
-                                tabName: 'users',
-                                ref: NavigationUsers,
-                                end: false,
-                                permission: 'user.*',
-                            },
-                            {
-                                to: `/server/${id}/startup`,
-                                icon: Settings04Icon,
-                                text: 'Startup',
-                                tabName: 'startup',
-                                ref: NavigationStartup,
-                                end: true,
-                                permission: ['startup.read', 'startup.update', 'startup.docker-image'],
-                            },
-                            {
-                                to: `/server/${id}/schedules`,
-                                icon: ClockIcon,
-                                text: 'Schedule',
-                                tabName: 'schedules',
-                                ref: NavigationSchedules,
-                                end: false,
-                                permission: 'schedule.*',
-                            },
-                            {
-                                to: `/server/${id}/settings`,
-                                icon: Settings02Icon,
-                                text: 'Settings',
-                                tabName: 'settings',
-                                ref: NavigationServerSettings,
-                                end: true,
-                                permission: ['settings.*', 'file.sftp'],
-                            },
-                            {
-                                to: `/server/${id}/activity`,
-                                icon: Activity02Icon,
-                                text: 'Activity',
-                                tabName: 'activity',
-                                ref: NavigationActivity,
-                                end: true,
-                                permission: ['activity.*', 'activity.read'],
-                            },
-                        ]
-                      : []),
-                  {
-                      to: `/server/${id}/shell`,
-                      icon: GameControllerIcon,
-                      text: 'Software',
-                      tabName: 'shell',
-                      ref: NavigationShell,
-                      end: true,
-                      permission: 'startup.software',
-                  },
-              ]
-            : [] // empty navigation when server is loading
-        : [
-              {
-                  to: '/',
-                  icon: ServerStack02Icon,
-                  text: 'Servers',
-                  tabName: 'servers',
-                  ref: NavigationServers,
-                  end: true,
-              },
-              {
-                  to: '/account/api',
-                  icon: NoteIcon,
-                  text: 'API Keys',
-                  minimizedText: 'API',
-                  tabName: 'api',
-                  ref: NavigationApi,
-                  end: true,
-              },
-              {
-                  to: '/account/ssh',
-                  icon: ComputerTerminal01Icon,
-                  text: 'SSH Keys',
-                  minimizedText: 'SSH',
-                  tabName: 'ssh',
-                  ref: NavigationSSH,
-                  end: true,
-              },
-              {
-                  to: '/account',
-                  icon: Settings02Icon,
-                  text: 'Settings',
-                  tabName: 'settings',
-                  ref: NavigationSettings,
-                  end: true,
-              },
-          ];
+    const navItems = useMemo(
+        () =>
+            isServerRoute
+                ? id
+                    ? [
+                          {
+                              to: `/server/${id}`,
+                              icon: Cardiogram01Icon,
+                              text: 'Console',
+                              tabName: 'console',
+                              ref: NavigationConsole,
+                              end: true,
+                          },
+                          ...(egg_name && !egg_name?.includes(blank_egg_prefix)
+                              ? [
+                                    {
+                                        to: `/server/${id}/files`,
+                                        icon: FolderIcon,
+                                        text: 'Files',
+                                        tabName: 'files',
+                                        ref: NavigationFiles,
+                                        end: false,
+                                        permission: 'file.*',
+                                    },
+                                    ...(showInstaller
+                                        ? [
+                                              {
+                                                  to: `/server/${id}/installer`,
+                                                  icon: Download04Icon,
+                                                  text: 'Installer',
+                                                  tabName: 'installer',
+                                                  ref: NavigationInstaller,
+                                                  end: false,
+                                                  permission: 'mod.download',
+                                              },
+                                          ]
+                                        : []),
+                                    {
+                                        to: `/server/${id}/databases`,
+                                        icon: Database02Icon,
+                                        text: 'Database',
+                                        minimizedText: 'Database',
+                                        tabName: 'databases',
+                                        ref: NavigationDatabases,
+                                        end: true,
+                                        permission: 'database.*',
+                                    },
+                                    {
+                                        to: `/server/${id}/backups`,
+                                        icon: CloudUploadIcon,
+                                        text: 'Backups',
+                                        tabName: 'backups',
+                                        ref: NavigationBackups,
+                                        end: true,
+                                        permission: 'backup.*',
+                                    },
+                                    {
+                                        to: `/server/${id}/network`,
+                                        icon: ConnectIcon,
+                                        text: 'Network',
+                                        minimizedText: 'Network',
+                                        tabName: 'networking',
+                                        ref: NavigationNetworking,
+                                        end: true,
+                                        permission: 'allocation.*',
+                                    },
+                                    {
+                                        to: `/server/${id}/users`,
+                                        icon: UserMultiple02Icon,
+                                        text: 'Users',
+                                        tabName: 'users',
+                                        ref: NavigationUsers,
+                                        end: false,
+                                        permission: 'user.*',
+                                    },
+                                    {
+                                        to: `/server/${id}/startup`,
+                                        icon: Settings04Icon,
+                                        text: 'Startup',
+                                        tabName: 'startup',
+                                        ref: NavigationStartup,
+                                        end: true,
+                                        permission: ['startup.read', 'startup.update', 'startup.docker-image'],
+                                    },
+                                    {
+                                        to: `/server/${id}/schedules`,
+                                        icon: ClockIcon,
+                                        text: 'Schedule',
+                                        tabName: 'schedules',
+                                        ref: NavigationSchedules,
+                                        end: false,
+                                        permission: 'schedule.*',
+                                    },
+                                    {
+                                        to: `/server/${id}/settings`,
+                                        icon: Settings02Icon,
+                                        text: 'Settings',
+                                        tabName: 'settings',
+                                        ref: NavigationServerSettings,
+                                        end: true,
+                                        permission: ['settings.*', 'file.sftp'],
+                                    },
+                                    {
+                                        to: `/server/${id}/activity`,
+                                        icon: Activity02Icon,
+                                        text: 'Activity',
+                                        tabName: 'activity',
+                                        ref: NavigationActivity,
+                                        end: true,
+                                        permission: ['activity.*', 'activity.read'],
+                                    },
+                                ]
+                              : []),
+                          {
+                              to: `/server/${id}/shell`,
+                              icon: GameControllerIcon,
+                              text: 'Software',
+                              tabName: 'shell',
+                              ref: NavigationShell,
+                              end: true,
+                              permission: 'startup.software',
+                          },
+                      ]
+                    : [] // empty navigation when server is loading
+                : [
+                      {
+                          to: '/',
+                          icon: ServerStack02Icon,
+                          text: 'Servers',
+                          tabName: 'servers',
+                          ref: NavigationServers,
+                          end: true,
+                      },
+                      {
+                          to: '/account/api',
+                          icon: NoteIcon,
+                          text: 'API Keys',
+                          minimizedText: 'API',
+                          tabName: 'api',
+                          ref: NavigationApi,
+                          end: true,
+                      },
+                      {
+                          to: '/account/ssh',
+                          icon: ComputerTerminal01Icon,
+                          text: 'SSH Keys',
+                          minimizedText: 'SSH',
+                          tabName: 'ssh',
+                          ref: NavigationSSH,
+                          end: true,
+                      },
+                      {
+                          to: '/account',
+                          icon: Settings02Icon,
+                          text: 'Settings',
+                          tabName: 'settings',
+                          ref: NavigationSettings,
+                          end: true,
+                      },
+                  ],
+        [isServerRoute, id, egg_name, showInstaller],
+    );
     const bottomNavItems = customNavItems;
 
     return (

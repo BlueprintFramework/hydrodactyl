@@ -98,6 +98,7 @@ RUN rm /usr/local/etc/php-fpm.conf \
 COPY --chown=nginx:nginx .github/docker/default.conf /etc/nginx/http.d/default.conf
 COPY --chown=nginx:nginx .github/docker/www.conf     /usr/local/etc/php-fpm.conf
 COPY --chown=nginx:nginx .github/docker/supervisord.conf /etc/supervisord.conf
+COPY --chown=nginx:nginx .github/docker/opcache.ini  /usr/local/etc/php/conf.d/zz-opcache.ini
 
 RUN rm -rf bootstrap/cache/*.php \
     && rm -rf storage/framework/* || true

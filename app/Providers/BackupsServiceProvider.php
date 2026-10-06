@@ -60,7 +60,7 @@ class BackupsServiceProvider extends ServiceProvider
                     'region' => $s3Bucket->region ?: 'us-east-1',
                     'endpoint' => $s3Bucket->endpoint,
                     'force_path_style' => $s3Bucket->use_path_style_endpoint,
-                    'prefix' => env('RUSTIC_S3_PREFIX', 'rustic-repos/'),
+                    'prefix' => config('backups.disks.rustic_s3.prefix', 'rustic-repos/'),
                 ],
             )]);
         } catch (\Exception $e) {

@@ -20,7 +20,7 @@ import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 import ConfirmPasswordModal from './components/ConfirmPasswordModal';
 import type { BackupContextMenuBackup } from './types';
-import { useUnifiedBackups } from './useUnifiedBackups';
+import { useBackupMutations } from './useBackupMutations';
 
 interface Props {
     backup: BackupContextMenuBackup;
@@ -35,7 +35,7 @@ const BackupContextMenu = ({ backup }: Props) => {
     const [countdown, setCountdown] = useState(5);
     const [newName, setNewName] = useState(backup.name);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
-    const { renameBackup, toggleBackupLock, refresh } = useUnifiedBackups();
+    const { renameBackup, toggleBackupLock, refresh } = useBackupMutations();
     const hasTwoFactor = useStoreState((state: ApplicationStore) => state.user.data?.useTotp || false);
 
     const doDownload = () => {

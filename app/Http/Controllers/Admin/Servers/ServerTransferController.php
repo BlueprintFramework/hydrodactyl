@@ -101,16 +101,7 @@ class ServerTransferController extends Controller
         $allocations = $additional_allocations;
         $allocations[] = $allocation_id;
 
-        $unassigned = $this->allocationRepository->getUnassignedAllocationIds($node_id);
-
-        $updateIds = [];
-        foreach ($allocations as $allocation) {
-            if (!in_array($allocation, $unassigned)) {
-                continue;
-            }
-
-            $updateIds[] = $allocation;
-        }
+        $updateIds = $this->allocationRepository->getUnassignedAllocationIds($node_id, $allocations);
 
         if (!empty($updateIds)) {
             $this->allocationRepository->updateWhereIn('id', $updateIds, ['server_id' => $server->id]);

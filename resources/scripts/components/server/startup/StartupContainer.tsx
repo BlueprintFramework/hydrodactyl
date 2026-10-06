@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import isEqual from 'react-fast-compare';
+import { useDebouncedCallback } from 'use-debounce';
 import { httpErrorToHuman } from '@/api/http';
 import type { Server } from '@/api/server/getServer';
 import processStartupCommand from '@/api/server/processStartupCommand';
@@ -39,6 +40,7 @@ const StartupContainer = () => {
     const [commandValue, setCommandValue] = useState('');
     const [liveProcessedCommand, setLiveProcessedCommand] = useState('');
     const [revertModalVisible, setRevertModalVisible] = useState(false);
+    const commandRequestId = useRef(0);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const [canEditCommand] = usePermissions(['startup.command']);
     const [canEditDockerImage] = usePermissions(['startup.docker-image']);
@@ -162,6 +164,14 @@ const StartupContainer = () => {
         }
     };
 
+    const debouncedProcessCommand = useDebouncedCallback(async (value: string) => {
+        const requestId = ++commandRequestId.current;
+        const processed = await processCommandLive(value);
+        if (requestId === commandRequestId.current) {
+            setLiveProcessedCommand(processed);
+        }
+    }, 300);
+
     const startEditingCommand = async () => {
         const initialCommand = data?.rawStartupCommand || '';
         setCommandValue(initialCommand);
@@ -176,10 +186,9 @@ const StartupContainer = () => {
         setLiveProcessedCommand('');
     };
 
-    const handleCommandChange = async (value: string) => {
+    const handleCommandChange = (value: string) => {
         setCommandValue(value);
-        const processed = await processCommandLive(value);
-        setLiveProcessedCommand(processed);
+        debouncedProcessCommand(value);
     };
 
     return !data ? (
