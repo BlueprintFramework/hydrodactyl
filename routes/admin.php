@@ -67,6 +67,28 @@ Route::group(['prefix' => 'api'], function () {
 
     Route::get('/settings/logo', [Admin\Api\LogoController::class, 'index'])->name('admin.api.settings.logo');
     Route::post('/settings/logo', [Admin\Api\LogoController::class, 'update']);
+
+    Route::group(['prefix' => 'nodes'], function () {
+        Route::get('/', [Admin\Api\NodesController::class, 'index'])->name('admin.api.nodes');
+        Route::get('/options', [Admin\Api\NodesController::class, 'options']);
+        Route::get('/{node:id}', [Admin\Api\NodesController::class, 'view']);
+        Route::post('/', [Admin\Api\NodesController::class, 'store']);
+        Route::patch('/{node:id}', [Admin\Api\NodesController::class, 'update']);
+        Route::delete('/{node:id}', [Admin\Api\NodesController::class, 'destroy']);
+
+        Route::get('/{node:id}/configuration', [Admin\Api\NodeConfigurationController::class, 'index']);
+        Route::post('/{node:id}/configuration/token', Admin\NodeAutoDeployController::class);
+
+        Route::get('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'index']);
+        Route::post('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'store']);
+        Route::delete('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'destroyMultiple']);
+        Route::post('/{node:id}/allocations/remove-block', [Admin\Api\NodeAllocationController::class, 'destroyBlock']);
+        Route::post('/{node:id}/allocations/alias', [Admin\Api\NodeAllocationController::class, 'updateAlias']);
+        Route::patch('/{node:id}/allocations/{allocation:id}', [Admin\Api\NodeAllocationController::class, 'setAlias']);
+        Route::delete('/{node:id}/allocations/{allocation:id}', [Admin\Api\NodeAllocationController::class, 'destroy']);
+
+        Route::get('/{node:id}/servers', [Admin\Api\NodeServersController::class, 'index']);
+    });
 });
 
 /*
@@ -93,6 +115,14 @@ Route::get('/settings/domains', [Admin\AppController::class, 'index'])->name('ad
 Route::get('/settings/domains/new', [Admin\AppController::class, 'index'])->name('admin.settings.domains.create');
 Route::get('/settings/domains/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.settings.domains.edit');
 Route::get('/settings/logo', [Admin\AppController::class, 'index'])->name('admin.settings.logo');
+
+Route::get('/nodes', [Admin\AppController::class, 'index'])->name('admin.nodes');
+Route::get('/nodes/new', [Admin\AppController::class, 'index'])->name('admin.nodes.new');
+Route::get('/nodes/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view');
+Route::get('/nodes/{id}/settings', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.settings');
+Route::get('/nodes/{id}/configuration', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.configuration');
+Route::get('/nodes/{id}/allocation', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.allocation');
+Route::get('/nodes/{id}/servers', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.servers');
 
 /*
 |--------------------------------------------------------------------------
@@ -211,37 +241,6 @@ Route::group(['prefix' => 'servers'], function () {
     Route::delete('/view/{server:id}/database/{database:id}/delete', [Admin\ServersController::class, 'deleteDatabase'])->name('admin.servers.view.database.delete');
     Route::delete('/view/{server:id}/mounts/{mount:id}', [Admin\ServersController::class, 'deleteMount'])
         ->name('admin.servers.view.mounts.delete');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Node Controller Routes
-|--------------------------------------------------------------------------
-|
-| Endpoint: /admin/nodes
-|
-*/
-Route::group(['prefix' => 'nodes'], function () {
-    Route::get('/', [Admin\Nodes\NodeController::class, 'index'])->name('admin.nodes');
-    Route::get('/new', [Admin\NodesController::class, 'create'])->name('admin.nodes.new');
-    Route::get('/view/{node:id}', [Admin\Nodes\NodeViewController::class, 'index'])->name('admin.nodes.view');
-    Route::get('/view/{node:id}/settings', [Admin\Nodes\NodeViewController::class, 'settings'])->name('admin.nodes.view.settings');
-    Route::get('/view/{node:id}/configuration', [Admin\Nodes\NodeViewController::class, 'configuration'])->name('admin.nodes.view.configuration');
-    Route::get('/view/{node:id}/allocation', [Admin\Nodes\NodeViewController::class, 'allocations'])->name('admin.nodes.view.allocation');
-    Route::get('/view/{node:id}/servers', [Admin\Nodes\NodeViewController::class, 'servers'])->name('admin.nodes.view.servers');
-    Route::get('/view/{node:id}/system-information', Admin\Nodes\SystemInformationController::class);
-
-    Route::post('/new', [Admin\NodesController::class, 'store']);
-    Route::post('/view/{node:id}/allocation', [Admin\NodesController::class, 'createAllocation']);
-    Route::post('/view/{node:id}/allocation/remove', [Admin\NodesController::class, 'allocationRemoveBlock'])->name('admin.nodes.view.allocation.removeBlock');
-    Route::post('/view/{node:id}/allocation/alias', [Admin\NodesController::class, 'allocationSetAlias'])->name('admin.nodes.view.allocation.setAlias');
-    Route::post('/view/{node:id}/settings/token', Admin\NodeAutoDeployController::class)->name('admin.nodes.view.configuration.token');
-
-    Route::patch('/view/{node:id}/settings', [Admin\NodesController::class, 'updateSettings']);
-
-    Route::delete('/view/{node:id}/delete', [Admin\NodesController::class, 'delete'])->name('admin.nodes.view.delete');
-    Route::delete('/view/{node:id}/allocation/remove/{allocation:id}', [Admin\NodesController::class, 'allocationRemoveSingle'])->name('admin.nodes.view.allocation.removeSingle');
-    Route::delete('/view/{node:id}/allocations', [Admin\NodesController::class, 'allocationRemoveMultiple'])->name('admin.nodes.view.allocation.removeMultiple');
 });
 
 /*

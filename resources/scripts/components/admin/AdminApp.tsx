@@ -37,6 +37,15 @@ const UsersContainer = lazy(() => import('./users/UsersContainer'));
 const UserCreateContainer = lazy(() => import('./users/UserCreateContainer'));
 const UserViewContainer = lazy(() => import('./users/UserViewContainer'));
 
+const NodesContainer = lazy(() => import('./nodes/NodesContainer'));
+const NodeCreateContainer = lazy(() => import('./nodes/NodeCreateContainer'));
+const NodeLayout = lazy(() => import('./nodes/NodeLayout'));
+const NodeOverviewContainer = lazy(() => import('./nodes/NodeOverviewContainer'));
+const NodeSettingsContainer = lazy(() => import('./nodes/NodeSettingsContainer'));
+const NodeConfigurationContainer = lazy(() => import('./nodes/NodeConfigurationContainer'));
+const NodeAllocationContainer = lazy(() => import('./nodes/NodeAllocationContainer'));
+const NodeServersContainer = lazy(() => import('./nodes/NodeServersContainer'));
+
 const SettingsLayout = lazy(() => import('./settings/SettingsLayout'));
 const GeneralSettings = lazy(() => import('./settings/GeneralSettings'));
 const AdvancedSettings = lazy(() => import('./settings/AdvancedSettings'));
@@ -115,13 +124,12 @@ const AdminShell = () => {
             end: false,
         },
         {
-            to: '/admin/nodes',
+            to: '/nodes',
             icon: ServerStack01Icon,
             text: 'Nodes',
             tabName: 'nodes',
             ref: NavigationNodes,
             end: false,
-            hardNav: true,
         },
         {
             to: '/admin/locations',
@@ -205,6 +213,15 @@ const AdminShell = () => {
                                     <Route path='/users' element={<UsersContainer />} />
                                     <Route path='/users/new' element={<UserCreateContainer />} />
                                     <Route path='/users/:id' element={<UserViewContainer />} />
+                                    <Route path='/nodes' element={<NodesContainer />} />
+                                    <Route path='/nodes/new' element={<NodeCreateContainer />} />
+                                    <Route path='/nodes/:id' element={<NodeLayout />}>
+                                        <Route index element={<NodeOverviewContainer />} />
+                                        <Route path='settings' element={<NodeSettingsContainer />} />
+                                        <Route path='configuration' element={<NodeConfigurationContainer />} />
+                                        <Route path='allocation' element={<NodeAllocationContainer />} />
+                                        <Route path='servers' element={<NodeServersContainer />} />
+                                    </Route>
                                     <Route path='/settings' element={<SettingsLayout />}>
                                         <Route index element={<GeneralSettings />} />
                                         <Route path='advanced' element={<AdvancedSettings />} />
