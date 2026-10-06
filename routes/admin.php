@@ -64,6 +64,9 @@ Route::group(['prefix' => 'api'], function () {
         Route::patch('/{domain}', [Admin\Api\DomainsController::class, 'update']);
         Route::delete('/{domain}', [Admin\Api\DomainsController::class, 'destroy']);
     });
+
+    Route::get('/settings/logo', [Admin\Api\LogoController::class, 'index'])->name('admin.api.settings.logo');
+    Route::post('/settings/logo', [Admin\Api\LogoController::class, 'update']);
 });
 
 /*
@@ -89,6 +92,7 @@ Route::get('/settings/custom-navigation', [Admin\AppController::class, 'index'])
 Route::get('/settings/domains', [Admin\AppController::class, 'index'])->name('admin.settings.domains.index');
 Route::get('/settings/domains/new', [Admin\AppController::class, 'index'])->name('admin.settings.domains.create');
 Route::get('/settings/domains/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.settings.domains.edit');
+Route::get('/settings/logo', [Admin\AppController::class, 'index'])->name('admin.settings.logo');
 
 /*
 |--------------------------------------------------------------------------
@@ -150,11 +154,7 @@ Route::group(['prefix' => 'databases'], function () {
 |
 */
 Route::group(['prefix' => 'settings'], function () {
-    Route::get('/logo', [Admin\Settings\LogoController::class, 'index'])->name('admin.settings.logo');
-
     Route::post('/mail/test', [Admin\Settings\MailController::class, 'test'])->name('admin.settings.mail.test');
-
-    Route::patch('/logo', [Admin\Settings\LogoController::class, 'update']);
 });
 
 /*
