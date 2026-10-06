@@ -48,6 +48,13 @@ Route::group(['prefix' => 'api'], function () {
         Route::patch('/{user:id}', [Admin\Api\UserController::class, 'update'])->name('admin.api.users.update');
         Route::delete('/{user:id}', [Admin\Api\UserController::class, 'destroy'])->name('admin.api.users.destroy');
     });
+
+    Route::get('/settings', [Admin\Api\SettingsController::class, 'index'])->name('admin.api.settings');
+    Route::patch('/settings/general', [Admin\Api\SettingsController::class, 'updateGeneral']);
+    Route::patch('/settings/advanced', [Admin\Api\SettingsController::class, 'updateAdvanced']);
+    Route::patch('/settings/mail', [Admin\Api\SettingsController::class, 'updateMail']);
+    Route::patch('/settings/captcha', [Admin\Api\SettingsController::class, 'updateCaptcha']);
+    Route::patch('/settings/custom-navigation', [Admin\Api\SettingsController::class, 'updateCustomNavigation']);
 });
 
 /*
@@ -64,6 +71,12 @@ Route::group(['prefix' => 'api'], function () {
 Route::get('/users', [Admin\AppController::class, 'index'])->name('admin.users');
 Route::get('/users/new', [Admin\AppController::class, 'index'])->name('admin.users.new');
 Route::get('/users/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.users.view');
+
+Route::get('/settings', [Admin\AppController::class, 'index'])->name('admin.settings');
+Route::get('/settings/advanced', [Admin\AppController::class, 'index'])->name('admin.settings.advanced');
+Route::get('/settings/mail', [Admin\AppController::class, 'index'])->name('admin.settings.mail');
+Route::get('/settings/captcha', [Admin\AppController::class, 'index'])->name('admin.settings.captcha');
+Route::get('/settings/custom-navigation', [Admin\AppController::class, 'index'])->name('admin.settings.custom-navigation');
 
 /*
 |--------------------------------------------------------------------------
@@ -125,11 +138,6 @@ Route::group(['prefix' => 'databases'], function () {
 |
 */
 Route::group(['prefix' => 'settings'], function () {
-    Route::get('/', [Admin\Settings\IndexController::class, 'index'])->name('admin.settings');
-    Route::get('/mail', [Admin\Settings\MailController::class, 'index'])->name('admin.settings.mail');
-    Route::get('/advanced', [Admin\Settings\AdvancedController::class, 'index'])->name('admin.settings.advanced');
-    Route::get('/captcha', [Admin\Settings\CaptchaController::class, 'index'])->name('admin.settings.captcha');
-    Route::get('/custom-navigation', [Admin\Settings\CustomNavigationController::class, 'index'])->name('admin.settings.custom-navigation');
     Route::get('/logo', [Admin\Settings\LogoController::class, 'index'])->name('admin.settings.logo');
 
     Route::group(['prefix' => 'domains'], function () {
@@ -147,11 +155,6 @@ Route::group(['prefix' => 'settings'], function () {
 
     Route::post('/mail/test', [Admin\Settings\MailController::class, 'test'])->name('admin.settings.mail.test');
 
-    Route::patch('/', [Admin\Settings\IndexController::class, 'update']);
-    Route::patch('/mail', [Admin\Settings\MailController::class, 'update']);
-    Route::patch('/advanced', [Admin\Settings\AdvancedController::class, 'update']);
-    Route::patch('/captcha', [Admin\Settings\CaptchaController::class, 'update']);
-    Route::patch('/custom-navigation', [Admin\Settings\CustomNavigationController::class, 'update']);
     Route::patch('/logo', [Admin\Settings\LogoController::class, 'update']);
 });
 

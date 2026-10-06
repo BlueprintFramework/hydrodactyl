@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { UserValues } from '@/api/admin/users';
+import { Field } from '@/components/admin/Field';
 import { Input } from '@/components/elements/inputs';
 import Select from '@/components/elements/Select';
 import { Button } from '@/components/ui/button';
@@ -23,28 +24,6 @@ const emptyValues: UserValues = {
     language: 'en',
     root_admin: false,
 };
-
-const Field = ({
-    label,
-    error,
-    hint,
-    children,
-}: {
-    label: string;
-    error?: string;
-    hint?: string;
-    children: React.ReactNode;
-}) => (
-    <div className='block'>
-        <span className='mb-1 block text-xs font-medium text-cream-400/70'>{label}</span>
-        {children}
-        {error ? (
-            <span className='mt-1 block text-xs text-red-400'>{error}</span>
-        ) : hint ? (
-            <span className='mt-1 block text-xs text-cream-400/50'>{hint}</span>
-        ) : null}
-    </div>
-);
 
 const UserForm = ({ languages, initialValues, errors = {}, submitting, submitLabel, onSubmit, onCancel }: Props) => {
     const [values, setValues] = useState<UserValues>({ ...emptyValues, ...initialValues });

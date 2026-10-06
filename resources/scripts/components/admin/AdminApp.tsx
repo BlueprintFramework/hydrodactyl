@@ -37,6 +37,13 @@ const UsersContainer = lazy(() => import('./users/UsersContainer'));
 const UserCreateContainer = lazy(() => import('./users/UserCreateContainer'));
 const UserViewContainer = lazy(() => import('./users/UserViewContainer'));
 
+const SettingsLayout = lazy(() => import('./settings/SettingsLayout'));
+const GeneralSettings = lazy(() => import('./settings/GeneralSettings'));
+const AdvancedSettings = lazy(() => import('./settings/AdvancedSettings'));
+const MailSettings = lazy(() => import('./settings/MailSettings'));
+const CaptchaSettings = lazy(() => import('./settings/CaptchaSettings'));
+const CustomNavigationSettings = lazy(() => import('./settings/CustomNavigationSettings'));
+
 interface ExtendedWindow extends Window {
     SiteConfiguration?: SiteSettings;
     HydrodactylUser?: {
@@ -160,13 +167,12 @@ const AdminShell = () => {
             hardNav: true,
         },
         {
-            to: '/admin/settings',
+            to: '/settings',
             icon: Settings02Icon,
             text: 'Settings',
             tabName: 'settings',
             ref: NavigationSettings,
             end: false,
-            hardNav: true,
         },
         {
             to: '/admin/api',
@@ -196,6 +202,13 @@ const AdminShell = () => {
                                     <Route path='/users' element={<UsersContainer />} />
                                     <Route path='/users/new' element={<UserCreateContainer />} />
                                     <Route path='/users/:id' element={<UserViewContainer />} />
+                                    <Route path='/settings' element={<SettingsLayout />}>
+                                        <Route index element={<GeneralSettings />} />
+                                        <Route path='advanced' element={<AdvancedSettings />} />
+                                        <Route path='mail' element={<MailSettings />} />
+                                        <Route path='captcha' element={<CaptchaSettings />} />
+                                        <Route path='custom-navigation' element={<CustomNavigationSettings />} />
+                                    </Route>
                                     <Route path='*' element={<NotFound />} />
                                 </Routes>
                             </Suspense>
