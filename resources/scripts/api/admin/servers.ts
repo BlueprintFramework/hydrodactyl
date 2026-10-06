@@ -111,3 +111,58 @@ export const deleteServer = (id: number | string, force = false): Promise<void> 
 
 export const searchUsers = (term: string): Promise<UserSearchResult[]> =>
     http.get('/admin/users/accounts.json', { params: { 'filter[email]': term, page: 1 } }).then(({ data }) => data);
+
+export interface ServerAllocationOption {
+    id: number;
+    ip: string;
+    port: number;
+    alias: string;
+}
+
+export interface ServerBuildData {
+    cpu: number;
+    threads: string | null;
+    memory: number;
+    overhead_memory: number;
+    swap: number;
+    disk: number;
+    io: number;
+    oom_disabled: boolean;
+    exclude_from_resource_calculation: boolean;
+    database_limit: number | null;
+    allocation_limit: number | null;
+    backup_limit: number | null;
+    backup_storage_limit: number | null;
+    allocation_id: number;
+}
+
+export interface ServerBuildResponse {
+    data: ServerBuildData;
+    assigned: ServerAllocationOption[];
+    unassigned: ServerAllocationOption[];
+}
+
+export interface ServerBuildValues {
+    allocation_id: number;
+    add_allocations: number[];
+    remove_allocations: number[];
+    cpu: string;
+    threads: string;
+    memory: string;
+    overhead_memory: string;
+    swap: string;
+    disk: string;
+    io: string;
+    database_limit: string;
+    allocation_limit: string;
+    backup_limit: string;
+    backup_storage_limit: string;
+    oom_disabled: boolean;
+    exclude_from_resource_calculation: boolean;
+}
+
+export const getServerBuild = (id: number | string): Promise<ServerBuildResponse> =>
+    http.get(`/admin/api/servers/${id}/build`).then(({ data }) => data);
+
+export const updateServerBuild = (id: number | string, values: ServerBuildValues): Promise<AdminServer> =>
+    http.patch(`/admin/api/servers/${id}/build`, values).then(({ data }) => data.data);

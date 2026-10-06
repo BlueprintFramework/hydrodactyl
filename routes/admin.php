@@ -102,6 +102,8 @@ Route::group(['prefix' => 'api'], function () {
         Route::get('/', [Admin\Api\ServerController::class, 'index'])->name('admin.api.servers');
         Route::get('/{server:id}', [Admin\Api\ServerController::class, 'view']);
         Route::patch('/{server:id}/details', [Admin\Api\ServerController::class, 'updateDetails']);
+        Route::get('/{server:id}/build', [Admin\Api\ServerController::class, 'build']);
+        Route::patch('/{server:id}/build', [Admin\Api\ServerController::class, 'updateBuild']);
         Route::get('/{server:id}/manage', [Admin\Api\ServerController::class, 'manage']);
         Route::get('/{server:id}/transfer/allocations', [Admin\Api\ServerController::class, 'transferAllocations']);
         Route::post('/{server:id}/manage/toggle', [Admin\Api\ServerController::class, 'toggleInstall']);
@@ -151,6 +153,7 @@ Route::get('/locations/{id}', [Admin\AppController::class, 'index'])->where('id'
 Route::get('/servers', [Admin\AppController::class, 'index'])->name('admin.servers');
 Route::get('/servers/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view');
 Route::get('/servers/{id}/details', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.details');
+Route::get('/servers/{id}/build', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.build');
 Route::get('/servers/{id}/manage', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.manage');
 Route::get('/servers/{id}/delete', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.delete');
 
@@ -229,12 +232,10 @@ Route::group(['prefix' => 'servers'], function () {
     Route::get('/new', [Admin\Servers\CreateServerController::class, 'index'])->name('admin.servers.new');
 
     Route::group(['middleware' => [ServerInstalled::class]], function () {
-        Route::get('/view/{server:id}/build', [Admin\Servers\ServerViewController::class, 'build'])->name('admin.servers.view.build');
         Route::get('/view/{server:id}/startup', [Admin\Servers\ServerViewController::class, 'startup'])->name('admin.servers.view.startup');
         Route::get('/view/{server:id}/database', [Admin\Servers\ServerViewController::class, 'database'])->name('admin.servers.view.database');
         Route::get('/view/{server:id}/mounts', [Admin\Servers\ServerViewController::class, 'mounts'])->name('admin.servers.view.mounts');
 
-        Route::post('/view/{server:id}/build', [Admin\ServersController::class, 'updateBuild']);
         Route::post('/view/{server:id}/startup', [Admin\ServersController::class, 'saveStartup']);
         Route::post('/view/{server:id}/database', [Admin\ServersController::class, 'newDatabase']);
         Route::patch('/view/{server:id}/database', [Admin\ServersController::class, 'resetDatabasePassword']);

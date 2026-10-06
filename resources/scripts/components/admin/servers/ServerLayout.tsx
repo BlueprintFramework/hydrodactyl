@@ -35,7 +35,7 @@ const ServerLayout = () => {
         ...(server.is_installed
             ? [
                   { label: 'Details', to: `${base}/details`, end: false },
-                  { label: 'Build Configuration', href: `/admin/servers/view/${server.id}/build` },
+                  { label: 'Build Configuration', to: `${base}/build`, end: false },
                   { label: 'Startup', href: `/admin/servers/view/${server.id}/startup` },
                   { label: 'Database', href: `/admin/servers/view/${server.id}/database` },
                   { label: 'Mounts', href: `/admin/servers/view/${server.id}/mounts` },

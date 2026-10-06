@@ -22,6 +22,7 @@ use Pterodactyl\Services\Servers\SuspensionService;
 use Pterodactyl\Models\Filters\AdminServerFilter;
 use Pterodactyl\Services\Servers\ServerDeletionService;
 use Pterodactyl\Services\Servers\ReinstallServerService;
+use Pterodactyl\Services\Servers\BuildModificationService;
 use Pterodactyl\Exceptions\Model\DataValidationException;
 use Pterodactyl\Services\Servers\DetailsModificationService;
 use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
@@ -35,6 +36,7 @@ class ServerController extends Controller
      */
     public function __construct(
         private AllocationRepositoryInterface $allocationRepository,
+        private BuildModificationService $buildModificationService,
         private ConnectionInterface $connection,
         private DaemonTransferRepository $daemonTransferRepository,
         private DetailsModificationService $detailsModificationService,
@@ -97,6 +99,81 @@ class ServerController extends Controller
         }
 
         return response()->json(['data' => $this->transform($server->fresh())]);
+    }
+
+    /**
+     * Return the build configuration for a server.
+     */
+    public function build(Server $server): JsonResponse
+    {
+        $server->load(['node', 'allocation']);
+
+        $allocations = $server->node->allocations();
+
+        $assigned = (clone $allocations)
+            ->where('server_id', $server->id)
+            ->orderBy('ip')
+            ->orderBy('port')
+            ->get();
+
+        $unassigned = (clone $allocations)
+            ->whereNull('server_id')
+            ->orderBy('ip')
+            ->orderBy('port')
+            ->get();
+
+        return response()->json([
+            'data' => [
+                'cpu' => (int) $server->cpu,
+                'threads' => $server->threads,
+                'memory' => (int) $server->memory,
+                'overhead_memory' => (int) $server->overhead_memory,
+                'swap' => (int) $server->swap,
+                'disk' => (int) $server->disk,
+                'io' => (int) $server->io,
+                'oom_disabled' => (bool) $server->oom_disabled,
+                'exclude_from_resource_calculation' => (bool) $server->exclude_from_resource_calculation,
+                'database_limit' => $server->database_limit,
+                'allocation_limit' => $server->allocation_limit,
+                'backup_limit' => $server->backup_limit,
+                'backup_storage_limit' => $server->backup_storage_limit,
+                'allocation_id' => $server->allocation_id,
+            ],
+            'assigned' => $assigned->map(fn (Allocation $allocation) => $this->allocationOption($allocation))->values(),
+            'unassigned' => $unassigned->map(fn (Allocation $allocation) => $this->allocationOption($allocation))->values(),
+        ]);
+    }
+
+    /**
+     * Update the build configuration for a server.
+     */
+    public function updateBuild(Request $request, Server $server): JsonResponse
+    {
+        try {
+            $this->buildModificationService->handle($server, $request->only([
+                'allocation_id', 'add_allocations', 'remove_allocations',
+                'memory', 'overhead_memory', 'swap', 'io', 'cpu', 'threads', 'disk',
+                'database_limit', 'allocation_limit', 'backup_limit', 'backup_storage_limit', 'oom_disabled',
+                'exclude_from_resource_calculation',
+            ]));
+        } catch (DataValidationException $exception) {
+            throw new ValidationException($exception->getValidator());
+        }
+
+        return response()->json(['data' => $this->transform($server->fresh())]);
+    }
+
+    /**
+     * Map an allocation into a compact option shape.
+     */
+    private function allocationOption(Allocation $allocation): array
+    {
+        return [
+            'id' => $allocation->id,
+            'ip' => $allocation->ip,
+            'port' => $allocation->port,
+            'alias' => $allocation->alias,
+        ];
     }
 
     /**
