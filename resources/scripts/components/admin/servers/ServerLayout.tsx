@@ -37,8 +37,8 @@ const ServerLayout = () => {
                   { label: 'Details', to: `${base}/details`, end: false },
                   { label: 'Build Configuration', to: `${base}/build`, end: false },
                   { label: 'Startup', to: `${base}/startup`, end: false },
-                  { label: 'Database', href: `/admin/servers/view/${server.id}/database` },
-                  { label: 'Mounts', href: `/admin/servers/view/${server.id}/mounts` },
+                  { label: 'Database', to: `${base}/database`, end: false },
+                  { label: 'Mounts', to: `${base}/mounts`, end: false },
               ]
             : []),
         { label: 'Manage', to: `${base}/manage`, end: false },
@@ -60,21 +60,11 @@ const ServerLayout = () => {
             </MainPageHeader>
 
             <div className='mb-6 flex flex-wrap items-center gap-1 rounded-xl border border-mocha-400 bg-mocha-500 p-1'>
-                {tabs.map((tab) =>
-                    'href' in tab && tab.href ? (
-                        <a
-                            key={tab.label}
-                            href={tab.href}
-                            className={cn(tabClass, 'text-cream-400/70 hover:bg-mocha-400 hover:text-cream-100')}
-                        >
-                            {tab.label}
-                        </a>
-                    ) : (
-                        <NavLink key={tab.label} to={tab.to as string} end={tab.end} className={classes}>
-                            {tab.label}
-                        </NavLink>
-                    ),
-                )}
+                {tabs.map((tab) => (
+                    <NavLink key={tab.label} to={tab.to} end={tab.end} className={classes}>
+                        {tab.label}
+                    </NavLink>
+                ))}
                 <a
                     href={`/server/${server.uuid_short}`}
                     className={cn(tabClass, 'ml-auto text-hydro-400 hover:bg-mocha-400 hover:text-hydro-300')}

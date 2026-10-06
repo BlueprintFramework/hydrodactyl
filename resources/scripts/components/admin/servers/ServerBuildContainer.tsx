@@ -31,6 +31,7 @@ interface FormState {
     backup_storage_limit: string;
     oom_disabled: boolean;
     exclude_from_resource_calculation: boolean;
+    software_enabled: boolean;
 }
 
 const AllocationChecklist = ({
@@ -102,6 +103,7 @@ const ServerBuildForm = ({
     onSaved: () => Promise<unknown>;
 }) => {
     const { data, assigned, unassigned } = build;
+    const isElytra = data.node_daemon_type === 'elytra';
 
     const [allocationId, setAllocationId] = useState(String(data.allocation_id));
     const [add, setAdd] = useState<number[]>([]);
@@ -120,6 +122,7 @@ const ServerBuildForm = ({
         backup_storage_limit: data.backup_storage_limit === null ? '' : String(data.backup_storage_limit),
         oom_disabled: data.oom_disabled,
         exclude_from_resource_calculation: data.exclude_from_resource_calculation,
+        software_enabled: data.software_enabled,
     });
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -141,6 +144,7 @@ const ServerBuildForm = ({
             add_allocations: add,
             remove_allocations: remove,
             ...values,
+            backup_storage_limit: isElytra ? values.backup_storage_limit : '',
         };
 
         try {
@@ -237,6 +241,21 @@ const ServerBuildForm = ({
                         ]}
                     />
                 </Field>
+
+                <Field
+                    label='Software Page'
+                    error={errors.software_enabled}
+                    hint='When disabled, the built-in Software page is hidden from users on this server.'
+                >
+                    <Dropdown
+                        value={String(values.software_enabled)}
+                        onChange={(value) => set('software_enabled', value === 'true')}
+                        options={[
+                            { value: 'true', label: 'Enabled' },
+                            { value: 'false', label: 'Disabled' },
+                        ]}
+                    />
+                </Field>
             </div>
 
             <div className='flex flex-col gap-4 lg:col-span-7'>
@@ -272,17 +291,19 @@ const ServerBuildForm = ({
                                 onChange={(e) => set('backup_limit', e.target.value)}
                             />
                         </Field>
-                        <Field
-                            label='Backup Storage Limit'
-                            error={errors.backup_storage_limit}
-                            hint='MiB. Blank is unlimited.'
-                        >
-                            <Input.Text
-                                type='number'
-                                value={values.backup_storage_limit}
-                                onChange={(e) => set('backup_storage_limit', e.target.value)}
-                            />
-                        </Field>
+                        {isElytra && (
+                            <Field
+                                label='Backup Storage Limit'
+                                error={errors.backup_storage_limit}
+                                hint='MiB. Blank is unlimited. Elytra only.'
+                            >
+                                <Input.Text
+                                    type='number'
+                                    value={values.backup_storage_limit}
+                                    onChange={(e) => set('backup_storage_limit', e.target.value)}
+                                />
+                            </Field>
+                        )}
                     </div>
                 </div>
 

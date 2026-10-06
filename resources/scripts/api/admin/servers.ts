@@ -134,6 +134,8 @@ export interface ServerBuildData {
     backup_limit: number | null;
     backup_storage_limit: number | null;
     allocation_id: number;
+    node_daemon_type: string | null;
+    software_enabled: boolean;
 }
 
 export interface ServerBuildResponse {
@@ -159,6 +161,7 @@ export interface ServerBuildValues {
     backup_storage_limit: string;
     oom_disabled: boolean;
     exclude_from_resource_calculation: boolean;
+    software_enabled: boolean;
 }
 
 export const getServerBuild = (id: number | string): Promise<ServerBuildResponse> =>
@@ -216,3 +219,136 @@ export const getServerStartup = (id: number | string): Promise<ServerStartupData
 
 export const updateServerStartup = (id: number | string, values: ServerStartupValues): Promise<AdminServer> =>
     http.patch(`/admin/api/servers/${id}/startup`, values).then(({ data }) => data.data);
+
+export interface DatabaseHostOption {
+    id: number;
+    name: string;
+}
+
+export interface ServerDatabase {
+    id: number;
+    database: string;
+    username: string;
+    remote: string;
+    max_connections: number | null;
+    host: { id: number; name: string; host: string; port: number } | null;
+}
+
+export interface ServerDatabasesResponse {
+    data: ServerDatabase[];
+    hosts: DatabaseHostOption[];
+}
+
+export interface ServerDatabaseValues {
+    database: string;
+    remote: string;
+    max_connections: string;
+    database_host_id: number;
+}
+
+export const getServerDatabases = (id: number | string): Promise<ServerDatabasesResponse> =>
+    http.get(`/admin/api/servers/${id}/database`).then(({ data }) => data);
+
+export const createServerDatabase = (id: number | string, values: ServerDatabaseValues): Promise<void> =>
+    http.post(`/admin/api/servers/${id}/database`, values).then(() => undefined);
+
+export const resetServerDatabasePassword = (id: number | string, databaseId: number): Promise<void> =>
+    http.patch(`/admin/api/servers/${id}/database/${databaseId}`).then(() => undefined);
+
+export const deleteServerDatabase = (id: number | string, databaseId: number): Promise<void> =>
+    http.delete(`/admin/api/servers/${id}/database/${databaseId}`).then(() => undefined);
+
+export interface ServerMount {
+    id: number;
+    name: string;
+    source: string;
+    target: string;
+    is_mounted: boolean;
+}
+
+export const getServerMounts = (id: number | string): Promise<ServerMount[]> =>
+    http.get(`/admin/api/servers/${id}/mounts`).then(({ data }) => data.data);
+
+export const addServerMount = (id: number | string, mountId: number): Promise<void> =>
+    http.post(`/admin/api/servers/${id}/mounts`, { mount_id: mountId }).then(() => undefined);
+
+export const removeServerMount = (id: number | string, mountId: number): Promise<void> =>
+    http.delete(`/admin/api/servers/${id}/mounts/${mountId}`).then(() => undefined);
+
+export interface NodeOption {
+    id: number;
+    name: string;
+    daemonType: string;
+}
+
+export interface LocationOption {
+    id: number;
+    short: string;
+    long: string | null;
+    nodes: NodeOption[];
+}
+
+export interface ServerTemplate {
+    id: string;
+    name: string;
+    description: string | null;
+    memory: number;
+    overhead_memory: number;
+    swap: number;
+    disk: number;
+    cpu: number;
+    threads: string | null;
+    io: number;
+    database_limit: number;
+    allocation_limit: number;
+    backup_limit: number;
+    backup_storage_limit: number;
+    oom_disabled: boolean;
+    exclude_from_resource_calculation: boolean;
+    skip_scripts: boolean;
+    start_on_completion: boolean;
+}
+
+export interface ServerCreateOptions {
+    locations: LocationOption[];
+    nests: NestSummary[];
+    templates: ServerTemplate[];
+}
+
+export interface ServerCreateValues {
+    name: string;
+    owner_id: number;
+    description: string;
+    start_on_completion: boolean;
+    node_id: number;
+    allocation_id: number;
+    allocation_additional: number[];
+    database_limit: string;
+    allocation_limit: string;
+    backup_limit: string;
+    backup_storage_limit: string;
+    cpu: string;
+    threads: string;
+    memory: string;
+    overhead_memory: string;
+    swap: string;
+    disk: string;
+    io: string;
+    oom_disabled: boolean;
+    exclude_from_resource_calculation: boolean;
+    nest_id: number;
+    egg_id: number;
+    skip_scripts: boolean;
+    image: string;
+    startup: string;
+    environment: Record<string, string>;
+}
+
+export const getServerCreateOptions = (): Promise<ServerCreateOptions> =>
+    http.get('/admin/api/servers/create').then(({ data }) => data);
+
+export const getCreateAllocations = (nodeId: number | string): Promise<TransferAllocation[]> =>
+    http.get('/admin/api/servers/create/allocations', { params: { node_id: nodeId } }).then(({ data }) => data.data);
+
+export const createServer = (values: ServerCreateValues): Promise<AdminServer> =>
+    http.post('/admin/api/servers', values).then(({ data }) => data.data);

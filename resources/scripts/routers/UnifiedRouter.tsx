@@ -27,7 +27,7 @@ import {
 import type { IconSvgElement } from '@hugeicons/react';
 import { useStoreState } from 'easy-peasy';
 import { Fragment, lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Route, Routes, useLocation, useParams } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { httpErrorToHuman } from '@/api/http';
 import CommandMenu from '@/components/elements/commandk/CmdK';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
@@ -92,6 +92,7 @@ const UnifiedRouter = () => {
     const clearServerState = ServerContext.useStoreActions((actions) => actions.clearServerState);
     const egg_id = ServerContext.useStoreState((state) => state.server.data?.egg);
     const eggFeatures = ServerContext.useStoreState((state) => state.server.data?.eggFeatures) ?? [];
+    const softwareEnabled = ServerContext.useStoreState((state) => state.server.data?.softwareEnabled);
 
     // The plugin/mod installer is only relevant for Minecraft servers whose egg
     // advertises a mod or plugin loader (e.g. "mod/fabric", "plugin/paper").
@@ -297,15 +298,19 @@ const UnifiedRouter = () => {
                                     },
                                 ]
                               : []),
-                          {
-                              to: `/server/${id}/shell`,
-                              icon: GameControllerIcon,
-                              text: 'Software',
-                              tabName: 'shell',
-                              ref: NavigationShell,
-                              end: true,
-                              permission: 'startup.software',
-                          },
+                          ...(softwareEnabled
+                              ? [
+                                    {
+                                        to: `/server/${id}/shell`,
+                                        icon: GameControllerIcon,
+                                        text: 'Software',
+                                        tabName: 'shell',
+                                        ref: NavigationShell,
+                                        end: true,
+                                        permission: 'startup.software',
+                                    },
+                                ]
+                              : []),
                       ]
                     : [] // empty navigation when server is loading
                 : [
@@ -344,7 +349,7 @@ const UnifiedRouter = () => {
                           end: true,
                       },
                   ],
-        [isServerRoute, id, egg_name, showInstaller],
+        [isServerRoute, id, egg_name, showInstaller, softwareEnabled],
     );
     const bottomNavItems = customNavItems;
 
@@ -428,23 +433,34 @@ const UnifiedRouter = () => {
                                                 {isServerRoute &&
                                                     uuid &&
                                                     id &&
-                                                    routes.server.map(({ route, permission, component: Component }) => (
-                                                        <Route
-                                                            key={route}
-                                                            path={
-                                                                route === ''
-                                                                    ? `/server/${id}`
-                                                                    : `/server/${id}/${route}`
-                                                            }
-                                                            element={
-                                                                <PermissionRoute permission={permission}>
-                                                                    <Suspense fallback={null}>
-                                                                        <Component />
-                                                                    </Suspense>
-                                                                </PermissionRoute>
-                                                            }
-                                                        />
-                                                    ))}
+                                                    routes.server.map(
+                                                        ({
+                                                            route,
+                                                            permission,
+                                                            component: Component,
+                                                            requiresSoftware,
+                                                        }) => (
+                                                            <Route
+                                                                key={route}
+                                                                path={
+                                                                    route === ''
+                                                                        ? `/server/${id}`
+                                                                        : `/server/${id}/${route}`
+                                                                }
+                                                                element={
+                                                                    requiresSoftware && softwareEnabled === false ? (
+                                                                        <Navigate to={`/server/${id}`} replace />
+                                                                    ) : (
+                                                                        <PermissionRoute permission={permission}>
+                                                                            <Suspense fallback={null}>
+                                                                                <Component />
+                                                                            </Suspense>
+                                                                        </PermissionRoute>
+                                                                    )
+                                                                }
+                                                            />
+                                                        ),
+                                                    )}
                                                 <Route path='*' element={<NotFound />} />
                                             </Routes>
                                         </ErrorBoundary>

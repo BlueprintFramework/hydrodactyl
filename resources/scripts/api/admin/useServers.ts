@@ -1,5 +1,14 @@
 import useSWR from 'swr';
-import { getServer, getServerBuild, getServerManage, getServerStartup, getServers } from '@/api/admin/servers';
+import {
+    getServer,
+    getServerBuild,
+    getServerCreateOptions,
+    getServerDatabases,
+    getServerManage,
+    getServerMounts,
+    getServerStartup,
+    getServers,
+} from '@/api/admin/servers';
 
 export const useServers = (query: { page?: number; search?: string }) =>
     useSWR(['admin:servers', query], () => getServers(query), {
@@ -25,6 +34,24 @@ export const useServerBuild = (id?: number | string) =>
 
 export const useServerStartup = (id?: number | string) =>
     useSWR(id ? ['admin:server-startup', id] : null, () => getServerStartup(id as number | string), {
+        revalidateOnFocus: false,
+        revalidateIfStale: false,
+    });
+
+export const useServerDatabases = (id?: number | string) =>
+    useSWR(id ? ['admin:server-databases', id] : null, () => getServerDatabases(id as number | string), {
+        revalidateOnFocus: false,
+        revalidateIfStale: false,
+    });
+
+export const useServerMounts = (id?: number | string) =>
+    useSWR(id ? ['admin:server-mounts', id] : null, () => getServerMounts(id as number | string), {
+        revalidateOnFocus: false,
+        revalidateIfStale: false,
+    });
+
+export const useServerCreateOptions = () =>
+    useSWR('admin:server-create-options', getServerCreateOptions, {
         revalidateOnFocus: false,
         revalidateIfStale: false,
     });

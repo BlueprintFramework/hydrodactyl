@@ -59,7 +59,7 @@ const ServersContainer = () => {
                     className='w-full sm:max-w-sm'
                 />
                 <Button asChild className='sm:ml-auto'>
-                    <a href='/admin/servers/new'>Create Server</a>
+                    <Link to='/servers/new'>Create Server</Link>
                 </Button>
             </div>
 

@@ -7,9 +7,14 @@ use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\Nest;
+use Pterodactyl\Models\Mount;
 use Pterodactyl\Models\User;
 use Pterodactyl\Models\Server;
+use Pterodactyl\Models\Database;
+use Pterodactyl\Models\Location;
 use Pterodactyl\Models\EggVariable;
+use Pterodactyl\Models\MountServer;
+use Pterodactyl\Models\DatabaseHost;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Models\Allocation;
 use Pterodactyl\Models\ServerTransfer;
@@ -21,20 +26,26 @@ use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Services\Nodes\NodeJWTService;
 use Illuminate\Validation\ValidationException;
+use Pterodactyl\Http\Requests\Admin\ServerFormRequest;
 use Pterodactyl\Repositories\Eloquent\NestRepository;
 use Pterodactyl\Repositories\Eloquent\NodeRepository;
+use Pterodactyl\Repositories\Eloquent\MountRepository;
 use Pterodactyl\Services\Servers\SuspensionService;
 use Pterodactyl\Services\Servers\EnvironmentService;
 use Pterodactyl\Models\Filters\AdminServerFilter;
 use Pterodactyl\Services\Servers\ServerDeletionService;
 use Pterodactyl\Services\Servers\ReinstallServerService;
+use Pterodactyl\Services\Servers\ServerCreationService;
 use Pterodactyl\Services\Servers\BuildModificationService;
+use Pterodactyl\Services\Databases\DatabasePasswordService;
 use Pterodactyl\Services\Servers\StartupModificationService;
+use Pterodactyl\Services\Databases\DatabaseManagementService;
 use Pterodactyl\Exceptions\Model\DataValidationException;
 use Pterodactyl\Services\Servers\DetailsModificationService;
 use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
 use Pterodactyl\Contracts\Repository\ServerRepositoryInterface;
 use Pterodactyl\Contracts\Repository\AllocationRepositoryInterface;
+use Pterodactyl\Http\Requests\Admin\Servers\Databases\StoreServerDatabaseRequest;
 
 class ServerController extends Controller
 {
@@ -46,14 +57,18 @@ class ServerController extends Controller
         private BuildModificationService $buildModificationService,
         private ConnectionInterface $connection,
         private DaemonTransferRepository $daemonTransferRepository,
+        private DatabaseManagementService $databaseManagementService,
+        private DatabasePasswordService $databasePasswordService,
         private DetailsModificationService $detailsModificationService,
         private EnvironmentService $environmentService,
+        private MountRepository $mountRepository,
         private NestRepository $nestRepository,
         private NodeJWTService $nodeJWTService,
         private NodeRepository $nodeRepository,
         private ReinstallServerService $reinstallService,
         private ServerDeletionService $deletionService,
         private ServerRepositoryInterface $repository,
+        private ServerCreationService $serverCreationService,
         private StartupModificationService $startupModificationService,
         private SuspensionService $suspensionService,
     ) {
@@ -148,6 +163,8 @@ class ServerController extends Controller
                 'backup_limit' => $server->backup_limit,
                 'backup_storage_limit' => $server->backup_storage_limit,
                 'allocation_id' => $server->allocation_id,
+                'node_daemon_type' => $server->node?->daemonType,
+                'software_enabled' => is_null($server->software_enabled) ? true : (bool) $server->software_enabled,
             ],
             'assigned' => $assigned->map(fn (Allocation $allocation) => $this->allocationOption($allocation))->values(),
             'unassigned' => $unassigned->map(fn (Allocation $allocation) => $this->allocationOption($allocation))->values(),
@@ -164,7 +181,7 @@ class ServerController extends Controller
                 'allocation_id', 'add_allocations', 'remove_allocations',
                 'memory', 'overhead_memory', 'swap', 'io', 'cpu', 'threads', 'disk',
                 'database_limit', 'allocation_limit', 'backup_limit', 'backup_storage_limit', 'oom_disabled',
-                'exclude_from_resource_calculation',
+                'exclude_from_resource_calculation', 'software_enabled',
             ]));
         } catch (DataValidationException $exception) {
             throw new ValidationException($exception->getValidator());
@@ -189,30 +206,7 @@ class ServerController extends Controller
                 'nest_id' => (int) $server->nest_id,
                 'egg_id' => (int) $server->egg_id,
             ],
-            'nests' => $nests
-                ->map(fn (Nest $nest) => [
-                    'id' => $nest->id,
-                    'name' => $nest->name,
-                    'eggs' => $nest->eggs
-                        ->map(fn (Egg $egg) => [
-                            'id' => $egg->id,
-                            'name' => $egg->name,
-                            'startup' => $egg->startup,
-                            'docker_images' => $egg->docker_images ?? [],
-                            'variables' => $egg->variables
-                                ->map(fn (EggVariable $variable) => [
-                                    'env_variable' => $variable->env_variable,
-                                    'name' => $variable->name,
-                                    'description' => $variable->description,
-                                    'default_value' => $variable->default_value,
-                                    'required' => $variable->required,
-                                    'rules' => $variable->rules,
-                                ])
-                                ->values(),
-                        ])
-                        ->values(),
-                ])
-                ->values(),
+            'nests' => $nests->map(fn (Nest $nest) => $this->nestPayload($nest))->values(),
             'variables' => $this->environmentService->handle($server),
         ]);
     }
@@ -255,6 +249,107 @@ class ServerController extends Controller
     }
 
     /**
+     * Map a nest (with its eggs and variables) into the shape the interface needs.
+     */
+    private function nestPayload(Nest $nest): array
+    {
+        return [
+            'id' => $nest->id,
+            'name' => $nest->name,
+            'eggs' => $nest->eggs
+                ->map(fn (Egg $egg) => [
+                    'id' => $egg->id,
+                    'name' => $egg->name,
+                    'startup' => $egg->startup,
+                    'docker_images' => $egg->docker_images ?? [],
+                    'variables' => $egg->variables
+                        ->map(fn (EggVariable $variable) => [
+                            'env_variable' => $variable->env_variable,
+                            'name' => $variable->name,
+                            'description' => $variable->description,
+                            'default_value' => $variable->default_value,
+                            'required' => $variable->required,
+                            'rules' => $variable->rules,
+                        ])
+                        ->values(),
+                ])
+                ->values(),
+        ];
+    }
+
+    /**
+     * Return the options consumed by the server creation wizard.
+     */
+    public function create(): JsonResponse
+    {
+        $nests = $this->nestRepository->getWithEggs();
+
+        $locations = Location::query()
+            ->with(['nodes' => fn ($query) => $query->select('id', 'name', 'location_id', 'daemonType')->orderBy('name')])
+            ->orderBy('short')
+            ->get(['id', 'short', 'long']);
+
+        return response()->json([
+            'locations' => $locations
+                ->map(fn (Location $location) => [
+                    'id' => $location->id,
+                    'short' => $location->short,
+                    'long' => $location->long,
+                    'nodes' => $location->nodes
+                        ->map(fn (Node $node) => [
+                            'id' => $node->id,
+                            'name' => $node->name,
+                            'daemonType' => $node->daemonType,
+                        ])
+                        ->values(),
+                ])
+                ->values(),
+            'nests' => $nests->map(fn (Nest $nest) => $this->nestPayload($nest))->values(),
+            'templates' => config('server_templates.templates', []),
+        ]);
+    }
+
+    /**
+     * Return the unassigned allocations for a node when creating a server.
+     */
+    public function createAllocations(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'node_id' => 'required|numeric|exists:nodes,id',
+        ]);
+
+        $allocations = Allocation::query()
+            ->where('node_id', $data['node_id'])
+            ->whereNull('server_id')
+            ->orderBy('ip')
+            ->orderBy('port')
+            ->get(['id', 'ip', 'port', 'ip_alias']);
+
+        return response()->json([
+            'data' => $allocations->map(fn (Allocation $allocation) => $this->allocationOption($allocation))->values(),
+        ]);
+    }
+
+    /**
+     * Create a new server on the panel.
+     */
+    public function store(ServerFormRequest $request): JsonResponse
+    {
+        $data = $request->except(['_token']);
+
+        if (!empty($data['custom_image'])) {
+            $data['image'] = $data['custom_image'];
+        }
+
+        unset($data['custom_image']);
+
+        $server = $this->serverCreationService->handle($data);
+
+        return response()->json(['data' => $this->transform($server)], JsonResponse::HTTP_CREATED);
+    }
+
+
+    /**
      * Return the data needed to manage a server (transfer options, state).
      */
     public function manage(Server $server): JsonResponse
@@ -267,7 +362,7 @@ class ServerController extends Controller
 
         $server->loadMissing('transfer');
 
-        $nodes = \Pterodactyl\Models\Location::query()
+        $nodes = Location::query()
             ->with(['nodes' => fn ($query) => $query->select('id', 'name', 'location_id')->orderBy('name')])
             ->orderBy('short')
             ->get(['id', 'short', 'long']);
@@ -402,6 +497,127 @@ class ServerController extends Controller
         });
 
         return response()->json(['data' => $this->transform($server->fresh())]);
+    }
+
+    /**
+     * Return the databases assigned to a server.
+     */
+    public function database(Server $server): JsonResponse
+    {
+        $server->load('databases.host');
+
+        return response()->json([
+            'data' => $server->databases
+                ->map(fn (Database $database) => [
+                    'id' => $database->id,
+                    'database' => $database->database,
+                    'username' => $database->username,
+                    'remote' => $database->remote,
+                    'max_connections' => $database->max_connections,
+                    'host' => $database->host ? [
+                        'id' => $database->host->id,
+                        'name' => $database->host->name,
+                        'host' => $database->host->host,
+                        'port' => $database->host->port,
+                    ] : null,
+                ])
+                ->values(),
+            'hosts' => DatabaseHost::query()
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(fn (DatabaseHost $host) => ['id' => $host->id, 'name' => $host->name])
+                ->values(),
+        ]);
+    }
+
+    /**
+     * Create a new database for a server.
+     */
+    public function storeDatabase(StoreServerDatabaseRequest $request, Server $server): JsonResponse
+    {
+        $this->databaseManagementService->create($server, [
+            'database' => DatabaseManagementService::generateUniqueDatabaseName($request->input('database'), $server->id),
+            'remote' => $request->input('remote'),
+            'database_host_id' => $request->input('database_host_id'),
+            'max_connections' => $request->input('max_connections'),
+        ]);
+
+        return response()->json([], JsonResponse::HTTP_CREATED);
+    }
+
+    /**
+     * Reset the password for a database.
+     */
+    public function resetDatabasePassword(Server $server, Database $database): JsonResponse
+    {
+        $database = $server->databases()->findOrFail($database->id);
+
+        $this->databasePasswordService->handle($database);
+
+        return response()->json([], JsonResponse::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Delete a database from a server.
+     */
+    public function destroyDatabase(Server $server, Database $database): JsonResponse
+    {
+        $database = $server->databases()->findOrFail($database->id);
+
+        $this->databaseManagementService->delete($database);
+
+        return response()->json([], JsonResponse::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Return the mounts available to a server.
+     */
+    public function mounts(Server $server): JsonResponse
+    {
+        $server->loadMissing('mounts');
+        $attached = $server->mounts->pluck('id')->all();
+
+        return response()->json([
+            'data' => $this->mountRepository->getMountListForServer($server)
+                ->map(fn (Mount $mount) => [
+                    'id' => $mount->id,
+                    'name' => $mount->name,
+                    'source' => $mount->source,
+                    'target' => $mount->target,
+                    'is_mounted' => in_array($mount->id, $attached, true),
+                ])
+                ->values(),
+        ]);
+    }
+
+    /**
+     * Attach a mount to a server.
+     */
+    public function addMount(Request $request, Server $server): JsonResponse
+    {
+        $data = $request->validate([
+            'mount_id' => 'required|integer|exists:mounts,id',
+        ]);
+
+        (new MountServer())->forceFill([
+            'mount_id' => $data['mount_id'],
+            'server_id' => $server->id,
+        ])->saveOrFail();
+
+        return response()->json([], JsonResponse::HTTP_CREATED);
+    }
+
+    /**
+     * Detach a mount from a server.
+     */
+    public function deleteMount(Server $server, Mount $mount): JsonResponse
+    {
+        MountServer::query()
+            ->where('mount_id', $mount->id)
+            ->where('server_id', $server->id)
+            ->delete();
+
+        return response()->json([], JsonResponse::HTTP_NO_CONTENT);
     }
 
     /**

@@ -55,6 +55,9 @@ const ServerOverviewContainer = lazy(() => import('./servers/ServerOverviewConta
 const ServerDetailsContainer = lazy(() => import('./servers/ServerDetailsContainer'));
 const ServerBuildContainer = lazy(() => import('./servers/ServerBuildContainer'));
 const ServerStartupContainer = lazy(() => import('./servers/ServerStartupContainer'));
+const ServerDatabaseContainer = lazy(() => import('./servers/ServerDatabaseContainer'));
+const ServerMountsContainer = lazy(() => import('./servers/ServerMountsContainer'));
+const ServerCreateContainer = lazy(() => import('./servers/ServerCreateContainer'));
 const ServerManageContainer = lazy(() => import('./servers/ServerManageContainer'));
 const ServerDeleteContainer = lazy(() => import('./servers/ServerDeleteContainer'));
 
@@ -235,11 +238,14 @@ const AdminShell = () => {
                                     <Route path='/locations' element={<LocationsContainer />} />
                                     <Route path='/locations/:id' element={<LocationViewContainer />} />
                                     <Route path='/servers' element={<ServersContainer />} />
+                                    <Route path='/servers/new' element={<ServerCreateContainer />} />
                                     <Route path='/servers/:id' element={<ServerLayout />}>
                                         <Route index element={<ServerOverviewContainer />} />
                                         <Route path='details' element={<ServerDetailsContainer />} />
                                         <Route path='build' element={<ServerBuildContainer />} />
                                         <Route path='startup' element={<ServerStartupContainer />} />
+                                        <Route path='database' element={<ServerDatabaseContainer />} />
+                                        <Route path='mounts' element={<ServerMountsContainer />} />
                                         <Route path='manage' element={<ServerManageContainer />} />
                                         <Route path='delete' element={<ServerDeleteContainer />} />
                                     </Route>
