@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { UserValues } from '@/api/admin/users';
 import { Field } from '@/components/admin/Field';
+import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
-import Select from '@/components/elements/Select';
 import { Button } from '@/components/ui/button';
 
 interface Props {
@@ -71,17 +71,11 @@ const UserForm = ({ languages, initialValues, errors = {}, submitting, submitLab
                     />
                 </Field>
                 <Field label='Default Language' error={errors.language}>
-                    <Select
-                        className='w-full'
+                    <Dropdown
                         value={values.language}
-                        onChange={(e) => set('language', e.target.value)}
-                    >
-                        {Object.entries(languages).map(([code, name]) => (
-                            <option key={code} value={code}>
-                                {name}
-                            </option>
-                        ))}
-                    </Select>
+                        onChange={(value) => set('language', value)}
+                        options={Object.entries(languages).map(([value, label]) => ({ value, label }))}
+                    />
                 </Field>
             </div>
 
@@ -109,14 +103,14 @@ const UserForm = ({ languages, initialValues, errors = {}, submitting, submitLab
                         error={errors.root_admin}
                         hint="Setting this to 'Yes' gives a user full administrative access."
                     >
-                        <Select
-                            className='w-full'
+                        <Dropdown
                             value={values.root_admin ? '1' : '0'}
-                            onChange={(e) => set('root_admin', e.target.value === '1')}
-                        >
-                            <option value='0'>No</option>
-                            <option value='1'>Yes</option>
-                        </Select>
+                            onChange={(value) => set('root_admin', value === '1')}
+                            options={[
+                                { value: '0', label: 'No' },
+                                { value: '1', label: 'Yes' },
+                            ]}
+                        />
                     </Field>
                 </div>
             </div>

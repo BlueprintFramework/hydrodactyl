@@ -4,8 +4,8 @@ import { errorToMessage, parseValidationErrors } from '@/api/admin/errors';
 import { updateSettings } from '@/api/admin/settings';
 import { useSettings } from '@/api/admin/useSettings';
 import { Field } from '@/components/admin/Field';
+import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
-import Select from '@/components/elements/Select';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 
@@ -82,15 +82,15 @@ const MailForm = ({ host, port, encryption, username, fromAddress, fromName, onS
                         />
                     </Field>
                     <Field label='Encryption' error={errors['mail:mailers:smtp:encryption']}>
-                        <Select
-                            className='w-full'
+                        <Dropdown
                             value={values.encryption}
-                            onChange={(e) => setValues({ ...values, encryption: e.target.value })}
-                        >
-                            <option value=''>None</option>
-                            <option value='tls'>TLS</option>
-                            <option value='ssl'>SSL</option>
-                        </Select>
+                            onChange={(value) => setValues({ ...values, encryption: value })}
+                            options={[
+                                { value: '', label: 'None' },
+                                { value: 'tls', label: 'TLS' },
+                                { value: 'ssl', label: 'SSL' },
+                            ]}
+                        />
                     </Field>
                     <Field label='Username' error={errors['mail:mailers:smtp:username']}>
                         <Input.Text

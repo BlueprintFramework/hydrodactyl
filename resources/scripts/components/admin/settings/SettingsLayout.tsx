@@ -10,13 +10,13 @@ interface Tab {
     end?: boolean;
 }
 
-// Domains and Branding are still served by the legacy pages, so they get a
-// full page load rather than a client route.
+// Branding is still served by the legacy page, so it gets a full page load
+// rather than a client route.
 const tabs: Tab[] = [
     { label: 'General', to: '/settings', end: true },
     { label: 'Mail', to: '/settings/mail' },
     { label: 'Captcha', to: '/settings/captcha' },
-    { label: 'Domains', href: '/admin/settings/domains' },
+    { label: 'Domains', to: '/settings/domains' },
     { label: 'Custom Navigation', to: '/settings/custom-navigation' },
     { label: 'Branding', href: '/admin/settings/logo' },
     { label: 'Advanced', to: '/settings/advanced' },

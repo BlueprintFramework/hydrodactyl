@@ -4,8 +4,8 @@ import { errorToMessage, parseValidationErrors } from '@/api/admin/errors';
 import { type CustomNavigationSettings as CustomNavValues, updateSettings } from '@/api/admin/settings';
 import { useSettings } from '@/api/admin/useSettings';
 import { Field } from '@/components/admin/Field';
+import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
-import Select from '@/components/elements/Select';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 
@@ -69,17 +69,14 @@ const CustomNavigationForm = ({ settings, onSaved }: { settings: CustomNavValues
                         />
                     </Field>
                     <Field label={`Item ${index + 1} Icon`} error={errors[`app:custom_nav_items.${index}.icon`]}>
-                        <Select
-                            className='w-full'
+                        <Dropdown
                             value={item.icon}
-                            onChange={(e) => update(index, { icon: e.target.value })}
-                        >
-                            {ICONS.map((icon) => (
-                                <option key={icon} value={icon}>
-                                    {icon.charAt(0).toUpperCase() + icon.slice(1)}
-                                </option>
-                            ))}
-                        </Select>
+                            onChange={(value) => update(index, { icon: value })}
+                            options={ICONS.map((icon) => ({
+                                value: icon,
+                                label: icon.charAt(0).toUpperCase() + icon.slice(1),
+                            }))}
+                        />
                     </Field>
                 </div>
             ))}

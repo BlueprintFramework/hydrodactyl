@@ -43,6 +43,8 @@ const AdvancedSettings = lazy(() => import('./settings/AdvancedSettings'));
 const MailSettings = lazy(() => import('./settings/MailSettings'));
 const CaptchaSettings = lazy(() => import('./settings/CaptchaSettings'));
 const CustomNavigationSettings = lazy(() => import('./settings/CustomNavigationSettings'));
+const DomainsContainer = lazy(() => import('./settings/domains/DomainsContainer'));
+const DomainFormContainer = lazy(() => import('./settings/domains/DomainFormContainer'));
 
 interface ExtendedWindow extends Window {
     SiteConfiguration?: SiteSettings;
@@ -208,6 +210,9 @@ const AdminShell = () => {
                                         <Route path='mail' element={<MailSettings />} />
                                         <Route path='captcha' element={<CaptchaSettings />} />
                                         <Route path='custom-navigation' element={<CustomNavigationSettings />} />
+                                        <Route path='domains' element={<DomainsContainer />} />
+                                        <Route path='domains/new' element={<DomainFormContainer />} />
+                                        <Route path='domains/:id' element={<DomainFormContainer />} />
                                     </Route>
                                     <Route path='*' element={<NotFound />} />
                                 </Routes>

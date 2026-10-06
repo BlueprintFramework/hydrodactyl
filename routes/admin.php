@@ -55,6 +55,15 @@ Route::group(['prefix' => 'api'], function () {
     Route::patch('/settings/mail', [Admin\Api\SettingsController::class, 'updateMail']);
     Route::patch('/settings/captcha', [Admin\Api\SettingsController::class, 'updateCaptcha']);
     Route::patch('/settings/custom-navigation', [Admin\Api\SettingsController::class, 'updateCustomNavigation']);
+
+    Route::group(['prefix' => 'settings/domains'], function () {
+        Route::get('/', [Admin\Api\DomainsController::class, 'index'])->name('admin.api.settings.domains');
+        Route::get('/providers/{provider}/schema', [Admin\Api\DomainsController::class, 'schema']);
+        Route::post('/', [Admin\Api\DomainsController::class, 'store']);
+        Route::post('/test-connection', [Admin\Api\DomainsController::class, 'testConnection']);
+        Route::patch('/{domain}', [Admin\Api\DomainsController::class, 'update']);
+        Route::delete('/{domain}', [Admin\Api\DomainsController::class, 'destroy']);
+    });
 });
 
 /*
@@ -77,6 +86,9 @@ Route::get('/settings/advanced', [Admin\AppController::class, 'index'])->name('a
 Route::get('/settings/mail', [Admin\AppController::class, 'index'])->name('admin.settings.mail');
 Route::get('/settings/captcha', [Admin\AppController::class, 'index'])->name('admin.settings.captcha');
 Route::get('/settings/custom-navigation', [Admin\AppController::class, 'index'])->name('admin.settings.custom-navigation');
+Route::get('/settings/domains', [Admin\AppController::class, 'index'])->name('admin.settings.domains.index');
+Route::get('/settings/domains/new', [Admin\AppController::class, 'index'])->name('admin.settings.domains.create');
+Route::get('/settings/domains/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.settings.domains.edit');
 
 /*
 |--------------------------------------------------------------------------
@@ -139,19 +151,6 @@ Route::group(['prefix' => 'databases'], function () {
 */
 Route::group(['prefix' => 'settings'], function () {
     Route::get('/logo', [Admin\Settings\LogoController::class, 'index'])->name('admin.settings.logo');
-
-    Route::group(['prefix' => 'domains'], function () {
-        Route::get('/', [Admin\Settings\DomainsController::class, 'index'])->name('admin.settings.domains.index');
-        Route::get('/create', [Admin\Settings\DomainsController::class, 'create'])->name('admin.settings.domains.create');
-        Route::get('/{domain}/edit', [Admin\Settings\DomainsController::class, 'edit'])->name('admin.settings.domains.edit');
-
-        Route::post('/', [Admin\Settings\DomainsController::class, 'store'])->name('admin.settings.domains.store');
-        Route::patch('/{domain}', [Admin\Settings\DomainsController::class, 'update'])->name('admin.settings.domains.update');
-        Route::delete('/{domain}', [Admin\Settings\DomainsController::class, 'destroy'])->name('admin.settings.domains.destroy');
-
-        Route::post('/test-connection', [Admin\Settings\DomainsController::class, 'testConnection'])->name('admin.settings.domains.test-connection');
-        Route::get('/provider-schema/{provider}', [Admin\Settings\DomainsController::class, 'getProviderSchema'])->name('admin.settings.domains.provider-schema');
-    });
 
     Route::post('/mail/test', [Admin\Settings\MailController::class, 'test'])->name('admin.settings.mail.test');
 

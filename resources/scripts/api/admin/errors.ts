@@ -39,5 +39,12 @@ export const parseValidationErrors = (error: unknown): Record<string, string> =>
     return {};
 };
 
-export const errorToMessage = (error: unknown, fallback: string): string =>
-    httpErrorToHuman(error as { message?: string }) || fallback;
+export const errorToMessage = (error: unknown, fallback: string): string => {
+    const data = (error as { response?: { data?: { message?: unknown } } }).response?.data;
+
+    if (typeof data?.message === 'string' && data.message.length > 0) {
+        return data.message;
+    }
+
+    return httpErrorToHuman(error as { message?: string }) || fallback;
+};

@@ -4,8 +4,8 @@ import { errorToMessage, parseValidationErrors } from '@/api/admin/errors';
 import { type CaptchaSettings as CaptchaValues, updateSettings } from '@/api/admin/settings';
 import { useSettings } from '@/api/admin/useSettings';
 import { Field } from '@/components/admin/Field';
+import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
-import Select from '@/components/elements/Select';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 
@@ -72,13 +72,12 @@ const CaptchaForm = ({ settings, onSaved }: { settings: CaptchaValues; onSaved: 
         >
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
                 <Field label='Provider' error={errors['pterodactyl:captcha:provider']}>
-                    <Select className='w-full md:w-1/3' value={provider} onChange={(e) => setProvider(e.target.value)}>
-                        {Object.entries(settings.providers).map(([value, label]) => (
-                            <option key={value} value={value}>
-                                {label}
-                            </option>
-                        ))}
-                    </Select>
+                    <Dropdown
+                        className='md:w-1/3'
+                        value={provider}
+                        onChange={setProvider}
+                        options={Object.entries(settings.providers).map(([value, label]) => ({ value, label }))}
+                    />
                 </Field>
             </div>
 

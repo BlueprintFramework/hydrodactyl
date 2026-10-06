@@ -4,8 +4,8 @@ import { errorToMessage, parseValidationErrors } from '@/api/admin/errors';
 import { updateSettings } from '@/api/admin/settings';
 import { useSettings } from '@/api/admin/useSettings';
 import { Field } from '@/components/admin/Field';
+import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
-import Select from '@/components/elements/Select';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 
@@ -20,10 +20,14 @@ interface Props {
 }
 
 const Toggle = ({ value, onChange }: { value: boolean; onChange: (value: boolean) => void }) => (
-    <Select className='w-full' value={value ? 'true' : 'false'} onChange={(e) => onChange(e.target.value === 'true')}>
-        <option value='false'>Disabled</option>
-        <option value='true'>Enabled</option>
-    </Select>
+    <Dropdown
+        value={value ? 'true' : 'false'}
+        onChange={(next) => onChange(next === 'true')}
+        options={[
+            { value: 'false', label: 'Disabled' },
+            { value: 'true', label: 'Enabled' },
+        ]}
+    />
 );
 
 const AdvancedForm = ({

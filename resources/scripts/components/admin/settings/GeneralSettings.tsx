@@ -4,8 +4,8 @@ import { errorToMessage, parseValidationErrors } from '@/api/admin/errors';
 import { updateSettings } from '@/api/admin/settings';
 import { useSettings } from '@/api/admin/useSettings';
 import { Field } from '@/components/admin/Field';
+import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
-import Select from '@/components/elements/Select';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 
@@ -55,17 +55,11 @@ const GeneralForm = ({ name, locale, twoFactor, languages, onSaved }: Props) => 
                     <Input.Text value={values.name} onChange={(e) => setValues({ ...values, name: e.target.value })} />
                 </Field>
                 <Field label='Default Language' error={errors['app:locale']}>
-                    <Select
-                        className='w-full'
+                    <Dropdown
                         value={values.locale}
-                        onChange={(e) => setValues({ ...values, locale: e.target.value })}
-                    >
-                        {Object.entries(languages).map(([code, label]) => (
-                            <option key={code} value={code}>
-                                {label}
-                            </option>
-                        ))}
-                    </Select>
+                        onChange={(value) => setValues({ ...values, locale: value })}
+                        options={Object.entries(languages).map(([value, label]) => ({ value, label }))}
+                    />
                 </Field>
             </div>
 
@@ -74,15 +68,16 @@ const GeneralForm = ({ name, locale, twoFactor, languages, onSaved }: Props) => 
                 error={errors['pterodactyl:auth:2fa_required']}
                 hint='Accounts in the selected group must have 2FA enabled to use the panel.'
             >
-                <Select
-                    className='w-full md:w-1/3'
+                <Dropdown
+                    className='md:w-1/3'
                     value={String(values.twoFactor)}
-                    onChange={(e) => setValues({ ...values, twoFactor: Number(e.target.value) })}
-                >
-                    <option value='0'>Not Required</option>
-                    <option value='1'>Admin Only</option>
-                    <option value='2'>All Users</option>
-                </Select>
+                    onChange={(value) => setValues({ ...values, twoFactor: Number(value) })}
+                    options={[
+                        { value: '0', label: 'Not Required' },
+                        { value: '1', label: 'Admin Only' },
+                        { value: '2', label: 'All Users' },
+                    ]}
+                />
             </Field>
 
             <div className='flex justify-end'>
