@@ -39,7 +39,31 @@ Route::get('/', [Admin\AppController::class, 'index'])->name('admin.index');
 */
 Route::group(['prefix' => 'api'], function () {
     Route::get('/system-status', [Base\SystemStatusController::class, 'index'])->name('admin.api.system-status');
+
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('/', [Admin\Api\UserController::class, 'index'])->name('admin.api.users');
+        Route::get('/languages', [Admin\Api\UserController::class, 'languages'])->name('admin.api.users.languages');
+        Route::get('/{user:id}', [Admin\Api\UserController::class, 'view'])->name('admin.api.users.view');
+        Route::post('/', [Admin\Api\UserController::class, 'store'])->name('admin.api.users.store');
+        Route::patch('/{user:id}', [Admin\Api\UserController::class, 'update'])->name('admin.api.users.update');
+        Route::delete('/{user:id}', [Admin\Api\UserController::class, 'destroy'])->name('admin.api.users.destroy');
+    });
 });
+
+/*
+|--------------------------------------------------------------------------
+| Rebuilt Sections
+|--------------------------------------------------------------------------
+|
+| Sections that have been rebuilt in the React admin are served by the shell,
+| which handles the rest of the routing client-side. Their legacy routes are
+| removed, though any route still referenced elsewhere (like the user
+| autocomplete JSON) is kept.
+|
+*/
+Route::get('/users', [Admin\AppController::class, 'index'])->name('admin.users');
+Route::get('/users/new', [Admin\AppController::class, 'index'])->name('admin.users.new');
+Route::get('/users/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.users.view');
 
 /*
 |--------------------------------------------------------------------------
@@ -140,15 +164,8 @@ Route::group(['prefix' => 'settings'], function () {
 |
 */
 Route::group(['prefix' => 'users'], function () {
-    Route::get('/', [Admin\UserController::class, 'index'])->name('admin.users');
+    // Still used by the legacy server owner autocomplete on the server pages.
     Route::get('/accounts.json', [Admin\UserController::class, 'json'])->name('admin.users.json');
-    Route::get('/new', [Admin\UserController::class, 'create'])->name('admin.users.new');
-    Route::get('/view/{user:id}', [Admin\UserController::class, 'view'])->name('admin.users.view');
-
-    Route::post('/new', [Admin\UserController::class, 'store']);
-
-    Route::patch('/view/{user:id}', [Admin\UserController::class, 'update']);
-    Route::delete('/view/{user:id}', [Admin\UserController::class, 'delete']);
 });
 
 /*

@@ -1,6 +1,7 @@
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { useSystemStatus } from '@/api/admin/useSystemStatus';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
+import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 
 function formatBytes(bytes: number): string {
@@ -18,13 +19,23 @@ function formatUptime(seconds: number): string {
     return `${days}d ${hours}h ${minutes}m`;
 }
 
-const COLORS = { used: '#52A9FF', free: '#2D5A8A', bg: '#1E3A5A' };
+const CHART = {
+    usage: 'var(--color-hydro-500)',
+    track: 'var(--color-mocha-400)',
+    axis: 'var(--color-mocha-50)',
+};
 
-const tooltipStyle = { background: '#222', border: '1px solid #444', borderRadius: 6, fontSize: 12 };
+const tooltipStyle = {
+    background: 'var(--color-mocha-500)',
+    border: '1px solid var(--color-mocha-400)',
+    borderRadius: 6,
+    fontSize: 12,
+    color: 'var(--color-cream-400)',
+};
 
 function Card({ label, children }: { label: string; children: React.ReactNode }) {
     return (
-        <div className='rounded-xl border border-mocha-300 bg-linear-to-b from-[#ffffff12] to-[#ffffff08] p-4'>
+        <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
             <div className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>{label}</div>
             <div className='mt-3'>{children}</div>
         </div>
@@ -44,8 +55,8 @@ function UsageBar({ used, total, percent }: { used: number; total: number; perce
                         contentStyle={tooltipStyle}
                         formatter={(value) => formatBytes(Number(value))}
                     />
-                    <Bar dataKey='used' fill={COLORS.used} stackId='a' radius={[4, 0, 0, 4]} maxBarSize={18} />
-                    <Bar dataKey='free' fill={COLORS.bg} stackId='a' radius={[0, 4, 4, 0]} maxBarSize={18} />
+                    <Bar dataKey='used' fill={CHART.usage} stackId='a' radius={[4, 0, 0, 4]} maxBarSize={18} />
+                    <Bar dataKey='free' fill={CHART.track} stackId='a' radius={[0, 4, 4, 0]} maxBarSize={18} />
                 </BarChart>
             </ResponsiveContainer>
             <div className='mt-2 flex items-baseline justify-between'>
@@ -64,9 +75,9 @@ function LoadGraph({ loads }: { loads: number[] }) {
     return (
         <ResponsiveContainer width='100%' height={120}>
             <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
-                <XAxis dataKey='name' tick={{ fontSize: 10, fill: '#777' }} axisLine={false} tickLine={false} />
+                <XAxis dataKey='name' tick={{ fontSize: 10, fill: CHART.axis }} axisLine={false} tickLine={false} />
                 <Tooltip cursor={false} contentStyle={tooltipStyle} />
-                <Bar dataKey='value' fill={COLORS.used} radius={[3, 3, 0, 0]} maxBarSize={48} />
+                <Bar dataKey='value' fill={CHART.usage} radius={[3, 3, 0, 0]} maxBarSize={48} />
             </BarChart>
         </ResponsiveContainer>
     );
@@ -88,7 +99,7 @@ const OverviewContainer = () => {
     const diskPercent = metrics.disk.total > 0 ? (metrics.disk.used / metrics.disk.total) * 100 : 0;
 
     return (
-        <div className='px-2 pt-2 sm:px-14 sm:pt-10 pb-10 overflow-y-auto h-full'>
+        <PageContentBlock title='Overview'>
             <MainPageHeader direction='column' title='Overview'>
                 <p className='text-sm text-neutral-400'>A quick glance at the host system.</p>
             </MainPageHeader>
@@ -128,7 +139,7 @@ const OverviewContainer = () => {
                     <LoadGraph loads={system.load_average} />
                 </Card>
             </div>
-        </div>
+        </PageContentBlock>
     );
 };
 

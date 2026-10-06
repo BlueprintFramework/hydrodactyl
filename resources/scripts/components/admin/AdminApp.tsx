@@ -16,8 +16,9 @@ import {
 } from '@hugeicons/core-free-icons';
 import type { IconSvgElement } from '@hugeicons/react';
 import { StoreProvider } from 'easy-peasy';
-import { type RefObject, Suspense, useRef } from 'react';
+import { lazy, type RefObject, Suspense, useRef } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import MainWrapper from '@/components/elements/MainWrapper';
 import { NotFound } from '@/components/elements/ScreenBlock';
 import HydrodactylProvider from '@/components/HydrodactylProvider';
@@ -31,6 +32,10 @@ import { store } from '@/state';
 import type { SiteSettings } from '@/state/settings';
 
 import OverviewContainer from './containers/OverviewContainer';
+
+const UsersContainer = lazy(() => import('./users/UsersContainer'));
+const UserCreateContainer = lazy(() => import('./users/UserCreateContainer'));
+const UserViewContainer = lazy(() => import('./users/UserViewContainer'));
 
 interface ExtendedWindow extends Window {
     SiteConfiguration?: SiteSettings;
@@ -92,13 +97,12 @@ const AdminShell = () => {
             hardNav: true,
         },
         {
-            to: '/admin/users',
+            to: '/users',
             icon: UserMultiple02Icon,
             text: 'Users',
             tabName: 'users',
             ref: NavigationUsers,
             end: false,
-            hardNav: true,
         },
         {
             to: '/admin/nodes',
@@ -189,6 +193,9 @@ const AdminShell = () => {
                             <Suspense fallback={null}>
                                 <Routes>
                                     <Route path='/' element={<OverviewContainer />} />
+                                    <Route path='/users' element={<UsersContainer />} />
+                                    <Route path='/users/new' element={<UserCreateContainer />} />
+                                    <Route path='/users/:id' element={<UserViewContainer />} />
                                     <Route path='*' element={<NotFound />} />
                                 </Routes>
                             </Suspense>
@@ -230,6 +237,15 @@ const AdminApp = () => {
                         data-hydrodactyl-routerwrap=''
                         className='relative w-full h-full flex flex-row p-2 overflow-hidden rounded-lg'
                     >
+                        <Toaster
+                            theme='dark'
+                            toastOptions={{
+                                unstyled: true,
+                                classNames: {
+                                    toast: 'p-4 bg-[#ffffff09] border border-[#ffffff12] rounded-2xl shadow-lg backdrop-blur-2xl flex items-center w-full gap-2',
+                                },
+                            }}
+                        />
                         <BrowserRouter basename='/admin'>
                             <AdminShell />
                         </BrowserRouter>

@@ -5,7 +5,7 @@ export default createGlobalStyle`
     //     min-width: 0
     // }
 
-    html, body, #app {
+    html, body, [data-hydrodactyl-app] {
         position: relative;
         height: 100%;
         width: 100%;

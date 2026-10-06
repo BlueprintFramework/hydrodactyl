@@ -183,13 +183,15 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
                                 aria-current={item.active ? 'page' : undefined}
                                 onSelect={handleSelect}
                                 className={`flex items-center gap-2 ${item.link?.external ? 'cursor-pointer' : ''} ${
-                                    item.active ? 'bg-brand/15 font-medium text-brand data-[disabled]:opacity-100!' : ''
+                                    item.active
+                                        ? 'bg-hydro-500/15 font-medium text-hydro-400 data-[disabled]:opacity-100!'
+                                        : ''
                                 }`}
                             >
                                 {IconComponent && <IconComponent className='size-4' />}
                                 {item.label}
                                 {item.badge && (
-                                    <span className='ml-auto z-10 rounded-full bg-brand px-2 py-1 text-xs text-white'>
+                                    <span className='ml-auto z-10 rounded-full bg-hydro-500 px-2 py-1 text-xs text-mocha-500'>
                                         {item.badge}
                                     </span>
                                 )}
