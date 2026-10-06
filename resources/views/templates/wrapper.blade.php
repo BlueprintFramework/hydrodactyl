@@ -61,7 +61,7 @@
         @include('layouts.scripts')
 
         @viteReactRefresh
-        @vite('resources/scripts/index.tsx')
+        @vite($viteEntry ?? 'resources/scripts/index.tsx')
     </head>
     <body data-hydrodactyl-body class="{{ $css['body'] }}" style="background-color: #11100E; height: 100%; width: 100%; margin: 0; padding: 0;">
         @section('content')

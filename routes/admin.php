@@ -2,9 +2,44 @@
 
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Controllers\Admin;
+use Pterodactyl\Http\Controllers\Base;
 use Pterodactyl\Http\Middleware\Admin\Servers\ServerInstalled;
 
-Route::get('/', [Admin\BaseController::class, 'index'])->name('admin.index');
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+|
+| The admin panel is being migrated from the legacy AdminLTE blade pages to a
+| React SPA. The shell lives at "/admin" and is served by Admin\AppController.
+|
+| Only rebuilt pages are served by the shell. Every section still running on
+| the legacy layout keeps its own server-rendered route below, and the React
+| sidebar links to those with a full page load so nothing breaks mid-migration.
+|
+| TODO: once every section has been rebuilt and its legacy route removed,
+| replace the individual route groups with a single catch-all that serves the
+| shell, e.g.:
+|
+|     Route::get('/{path?}', [Admin\AppController::class, 'index'])->where('path', '.*');
+|
+*/
+
+Route::get('/', [Admin\AppController::class, 'index'])->name('admin.index');
+
+/*
+|--------------------------------------------------------------------------
+| Internal Admin API
+|--------------------------------------------------------------------------
+|
+| Session-authenticated JSON endpoints consumed by the React admin SPA. These
+| are internal to the dashboard, unlike the token-authenticated public API
+| under /api/application.
+|
+*/
+Route::group(['prefix' => 'api'], function () {
+    Route::get('/system-status', [Base\SystemStatusController::class, 'index'])->name('admin.api.system-status');
+});
 
 /*
 |--------------------------------------------------------------------------

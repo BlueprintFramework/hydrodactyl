@@ -36,9 +36,6 @@
   @include('layouts.scripts')
 
   @section('scripts')
-  @if(file_exists(public_path('build/manifest.json')))
-  @vite('resources/scripts/admin/index.tsx')
-  @endif
   {!! Theme::css('vendor/select2/select2.min.css?t={cache-version}') !!}
   {!! Theme::css('vendor/bootstrap/bootstrap.min.css?t={cache-version}') !!}
   {!! Theme::css('vendor/adminlte/admin.min.css?t={cache-version}') !!}
