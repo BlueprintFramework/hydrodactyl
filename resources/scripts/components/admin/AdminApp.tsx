@@ -49,6 +49,13 @@ const NodeServersContainer = lazy(() => import('./nodes/NodeServersContainer'));
 const LocationsContainer = lazy(() => import('./locations/LocationsContainer'));
 const LocationViewContainer = lazy(() => import('./locations/LocationViewContainer'));
 
+const ServersContainer = lazy(() => import('./servers/ServersContainer'));
+const ServerLayout = lazy(() => import('./servers/ServerLayout'));
+const ServerOverviewContainer = lazy(() => import('./servers/ServerOverviewContainer'));
+const ServerDetailsContainer = lazy(() => import('./servers/ServerDetailsContainer'));
+const ServerManageContainer = lazy(() => import('./servers/ServerManageContainer'));
+const ServerDeleteContainer = lazy(() => import('./servers/ServerDeleteContainer'));
+
 const SettingsLayout = lazy(() => import('./settings/SettingsLayout'));
 const GeneralSettings = lazy(() => import('./settings/GeneralSettings'));
 const AdvancedSettings = lazy(() => import('./settings/AdvancedSettings'));
@@ -110,13 +117,12 @@ const AdminShell = () => {
             end: true,
         },
         {
-            to: '/admin/servers',
+            to: '/servers',
             icon: ServerStack02Icon,
             text: 'Servers',
             tabName: 'servers',
             ref: NavigationServers,
             end: false,
-            hardNav: true,
         },
         {
             to: '/users',
@@ -226,6 +232,13 @@ const AdminShell = () => {
                                     </Route>
                                     <Route path='/locations' element={<LocationsContainer />} />
                                     <Route path='/locations/:id' element={<LocationViewContainer />} />
+                                    <Route path='/servers' element={<ServersContainer />} />
+                                    <Route path='/servers/:id' element={<ServerLayout />}>
+                                        <Route index element={<ServerOverviewContainer />} />
+                                        <Route path='details' element={<ServerDetailsContainer />} />
+                                        <Route path='manage' element={<ServerManageContainer />} />
+                                        <Route path='delete' element={<ServerDeleteContainer />} />
+                                    </Route>
                                     <Route path='/settings' element={<SettingsLayout />}>
                                         <Route index element={<GeneralSettings />} />
                                         <Route path='advanced' element={<AdvancedSettings />} />

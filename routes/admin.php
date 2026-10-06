@@ -97,6 +97,19 @@ Route::group(['prefix' => 'api'], function () {
         Route::patch('/{location:id}', [Admin\Api\LocationController::class, 'update']);
         Route::delete('/{location:id}', [Admin\Api\LocationController::class, 'destroy']);
     });
+
+    Route::group(['prefix' => 'servers'], function () {
+        Route::get('/', [Admin\Api\ServerController::class, 'index'])->name('admin.api.servers');
+        Route::get('/{server:id}', [Admin\Api\ServerController::class, 'view']);
+        Route::patch('/{server:id}/details', [Admin\Api\ServerController::class, 'updateDetails']);
+        Route::get('/{server:id}/manage', [Admin\Api\ServerController::class, 'manage']);
+        Route::get('/{server:id}/transfer/allocations', [Admin\Api\ServerController::class, 'transferAllocations']);
+        Route::post('/{server:id}/manage/toggle', [Admin\Api\ServerController::class, 'toggleInstall']);
+        Route::post('/{server:id}/manage/suspension', [Admin\Api\ServerController::class, 'suspension']);
+        Route::post('/{server:id}/manage/reinstall', [Admin\Api\ServerController::class, 'reinstall']);
+        Route::post('/{server:id}/manage/transfer', [Admin\Api\ServerController::class, 'transfer']);
+        Route::delete('/{server:id}', [Admin\Api\ServerController::class, 'destroy']);
+    });
 });
 
 /*
@@ -134,6 +147,12 @@ Route::get('/nodes/{id}/servers', [Admin\AppController::class, 'index'])->where(
 
 Route::get('/locations', [Admin\AppController::class, 'index'])->name('admin.locations');
 Route::get('/locations/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.locations.view');
+
+Route::get('/servers', [Admin\AppController::class, 'index'])->name('admin.servers');
+Route::get('/servers/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view');
+Route::get('/servers/{id}/details', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.details');
+Route::get('/servers/{id}/manage', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.manage');
+Route::get('/servers/{id}/delete', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.delete');
 
 /*
 |--------------------------------------------------------------------------
@@ -204,38 +223,28 @@ Route::group(['prefix' => 'users'], function () {
 |
 */
 Route::group(['prefix' => 'servers'], function () {
-    Route::get('/', [Admin\Servers\ServerController::class, 'index'])->name('admin.servers');
+    // The creation wizard and the build/startup/database/mounts sub-pages have
+    // not been rebuilt in the React admin yet, so they stay on the legacy
+    // AdminLTE interface for now.
     Route::get('/new', [Admin\Servers\CreateServerController::class, 'index'])->name('admin.servers.new');
-    Route::get('/view/{server:id}', [Admin\Servers\ServerViewController::class, 'index'])->name('admin.servers.view');
 
     Route::group(['middleware' => [ServerInstalled::class]], function () {
-        Route::get('/view/{server:id}/details', [Admin\Servers\ServerViewController::class, 'details'])->name('admin.servers.view.details');
         Route::get('/view/{server:id}/build', [Admin\Servers\ServerViewController::class, 'build'])->name('admin.servers.view.build');
         Route::get('/view/{server:id}/startup', [Admin\Servers\ServerViewController::class, 'startup'])->name('admin.servers.view.startup');
         Route::get('/view/{server:id}/database', [Admin\Servers\ServerViewController::class, 'database'])->name('admin.servers.view.database');
         Route::get('/view/{server:id}/mounts', [Admin\Servers\ServerViewController::class, 'mounts'])->name('admin.servers.view.mounts');
+
+        Route::post('/view/{server:id}/build', [Admin\ServersController::class, 'updateBuild']);
+        Route::post('/view/{server:id}/startup', [Admin\ServersController::class, 'saveStartup']);
+        Route::post('/view/{server:id}/database', [Admin\ServersController::class, 'newDatabase']);
+        Route::patch('/view/{server:id}/database', [Admin\ServersController::class, 'resetDatabasePassword']);
+
+        Route::delete('/view/{server:id}/database/{database:id}/delete', [Admin\ServersController::class, 'deleteDatabase'])->name('admin.servers.view.database.delete');
     });
 
-    Route::get('/view/{server:id}/manage', [Admin\Servers\ServerViewController::class, 'manage'])->name('admin.servers.view.manage');
-    Route::get('/view/{server:id}/delete', [Admin\Servers\ServerViewController::class, 'delete'])->name('admin.servers.view.delete');
-
     Route::post('/new', [Admin\Servers\CreateServerController::class, 'store']);
-    Route::post('/view/{server:id}/build', [Admin\ServersController::class, 'updateBuild']);
-    Route::post('/view/{server:id}/startup', [Admin\ServersController::class, 'saveStartup']);
-    Route::post('/view/{server:id}/database', [Admin\ServersController::class, 'newDatabase']);
     Route::post('/view/{server:id}/mounts', [Admin\ServersController::class, 'addMount'])->name('admin.servers.view.mounts.store');
-    Route::post('/view/{server:id}/manage/toggle', [Admin\ServersController::class, 'toggleInstall'])->name('admin.servers.view.manage.toggle');
-    Route::post('/view/{server:id}/manage/suspension', [Admin\ServersController::class, 'manageSuspension'])->name('admin.servers.view.manage.suspension');
-    Route::post('/view/{server:id}/manage/reinstall', [Admin\ServersController::class, 'reinstallServer'])->name('admin.servers.view.manage.reinstall');
-    Route::post('/view/{server:id}/manage/transfer', [Admin\Servers\ServerTransferController::class, 'transfer'])->name('admin.servers.view.manage.transfer');
-    Route::post('/view/{server:id}/delete', [Admin\ServersController::class, 'delete']);
-
-    Route::patch('/view/{server:id}/details', [Admin\ServersController::class, 'setDetails']);
-    Route::patch('/view/{server:id}/database', [Admin\ServersController::class, 'resetDatabasePassword']);
-
-    Route::delete('/view/{server:id}/database/{database:id}/delete', [Admin\ServersController::class, 'deleteDatabase'])->name('admin.servers.view.database.delete');
-    Route::delete('/view/{server:id}/mounts/{mount:id}', [Admin\ServersController::class, 'deleteMount'])
-        ->name('admin.servers.view.mounts.delete');
+    Route::delete('/view/{server:id}/mounts/{mount:id}', [Admin\ServersController::class, 'deleteMount'])->name('admin.servers.view.mounts.delete');
 });
 
 /*
