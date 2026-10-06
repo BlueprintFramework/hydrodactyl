@@ -166,3 +166,53 @@ export const getServerBuild = (id: number | string): Promise<ServerBuildResponse
 
 export const updateServerBuild = (id: number | string, values: ServerBuildValues): Promise<AdminServer> =>
     http.patch(`/admin/api/servers/${id}/build`, values).then(({ data }) => data.data);
+
+export interface EggVariableDef {
+    env_variable: string;
+    name: string;
+    description: string;
+    default_value: string;
+    required: boolean;
+    rules: string;
+}
+
+export interface EggSummary {
+    id: number;
+    name: string;
+    startup: string | null;
+    docker_images: Record<string, string>;
+    variables: EggVariableDef[];
+}
+
+export interface NestSummary {
+    id: number;
+    name: string;
+    eggs: EggSummary[];
+}
+
+export interface ServerStartupData {
+    server: {
+        startup: string;
+        image: string;
+        skip_scripts: boolean;
+        nest_id: number;
+        egg_id: number;
+    };
+    nests: NestSummary[];
+    variables: Record<string, string | null>;
+}
+
+export interface ServerStartupValues {
+    startup: string;
+    nest_id: number;
+    egg_id: number;
+    skip_scripts: boolean;
+    docker_image: string;
+    environment: Record<string, string>;
+}
+
+export const getServerStartup = (id: number | string): Promise<ServerStartupData> =>
+    http.get(`/admin/api/servers/${id}/startup`).then(({ data }) => data);
+
+export const updateServerStartup = (id: number | string, values: ServerStartupValues): Promise<AdminServer> =>
+    http.patch(`/admin/api/servers/${id}/startup`, values).then(({ data }) => data.data);

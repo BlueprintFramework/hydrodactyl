@@ -5,7 +5,11 @@ namespace Pterodactyl\Http\Controllers\Admin\Api;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Node;
+use Pterodactyl\Models\Egg;
+use Pterodactyl\Models\Nest;
+use Pterodactyl\Models\User;
 use Pterodactyl\Models\Server;
+use Pterodactyl\Models\EggVariable;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Models\Allocation;
 use Pterodactyl\Models\ServerTransfer;
@@ -17,12 +21,15 @@ use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Services\Nodes\NodeJWTService;
 use Illuminate\Validation\ValidationException;
+use Pterodactyl\Repositories\Eloquent\NestRepository;
 use Pterodactyl\Repositories\Eloquent\NodeRepository;
 use Pterodactyl\Services\Servers\SuspensionService;
+use Pterodactyl\Services\Servers\EnvironmentService;
 use Pterodactyl\Models\Filters\AdminServerFilter;
 use Pterodactyl\Services\Servers\ServerDeletionService;
 use Pterodactyl\Services\Servers\ReinstallServerService;
 use Pterodactyl\Services\Servers\BuildModificationService;
+use Pterodactyl\Services\Servers\StartupModificationService;
 use Pterodactyl\Exceptions\Model\DataValidationException;
 use Pterodactyl\Services\Servers\DetailsModificationService;
 use Pterodactyl\Repositories\Wings\DaemonTransferRepository;
@@ -40,11 +47,14 @@ class ServerController extends Controller
         private ConnectionInterface $connection,
         private DaemonTransferRepository $daemonTransferRepository,
         private DetailsModificationService $detailsModificationService,
+        private EnvironmentService $environmentService,
+        private NestRepository $nestRepository,
         private NodeJWTService $nodeJWTService,
         private NodeRepository $nodeRepository,
         private ReinstallServerService $reinstallService,
         private ServerDeletionService $deletionService,
         private ServerRepositoryInterface $repository,
+        private StartupModificationService $startupModificationService,
         private SuspensionService $suspensionService,
     ) {
     }
@@ -156,6 +166,74 @@ class ServerController extends Controller
                 'database_limit', 'allocation_limit', 'backup_limit', 'backup_storage_limit', 'oom_disabled',
                 'exclude_from_resource_calculation',
             ]));
+        } catch (DataValidationException $exception) {
+            throw new ValidationException($exception->getValidator());
+        }
+
+        return response()->json(['data' => $this->transform($server->fresh())]);
+    }
+
+    /**
+     * Return the startup configuration for a server.
+     */
+    public function startup(Server $server): JsonResponse
+    {
+        $server->loadMissing('variables', 'location');
+        $nests = $this->nestRepository->getWithEggs();
+
+        return response()->json([
+            'server' => [
+                'startup' => $server->startup,
+                'image' => $server->image,
+                'skip_scripts' => (bool) $server->skip_scripts,
+                'nest_id' => (int) $server->nest_id,
+                'egg_id' => (int) $server->egg_id,
+            ],
+            'nests' => $nests
+                ->map(fn (Nest $nest) => [
+                    'id' => $nest->id,
+                    'name' => $nest->name,
+                    'eggs' => $nest->eggs
+                        ->map(fn (Egg $egg) => [
+                            'id' => $egg->id,
+                            'name' => $egg->name,
+                            'startup' => $egg->startup,
+                            'docker_images' => $egg->docker_images ?? [],
+                            'variables' => $egg->variables
+                                ->map(fn (EggVariable $variable) => [
+                                    'env_variable' => $variable->env_variable,
+                                    'name' => $variable->name,
+                                    'description' => $variable->description,
+                                    'default_value' => $variable->default_value,
+                                    'required' => $variable->required,
+                                    'rules' => $variable->rules,
+                                ])
+                                ->values(),
+                        ])
+                        ->values(),
+                ])
+                ->values(),
+            'variables' => $this->environmentService->handle($server),
+        ]);
+    }
+
+    /**
+     * Update the startup configuration for a server.
+     */
+    public function updateStartup(Request $request, Server $server): JsonResponse
+    {
+        $data = $request->all();
+
+        if (!empty($data['custom_docker_image'])) {
+            $data['docker_image'] = $data['custom_docker_image'];
+        }
+
+        unset($data['custom_docker_image']);
+
+        try {
+            $this->startupModificationService
+                ->setUserLevel(User::USER_LEVEL_ADMIN)
+                ->handle($server, $data);
         } catch (DataValidationException $exception) {
             throw new ValidationException($exception->getValidator());
         }

@@ -54,6 +54,7 @@ const ServerLayout = lazy(() => import('./servers/ServerLayout'));
 const ServerOverviewContainer = lazy(() => import('./servers/ServerOverviewContainer'));
 const ServerDetailsContainer = lazy(() => import('./servers/ServerDetailsContainer'));
 const ServerBuildContainer = lazy(() => import('./servers/ServerBuildContainer'));
+const ServerStartupContainer = lazy(() => import('./servers/ServerStartupContainer'));
 const ServerManageContainer = lazy(() => import('./servers/ServerManageContainer'));
 const ServerDeleteContainer = lazy(() => import('./servers/ServerDeleteContainer'));
 
@@ -238,6 +239,7 @@ const AdminShell = () => {
                                         <Route index element={<ServerOverviewContainer />} />
                                         <Route path='details' element={<ServerDetailsContainer />} />
                                         <Route path='build' element={<ServerBuildContainer />} />
+                                        <Route path='startup' element={<ServerStartupContainer />} />
                                         <Route path='manage' element={<ServerManageContainer />} />
                                         <Route path='delete' element={<ServerDeleteContainer />} />
                                     </Route>

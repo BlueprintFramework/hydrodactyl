@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { getServer, getServerBuild, getServerManage, getServers } from '@/api/admin/servers';
+import { getServer, getServerBuild, getServerManage, getServerStartup, getServers } from '@/api/admin/servers';
 
 export const useServers = (query: { page?: number; search?: string }) =>
     useSWR(['admin:servers', query], () => getServers(query), {
@@ -19,6 +19,12 @@ export const useServerManage = (id?: number | string) =>
 
 export const useServerBuild = (id?: number | string) =>
     useSWR(id ? ['admin:server-build', id] : null, () => getServerBuild(id as number | string), {
+        revalidateOnFocus: false,
+        revalidateIfStale: false,
+    });
+
+export const useServerStartup = (id?: number | string) =>
+    useSWR(id ? ['admin:server-startup', id] : null, () => getServerStartup(id as number | string), {
         revalidateOnFocus: false,
         revalidateIfStale: false,
     });

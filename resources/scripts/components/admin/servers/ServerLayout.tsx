@@ -36,7 +36,7 @@ const ServerLayout = () => {
             ? [
                   { label: 'Details', to: `${base}/details`, end: false },
                   { label: 'Build Configuration', to: `${base}/build`, end: false },
-                  { label: 'Startup', href: `/admin/servers/view/${server.id}/startup` },
+                  { label: 'Startup', to: `${base}/startup`, end: false },
                   { label: 'Database', href: `/admin/servers/view/${server.id}/database` },
                   { label: 'Mounts', href: `/admin/servers/view/${server.id}/mounts` },
               ]
