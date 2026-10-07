@@ -33,13 +33,16 @@ export interface UserDropdownMenuItem {
         href: string;
         external?: boolean;
     };
+    active?: boolean;
+    disabled?: boolean;
 }
 
 interface UserDropdownProps {
     serverId?: string;
+    admin?: boolean;
 }
 
-export default function UserDropdown({ serverId }: UserDropdownProps) {
+export default function UserDropdown({ serverId, admin = false }: UserDropdownProps) {
     const rootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
     const email = useStoreState((state) => state.user.data?.email);
     const navigate = useNavigate();
@@ -90,6 +93,8 @@ export default function UserDropdown({ serverId }: UserDropdownProps) {
             },
             showWhen: rootAdmin,
             type: 'item',
+            active: admin,
+            disabled: admin,
         },
         {
             id: 'logout',
@@ -174,13 +179,19 @@ export default function UserDropdown({ serverId }: UserDropdownProps) {
                         return (
                             <DropdownMenuItem
                                 key={item.id}
+                                disabled={item.disabled}
+                                aria-current={item.active ? 'page' : undefined}
                                 onSelect={handleSelect}
-                                className={`flex items-center gap-2 ${item.link?.external ? 'cursor-pointer' : ''}`}
+                                className={`flex items-center gap-2 ${item.link?.external ? 'cursor-pointer' : ''} ${
+                                    item.active
+                                        ? 'bg-hydro-500/15 font-medium text-hydro-400 data-[disabled]:opacity-100!'
+                                        : ''
+                                }`}
                             >
                                 {IconComponent && <IconComponent className='size-4' />}
                                 {item.label}
                                 {item.badge && (
-                                    <span className='ml-auto z-10 rounded-full bg-brand px-2 py-1 text-xs text-white'>
+                                    <span className='ml-auto z-10 rounded-full bg-hydro-500 px-2 py-1 text-xs text-mocha-500'>
                                         {item.badge}
                                     </span>
                                 )}

@@ -23,9 +23,7 @@ use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
 Route::get('/', [Client\ClientController::class, 'index'])->name('api:client.index');
 Route::get('/filter-options', [Client\ClientController::class, 'filterOptions'])->name('api:client.filter-options');
 Route::get('/permissions', [Client\ClientController::class, 'permissions']);
-Route::get('/version', function () {
-    return response()->json(['version' => config('app.version')]);
-});
+Route::get('/version', [Client\ClientController::class, 'version']);
 
 Route::prefix('/server-groups')->group(function () {
     Route::get('/', [Client\ServerGroupController::class, 'index'])->name('api:client.server-groups.index');

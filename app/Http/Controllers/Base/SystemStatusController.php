@@ -14,7 +14,7 @@ class SystemStatusController extends Controller
   public function index(): JsonResponse
   {
     try {
-      $metrics = Cache::remember('system_metrics', 60, function () {
+      $metrics = Cache::remember('system_metrics', 300, function () {
         return [
           'status' => 'running',
           'timestamp' => now()->toIso8601String(),
@@ -76,19 +76,27 @@ class SystemStatusController extends Controller
     }
 
     // Linux memory calculation
-    $memory = shell_exec('free -b');
-    if (!$memory) {
-      throw new \RuntimeException('Failed to execute free command');
+    $memory = @file_get_contents('/proc/meminfo');
+    if ($memory === false) {
+      throw new \RuntimeException('Failed to read memory information');
     }
 
-    if (!preg_match('/Mem:\s+(\d+)\s+(\d+)\s+(\d+)/', $memory, $matches)) {
-      throw new \RuntimeException('Failed to parse memory information');
+    $stats = [];
+    foreach (explode("\n", $memory) as $line) {
+      if (preg_match('/^(\w+):\s+(\d+)\s*kB/', $line, $matches)) {
+        $stats[$matches[1]] = (int) $matches[2] * 1024;
+      }
     }
+
+    $total = $stats['MemTotal'] ?? 0;
+    $free = $stats['MemFree'] ?? 0;
+    $available = $stats['MemAvailable']
+      ?? ($free + ($stats['Buffers'] ?? 0) + ($stats['Cached'] ?? 0));
 
     return [
-      'total' => (int) $matches[1],
-      'used' => (int) $matches[2],
-      'free' => (int) $matches[3]
+      'total' => $total,
+      'used' => max(0, $total - $available),
+      'free' => $free
     ];
   }
 
@@ -104,17 +112,59 @@ class SystemStatusController extends Controller
   private function getCpuUsage(): float
   {
     if (PHP_OS_FAMILY === 'Darwin') {
-      $cmd = "top -l 1 | grep -E '^CPU' | awk '{print $3}' | cut -d'%' -f1";
-    } else {
-      $cmd = "top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'";
+      $usage = shell_exec("top -l 1 | grep -E '^CPU' | awk '{print $3}' | cut -d'%' -f1");
+      if ($usage === null) {
+        throw new \RuntimeException('Failed to get CPU usage');
+      }
+
+      return (float) $usage;
     }
 
-    $usage = shell_exec($cmd);
-    if ($usage === null) {
-      throw new \RuntimeException('Failed to get CPU usage');
+    // Sample /proc/stat twice rather than spawning `top`.
+    $first = $this->readCpuStat();
+    usleep(100000);
+    $second = $this->readCpuStat();
+
+    if ($first === null || $second === null) {
+      throw new \RuntimeException('Failed to read CPU usage');
     }
 
-    return (float) $usage;
+    $totalDelta = $second['total'] - $first['total'];
+    if ($totalDelta <= 0) {
+      return 0.0;
+    }
+
+    $idleDelta = $second['idle'] - $first['idle'];
+
+    return round((1 - ($idleDelta / $totalDelta)) * 100, 2);
+  }
+
+  private function readCpuStat(): ?array
+  {
+    $stat = @file_get_contents('/proc/stat');
+    if ($stat === false) {
+      return null;
+    }
+
+    foreach (explode("\n", $stat) as $line) {
+      if (!str_starts_with($line, 'cpu ')) {
+        continue;
+      }
+
+      $parts = preg_split('/\s+/', trim(substr($line, 3)));
+      if ($parts === false || count($parts) < 4) {
+        return null;
+      }
+
+      $parts = array_map('intval', $parts);
+
+      return [
+        'total' => array_sum($parts),
+        'idle' => $parts[3] + ($parts[4] ?? 0),
+      ];
+    }
+
+    return null;
   }
 
   private function getCpuCores(): int

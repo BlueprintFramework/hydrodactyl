@@ -80,6 +80,7 @@ class ServerDetailsController extends Controller
                 'activity' => fn ($builder) => $builder
                     ->where('activity_logs.event', 'server:backup.restore-started')
                     ->latest('timestamp'),
+                'activity.subjects',
             ])
             ->where('node_id', $node->id)
             ->where('status', Server::STATUS_RESTORING_BACKUP)

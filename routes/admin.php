@@ -2,60 +2,273 @@
 
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Controllers\Admin;
-use Pterodactyl\Http\Middleware\Admin\Servers\ServerInstalled;
-
-Route::get('/', [Admin\BaseController::class, 'index'])->name('admin.index');
+use Pterodactyl\Http\Controllers\Base;
 
 /*
 |--------------------------------------------------------------------------
-| Location Controller Routes
+| Admin Routes
 |--------------------------------------------------------------------------
 |
-| Endpoint: /admin/api
+| The admin panel is being migrated from the legacy AdminLTE blade pages to a
+| React SPA. The shell lives at "/admin" and is served by Admin\AppController.
+|
+| Only rebuilt pages are served by the shell. Every section still running on
+| the legacy layout keeps its own server-rendered route below, and the React
+| sidebar links to those with a full page load so nothing breaks mid-migration.
+|
+| TODO: once every section has been rebuilt and its legacy route removed,
+| replace the individual route groups with a single catch-all that serves the
+| shell, e.g.:
+|
+|     Route::get('/{path?}', [Admin\AppController::class, 'index'])->where('path', '.*');
+|
+*/
+
+Route::get('/', [Admin\AppController::class, 'index'])->name('admin.index');
+
+/*
+|--------------------------------------------------------------------------
+| Internal Admin API
+|--------------------------------------------------------------------------
+|
+| Session-authenticated JSON endpoints consumed by the React admin SPA. These
+| are internal to the dashboard, unlike the token-authenticated public API
+| under /api/application.
 |
 */
 Route::group(['prefix' => 'api'], function () {
-    Route::get('/', [Admin\ApiController::class, 'index'])->name('admin.api.index');
-    Route::get('/new', [Admin\ApiController::class, 'create'])->name('admin.api.new');
+    Route::get('/system-status', [Base\SystemStatusController::class, 'index'])->name('admin.api.system-status');
 
-    Route::post('/new', [Admin\ApiController::class, 'store']);
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('/', [Admin\Api\UserController::class, 'index'])->name('admin.api.users');
+        Route::get('/languages', [Admin\Api\UserController::class, 'languages'])->name('admin.api.users.languages');
+        Route::get('/{user:id}', [Admin\Api\UserController::class, 'view'])->name('admin.api.users.view');
+        Route::post('/', [Admin\Api\UserController::class, 'store'])->name('admin.api.users.store');
+        Route::patch('/{user:id}', [Admin\Api\UserController::class, 'update'])->name('admin.api.users.update');
+        Route::delete('/{user:id}', [Admin\Api\UserController::class, 'destroy'])->name('admin.api.users.destroy');
+    });
 
-    Route::delete('/revoke/{identifier}', [Admin\ApiController::class, 'delete'])->name('admin.api.delete');
+    Route::get('/settings', [Admin\Api\SettingsController::class, 'index'])->name('admin.api.settings');
+    Route::patch('/settings/general', [Admin\Api\SettingsController::class, 'updateGeneral']);
+    Route::patch('/settings/advanced', [Admin\Api\SettingsController::class, 'updateAdvanced']);
+    Route::patch('/settings/mail', [Admin\Api\SettingsController::class, 'updateMail']);
+    Route::patch('/settings/captcha', [Admin\Api\SettingsController::class, 'updateCaptcha']);
+    Route::patch('/settings/custom-navigation', [Admin\Api\SettingsController::class, 'updateCustomNavigation']);
+
+    Route::group(['prefix' => 'settings/domains'], function () {
+        Route::get('/', [Admin\Api\DomainsController::class, 'index'])->name('admin.api.settings.domains');
+        Route::get('/providers/{provider}/schema', [Admin\Api\DomainsController::class, 'schema']);
+        Route::post('/', [Admin\Api\DomainsController::class, 'store']);
+        Route::post('/test-connection', [Admin\Api\DomainsController::class, 'testConnection']);
+        Route::patch('/{domain}', [Admin\Api\DomainsController::class, 'update']);
+        Route::delete('/{domain}', [Admin\Api\DomainsController::class, 'destroy']);
+    });
+
+    Route::get('/settings/logo', [Admin\Api\LogoController::class, 'index'])->name('admin.api.settings.logo');
+    Route::post('/settings/logo', [Admin\Api\LogoController::class, 'update']);
+
+    Route::group(['prefix' => 'nodes'], function () {
+        Route::get('/', [Admin\Api\NodesController::class, 'index'])->name('admin.api.nodes');
+        Route::get('/options', [Admin\Api\NodesController::class, 'options']);
+        Route::get('/{node:id}', [Admin\Api\NodesController::class, 'view']);
+        Route::get('/{node:id}/status', [Admin\Api\NodesController::class, 'status']);
+        Route::post('/', [Admin\Api\NodesController::class, 'store']);
+        Route::patch('/{node:id}', [Admin\Api\NodesController::class, 'update']);
+        Route::delete('/{node:id}', [Admin\Api\NodesController::class, 'destroy']);
+
+        Route::get('/{node:id}/configuration', [Admin\Api\NodeConfigurationController::class, 'index']);
+        Route::post('/{node:id}/configuration/token', Admin\NodeAutoDeployController::class);
+
+        Route::get('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'index']);
+        Route::post('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'store']);
+        Route::delete('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'destroyMultiple']);
+        Route::post('/{node:id}/allocations/remove-block', [Admin\Api\NodeAllocationController::class, 'destroyBlock']);
+        Route::post('/{node:id}/allocations/alias', [Admin\Api\NodeAllocationController::class, 'updateAlias']);
+        Route::patch('/{node:id}/allocations/{allocation:id}', [Admin\Api\NodeAllocationController::class, 'setAlias']);
+        Route::delete('/{node:id}/allocations/{allocation:id}', [Admin\Api\NodeAllocationController::class, 'destroy']);
+
+        Route::get('/{node:id}/servers', [Admin\Api\NodeServersController::class, 'index']);
+    });
+
+    Route::group(['prefix' => 'locations'], function () {
+        Route::get('/', [Admin\Api\LocationController::class, 'index'])->name('admin.api.locations');
+        Route::get('/{location:id}', [Admin\Api\LocationController::class, 'view']);
+        Route::post('/', [Admin\Api\LocationController::class, 'store']);
+        Route::patch('/{location:id}', [Admin\Api\LocationController::class, 'update']);
+        Route::delete('/{location:id}', [Admin\Api\LocationController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'database-hosts'], function () {
+        Route::get('/', [Admin\Api\DatabaseHostController::class, 'index'])->name('admin.api.database-hosts');
+        Route::get('/options', [Admin\Api\DatabaseHostController::class, 'options']);
+        Route::post('/test', [Admin\Api\DatabaseHostController::class, 'testConnection']);
+        Route::get('/{host:id}', [Admin\Api\DatabaseHostController::class, 'view']);
+        Route::post('/', [Admin\Api\DatabaseHostController::class, 'store']);
+        Route::patch('/{host:id}', [Admin\Api\DatabaseHostController::class, 'update']);
+        Route::delete('/{host:id}', [Admin\Api\DatabaseHostController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'servers'], function () {
+        Route::get('/', [Admin\Api\ServerController::class, 'index'])->name('admin.api.servers');
+        Route::post('/', [Admin\Api\ServerController::class, 'store']);
+        Route::get('/create', [Admin\Api\ServerController::class, 'create']);
+        Route::get('/create/allocations', [Admin\Api\ServerController::class, 'createAllocations']);
+        Route::get('/{server:id}', [Admin\Api\ServerController::class, 'view']);
+        Route::patch('/{server:id}/details', [Admin\Api\ServerController::class, 'updateDetails']);
+        Route::get('/{server:id}/build', [Admin\Api\ServerController::class, 'build']);
+        Route::patch('/{server:id}/build', [Admin\Api\ServerController::class, 'updateBuild']);
+        Route::get('/{server:id}/startup', [Admin\Api\ServerController::class, 'startup']);
+        Route::patch('/{server:id}/startup', [Admin\Api\ServerController::class, 'updateStartup']);
+        Route::get('/{server:id}/database', [Admin\Api\ServerController::class, 'database']);
+        Route::post('/{server:id}/database', [Admin\Api\ServerController::class, 'storeDatabase']);
+        Route::patch('/{server:id}/database/{database:id}', [Admin\Api\ServerController::class, 'resetDatabasePassword']);
+        Route::delete('/{server:id}/database/{database:id}', [Admin\Api\ServerController::class, 'destroyDatabase']);
+        Route::get('/{server:id}/mounts', [Admin\Api\ServerController::class, 'mounts']);
+        Route::post('/{server:id}/mounts', [Admin\Api\ServerController::class, 'addMount']);
+        Route::delete('/{server:id}/mounts/{mount:id}', [Admin\Api\ServerController::class, 'deleteMount']);
+        Route::get('/{server:id}/manage', [Admin\Api\ServerController::class, 'manage']);
+        Route::get('/{server:id}/transfer/allocations', [Admin\Api\ServerController::class, 'transferAllocations']);
+        Route::post('/{server:id}/manage/toggle', [Admin\Api\ServerController::class, 'toggleInstall']);
+        Route::post('/{server:id}/manage/suspension', [Admin\Api\ServerController::class, 'suspension']);
+        Route::post('/{server:id}/manage/reinstall', [Admin\Api\ServerController::class, 'reinstall']);
+        Route::post('/{server:id}/manage/transfer', [Admin\Api\ServerController::class, 'transfer']);
+        Route::delete('/{server:id}', [Admin\Api\ServerController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'mounts'], function () {
+        Route::get('/', [Admin\Api\MountController::class, 'index'])->name('admin.api.mounts');
+        Route::get('/{mount:id}', [Admin\Api\MountController::class, 'view']);
+        Route::post('/', [Admin\Api\MountController::class, 'store']);
+        Route::patch('/{mount:id}', [Admin\Api\MountController::class, 'update']);
+        Route::delete('/{mount:id}', [Admin\Api\MountController::class, 'destroy']);
+        Route::post('/{mount:id}/eggs', [Admin\Api\MountController::class, 'addEggs']);
+        Route::post('/{mount:id}/nodes', [Admin\Api\MountController::class, 'addNodes']);
+        Route::delete('/{mount:id}/eggs/{egg}', [Admin\Api\MountController::class, 'deleteEgg']);
+        Route::delete('/{mount:id}/nodes/{node}', [Admin\Api\MountController::class, 'deleteNode']);
+    });
+
+    Route::group(['prefix' => 'application-keys'], function () {
+        Route::get('/', [Admin\Api\ApplicationApiController::class, 'index'])->name('admin.api.application-keys');
+        Route::post('/', [Admin\Api\ApplicationApiController::class, 'store']);
+        Route::delete('/{identifier}', [Admin\Api\ApplicationApiController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'nests'], function () {
+        Route::get('/', [Admin\Api\NestController::class, 'index']);
+        Route::post('/', [Admin\Api\NestController::class, 'store']);
+        Route::post('/import', [Admin\Api\EggShareController::class, 'import']);
+        Route::post('/import-url', [Admin\Api\EggShareController::class, 'importFromUrl']);
+        Route::get('/{nest:id}', [Admin\Api\NestController::class, 'view']);
+        Route::patch('/{nest:id}', [Admin\Api\NestController::class, 'update']);
+        Route::delete('/{nest:id}', [Admin\Api\NestController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'eggs'], function () {
+        Route::post('/', [Admin\Api\EggController::class, 'store']);
+        Route::get('/{egg:id}', [Admin\Api\EggController::class, 'view']);
+        Route::patch('/{egg:id}', [Admin\Api\EggController::class, 'update']);
+        Route::delete('/{egg:id}', [Admin\Api\EggController::class, 'destroy']);
+        Route::post('/{egg:id}/import', [Admin\Api\EggController::class, 'importUpdate']);
+        Route::get('/{egg:id}/variables', [Admin\Api\EggController::class, 'variables']);
+        Route::post('/{egg:id}/variables', [Admin\Api\EggController::class, 'storeVariable']);
+        Route::patch('/{egg:id}/variables/{variable:id}', [Admin\Api\EggController::class, 'updateVariable']);
+        Route::delete('/{egg:id}/variables/{variable:id}', [Admin\Api\EggController::class, 'destroyVariable']);
+        Route::get('/{egg:id}/scripts', [Admin\Api\EggController::class, 'scripts']);
+        Route::patch('/{egg:id}/scripts', [Admin\Api\EggController::class, 'updateScripts']);
+    });
+
+    Route::group(['prefix' => 'buckets'], function () {
+        Route::get('/', [Admin\Api\BucketController::class, 'index']);
+        Route::post('/', [Admin\Api\BucketController::class, 'store']);
+        Route::post('/test-connection', [Admin\Api\BucketController::class, 'testConnection']);
+        Route::get('/{s3:id}', [Admin\Api\BucketController::class, 'view']);
+        Route::patch('/{s3:id}', [Admin\Api\BucketController::class, 'update']);
+        Route::delete('/{s3:id}', [Admin\Api\BucketController::class, 'destroy']);
+        Route::get('/{s3:id}/servers', [Admin\Api\BucketController::class, 'servers']);
+    });
 });
 
 /*
 |--------------------------------------------------------------------------
-| Location Controller Routes
+| Rebuilt Sections
 |--------------------------------------------------------------------------
 |
-| Endpoint: /admin/locations
+| Sections that have been rebuilt in the React admin are served by the shell,
+| which handles the rest of the routing client-side. Their legacy routes are
+| removed, though any route still referenced elsewhere (like the user
+| autocomplete JSON) is kept.
 |
 */
-Route::group(['prefix' => 'locations'], function () {
-    Route::get('/', [Admin\LocationController::class, 'index'])->name('admin.locations');
-    Route::get('/view/{location:id}', [Admin\LocationController::class, 'view'])->name('admin.locations.view');
+Route::get('/users', [Admin\AppController::class, 'index'])->name('admin.users');
+Route::get('/users/new', [Admin\AppController::class, 'index'])->name('admin.users.new');
+Route::get('/users/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.users.view');
 
-    Route::post('/', [Admin\LocationController::class, 'create']);
-    Route::patch('/view/{location:id}', [Admin\LocationController::class, 'update']);
-});
+Route::get('/settings', [Admin\AppController::class, 'index'])->name('admin.settings');
+Route::get('/settings/advanced', [Admin\AppController::class, 'index'])->name('admin.settings.advanced');
+Route::get('/settings/mail', [Admin\AppController::class, 'index'])->name('admin.settings.mail');
+Route::get('/settings/captcha', [Admin\AppController::class, 'index'])->name('admin.settings.captcha');
+Route::get('/settings/custom-navigation', [Admin\AppController::class, 'index'])->name('admin.settings.custom-navigation');
+Route::get('/settings/domains', [Admin\AppController::class, 'index'])->name('admin.settings.domains.index');
+Route::get('/settings/domains/new', [Admin\AppController::class, 'index'])->name('admin.settings.domains.create');
+Route::get('/settings/domains/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.settings.domains.edit');
+Route::get('/settings/logo', [Admin\AppController::class, 'index'])->name('admin.settings.logo');
+
+Route::get('/nodes', [Admin\AppController::class, 'index'])->name('admin.nodes');
+Route::get('/nodes/new', [Admin\AppController::class, 'index'])->name('admin.nodes.new');
+Route::get('/nodes/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view');
+Route::get('/nodes/{id}/settings', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.settings');
+Route::get('/nodes/{id}/configuration', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.configuration');
+Route::get('/nodes/{id}/allocation', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.allocation');
+Route::get('/nodes/{id}/servers', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nodes.view.servers');
+
+Route::get('/locations', [Admin\AppController::class, 'index'])->name('admin.locations');
+Route::get('/locations/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.locations.view');
+
+Route::get('/databases', [Admin\AppController::class, 'index'])->name('admin.databases');
+Route::get('/databases/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.databases.view');
+
+Route::get('/servers', [Admin\AppController::class, 'index'])->name('admin.servers');
+Route::get('/servers/new', [Admin\AppController::class, 'index'])->name('admin.servers.new');
+Route::get('/servers/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view');
+Route::get('/servers/{id}/details', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.details');
+Route::get('/servers/{id}/build', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.build');
+Route::get('/servers/{id}/startup', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.startup');
+Route::get('/servers/{id}/database', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.database');
+Route::get('/servers/{id}/mounts', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.mounts');
+
+Route::get('/mounts', [Admin\AppController::class, 'index'])->name('admin.mounts');
+Route::get('/mounts/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.mounts.view');
+Route::get('/servers/{id}/manage', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.manage');
+Route::get('/servers/{id}/delete', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.delete');
+
+Route::get('/api', [Admin\AppController::class, 'index'])->name('admin.api.index');
+Route::get('/api/new', [Admin\AppController::class, 'index'])->name('admin.api.new');
+
+Route::get('/nests', [Admin\AppController::class, 'index'])->name('admin.nests');
+Route::get('/nests/new', [Admin\AppController::class, 'index'])->name('admin.nests.new');
+Route::get('/nests/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nests.view');
+
+Route::get('/eggs/new', [Admin\AppController::class, 'index'])->name('admin.nests.egg.new');
+Route::get('/eggs/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nests.egg.view');
+Route::get('/eggs/{id}/variables', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nests.egg.variables');
+Route::get('/eggs/{id}/scripts', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nests.egg.scripts');
+
+Route::get('/buckets', [Admin\AppController::class, 'index'])->name('admin.buckets');
+Route::get('/buckets/new', [Admin\AppController::class, 'index'])->name('admin.buckets.new');
+Route::get('/buckets/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.buckets.view');
+Route::get('/buckets/{id}/details', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.buckets.view.details');
+Route::get('/buckets/{id}/servers', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.buckets.view.servers');
+Route::get('/buckets/{id}/delete', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.buckets.view.delete');
 
 /*
 |--------------------------------------------------------------------------
-| Database Controller Routes
+| Application API
 |--------------------------------------------------------------------------
 |
-| Endpoint: /admin/databases
+| The credentials page is served by the React shell; its JSON endpoints live
+| under the internal admin API (/admin/api/application-keys).
 |
 */
-Route::group(['prefix' => 'databases'], function () {
-    Route::get('/', [Admin\DatabaseController::class, 'index'])->name('admin.databases');
-    Route::get('/view/{host:id}', [Admin\DatabaseController::class, 'view'])->name('admin.databases.view');
-
-    Route::post('/', [Admin\DatabaseController::class, 'create']);
-    Route::post('/test', [Admin\DatabaseController::class, 'testConnection'])->name('admin.databases.test');
-    Route::patch('/view/{host:id}', [Admin\DatabaseController::class, 'update']);
-    Route::delete('/view/{host:id}', [Admin\DatabaseController::class, 'delete']);
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -66,34 +279,7 @@ Route::group(['prefix' => 'databases'], function () {
 |
 */
 Route::group(['prefix' => 'settings'], function () {
-    Route::get('/', [Admin\Settings\IndexController::class, 'index'])->name('admin.settings');
-    Route::get('/mail', [Admin\Settings\MailController::class, 'index'])->name('admin.settings.mail');
-    Route::get('/advanced', [Admin\Settings\AdvancedController::class, 'index'])->name('admin.settings.advanced');
-    Route::get('/captcha', [Admin\Settings\CaptchaController::class, 'index'])->name('admin.settings.captcha');
-    Route::get('/custom-navigation', [Admin\Settings\CustomNavigationController::class, 'index'])->name('admin.settings.custom-navigation');
-    Route::get('/logo', [Admin\Settings\LogoController::class, 'index'])->name('admin.settings.logo');
-
-    Route::group(['prefix' => 'domains'], function () {
-        Route::get('/', [Admin\Settings\DomainsController::class, 'index'])->name('admin.settings.domains.index');
-        Route::get('/create', [Admin\Settings\DomainsController::class, 'create'])->name('admin.settings.domains.create');
-        Route::get('/{domain}/edit', [Admin\Settings\DomainsController::class, 'edit'])->name('admin.settings.domains.edit');
-
-        Route::post('/', [Admin\Settings\DomainsController::class, 'store'])->name('admin.settings.domains.store');
-        Route::patch('/{domain}', [Admin\Settings\DomainsController::class, 'update'])->name('admin.settings.domains.update');
-        Route::delete('/{domain}', [Admin\Settings\DomainsController::class, 'destroy'])->name('admin.settings.domains.destroy');
-
-        Route::post('/test-connection', [Admin\Settings\DomainsController::class, 'testConnection'])->name('admin.settings.domains.test-connection');
-        Route::get('/provider-schema/{provider}', [Admin\Settings\DomainsController::class, 'getProviderSchema'])->name('admin.settings.domains.provider-schema');
-    });
-
     Route::post('/mail/test', [Admin\Settings\MailController::class, 'test'])->name('admin.settings.mail.test');
-
-    Route::patch('/', [Admin\Settings\IndexController::class, 'update']);
-    Route::patch('/mail', [Admin\Settings\MailController::class, 'update']);
-    Route::patch('/advanced', [Admin\Settings\AdvancedController::class, 'update']);
-    Route::patch('/captcha', [Admin\Settings\CaptchaController::class, 'update']);
-    Route::patch('/custom-navigation', [Admin\Settings\CustomNavigationController::class, 'update']);
-    Route::patch('/logo', [Admin\Settings\LogoController::class, 'update']);
 });
 
 /*
@@ -105,15 +291,8 @@ Route::group(['prefix' => 'settings'], function () {
 |
 */
 Route::group(['prefix' => 'users'], function () {
-    Route::get('/', [Admin\UserController::class, 'index'])->name('admin.users');
+    // Still used by the legacy server owner autocomplete on the server pages.
     Route::get('/accounts.json', [Admin\UserController::class, 'json'])->name('admin.users.json');
-    Route::get('/new', [Admin\UserController::class, 'create'])->name('admin.users.new');
-    Route::get('/view/{user:id}', [Admin\UserController::class, 'view'])->name('admin.users.view');
-
-    Route::post('/new', [Admin\UserController::class, 'store']);
-
-    Route::patch('/view/{user:id}', [Admin\UserController::class, 'update']);
-    Route::delete('/view/{user:id}', [Admin\UserController::class, 'delete']);
 });
 
 /*
@@ -124,72 +303,6 @@ Route::group(['prefix' => 'users'], function () {
 | Endpoint: /admin/servers
 |
 */
-Route::group(['prefix' => 'servers'], function () {
-    Route::get('/', [Admin\Servers\ServerController::class, 'index'])->name('admin.servers');
-    Route::get('/new', [Admin\Servers\CreateServerController::class, 'index'])->name('admin.servers.new');
-    Route::get('/view/{server:id}', [Admin\Servers\ServerViewController::class, 'index'])->name('admin.servers.view');
-
-    Route::group(['middleware' => [ServerInstalled::class]], function () {
-        Route::get('/view/{server:id}/details', [Admin\Servers\ServerViewController::class, 'details'])->name('admin.servers.view.details');
-        Route::get('/view/{server:id}/build', [Admin\Servers\ServerViewController::class, 'build'])->name('admin.servers.view.build');
-        Route::get('/view/{server:id}/startup', [Admin\Servers\ServerViewController::class, 'startup'])->name('admin.servers.view.startup');
-        Route::get('/view/{server:id}/database', [Admin\Servers\ServerViewController::class, 'database'])->name('admin.servers.view.database');
-        Route::get('/view/{server:id}/mounts', [Admin\Servers\ServerViewController::class, 'mounts'])->name('admin.servers.view.mounts');
-    });
-
-    Route::get('/view/{server:id}/manage', [Admin\Servers\ServerViewController::class, 'manage'])->name('admin.servers.view.manage');
-    Route::get('/view/{server:id}/delete', [Admin\Servers\ServerViewController::class, 'delete'])->name('admin.servers.view.delete');
-
-    Route::post('/new', [Admin\Servers\CreateServerController::class, 'store']);
-    Route::post('/view/{server:id}/build', [Admin\ServersController::class, 'updateBuild']);
-    Route::post('/view/{server:id}/startup', [Admin\ServersController::class, 'saveStartup']);
-    Route::post('/view/{server:id}/database', [Admin\ServersController::class, 'newDatabase']);
-    Route::post('/view/{server:id}/mounts', [Admin\ServersController::class, 'addMount'])->name('admin.servers.view.mounts.store');
-    Route::post('/view/{server:id}/manage/toggle', [Admin\ServersController::class, 'toggleInstall'])->name('admin.servers.view.manage.toggle');
-    Route::post('/view/{server:id}/manage/suspension', [Admin\ServersController::class, 'manageSuspension'])->name('admin.servers.view.manage.suspension');
-    Route::post('/view/{server:id}/manage/reinstall', [Admin\ServersController::class, 'reinstallServer'])->name('admin.servers.view.manage.reinstall');
-    Route::post('/view/{server:id}/manage/transfer', [Admin\Servers\ServerTransferController::class, 'transfer'])->name('admin.servers.view.manage.transfer');
-    Route::post('/view/{server:id}/delete', [Admin\ServersController::class, 'delete']);
-
-    Route::patch('/view/{server:id}/details', [Admin\ServersController::class, 'setDetails']);
-    Route::patch('/view/{server:id}/database', [Admin\ServersController::class, 'resetDatabasePassword']);
-
-    Route::delete('/view/{server:id}/database/{database:id}/delete', [Admin\ServersController::class, 'deleteDatabase'])->name('admin.servers.view.database.delete');
-    Route::delete('/view/{server:id}/mounts/{mount:id}', [Admin\ServersController::class, 'deleteMount'])
-        ->name('admin.servers.view.mounts.delete');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Node Controller Routes
-|--------------------------------------------------------------------------
-|
-| Endpoint: /admin/nodes
-|
-*/
-Route::group(['prefix' => 'nodes'], function () {
-    Route::get('/', [Admin\Nodes\NodeController::class, 'index'])->name('admin.nodes');
-    Route::get('/new', [Admin\NodesController::class, 'create'])->name('admin.nodes.new');
-    Route::get('/view/{node:id}', [Admin\Nodes\NodeViewController::class, 'index'])->name('admin.nodes.view');
-    Route::get('/view/{node:id}/settings', [Admin\Nodes\NodeViewController::class, 'settings'])->name('admin.nodes.view.settings');
-    Route::get('/view/{node:id}/configuration', [Admin\Nodes\NodeViewController::class, 'configuration'])->name('admin.nodes.view.configuration');
-    Route::get('/view/{node:id}/allocation', [Admin\Nodes\NodeViewController::class, 'allocations'])->name('admin.nodes.view.allocation');
-    Route::get('/view/{node:id}/servers', [Admin\Nodes\NodeViewController::class, 'servers'])->name('admin.nodes.view.servers');
-    Route::get('/view/{node:id}/system-information', Admin\Nodes\SystemInformationController::class);
-
-    Route::post('/new', [Admin\NodesController::class, 'store']);
-    Route::post('/view/{node:id}/allocation', [Admin\NodesController::class, 'createAllocation']);
-    Route::post('/view/{node:id}/allocation/remove', [Admin\NodesController::class, 'allocationRemoveBlock'])->name('admin.nodes.view.allocation.removeBlock');
-    Route::post('/view/{node:id}/allocation/alias', [Admin\NodesController::class, 'allocationSetAlias'])->name('admin.nodes.view.allocation.setAlias');
-    Route::post('/view/{node:id}/settings/token', Admin\NodeAutoDeployController::class)->name('admin.nodes.view.configuration.token');
-
-    Route::patch('/view/{node:id}/settings', [Admin\NodesController::class, 'updateSettings']);
-
-    Route::delete('/view/{node:id}/delete', [Admin\NodesController::class, 'delete'])->name('admin.nodes.view.delete');
-    Route::delete('/view/{node:id}/allocation/remove/{allocation:id}', [Admin\NodesController::class, 'allocationRemoveSingle'])->name('admin.nodes.view.allocation.removeSingle');
-    Route::delete('/view/{node:id}/allocations', [Admin\NodesController::class, 'allocationRemoveMultiple'])->name('admin.nodes.view.allocation.removeMultiple');
-});
-
 /*
 |--------------------------------------------------------------------------
 | Mount Controller Routes
@@ -198,77 +311,22 @@ Route::group(['prefix' => 'nodes'], function () {
 | Endpoint: /admin/mounts
 |
 */
-Route::group(['prefix' => 'mounts'], function () {
-    Route::get('/', [Admin\MountController::class, 'index'])->name('admin.mounts');
-    Route::get('/view/{mount:id}', [Admin\MountController::class, 'view'])->name('admin.mounts.view');
-
-    Route::post('/', [Admin\MountController::class, 'create']);
-    Route::post('/{mount:id}/eggs', [Admin\MountController::class, 'addEggs'])->name('admin.mounts.eggs');
-    Route::post('/{mount:id}/nodes', [Admin\MountController::class, 'addNodes'])->name('admin.mounts.nodes');
-
-    Route::patch('/view/{mount:id}', [Admin\MountController::class, 'update']);
-
-    Route::delete('/{mount:id}/eggs/{egg_id}', [Admin\MountController::class, 'deleteEgg']);
-    Route::delete('/{mount:id}/nodes/{node_id}', [Admin\MountController::class, 'deleteNode']);
-});
+/*
+|--------------------------------------------------------------------------
+| Egg Export
+|--------------------------------------------------------------------------
+|
+| A file download kept outside the shell so admins can export an egg.
+|
+*/
+Route::get('/eggs/{egg:id}/export', [Admin\Nests\EggShareController::class, 'export'])->name('admin.nests.egg.export');
 
 /*
 |--------------------------------------------------------------------------
-| Nest Controller Routes
+| S3 Buckets
 |--------------------------------------------------------------------------
 |
-| Endpoint: /admin/nests
+| The bucket pages are served by the React shell; their JSON endpoints live
+| under the internal admin API (/admin/api/buckets).
 |
 */
-Route::group(['prefix' => 'nests'], function () {
-    Route::get('/', [Admin\Nests\NestController::class, 'index'])->name('admin.nests');
-    Route::get('/new', [Admin\Nests\NestController::class, 'create'])->name('admin.nests.new');
-    Route::get('/view/{nest:id}', [Admin\Nests\NestController::class, 'view'])->name('admin.nests.view');
-    Route::get('/egg/new', [Admin\Nests\EggController::class, 'create'])->name('admin.nests.egg.new');
-    Route::get('/egg/{egg:id}', [Admin\Nests\EggController::class, 'view'])->name('admin.nests.egg.view');
-    Route::get('/egg/{egg:id}/export', [Admin\Nests\EggShareController::class, 'export'])->name('admin.nests.egg.export');
-    Route::get('/egg/{egg:id}/variables', [Admin\Nests\EggVariableController::class, 'view'])->name('admin.nests.egg.variables');
-    Route::get('/egg/{egg:id}/scripts', [Admin\Nests\EggScriptController::class, 'index'])->name('admin.nests.egg.scripts');
-
-    Route::post('/new', [Admin\Nests\NestController::class, 'store']);
-    Route::post('/import', [Admin\Nests\EggShareController::class, 'import'])->name('admin.nests.egg.import');
-    Route::post('/importFromUrl', [Admin\Nests\EggShareController::class, 'importFromUrl'])->name('admin.nests.egg.import_url');
-    Route::post('/egg/new', [Admin\Nests\EggController::class, 'store']);
-    Route::post('/egg/{egg:id}/variables', [Admin\Nests\EggVariableController::class, 'store']);
-
-    Route::put('/egg/{egg:id}', [Admin\Nests\EggShareController::class, 'update']);
-
-    Route::patch('/view/{nest:id}', [Admin\Nests\NestController::class, 'update']);
-    Route::patch('/egg/{egg:id}', [Admin\Nests\EggController::class, 'update']);
-    Route::patch('/egg/{egg:id}/scripts', [Admin\Nests\EggScriptController::class, 'update']);
-    Route::patch('/egg/{egg:id}/variables/{variable:id}', [Admin\Nests\EggVariableController::class, 'update'])->name('admin.nests.egg.variables.edit');
-
-    Route::delete('/view/{nest:id}', [Admin\Nests\NestController::class, 'destroy']);
-    Route::delete('/egg/{egg:id}', [Admin\Nests\EggController::class, 'destroy']);
-    Route::delete('/egg/{egg:id}/variables/{variable:id}', [Admin\Nests\EggVariableController::class, 'destroy']);
-});
-
-/*
-|--------------------------------------------------------------------------
-| S3 Bucket Controller Routes
-|--------------------------------------------------------------------------
-|
-| Endpoint: /admin/buckets
-|
-*/
-Route::group(['prefix' => 'buckets'], function () {
-    Route::get('/', [Admin\S3Controller::class, 'index'])->name('admin.buckets');
-    Route::get('/new', [Admin\S3Controller::class, 'create'])->name('admin.buckets.new');
-
-    Route::post('/', [Admin\S3Controller::class, 'store']);
-
-    Route::post('/test-connection', [Admin\S3Controller::class, 'testConnection'])->name('admin.buckets.test-connection');
-
-    Route::get('/view/{s3}', [Admin\Buckets\BucketViewController::class, 'index'])->name('admin.buckets.view');
-    Route::get('/view/{s3}/details', [Admin\Buckets\BucketViewController::class, 'details'])->name('admin.buckets.view.details');
-    Route::get('/view/{s3}/servers', [Admin\Buckets\BucketViewController::class, 'servers'])->name('admin.buckets.view.servers');
-    Route::get('/view/{s3}/delete', [Admin\Buckets\BucketViewController::class, 'delete'])->name('admin.buckets.view.delete');
-
-    Route::post('/view/{s3}/details', [Admin\Buckets\BucketViewController::class, 'update']);
-    Route::delete('/view/{s3}/delete', [Admin\S3Controller::class, 'delete']);
-});

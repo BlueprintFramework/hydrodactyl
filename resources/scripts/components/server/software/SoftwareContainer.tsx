@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { toast } from 'sonner';
 import { httpErrorToHuman } from '@/api/http';
-import getNests from '@/api/nests/getNests';
 import applyEggChange from '@/api/server/applyEggChange';
 import applyEggChangeSync from '@/api/server/applyEggChangeSync';
 import { getGlobalDaemonType } from '@/api/server/getServer';
@@ -17,6 +16,7 @@ import ServerHeader from '@/components/server/header/ServerHeader';
 import OperationProgressModal from '@/components/server/operations/OperationProgressModal';
 import WingsOperationProgressModal from '@/components/server/operations/WingsOperationProgressModal';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
+import { useNests } from '@/plugins/useNests';
 import { ServerContext } from '@/state/server';
 import GameSelection from './GameSelection';
 import ReviewChanges from './ReviewChanges';
@@ -31,7 +31,7 @@ const SoftwareContainer = () => {
     const serverData = ServerContext.useStoreState((state) => state.server.data);
     const daemonType = getGlobalDaemonType();
     const uuid = serverData?.uuid;
-    const [nests, setNests] = useState<Nest[]>();
+    const { data: nests } = useNests();
     const currentEgg = serverData?.egg;
     const currentEggName = useMemo(() => {
         if (!nests || !currentEgg) return undefined;
@@ -67,14 +67,6 @@ const SoftwareContainer = () => {
 
     const [customStartup, setCustomStartup] = useState('');
     const [selectedDockerImage, setSelectedDockerImage] = useState('');
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await getNests();
-            setNests(data);
-        };
-        fetchData();
-    }, []);
 
     const variables = ServerContext.useStoreState(
         ({ server }) => ({

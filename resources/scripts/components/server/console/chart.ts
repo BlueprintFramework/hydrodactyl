@@ -1,7 +1,7 @@
 import type { ChartData, ChartDataset, ChartOptions } from 'chart.js';
 import { Chart as ChartJS, Filler, LinearScale, LineController, LineElement, PointElement } from 'chart.js';
 
-import { deepmerge, deepmergeCustom } from 'deepmerge-ts';
+import { deepmerge } from 'deepmerge-ts';
 import { useState } from 'react';
 import type { DeepPartial } from 'ts-essentials';
 
@@ -59,8 +59,11 @@ const options: ChartOptions<'line'> = {
 };
 
 function getOptions(opts?: DeepPartial<ChartOptions<'line'>> | undefined): ChartOptions<'line'> {
-    // @ts-expect-error - deepmerge type compatibility issue with ChartOptions
-    return deepmerge(options, opts || {});
+    if (!opts) {
+        return options;
+    }
+
+    return deepmerge(options, opts);
 }
 
 type ChartDatasetCallback = (value: ChartDataset<'line'>, index: number) => ChartDataset<'line'>;
@@ -89,8 +92,6 @@ function getEmptyData(label: string, sets = 1, callback?: ChartDatasetCallback |
     };
 }
 
-const merge = deepmergeCustom({ mergeArrays: false });
-
 interface UseChartOptions {
     sets: number;
     options?: DeepPartial<ChartOptions<'line'>> | number | undefined;
@@ -104,27 +105,25 @@ function useChart(label: string, opts?: UseChartOptions) {
     const [data, setData] = useState(getEmptyData(label, opts?.sets || 1, opts?.callback));
 
     const push = (items: number | null | (number | null)[]) =>
-        setData((state) =>
-            merge(state, {
-                datasets: (Array.isArray(items) ? items : [items]).map((item, index) => ({
-                    ...state.datasets[index],
-                    data:
-                        state.datasets[index]?.data
-                            ?.slice(1)
-                            ?.concat(typeof item === 'number' ? Number(item.toFixed(2)) : item) ?? [],
-                })),
-            }),
-        );
+        setData((state) => ({
+            ...state,
+            datasets: (Array.isArray(items) ? items : [items]).map((item, index) => ({
+                ...state.datasets[index],
+                data:
+                    state.datasets[index]?.data
+                        ?.slice(1)
+                        ?.concat(typeof item === 'number' ? Number(item.toFixed(2)) : item) ?? [],
+            })),
+        }));
 
     const clear = () =>
-        setData((state) =>
-            merge(state, {
-                datasets: state.datasets.map((value) => ({
-                    ...value,
-                    data: Array(20).fill(-5),
-                })),
-            }),
-        );
+        setData((state) => ({
+            ...state,
+            datasets: state.datasets.map((value) => ({
+                ...value,
+                data: Array(20).fill(-5),
+            })),
+        }));
 
     return { props: { data, options }, push, clear };
 }

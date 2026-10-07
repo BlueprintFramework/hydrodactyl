@@ -12,6 +12,7 @@ export interface BottomNavItem {
     minimizedText?: string;
     end?: boolean;
     permission?: string | string[];
+    hardNav?: boolean;
 }
 
 interface BottomNavProps {
@@ -38,7 +39,8 @@ const BottomNav = memo(({ items }: BottomNavProps) => {
             <ul className='flex h-14 items-stretch gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
                 {items.map((item) => {
                     const external = /^https?:\/\//i.test(item.to);
-                    const active = !external && isActive(item.to, item.end);
+                    const hardNav = item.hardNav;
+                    const active = !external && !hardNav && isActive(item.to, item.end);
                     const label = item.minimizedText ?? item.text;
                     const className =
                         'group flex w-full flex-col items-center justify-center gap-1 py-2 touch-manipulation';
@@ -66,6 +68,10 @@ const BottomNav = memo(({ items }: BottomNavProps) => {
                         <li key={item.to} className='flex min-w-[72px] flex-1 items-stretch'>
                             {external ? (
                                 <a href={item.to} className={className} target='_blank' rel='noreferrer'>
+                                    {content}
+                                </a>
+                            ) : hardNav ? (
+                                <a href={item.to} className={className}>
                                     {content}
                                 </a>
                             ) : (

@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, memo, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import type { Server } from '@/api/server/getServer';
@@ -92,7 +92,11 @@ const ServerRow = ({ server, className, hideGroup }: { server: Server; className
         if (isSuspended) return;
 
         getStats();
-        const interval = setInterval(getStats, 30000);
+        const interval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                getStats();
+            }
+        }, 30000);
 
         return () => clearInterval(interval);
     }, [isSuspended, getStats]);
@@ -193,4 +197,4 @@ const ServerRow = ({ server, className, hideGroup }: { server: Server; className
     );
 };
 
-export default ServerRow;
+export default memo(ServerRow);

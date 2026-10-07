@@ -4,7 +4,7 @@ import { Ellipsis } from '@gravity-ui/icons';
 import { useStoreState } from 'easy-peasy';
 import type { RefObject } from 'react';
 import { createRef, Fragment, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom';
+import { Navigate, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import http, { httpErrorToHuman } from '@/api/http';
 import { getSubdomainInfo } from '@/api/server/network/subdomain';
 import CommandMenu from '@/components/elements/commandk/CmdK';
@@ -51,6 +51,7 @@ const ServerRouter = () => {
     const databaseLimit = ServerContext.useStoreState((state) => state.server.data?.featureLimits.databases);
     const backupLimit = ServerContext.useStoreState((state) => state.server.data?.featureLimits.backups);
     const allocationLimit = ServerContext.useStoreState((state) => state.server.data?.featureLimits.allocations);
+    const softwareEnabled = ServerContext.useStoreState((state) => state.server.data?.softwareEnabled);
 
     // Mobile menu state
     const [isMobileMenuVisible, setMobileMenuVisible] = useState(false);
@@ -367,19 +368,25 @@ const ServerRouter = () => {
                                 ) : (
                                     <ErrorBoundary>
                                         <Routes location={location}>
-                                            {routes.server.map(({ route, permission, component: Component }) => (
-                                                <Route
-                                                    key={route}
-                                                    path={route}
-                                                    element={
-                                                        <PermissionRoute permission={permission ?? undefined}>
-                                                            <Suspense fallback={null}>
-                                                                <Component />
-                                                            </Suspense>
-                                                        </PermissionRoute>
-                                                    }
-                                                />
-                                            ))}
+                                            {routes.server.map(
+                                                ({ route, permission, component: Component, requiresSoftware }) => (
+                                                    <Route
+                                                        key={route}
+                                                        path={route}
+                                                        element={
+                                                            requiresSoftware && softwareEnabled === false ? (
+                                                                <Navigate to={`/server/${id}`} replace />
+                                                            ) : (
+                                                                <PermissionRoute permission={permission ?? undefined}>
+                                                                    <Suspense fallback={null}>
+                                                                        <Component />
+                                                                    </Suspense>
+                                                                </PermissionRoute>
+                                                            )
+                                                        }
+                                                    />
+                                                ),
+                                            )}
 
                                             <Route path='*' element={<NotFound />} />
                                         </Routes>

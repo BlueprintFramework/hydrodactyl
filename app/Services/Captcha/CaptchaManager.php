@@ -26,7 +26,7 @@ class CaptchaManager extends Manager
      */
     public function getDefaultDriver(): string
     {
-        return $this->settings->get('settings::pterodactyl:captcha:provider', 'none');
+        return config('pterodactyl.captcha.provider', 'none');
     }
 
     /**

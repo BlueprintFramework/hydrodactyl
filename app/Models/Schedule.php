@@ -47,11 +47,6 @@ class Schedule extends Model
     protected $table = 'schedules';
 
     /**
-     * Always return the tasks associated with this schedule.
-     */
-    protected $with = ['tasks'];
-
-    /**
      * Mass assignable attributes on this model.
      */
     protected $fillable = [
