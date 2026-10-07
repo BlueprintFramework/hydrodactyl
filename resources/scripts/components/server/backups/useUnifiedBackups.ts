@@ -18,12 +18,29 @@ export const useUnifiedBackups = () => {
         for (const backup of backups.items) {
             const live = liveProgress[backup.uuid];
 
+            // A backup that is neither successful nor has a completion time is
+            // still running. Wings/Calagopus do not emit live progress events,
+            // so without this it would be misreported as "failed" until reload.
+            const isPending = !backup.isSuccessful && backup.completedAt === null;
+
             unifiedBackups.push({
                 uuid: backup.uuid,
                 name: live?.backupName || backup.name,
-                status: live ? (live.status as string) : backup.isSuccessful ? 'completed' : 'failed',
+                status: live
+                    ? (live.status as UnifiedBackup['status'])
+                    : backup.isSuccessful
+                      ? 'completed'
+                      : isPending
+                        ? 'pending'
+                        : 'failed',
                 progress: live ? live.progress : backup.isSuccessful ? 100 : 0,
-                message: live ? live.message : backup.isSuccessful ? 'Completed' : 'Failed',
+                message: live
+                    ? live.message
+                    : backup.isSuccessful
+                      ? 'Completed'
+                      : isPending
+                        ? 'In progress…'
+                        : 'Failed',
                 isSuccessful: backup.isSuccessful,
                 isLocked: backup.isLocked,
                 isAutomatic: backup.isAutomatic,
@@ -31,8 +48,8 @@ export const useUnifiedBackups = () => {
                 bytes: backup.bytes,
                 createdAt: backup.createdAt,
                 completedAt: backup.completedAt,
-                canRetry: live ? live.canRetry : backup.canRetry,
-                canDelete: !live,
+                canRetry: live ? live.canRetry : isPending ? false : backup.canRetry,
+                canDelete: !live && !isPending,
                 canDownload: backup.isSuccessful && !live,
                 canRestore: backup.isSuccessful && !live,
                 isLiveOnly: false,
@@ -49,7 +66,7 @@ export const useUnifiedBackups = () => {
             unifiedBackups.push({
                 uuid: backupUuid,
                 name: live.backupName || live.message || 'Processing...',
-                status: live.status as string,
+                status: live.status as UnifiedBackup['status'],
                 progress: live.progress,
                 message: live.message,
                 isSuccessful: false,

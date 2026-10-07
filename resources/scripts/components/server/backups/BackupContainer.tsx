@@ -107,7 +107,8 @@ const BackupContainer = () => {
 
         try {
             const http = (await import('@/api/http')).default;
-            await http.post(`/api/client/servers/${uuid}/backups/bulk-delete`, {
+            const { getGlobalDaemonType } = await import('@/api/server/getServer');
+            await http.post(`/api/client/servers/${getGlobalDaemonType()}/${uuid}/backups/bulk-delete`, {
                 backup_uuids: Array.from(selectedBackups),
                 password,
                 ...(hasTwoFactor && totpCode ? { totp_code: totpCode } : {}),

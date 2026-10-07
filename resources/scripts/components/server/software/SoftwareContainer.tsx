@@ -278,7 +278,7 @@ const SoftwareContainer = () => {
 
                 setCurrentOperationId(response.operation_id);
                 setShowOperationModal(true);
-            } else if (daemonType?.toLowerCase() === 'wings') {
+            } else if (daemonType?.toLowerCase() === 'wings' || daemonType?.toLowerCase() === 'calagopus') {
                 await applyEggChangeSync(uuid, {
                     egg_id: selectedEgg.attributes.id,
                     nest_id: selectedNest.attributes.id,
@@ -451,7 +451,7 @@ const SoftwareContainer = () => {
                     onError={handleOperationError}
                 />
             )}
-            {daemonType === 'wings' && (
+            {(daemonType === 'wings' || daemonType === 'calagopus') && (
                 <WingsOperationProgressModal
                     visible={showOperationModal}
                     operationId={currentOperationId}
@@ -461,7 +461,7 @@ const SoftwareContainer = () => {
                     onError={handleOperationError}
                 />
             )}
-            {daemonType !== 'elytra' && daemonType !== 'wings' && (
+            {daemonType !== 'elytra' && daemonType !== 'wings' && daemonType !== 'calagopus' && (
                 <div>Could not find Operation Modal for this daemon: Using ${daemonType}</div>
             )}
         </ServerContentBlock>

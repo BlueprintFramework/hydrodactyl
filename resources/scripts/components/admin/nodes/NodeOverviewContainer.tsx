@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useNode } from '@/api/admin/useNodes';
 import Spinner from '@/components/elements/Spinner';
 import { cn } from '@/lib/utils';
+import CalagopusNodePanel from './CalagopusNodePanel';
 
 const formatBytes = (bytes: number): string => {
     if (!bytes) return '0 B';
@@ -88,6 +89,8 @@ const NodeOverviewContainer = () => {
                 <Stat label='Servers' value={String(node.servers_count)} />
                 <Stat label='Maintenance Mode' value={node.maintenance_mode ? 'Enabled' : 'Disabled'} />
             </div>
+
+            {node.daemonType === 'calagopus' && <CalagopusNodePanel nodeId={node.id} />}
         </div>
     );
 };

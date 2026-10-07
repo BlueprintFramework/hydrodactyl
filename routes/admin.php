@@ -79,6 +79,15 @@ Route::group(['prefix' => 'api'], function () {
         Route::get('/{node:id}/configuration', [Admin\Api\NodeConfigurationController::class, 'index']);
         Route::post('/{node:id}/configuration/token', Admin\NodeAutoDeployController::class);
 
+        // Calagopus-only node endpoints (system info, stats, logs, self-upgrade).
+        Route::group(['prefix' => '{node:id}/calagopus'], function () {
+            Route::get('/system', [Admin\Api\NodeCalagopusController::class, 'system']);
+            Route::get('/stats', [Admin\Api\NodeCalagopusController::class, 'stats']);
+            Route::get('/logs', [Admin\Api\NodeCalagopusController::class, 'logs']);
+            Route::get('/logs/{file}', [Admin\Api\NodeCalagopusController::class, 'log']);
+            Route::post('/upgrade', [Admin\Api\NodeCalagopusController::class, 'upgrade']);
+        });
+
         Route::get('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'index']);
         Route::post('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'store']);
         Route::delete('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'destroyMultiple']);

@@ -152,3 +152,19 @@ Route::group([
 ], function () {
     require __DIR__ . '/servers/elytra.php';
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Client Control API (Calagopus)
+|--------------------------------------------------------------------------
+|
+| Endpoint: /api/client/servers/calagopus/{server}
+|
+*/
+
+Route::group([
+    'prefix' => 'servers/calagopus',
+], function () {
+    require __DIR__ . '/servers/calagopus.php';
+});

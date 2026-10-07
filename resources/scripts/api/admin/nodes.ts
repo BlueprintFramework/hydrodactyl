@@ -179,3 +179,44 @@ export const getNodeServers = (id: number | string, page = 1): Promise<Paginated
         items: data.data,
         pagination: getPaginationSet(data.meta.pagination),
     }));
+
+export interface CalagopusSystem {
+    architecture: string;
+    cpu_count: number;
+    kernel_version: string;
+    os: string;
+    version: string;
+}
+
+export interface CalagopusLogFile {
+    name: string;
+    compression_type: string;
+    size: number;
+    last_modified: string;
+}
+
+/**
+ * Calagopus-only node endpoints. These are not available on stock Wings.
+ */
+export const getCalagopusSystem = (id: number | string): Promise<CalagopusSystem> =>
+    http.get(`/admin/api/nodes/${id}/calagopus/system`).then(({ data }) => data);
+
+export const getCalagopusStats = (id: number | string): Promise<Record<string, unknown>> =>
+    http.get(`/admin/api/nodes/${id}/calagopus/stats`).then(({ data }) => data);
+
+export const getCalagopusLogs = (id: number | string): Promise<{ log_files: CalagopusLogFile[] }> =>
+    http.get(`/admin/api/nodes/${id}/calagopus/logs`).then(({ data }) => data);
+
+export const getCalagopusLog = (id: number | string, file: string, lines = 500): Promise<string> =>
+    http
+        .get(`/admin/api/nodes/${id}/calagopus/logs/${encodeURIComponent(file)}`, {
+            params: { lines },
+            transformResponse: [(data) => data],
+        })
+        .then(({ data }) => data);
+
+export const upgradeCalagopus = (
+    id: number | string,
+    values: { url: string; sha256: string; headers?: Record<string, string> },
+): Promise<{ applied: boolean }> =>
+    http.post(`/admin/api/nodes/${id}/calagopus/upgrade`, values).then(({ data }) => data);

@@ -27,7 +27,7 @@ class ServerDetailsController extends Controller
     }
 
     /**
-     * Get server details for Wings
+     * Get server details for Wings.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
      */
@@ -42,7 +42,7 @@ class ServerDetailsController extends Controller
     }
 
     /**
-     * List all servers for a node
+     * List all servers for a node.
      */
     public function list(Request $request): ServerConfigurationCollection
     {
@@ -51,7 +51,7 @@ class ServerDetailsController extends Controller
 
         // Avoid run-away N+1 SQL queries by preloading the relationships that are used
         // within each of the services called below.
-        $servers = Server::query()->with('allocations', 'egg', 'mounts', 'variables', 'location')
+        $servers = Server::query()->with('allocations', 'egg', 'mounts', 'variables', 'location', 'node')
             ->where('node_id', $node->id)
             // If you don't cast this to a string you'll end up with a stringified per_page returned in
             // the metadata, and then Wings will panic crash as a result.
@@ -61,7 +61,7 @@ class ServerDetailsController extends Controller
     }
 
     /**
-     * Reset all server states on node
+     * Reset all server states on node.
      *
      * @throws \Throwable
      */
