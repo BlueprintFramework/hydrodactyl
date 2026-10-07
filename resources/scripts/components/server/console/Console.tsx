@@ -1,3 +1,5 @@
+import { Copy01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { FitAddon } from '@xterm/addon-fit';
 import { SearchAddon } from '@xterm/addon-search';
 import { WebLinksAddon } from '@xterm/addon-web-links';
@@ -6,10 +8,13 @@ import { useSidebar } from '@/contexts/SidebarContext';
 import '@xterm/xterm/css/xterm.css';
 import './console.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
 
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import { getTerminalBufferText } from '@/components/server/console/consoleBuffer';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
+import { Button } from '@/components/ui/button';
 import KeyboardShortcut from '@/components/ui/keyboard-shortcut';
 
 import { cn } from '@/lib/utils';
@@ -66,6 +71,8 @@ const Console = () => {
     const isTransferring = ServerContext.useStoreState((state) => state.server.data?.isTransferring);
     const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
     const [historyIndex, setHistoryIndex] = useState(-1);
+    const [copiedConsole, setCopiedConsole] = useState(false);
+    const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const { isMinimized: _isMinimized } = useSidebar();
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -205,6 +212,44 @@ const Console = () => {
         };
     }, [handleGlobalKeyDown, handleCopy]);
 
+    // Copy the entire console buffer (including scrollback) in one click, so
+    // users don't have to scroll up and select the output by hand.
+    const handleCopyConsole = useCallback(() => {
+        const content = getTerminalBufferText(terminal.buffer.active);
+
+        if (!content) {
+            toast.error('There is nothing in the console to copy yet.');
+            return;
+        }
+
+        if (!navigator.clipboard) {
+            toast.error('Clipboard is not available in this context.');
+            return;
+        }
+
+        navigator.clipboard
+            .writeText(content)
+            .then(() => {
+                setCopiedConsole(true);
+                toast.success('Copied console output to clipboard.');
+
+                if (copyResetTimerRef.current) {
+                    clearTimeout(copyResetTimerRef.current);
+                }
+                copyResetTimerRef.current = setTimeout(() => setCopiedConsole(false), 2000);
+            })
+            .catch(() => toast.error('Failed to copy console output to the clipboard.'));
+    }, [terminal]);
+
+    useEffect(
+        () => () => {
+            if (copyResetTimerRef.current) {
+                clearTimeout(copyResetTimerRef.current);
+            }
+        },
+        [],
+    );
+
     // Auto-focus input on component mount
     useEffect(() => {
         if (inputRef.current && canSendCommands) {
@@ -341,11 +386,29 @@ const Console = () => {
                         // stutters on phones), and overscroll-behavior:contain keeps it from
                         // chaining to the page. Desktop (mouse) is untouched. This is the
                         // "separate the xterm console from the console page" behaviour.
-                        'console-terminal-host bg-bg-raised border-mocha-400 p-4 flex min-h-65 lg:flex-1 lg:min-h-0 flex-col overflow-hidden rounded-t-2xl border text-sm',
+                        'console-terminal-host bg-bg-raised border-mocha-400 p-4 flex min-h-65 lg:flex-1 lg:min-h-0 flex-col overflow-hidden rounded-t-2xl border text-sm relative',
                         canSendCommands ? 'rounded-b-none border-b-0' : 'rounded-b-2xl',
                     )}
                 >
                     <div className='h-full' ref={ref} />
+                    <Button
+                        type='button'
+                        variant='secondary'
+                        size='sm'
+                        shape='round'
+                        className='absolute top-4 right-4 z-20 gap-1.5 bg-mocha-400/90 backdrop-blur'
+                        onClick={handleCopyConsole}
+                        aria-label={'Copy full console output'}
+                        title={'Copy full console output'}
+                    >
+                        <HugeiconsIcon
+                            size={16}
+                            strokeWidth={2}
+                            icon={copiedConsole ? Tick02Icon : Copy01Icon}
+                            className='size-4'
+                        />
+                        {copiedConsole ? 'Copied' : 'Copy'}
+                    </Button>
                 </div>
 
                 {canSendCommands && (
