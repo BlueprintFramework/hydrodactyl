@@ -91,7 +91,7 @@ const ServerRouter = () => {
     };
 
     const onSelectManageServer = () => {
-        window.open(`/admin/servers/view/${serverId}`);
+        window.open(`/admin/servers/${serverId}`);
     };
 
     useEffect(

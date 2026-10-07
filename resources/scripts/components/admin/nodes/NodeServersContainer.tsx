@@ -35,7 +35,7 @@ const NodeServersContainer = () => {
                                 <td className='px-4 py-3 font-mono text-cream-400/60'>{server.uuidShort}</td>
                                 <td className='px-4 py-3'>
                                     <a
-                                        href={`/admin/servers/view/${server.id}`}
+                                        href={`/admin/servers/${server.id}`}
                                         className='text-cream-50 hover:text-hydro-400'
                                     >
                                         {server.name}

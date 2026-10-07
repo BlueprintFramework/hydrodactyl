@@ -230,7 +230,7 @@ const NodeAllocationContainer = () => {
                                     <td className='px-3 py-2 align-middle'>
                                         {allocation.server && (
                                             <a
-                                                href={`/admin/servers/view/${allocation.server.id}`}
+                                                href={`/admin/servers/${allocation.server.id}`}
                                                 className='text-cream-50 hover:text-hydro-400'
                                             >
                                                 {allocation.server.name}

@@ -114,7 +114,7 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
             label: 'Manage Server',
             icon: () => <HugeiconsIcon size={16} strokeWidth={2} icon={ServerStack02Icon} />,
             link: {
-                href: `/admin/servers/view/${serverId}`,
+                href: `/admin/servers/${serverId}`,
                 external: true,
             },
             badge: 'Staff',
