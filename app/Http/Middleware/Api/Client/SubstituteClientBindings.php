@@ -15,7 +15,10 @@ class SubstituteClientBindings extends SubstituteBindings
         // Override default behavior of the model binding to use a specific table
         // column rather than the default 'id'.
         $this->router->bind('server', function ($value) {
-            return Server::query()->where(strlen($value) === 8 ? 'uuidShort' : 'uuid', $value)->firstOrFail();
+            return Server::query()
+                ->with(['node', 'transfer'])
+                ->where(strlen($value) === 8 ? 'uuidShort' : 'uuid', $value)
+                ->firstOrFail();
         });
 
         $this->router->bind('user', function ($value, $route) {
@@ -23,6 +26,7 @@ class SubstituteClientBindings extends SubstituteBindings
             $match = $route->parameter('server')
                 ->subusers()
                 ->whereRelation('user', 'uuid', '=', $value)
+                ->with('user')
                 ->firstOrFail();
 
             return $match->user;

@@ -8,9 +8,8 @@ type Props = Readonly<{
 }>;
 
 const FlashMessageRender = ({ byKey }: Props) => {
-    const flashes = useStoreState((state) =>
-        state.flashes.items.filter((flash) => (byKey ? flash.key === byKey : true)),
-    );
+    const items = useStoreState((state) => state.flashes.items);
+    const flashes = byKey ? items.filter((flash) => flash.key === byKey) : items;
 
     const getFlashStyles = (type: string) => {
         switch (type) {

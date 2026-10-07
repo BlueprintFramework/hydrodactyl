@@ -34,7 +34,7 @@ class DatabaseController extends ClientApiController
      */
     public function index(GetDatabasesRequest $request, Server $server): array
     {
-        return $this->fractal->collection($server->databases)
+        return $this->fractal->collection($server->databases()->with('host')->get())
             ->transformWith($this->getTransformer(DatabaseTransformer::class))
             ->toArray();
     }

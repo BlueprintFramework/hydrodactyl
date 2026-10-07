@@ -17,6 +17,7 @@ use Pterodactyl\Repositories\Wings\DaemonCommandRepository;
 use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
 use Pterodactyl\Exceptions\Service\Backup\BackupFailedException;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Pterodactyl\Services\Backups\Calagopus\InitiateBackupService as CalagopusInitiateBackupService;
 
 class RunTaskJob extends Job implements ShouldQueue
 {
@@ -38,6 +39,7 @@ class RunTaskJob extends Job implements ShouldQueue
         DaemonCommandRepository $commandRepository,
         ElytraJobService $elytraJobService,
         InitiateBackupService $backupService,
+        CalagopusInitiateBackupService $calagopusBackupService,
         DaemonPowerRepository $powerRepository,
     ) {
         // Do not process a task that is not set to active, unless it's been manually triggered.
@@ -101,6 +103,10 @@ class RunTaskJob extends Job implements ShouldQueue
 
                         if (strtolower($server->node->daemonType) === 'wings') {
                             $backupService
+                                ->setIgnoredFiles($ignoredFiles)
+                                ->handle($server, null, true);
+                        } elseif (strtolower($server->node->daemonType) === 'calagopus') {
+                            $calagopusBackupService
                                 ->setIgnoredFiles($ignoredFiles)
                                 ->handle($server, null, true);
                         } else {

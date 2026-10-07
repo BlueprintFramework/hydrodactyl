@@ -20,6 +20,7 @@ interface NavItemData {
     ref: RefObject<HTMLAnchorElement | null>;
     end: boolean;
     permission?: string | string[];
+    hardNav?: boolean;
 }
 
 interface MobileSidebarProps {
@@ -96,6 +97,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                                     lastItem={index === navItems.length - 1}
                                     permission={item.permission}
                                     onNavClick={() => setMobileOpen(false)}
+                                    hardNav={item.hardNav}
                                 />
                             </li>
                         ))}
@@ -113,6 +115,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                                         lastItem={index === bottomNavItems.length - 1}
                                         permission={item.permission}
                                         onNavClick={() => setMobileOpen(false)}
+                                        hardNav={item.hardNav}
                                     />
                                 </li>
                             ))}

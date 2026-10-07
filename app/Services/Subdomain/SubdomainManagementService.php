@@ -46,7 +46,6 @@ class SubdomainManagementService
 
         // Validate subdomain
         $this->validateSubdomain($subdomain, $feature, $domain);
-        $dnsRecord = $this->createDnsRecord($subdomain, $domain);
 
         // Get DNS provider
         try {

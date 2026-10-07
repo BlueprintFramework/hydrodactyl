@@ -88,6 +88,11 @@ export interface ServerRouteDefinition extends RouteDefinition {
      */
     eggFeature?: RegExp;
     /**
+     * When true, the route is only available when the server has the built-in
+     * Software page enabled. Hides the nav item and blocks the route otherwise.
+     */
+    requiresSoftware?: boolean;
+    /**
      * Route path patterns that should highlight this nav item.
      * Used for matching nested routes to parent nav items.
      */
@@ -259,6 +264,7 @@ const routes: Routes = {
             component: SoftwareContainer,
             icon: Box,
             end: true,
+            requiresSoftware: true,
         },
         {
             route: 'installer/*',

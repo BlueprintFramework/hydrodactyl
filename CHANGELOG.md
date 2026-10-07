@@ -11,6 +11,10 @@ This project follows [Semantic Versioning](http://semver.org) guidelines.
 
 ## [Unreleased]
 
+### Added
+- Added support for the Calagopus Wings daemon type: node configuration and auto-deploy, the full client API, and its backup drivers (`ddup-bak`, `btrfs`, `zfs`, `restic`, `proxmox-backup-server`, `kopia`).
+- Added Calagopus node system information, live stats, a log viewer, and remote upgrade to the admin node page.
+
 ### Changed
 - Updated Paper egg to download the server jar without corruption.
 - Added Java 18 back to supported egg versions.
@@ -19,6 +23,8 @@ This project follows [Semantic Versioning](http://semver.org) guidelines.
 
 ### Fixed
 - Discord link in the admin dashboard.
+- Backups created through the client panel now show as pending rather than failed while they are still running, and the backup list refreshes automatically once one completes.
+- Widened the `backups.disk` column so non-rustic backup adapters are no longer silently stored as an empty string.
 
 ## v6.3.0 - 7/25/26
 

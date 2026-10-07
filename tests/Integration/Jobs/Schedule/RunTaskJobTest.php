@@ -17,6 +17,7 @@ use Pterodactyl\Tests\Integration\IntegrationTestCase;
 use Pterodactyl\Repositories\Wings\DaemonPowerRepository;
 use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Pterodactyl\Services\Backups\Calagopus\InitiateBackupService as CalagopusInitiateBackupService;
 
 class RunTaskJobTest extends IntegrationTestCase
 {
@@ -191,6 +192,40 @@ class RunTaskJobTest extends IntegrationTestCase
         $backupService->expects('handle')
             ->with(\Mockery::on(fn (Server $value) => $value->is($server)), null, true)
             ->once();
+
+        $elytraJobService = \Mockery::mock(ElytraJobService::class);
+        $this->instance(ElytraJobService::class, $elytraJobService);
+        $elytraJobService->shouldNotReceive('submitJob');
+
+        Bus::dispatchSync(new RunTaskJob($task));
+
+        $this->assertFalse($task->fresh()->is_queued);
+        $this->assertFalse($task->fresh()->is_processing);
+        $this->assertFalse($schedule->fresh()->is_processing);
+    }
+
+    public function testScheduledBackupUsesCalagopusBackupServiceForCalagopusNode(): void
+    {
+        $server = $this->createServerModel(['backup_limit' => 5]);
+        $server->node->update(['daemonType' => 'calagopus']);
+
+        $schedule = Schedule::factory()->for($server)->create(['is_processing' => true]);
+        $task = Task::factory()->for($schedule)->create([
+            'action' => Task::ACTION_BACKUP,
+            'payload' => "cache\ntemp",
+            'is_queued' => true,
+        ]);
+
+        $calagopusService = \Mockery::mock(CalagopusInitiateBackupService::class);
+        $this->instance(CalagopusInitiateBackupService::class, $calagopusService);
+        $calagopusService->expects('setIgnoredFiles')->with(['cache', 'temp'])->andReturnSelf();
+        $calagopusService->expects('handle')
+            ->with(\Mockery::on(fn (Server $value) => $value->is($server)), null, true)
+            ->once();
+
+        $backupService = \Mockery::mock(InitiateBackupService::class);
+        $this->instance(InitiateBackupService::class, $backupService);
+        $backupService->shouldNotReceive('setIgnoredFiles');
 
         $elytraJobService = \Mockery::mock(ElytraJobService::class);
         $this->instance(ElytraJobService::class, $elytraJobService);

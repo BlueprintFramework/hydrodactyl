@@ -7,10 +7,12 @@ use Pterodactyl\Models\Allocation;
 interface AllocationRepositoryInterface extends RepositoryInterface
 {
     /**
-     * Return all the allocations that exist for a node that are not currently
-     * allocated.
+     * Return all the unassigned allocations for a node, optionally limited to a
+     * set of IDs.
+     *
+     * @param int[] $ids
      */
-    public function getUnassignedAllocationIds(int $node): array;
+    public function getUnassignedAllocationIds(int $node, array $ids = []): array;
 
     /**
      * Return a single allocation from those meeting the requirements.

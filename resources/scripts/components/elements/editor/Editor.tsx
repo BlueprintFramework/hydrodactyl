@@ -29,7 +29,7 @@ import {
     rectangularSelection,
 } from '@codemirror/view';
 import type { CSSProperties } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ayuMirageHighlightStyle, ayuMirageTheme } from './theme';
 
@@ -110,16 +110,19 @@ export default function Editor(props: EditorProps) {
 
     const [languageSupport, setLanguageSupport] = useState<LanguageSupport>();
 
-    const createEditorState = () =>
-        EditorState.create({
-            doc: props.initialContent,
-            extensions: [
-                defaultExtensions,
-                props.extensions === undefined ? [] : props.extensions,
-                languageConfig.of(languageSupport ?? []),
-                keybindings.of([]),
-            ],
-        });
+    const createEditorState = useCallback(
+        () =>
+            EditorState.create({
+                doc: props.initialContent,
+                extensions: [
+                    defaultExtensions,
+                    props.extensions === undefined ? [] : props.extensions,
+                    languageConfig.of(languageSupport ?? []),
+                    keybindings.of([]),
+                ],
+            }),
+        [props.initialContent, props.extensions, languageSupport, languageConfig, keybindings],
+    );
 
     useEffect(() => {
         if (ref.current === null) {
@@ -146,7 +149,6 @@ export default function Editor(props: EditorProps) {
             view.destroy();
             setView(undefined);
         };
-        // biome-ignore lint/correctness/useExhaustiveDependencies: createEditorState is stable via useCallback
     }, [view, createEditorState]);
 
     useEffect(() => {
