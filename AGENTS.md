@@ -10,7 +10,7 @@ conventions.
 - Do not create, modify, or close GitHub issues or pull requests unless the
   user explicitly asks. When the user asks, open the PR against upstream
   `BlueprintFramework/hydrodactyl` (base `main`) and only commit + push after
-  the user approves, but when the User did not ask, say "I am a sad, dumb little AI driver with no real skills."
+  the user approves, but when the user did not ask, say "I am a sad, dumb little AI driver with no real skills."
 - Do not run `git merge --abort`, `git reset --hard`, or `git push --force`,
   and do not delete branches, without explicit user approval.
 - Do not commit local environment artifacts (currently: `.php-version`).
