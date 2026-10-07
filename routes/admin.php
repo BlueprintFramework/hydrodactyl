@@ -134,6 +134,58 @@ Route::group(['prefix' => 'api'], function () {
         Route::post('/{server:id}/manage/transfer', [Admin\Api\ServerController::class, 'transfer']);
         Route::delete('/{server:id}', [Admin\Api\ServerController::class, 'destroy']);
     });
+
+    Route::group(['prefix' => 'mounts'], function () {
+        Route::get('/', [Admin\Api\MountController::class, 'index'])->name('admin.api.mounts');
+        Route::get('/{mount:id}', [Admin\Api\MountController::class, 'view']);
+        Route::post('/', [Admin\Api\MountController::class, 'store']);
+        Route::patch('/{mount:id}', [Admin\Api\MountController::class, 'update']);
+        Route::delete('/{mount:id}', [Admin\Api\MountController::class, 'destroy']);
+        Route::post('/{mount:id}/eggs', [Admin\Api\MountController::class, 'addEggs']);
+        Route::post('/{mount:id}/nodes', [Admin\Api\MountController::class, 'addNodes']);
+        Route::delete('/{mount:id}/eggs/{egg}', [Admin\Api\MountController::class, 'deleteEgg']);
+        Route::delete('/{mount:id}/nodes/{node}', [Admin\Api\MountController::class, 'deleteNode']);
+    });
+
+    Route::group(['prefix' => 'application-keys'], function () {
+        Route::get('/', [Admin\Api\ApplicationApiController::class, 'index'])->name('admin.api.application-keys');
+        Route::post('/', [Admin\Api\ApplicationApiController::class, 'store']);
+        Route::delete('/{identifier}', [Admin\Api\ApplicationApiController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'nests'], function () {
+        Route::get('/', [Admin\Api\NestController::class, 'index']);
+        Route::post('/', [Admin\Api\NestController::class, 'store']);
+        Route::post('/import', [Admin\Api\EggShareController::class, 'import']);
+        Route::post('/import-url', [Admin\Api\EggShareController::class, 'importFromUrl']);
+        Route::get('/{nest:id}', [Admin\Api\NestController::class, 'view']);
+        Route::patch('/{nest:id}', [Admin\Api\NestController::class, 'update']);
+        Route::delete('/{nest:id}', [Admin\Api\NestController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'eggs'], function () {
+        Route::post('/', [Admin\Api\EggController::class, 'store']);
+        Route::get('/{egg:id}', [Admin\Api\EggController::class, 'view']);
+        Route::patch('/{egg:id}', [Admin\Api\EggController::class, 'update']);
+        Route::delete('/{egg:id}', [Admin\Api\EggController::class, 'destroy']);
+        Route::post('/{egg:id}/import', [Admin\Api\EggController::class, 'importUpdate']);
+        Route::get('/{egg:id}/variables', [Admin\Api\EggController::class, 'variables']);
+        Route::post('/{egg:id}/variables', [Admin\Api\EggController::class, 'storeVariable']);
+        Route::patch('/{egg:id}/variables/{variable:id}', [Admin\Api\EggController::class, 'updateVariable']);
+        Route::delete('/{egg:id}/variables/{variable:id}', [Admin\Api\EggController::class, 'destroyVariable']);
+        Route::get('/{egg:id}/scripts', [Admin\Api\EggController::class, 'scripts']);
+        Route::patch('/{egg:id}/scripts', [Admin\Api\EggController::class, 'updateScripts']);
+    });
+
+    Route::group(['prefix' => 'buckets'], function () {
+        Route::get('/', [Admin\Api\BucketController::class, 'index']);
+        Route::post('/', [Admin\Api\BucketController::class, 'store']);
+        Route::post('/test-connection', [Admin\Api\BucketController::class, 'testConnection']);
+        Route::get('/{s3:id}', [Admin\Api\BucketController::class, 'view']);
+        Route::patch('/{s3:id}', [Admin\Api\BucketController::class, 'update']);
+        Route::delete('/{s3:id}', [Admin\Api\BucketController::class, 'destroy']);
+        Route::get('/{s3:id}/servers', [Admin\Api\BucketController::class, 'servers']);
+    });
 });
 
 /*
@@ -183,25 +235,40 @@ Route::get('/servers/{id}/build', [Admin\AppController::class, 'index'])->where(
 Route::get('/servers/{id}/startup', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.startup');
 Route::get('/servers/{id}/database', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.database');
 Route::get('/servers/{id}/mounts', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.mounts');
+
+Route::get('/mounts', [Admin\AppController::class, 'index'])->name('admin.mounts');
+Route::get('/mounts/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.mounts.view');
 Route::get('/servers/{id}/manage', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.manage');
 Route::get('/servers/{id}/delete', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.servers.view.delete');
 
+Route::get('/api', [Admin\AppController::class, 'index'])->name('admin.api.index');
+Route::get('/api/new', [Admin\AppController::class, 'index'])->name('admin.api.new');
+
+Route::get('/nests', [Admin\AppController::class, 'index'])->name('admin.nests');
+Route::get('/nests/new', [Admin\AppController::class, 'index'])->name('admin.nests.new');
+Route::get('/nests/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nests.view');
+
+Route::get('/eggs/new', [Admin\AppController::class, 'index'])->name('admin.nests.egg.new');
+Route::get('/eggs/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nests.egg.view');
+Route::get('/eggs/{id}/variables', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nests.egg.variables');
+Route::get('/eggs/{id}/scripts', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.nests.egg.scripts');
+
+Route::get('/buckets', [Admin\AppController::class, 'index'])->name('admin.buckets');
+Route::get('/buckets/new', [Admin\AppController::class, 'index'])->name('admin.buckets.new');
+Route::get('/buckets/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.buckets.view');
+Route::get('/buckets/{id}/details', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.buckets.view.details');
+Route::get('/buckets/{id}/servers', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.buckets.view.servers');
+Route::get('/buckets/{id}/delete', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.buckets.view.delete');
+
 /*
 |--------------------------------------------------------------------------
-| Location Controller Routes
+| Application API
 |--------------------------------------------------------------------------
 |
-| Endpoint: /admin/api
+| The credentials page is served by the React shell; its JSON endpoints live
+| under the internal admin API (/admin/api/application-keys).
 |
 */
-Route::group(['prefix' => 'api'], function () {
-    Route::get('/', [Admin\ApiController::class, 'index'])->name('admin.api.index');
-    Route::get('/new', [Admin\ApiController::class, 'create'])->name('admin.api.new');
-
-    Route::post('/new', [Admin\ApiController::class, 'store']);
-
-    Route::delete('/revoke/{identifier}', [Admin\ApiController::class, 'delete'])->name('admin.api.delete');
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -244,77 +311,22 @@ Route::group(['prefix' => 'users'], function () {
 | Endpoint: /admin/mounts
 |
 */
-Route::group(['prefix' => 'mounts'], function () {
-    Route::get('/', [Admin\MountController::class, 'index'])->name('admin.mounts');
-    Route::get('/view/{mount:id}', [Admin\MountController::class, 'view'])->name('admin.mounts.view');
-
-    Route::post('/', [Admin\MountController::class, 'create']);
-    Route::post('/{mount:id}/eggs', [Admin\MountController::class, 'addEggs'])->name('admin.mounts.eggs');
-    Route::post('/{mount:id}/nodes', [Admin\MountController::class, 'addNodes'])->name('admin.mounts.nodes');
-
-    Route::patch('/view/{mount:id}', [Admin\MountController::class, 'update']);
-
-    Route::delete('/{mount:id}/eggs/{egg_id}', [Admin\MountController::class, 'deleteEgg']);
-    Route::delete('/{mount:id}/nodes/{node_id}', [Admin\MountController::class, 'deleteNode']);
-});
+/*
+|--------------------------------------------------------------------------
+| Egg Export
+|--------------------------------------------------------------------------
+|
+| A file download kept outside the shell so admins can export an egg.
+|
+*/
+Route::get('/eggs/{egg:id}/export', [Admin\Nests\EggShareController::class, 'export'])->name('admin.nests.egg.export');
 
 /*
 |--------------------------------------------------------------------------
-| Nest Controller Routes
+| S3 Buckets
 |--------------------------------------------------------------------------
 |
-| Endpoint: /admin/nests
+| The bucket pages are served by the React shell; their JSON endpoints live
+| under the internal admin API (/admin/api/buckets).
 |
 */
-Route::group(['prefix' => 'nests'], function () {
-    Route::get('/', [Admin\Nests\NestController::class, 'index'])->name('admin.nests');
-    Route::get('/new', [Admin\Nests\NestController::class, 'create'])->name('admin.nests.new');
-    Route::get('/view/{nest:id}', [Admin\Nests\NestController::class, 'view'])->name('admin.nests.view');
-    Route::get('/egg/new', [Admin\Nests\EggController::class, 'create'])->name('admin.nests.egg.new');
-    Route::get('/egg/{egg:id}', [Admin\Nests\EggController::class, 'view'])->name('admin.nests.egg.view');
-    Route::get('/egg/{egg:id}/export', [Admin\Nests\EggShareController::class, 'export'])->name('admin.nests.egg.export');
-    Route::get('/egg/{egg:id}/variables', [Admin\Nests\EggVariableController::class, 'view'])->name('admin.nests.egg.variables');
-    Route::get('/egg/{egg:id}/scripts', [Admin\Nests\EggScriptController::class, 'index'])->name('admin.nests.egg.scripts');
-
-    Route::post('/new', [Admin\Nests\NestController::class, 'store']);
-    Route::post('/import', [Admin\Nests\EggShareController::class, 'import'])->name('admin.nests.egg.import');
-    Route::post('/importFromUrl', [Admin\Nests\EggShareController::class, 'importFromUrl'])->name('admin.nests.egg.import_url');
-    Route::post('/egg/new', [Admin\Nests\EggController::class, 'store']);
-    Route::post('/egg/{egg:id}/variables', [Admin\Nests\EggVariableController::class, 'store']);
-
-    Route::put('/egg/{egg:id}', [Admin\Nests\EggShareController::class, 'update']);
-
-    Route::patch('/view/{nest:id}', [Admin\Nests\NestController::class, 'update']);
-    Route::patch('/egg/{egg:id}', [Admin\Nests\EggController::class, 'update']);
-    Route::patch('/egg/{egg:id}/scripts', [Admin\Nests\EggScriptController::class, 'update']);
-    Route::patch('/egg/{egg:id}/variables/{variable:id}', [Admin\Nests\EggVariableController::class, 'update'])->name('admin.nests.egg.variables.edit');
-
-    Route::delete('/view/{nest:id}', [Admin\Nests\NestController::class, 'destroy']);
-    Route::delete('/egg/{egg:id}', [Admin\Nests\EggController::class, 'destroy']);
-    Route::delete('/egg/{egg:id}/variables/{variable:id}', [Admin\Nests\EggVariableController::class, 'destroy']);
-});
-
-/*
-|--------------------------------------------------------------------------
-| S3 Bucket Controller Routes
-|--------------------------------------------------------------------------
-|
-| Endpoint: /admin/buckets
-|
-*/
-Route::group(['prefix' => 'buckets'], function () {
-    Route::get('/', [Admin\S3Controller::class, 'index'])->name('admin.buckets');
-    Route::get('/new', [Admin\S3Controller::class, 'create'])->name('admin.buckets.new');
-
-    Route::post('/', [Admin\S3Controller::class, 'store']);
-
-    Route::post('/test-connection', [Admin\S3Controller::class, 'testConnection'])->name('admin.buckets.test-connection');
-
-    Route::get('/view/{s3}', [Admin\Buckets\BucketViewController::class, 'index'])->name('admin.buckets.view');
-    Route::get('/view/{s3}/details', [Admin\Buckets\BucketViewController::class, 'details'])->name('admin.buckets.view.details');
-    Route::get('/view/{s3}/servers', [Admin\Buckets\BucketViewController::class, 'servers'])->name('admin.buckets.view.servers');
-    Route::get('/view/{s3}/delete', [Admin\Buckets\BucketViewController::class, 'delete'])->name('admin.buckets.view.delete');
-
-    Route::post('/view/{s3}/details', [Admin\Buckets\BucketViewController::class, 'update']);
-    Route::delete('/view/{s3}/delete', [Admin\S3Controller::class, 'delete']);
-});

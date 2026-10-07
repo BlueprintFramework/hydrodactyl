@@ -61,6 +61,29 @@ const ServerStartupContainer = lazy(() => import('./servers/ServerStartupContain
 const ServerDatabaseContainer = lazy(() => import('./servers/ServerDatabaseContainer'));
 const ServerMountsContainer = lazy(() => import('./servers/ServerMountsContainer'));
 const ServerCreateContainer = lazy(() => import('./servers/ServerCreateContainer'));
+
+const MountsContainer = lazy(() => import('./mounts/MountsContainer'));
+const MountViewContainer = lazy(() => import('./mounts/MountViewContainer'));
+
+const ApplicationApiContainer = lazy(() => import('./application-api/ApplicationApiContainer'));
+const ApplicationApiCreateContainer = lazy(() => import('./application-api/ApplicationApiCreateContainer'));
+
+const NestsContainer = lazy(() => import('./nests/NestsContainer'));
+const NestCreateContainer = lazy(() => import('./nests/NestCreateContainer'));
+const NestViewContainer = lazy(() => import('./nests/NestViewContainer'));
+const EggLayout = lazy(() => import('./nests/EggLayout'));
+const EggConfigurationContainer = lazy(() => import('./nests/EggConfigurationContainer'));
+const EggCreateContainer = lazy(() => import('./nests/EggCreateContainer'));
+const EggVariablesContainer = lazy(() => import('./nests/EggVariablesContainer'));
+const EggScriptsContainer = lazy(() => import('./nests/EggScriptsContainer'));
+
+const BucketsContainer = lazy(() => import('./buckets/BucketsContainer'));
+const BucketCreateContainer = lazy(() => import('./buckets/BucketCreateContainer'));
+const BucketLayout = lazy(() => import('./buckets/BucketLayout'));
+const BucketOverviewContainer = lazy(() => import('./buckets/BucketOverviewContainer'));
+const BucketDetailsContainer = lazy(() => import('./buckets/BucketDetailsContainer'));
+const BucketServersContainer = lazy(() => import('./buckets/BucketServersContainer'));
+const BucketDeleteContainer = lazy(() => import('./buckets/BucketDeleteContainer'));
 const ServerManageContainer = lazy(() => import('./servers/ServerManageContainer'));
 const ServerDeleteContainer = lazy(() => import('./servers/ServerDeleteContainer'));
 
@@ -165,32 +188,29 @@ const AdminShell = () => {
             end: false,
         },
         {
-            to: '/admin/buckets',
+            to: '/buckets',
             icon: Store01Icon,
             text: 'S3 Buckets',
             minimizedText: 'Buckets',
             tabName: 'buckets',
             ref: NavigationBuckets,
             end: false,
-            hardNav: true,
         },
         {
-            to: '/admin/nests',
+            to: '/nests',
             icon: Package01Icon,
             text: 'Nests',
             tabName: 'nests',
             ref: NavigationNests,
             end: false,
-            hardNav: true,
         },
         {
-            to: '/admin/mounts',
+            to: '/mounts',
             icon: Folder01Icon,
             text: 'Mounts',
             tabName: 'mounts',
             ref: NavigationMounts,
             end: false,
-            hardNav: true,
         },
         {
             to: '/settings',
@@ -201,14 +221,13 @@ const AdminShell = () => {
             end: false,
         },
         {
-            to: '/admin/api',
+            to: '/api',
             icon: Key01Icon,
             text: 'Application API',
             minimizedText: 'API',
             tabName: 'api',
             ref: NavigationApi,
             end: false,
-            hardNav: true,
         },
     ];
 
@@ -252,6 +271,27 @@ const AdminShell = () => {
                                         <Route path='mounts' element={<ServerMountsContainer />} />
                                         <Route path='manage' element={<ServerManageContainer />} />
                                         <Route path='delete' element={<ServerDeleteContainer />} />
+                                    </Route>
+                                    <Route path='/mounts' element={<MountsContainer />} />
+                                    <Route path='/mounts/:id' element={<MountViewContainer />} />
+                                    <Route path='/api' element={<ApplicationApiContainer />} />
+                                    <Route path='/api/new' element={<ApplicationApiCreateContainer />} />
+                                    <Route path='/nests' element={<NestsContainer />} />
+                                    <Route path='/nests/new' element={<NestCreateContainer />} />
+                                    <Route path='/nests/:id' element={<NestViewContainer />} />
+                                    <Route path='/eggs/new' element={<EggCreateContainer />} />
+                                    <Route path='/eggs/:id' element={<EggLayout />}>
+                                        <Route index element={<EggConfigurationContainer />} />
+                                        <Route path='variables' element={<EggVariablesContainer />} />
+                                        <Route path='scripts' element={<EggScriptsContainer />} />
+                                    </Route>
+                                    <Route path='/buckets' element={<BucketsContainer />} />
+                                    <Route path='/buckets/new' element={<BucketCreateContainer />} />
+                                    <Route path='/buckets/:id' element={<BucketLayout />}>
+                                        <Route index element={<BucketOverviewContainer />} />
+                                        <Route path='details' element={<BucketDetailsContainer />} />
+                                        <Route path='servers' element={<BucketServersContainer />} />
+                                        <Route path='delete' element={<BucketDeleteContainer />} />
                                     </Route>
                                     <Route path='/settings' element={<SettingsLayout />}>
                                         <Route index element={<GeneralSettings />} />

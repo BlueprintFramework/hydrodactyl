@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { errorToMessage } from '@/api/admin/errors';
 import { addServerMount, removeServerMount, type ServerMount } from '@/api/admin/servers';
@@ -61,12 +61,9 @@ const ServerMountsContainer = () => {
                                 <code className='text-xs text-cream-400/60'>{mount.id}</code>
                             </td>
                             <td className='px-4 py-3'>
-                                <a
-                                    href={`/admin/mounts/view/${mount.id}`}
-                                    className='text-cream-50 hover:text-hydro-400'
-                                >
+                                <Link to={`/mounts/${mount.id}`} className='text-cream-50 hover:text-hydro-400'>
                                     {mount.name}
-                                </a>
+                                </Link>
                             </td>
                             <td className='px-4 py-3'>
                                 <code className='text-xs text-cream-400/70'>{mount.source}</code>
