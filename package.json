@@ -110,11 +110,6 @@
         "test:unit": "php vendor/bin/phpunit --testsuite=Unit",
         "test:integration": "php vendor/bin/phpunit --testsuite=Integration"
     },
-    "browserslist": [
-        "> 0.5%",
-        "last 2 versions",
-        "firefox esr",
-        "not dead"
-    ],
+    "browserslist": ["> 0.5%", "last 2 versions", "firefox esr", "not dead"],
     "packageManager": "pnpm@11.3.0"
 }
