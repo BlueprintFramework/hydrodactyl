@@ -2,8 +2,7 @@
 
 Rules that bind all agents working in this repository. They override inherited
 instructions where the two conflict. Precedence: **(1)** safety constraints,
-**(2)** directory-scoped rules, **(3)** validation gates, **(4)** general
-conventions.
+**(2)** validation gates, **(3)** general conventions.
 
 ## 1. Project overview
 
@@ -34,11 +33,8 @@ smaller, safer, and more accessible, with a reimagined client UI, a marketplace
 - `routes/` — Laravel routes (`admin.php`, `api-client.php`, `auth.php`, …)
 - `tests/` — PHPUnit tests (`Integration/`, `Unit/`)
 
-**Scope of this fork**: the flagship work is the branding subsystem (logo +
-brand color) — see §3. Core/upstream concerns (Docker images, Wings, the admin
-redesign) belong in the upstream codebase — see §5. The admin branding UI is
-migrating Blade → React to match upstream's redesign; do not treat Blade admin
-paths as canon.
+**Scope of this fork**: the flagship work is the branding subsystem — logo
+uploads and brand color (rules in §4).
 
 ## 2. Safety constraints (never overridden)
 
@@ -56,60 +52,29 @@ paths as canon.
 - Handle merge conflicts in the working tree; never resolve them by deleting
   another branch's changes wholesale.
 
-## 3. Branding (logo) subsystem — directory scoped
-
-Files (backend is stable; the admin UI is migrating Blade → React):
-- `app/Services/Admin/LogoService.php` — domain logic, single source of truth
-- `app/Http/Requests/Admin/Settings/LogoFormRequest.php` and the settings
-  controller(s) serving the branding page
-- React UI: `resources/scripts/components/admin/settings/BrandingSettings.tsx`
-  and `resources/scripts/api/admin/logo.ts`
-- `tests/Integration/Admin/Settings/LogoControllerTest.php`
-
-Rules:
-
-- `LogoService` is the single source of truth for logo state. Read the current
-  logo and history through `getCurrentType()`, `getCurrentValue()`,
-  `getCurrentUrl()`, `getHistory()`; persist through `handle()`. Do not read
-  or write `settings::app:logo:*` settings keys directly from controllers,
-  views, or scripts.
-- Brand color: persist as `settings::app:brand_color`, read as
-  `config('app.brand_color', '#52A9FF')`. Wherever it is rendered (Blade or
-  React), it must come from config — never hardcode the hex in markup.
-- Raster uploads must be converted to WebP (quality 85) before saving. SVG
-  uploads must pass `LogoService::sanitizeSvg()`; do not weaken it (it strips
-  `<script|iframe|object|embed|applet|foreignObject|use>`, `on*` attribute
-  handlers, and `javascript:`/`data:` hrefs).
-- Only enqueue `queue:restart` when `app:name` changed. Logo-only and
-  brand-color changes must not restart workers.
-- PHP 8.5+: never call `imagedestroy()`; rely on PHP garbage collection for
-  GD images in tests.
-- `customNavItems` (`config('app.custom_nav_items')`) is consumed by the React
-  router (`UnifiedRouter.tsx`) and must be preserved in
-  `resources/scripts/state/settings.ts` and `SiteSettings` when editing
-  settings state.
-
-## 4. Validation gates (must pass before considering a task complete)
+## 3. Validation gates (must pass before considering a task complete)
 
 - Frontend: `pnpm check` — must exit 0 with no pending biome fixes.
 - Backend: always run PHP/Artisan/PHPUnit through the project-local wrapper:
   `lerd php -d memory_limit=512M vendor/bin/phpunit`. Never invoke bare
-  `php` or `artisan`. Full suite must pass, including
-  `LogoControllerTest`.
+  `php` or `artisan`. Full suite must pass.
 - Run biome (`pnpm exec biome check --write`) only on files you modified;
   never reformat unrelated files.
 
-## 5. General conventions
+## 4. General conventions
 
 - Prefer existing panel patterns (Blade layouts, `resources/scripts` React
   components, Formik, easy-peasy stores, SWR hooks) over introducing new
   frameworks or abstractions.
-- Keep this fork scoped: upstreamable work (Docker images, Wings, core
-  features, the admin redesign) belongs in `BlueprintFramework/hydrodactyl`,
-  not here, unless the user explicitly expands scope.
-- Do not silently change behavior of a setting documented as "not yet wired"
-  (e.g. brand color) without updating its warning text and the PR
-  description.
+- Branding subsystem guards (permanent architecture, do not weaken):
+  - `LogoService` is the single source of truth for logo state; never read or
+    write `settings::app:logo:*` keys directly. Brand color is persisted as
+    `settings::app:brand_color` and rendered from
+    `config('app.brand_color', '#52A9FF')` — never hardcode the hex in markup.
+  - Never weaken `LogoService::sanitizeSvg()` (strips
+    `<script|iframe|object|embed|applet|foreignObject|use>`, `on*` handlers,
+    and `javascript:`/`data:` hrefs); raster uploads convert to WebP
+    (quality 85).
 - When rules are ambiguous or a step is uncertain, ask one short clarifying
   question and stop; do not invent requirements.
 
