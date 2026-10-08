@@ -238,7 +238,7 @@ const AdminShell = () => {
                     <AppHeader admin />
                     <div className='flex flex-col lg:flex-row h-full w-full overflow-hidden relative'>
                         <Sidebar navItems={navItems} bottomNavItems={[]} className='hidden lg:flex' />
-                        <MobileSidebar navItems={navItems} />
+                        <MobileSidebar navItems={navItems} admin />
                         <BottomNav items={navItems} />
                         <MainWrapper>
                             <Suspense fallback={null}>

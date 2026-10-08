@@ -73,7 +73,7 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
             icon: () => <HugeiconsIcon size={16} strokeWidth={2} icon={Settings02Icon} />,
             link: {
                 href: '/account',
-                external: false,
+                external: admin,
             },
             type: 'item',
         },
@@ -84,17 +84,15 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
         },
         {
             id: 'admin-panel',
-            label: 'Admin Panel',
+            label: admin ? 'Client Panel' : 'Admin Panel',
             icon: () => <HugeiconsIcon size={16} strokeWidth={2} icon={UserShield02Icon} />,
             badge: 'Staff',
             link: {
-                href: '/admin',
+                href: admin ? '/' : '/admin',
                 external: true,
             },
             showWhen: rootAdmin,
             type: 'item',
-            active: admin,
-            disabled: admin,
         },
         {
             id: 'logout',
