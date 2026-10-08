@@ -38,8 +38,22 @@ class LogoController extends Controller
         try {
             $data = $request->validated();
 
-            if (array_key_exists('app:brand_color', $data) && $data['app:brand_color'] !== null) {
-                $this->settings->set('settings::app:brand_color', $data['app:brand_color']);
+            if (array_key_exists('app:brand_color', $data)) {
+                if ($data['app:brand_color'] !== null) {
+                    $this->settings->set('settings::app:brand_color', $data['app:brand_color']);
+                } else {
+                    $this->settings->forget('settings::app:brand_color');
+                }
+
+                // Re-boot the brand color into the current request's config so
+                // the response reflects the mutation instead of the value that
+                // was loaded when the request began.
+                config([
+                    'app.brand_color' => $this->settings->get(
+                        'settings::app:brand_color',
+                        env('APP_BRAND_COLOR', '#52A9FF'),
+                    ),
+                ]);
             }
 
             $this->logoService->handle($data);

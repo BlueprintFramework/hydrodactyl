@@ -231,6 +231,26 @@ class LogoControllerTest extends IntegrationTestCase
         ]);
     }
 
+    public function testBrandColorCanBeResetToDefault(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user)->postJson('/admin/api/settings/logo', [
+            'app:brand_color' => '#FF6600',
+        ])->assertOk();
+
+        $response = $this->actingAs($user)->postJson('/admin/api/settings/logo', [
+            'app:brand_color' => null,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('brandColor', config('app.brand_color', '#52A9FF'));
+
+        $this->assertDatabaseMissing('settings', [
+            'key' => 'settings::app:brand_color',
+        ]);
+    }
+
     private function makeJpg(): string
     {
         $image = imagecreatetruecolor(100, 50);

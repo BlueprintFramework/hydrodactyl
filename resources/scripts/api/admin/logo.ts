@@ -21,7 +21,7 @@ export interface LogoValues {
     logo_url?: string;
     remove?: boolean;
     rewind?: number;
-    brand_color?: string;
+    brand_color?: string | null;
 }
 
 export const getLogo = (): Promise<LogoResponse> => http.get('/admin/api/settings/logo').then(({ data }) => data);
@@ -33,14 +33,16 @@ export const updateLogo = (values: LogoValues): Promise<LogoResponse> => {
         const form = new FormData();
         form.append('logo_file', rest.logo_file);
 
-        if (brandColor) {
-            form.append('app:brand_color', brandColor);
+        if (brandColor !== undefined) {
+            // An explicit reset sends an empty string, which the framework's
+            // ConvertEmptyStringsToNull middleware turns into null.
+            form.append('app:brand_color', brandColor ?? '');
         }
 
         return http.post('/admin/api/settings/logo', form).then(({ data }) => data);
     }
 
-    const payload = { ...rest, ...(brandColor ? { 'app:brand_color': brandColor } : {}) };
+    const payload = { ...rest, ...(brandColor !== undefined ? { 'app:brand_color': brandColor } : {}) };
 
     return http.post('/admin/api/settings/logo', payload).then(({ data }) => data);
 };

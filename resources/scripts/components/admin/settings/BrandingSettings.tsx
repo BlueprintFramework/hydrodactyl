@@ -22,6 +22,7 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
     const [confirmRemove, setConfirmRemove] = useState(false);
     const [brandColor, setBrandColor] = useState<string>(logo.brandColor || '#52A9FF');
     const [savingColor, setSavingColor] = useState(false);
+    const [resettingColor, setResettingColor] = useState(false);
 
     const chooseFile = (selected: File) => {
         setFile(selected);
@@ -94,6 +95,23 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
             toast.error(errorToMessage(error, 'Failed to save brand color.'));
         } finally {
             setSavingColor(false);
+        }
+    };
+
+    const resetBrandColor = async () => {
+        setResettingColor(true);
+
+        try {
+            // Clearing the stored setting makes config('app.brand_color')
+            // fall back to its default — the API returns that resolved value.
+            const updated = await updateLogo({ brand_color: null });
+            await onSaved();
+            setBrandColor(updated.brandColor);
+            toast.success('Brand color reset to default.');
+        } catch (error) {
+            toast.error(errorToMessage(error, 'Failed to reset brand color.'));
+        } finally {
+            setResettingColor(false);
         }
     };
 
@@ -264,14 +282,19 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
                         className='w-32 uppercase'
                         aria-label='Brand color hex'
                     />
-                    <Button
-                        onClick={saveBrandColor}
-                        disabled={
-                            savingColor || brandColor.toLowerCase() === (logo.brandColor || '#52A9FF').toLowerCase()
-                        }
-                    >
-                        {savingColor ? <Spinner size={Spinner.Size.SMALL} /> : 'Save Color'}
-                    </Button>
+                    <div className='flex items-center gap-2'>
+                        <Button
+                            onClick={saveBrandColor}
+                            disabled={
+                                savingColor || brandColor.toLowerCase() === (logo.brandColor || '#52A9FF').toLowerCase()
+                            }
+                        >
+                            {savingColor ? <Spinner size={Spinner.Size.SMALL} /> : 'Save Color'}
+                        </Button>
+                        <Button variant='outline' onClick={resetBrandColor} disabled={resettingColor || savingColor}>
+                            {resettingColor ? <Spinner size={Spinner.Size.SMALL} /> : 'Reset to default'}
+                        </Button>
+                    </div>
                 </div>
             </div>
 

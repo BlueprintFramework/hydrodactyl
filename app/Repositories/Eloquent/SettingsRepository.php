@@ -68,6 +68,10 @@ class SettingsRepository extends EloquentRepository implements SettingsRepositor
     {
         $this->clearCache($key);
         $this->deleteWhere(['key' => $key]);
+
+        // Invalidate the cached settings collection so SettingsServiceProvider
+        // picks up the change on the next request.
+        Cache::forget('pterodactyl:settings:all');
     }
 
     /**
