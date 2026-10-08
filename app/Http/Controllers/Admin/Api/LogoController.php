@@ -51,7 +51,7 @@ class LogoController extends Controller
                 config([
                     'app.brand_color' => $this->settings->get(
                         'settings::app:brand_color',
-                        env('APP_BRAND_COLOR', '#52A9FF'),
+                        config('app.brand_color_default'),
                     ),
                 ]);
             }
@@ -89,6 +89,7 @@ class LogoController extends Controller
             'url' => $this->logoService->getCurrentUrl(),
             'history' => $history,
             'brandColor' => config('app.brand_color', '#52A9FF'),
+            'defaultBrandColor' => config('app.brand_color_default'),
             'canProcessImages' => $this->logoService->canProcessImages(),
         ];
     }

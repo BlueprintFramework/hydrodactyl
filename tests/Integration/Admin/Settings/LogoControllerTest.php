@@ -244,7 +244,8 @@ class LogoControllerTest extends IntegrationTestCase
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('brandColor', config('app.brand_color', '#52A9FF'));
+            ->assertJsonPath('brandColor', config('app.brand_color', '#52A9FF'))
+            ->assertJsonPath('defaultBrandColor', config('app.brand_color_default'));
 
         $this->assertDatabaseMissing('settings', [
             'key' => 'settings::app:brand_color',

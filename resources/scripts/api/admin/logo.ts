@@ -13,6 +13,7 @@ export interface LogoResponse {
     url: string | null;
     history: LogoHistoryEntry[];
     brandColor: string;
+    defaultBrandColor: string;
     canProcessImages: boolean;
 }
 

@@ -123,6 +123,8 @@ const AdvancedForm = ({
                             type='number'
                             value={values.rangeStart}
                             onChange={(e) => setValues({ ...values, rangeStart: e.target.value })}
+                            disabled={!values.allocationsEnabled}
+                            className='disabled:cursor-not-allowed disabled:opacity-60'
                         />
                     </Field>
                     <Field label='Ending Port' error={errors['pterodactyl:client_features:allocations:range_end']}>
@@ -130,6 +132,8 @@ const AdvancedForm = ({
                             type='number'
                             value={values.rangeEnd}
                             onChange={(e) => setValues({ ...values, rangeEnd: e.target.value })}
+                            disabled={!values.allocationsEnabled}
+                            className='disabled:cursor-not-allowed disabled:opacity-60'
                         />
                     </Field>
                 </div>

@@ -32,6 +32,10 @@ return [
   // Rendered from config so markup never hardcodes the hex.
   'brand_color' => env('APP_BRAND_COLOR', '#52A9FF'),
 
+  // The stock brand color — never overridden by settings so it can serve as
+  // the reference for "reset to default" and be exposed by the branding API.
+  'brand_color_default' => env('APP_BRAND_COLOR', '#52A9FF'),
+
   /*
   |--------------------------------------------------------------------------
   | Application Environment

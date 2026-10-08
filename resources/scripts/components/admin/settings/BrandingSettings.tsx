@@ -291,7 +291,15 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
                         >
                             {savingColor ? <Spinner size={Spinner.Size.SMALL} /> : 'Save Color'}
                         </Button>
-                        <Button variant='outline' onClick={resetBrandColor} disabled={resettingColor || savingColor}>
+                        <Button
+                            variant='outline'
+                            onClick={resetBrandColor}
+                            disabled={
+                                resettingColor ||
+                                savingColor ||
+                                brandColor.toLowerCase() === (logo.defaultBrandColor || '').toLowerCase()
+                            }
+                        >
                             {resettingColor ? <Spinner size={Spinner.Size.SMALL} /> : 'Reset to default'}
                         </Button>
                     </div>
