@@ -17,6 +17,7 @@ services:
   - valkey:
       preset: valkey
 workers:
+  - queue
   - schedule
   - vite
 commands:
