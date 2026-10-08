@@ -195,6 +195,10 @@ class LogoService
             $value = $this->settings->get('settings::app:logo:value');
             if ($value) {
                 Storage::disk('public')->delete($value);
+                // The service instance can live across requests (controller is a
+                // container singleton), so a cached existence check for a deleted
+                // file would otherwise keep the logo in history forever.
+                unset($this->existsCache[$value]);
             }
         }
 

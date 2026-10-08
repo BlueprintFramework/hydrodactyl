@@ -20,6 +20,8 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
     const [submitting, setSubmitting] = useState(false);
     const [removing, setRemoving] = useState(false);
     const [confirmRemove, setConfirmRemove] = useState(false);
+    const [brandColor, setBrandColor] = useState<string>(logo.brandColor || '#52A9FF');
+    const [savingColor, setSavingColor] = useState(false);
 
     const chooseFile = (selected: File) => {
         setFile(selected);
@@ -76,6 +78,22 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
             toast.success('Logo restored.');
         } catch (error) {
             toast.error(errorToMessage(error, 'Failed to restore logo.'));
+        }
+    };
+
+    const saveBrandColor = async () => {
+        const next = brandColor || '#52A9FF';
+
+        setSavingColor(true);
+
+        try {
+            await updateLogo({ brand_color: next });
+            await onSaved();
+            toast.success('Brand color updated.');
+        } catch (error) {
+            toast.error(errorToMessage(error, 'Failed to save brand color.'));
+        } finally {
+            setSavingColor(false);
         }
     };
 
@@ -228,6 +246,34 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
                     </div>
                 </div>
             )}
+
+            <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
+                <h2 className='text-sm font-semibold text-cream-50'>Brand Color</h2>
+                <p className='text-xs text-cream-400/50'>Accent color used across the panel interface.</p>
+                <div className='flex items-center gap-3'>
+                    <input
+                        type='color'
+                        value={brandColor}
+                        onChange={(event) => setBrandColor(event.target.value)}
+                        className='h-9 w-9 cursor-pointer rounded-lg border border-mocha-300 bg-transparent p-1'
+                        aria-label='Brand color'
+                    />
+                    <Input.Text
+                        value={brandColor}
+                        onChange={(event) => setBrandColor(event.target.value)}
+                        className='w-32 uppercase'
+                        aria-label='Brand color hex'
+                    />
+                    <Button
+                        onClick={saveBrandColor}
+                        disabled={
+                            savingColor || brandColor.toLowerCase() === (logo.brandColor || '#52A9FF').toLowerCase()
+                        }
+                    >
+                        {savingColor ? <Spinner size={Spinner.Size.SMALL} /> : 'Save Color'}
+                    </Button>
+                </div>
+            </div>
 
             <Dialog.Confirm
                 open={confirmRemove}

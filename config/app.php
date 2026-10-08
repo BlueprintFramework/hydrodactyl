@@ -28,6 +28,10 @@ return [
 
   'custom_nav_items' => '[]',
 
+  // Brand accent color — overridden by settings::app:brand_color when set.
+  // Rendered from config so markup never hardcodes the hex.
+  'brand_color' => env('APP_BRAND_COLOR', '#52A9FF'),
+
   /*
   |--------------------------------------------------------------------------
   | Application Environment

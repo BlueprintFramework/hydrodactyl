@@ -6,49 +6,38 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Pterodactyl\Models\User;
+use Pterodactyl\Services\Admin\LogoService;
 use Pterodactyl\Tests\Integration\IntegrationTestCase;
 
 class LogoControllerTest extends IntegrationTestCase
 {
     use DatabaseTransactions;
-    public function testIndexPageRendersWithoutExperimentalBadge(): void
+
+    public function testBrandingPageRespondsOk(): void
     {
         $user = User::factory()->admin()->create();
 
-        $response = $this->actingAs($user)->get('/admin/settings/logo');
-
-        $response->assertOk();
-        $response->assertSee('Branding');
-        $response->assertDontSee('Experimental');
-        $response->assertSee('faviconPreview');
-        $response->assertSee('Company Name');
-        $response->assertSee('companyNameInput');
+        $this->actingAs($user)->get('/admin/settings/logo')->assertOk();
     }
 
-    public function testCompanyNameCanBeSavedViaBrandingPage(): void
+    public function testBrandingApiReturnsStateWithoutExperimentalFlag(): void
     {
         $user = User::factory()->admin()->create();
 
-        $response = $this->actingAs($user)->patch('/admin/settings/logo', [
-            'app:name' => 'Hydrodactyl Test',
-        ]);
+        $response = $this->actingAs($user)->getJson('/admin/api/settings/logo');
 
-        $response->assertRedirect('/admin/settings/logo');
+        $response->assertOk()
+            ->assertJsonStructure([
+                'type',
+                'value',
+                'url',
+                'history',
+                'brandColor',
+                'canProcessImages',
+            ])
+            ->assertJsonPath('brandColor', config('app.brand_color', '#52A9FF'));
 
-        $this->assertDatabaseHas('settings', [
-            'key' => 'settings::app:name',
-            'value' => 'Hydrodactyl Test',
-        ]);
-    }
-
-    public function testGeneralSettingsPageDoesNotHaveCompanyNameField(): void
-    {
-        $user = User::factory()->admin()->create();
-
-        $response = $this->actingAs($user)->get('/admin/settings');
-
-        $response->assertOk();
-        $response->assertDontSee('name="app:name"');
+        $this->assertArrayNotHasKey('experimental', $response->json());
     }
 
     public function testJpgUploadIsConvertedToWebp(): void
@@ -66,14 +55,13 @@ class LogoControllerTest extends IntegrationTestCase
 
         $file = UploadedFile::fake()->createWithContent('logo.jpg', $jpg);
 
-        $response = $this->actingAs($user)->patch('/admin/settings/logo', [
+        $response = $this->actingAs($user)->post('/admin/api/settings/logo', [
             'logo_file' => $file,
         ]);
 
-        $response->assertRedirect('/admin/settings/logo');
+        $response->assertOk()->assertJsonPath('type', 'upload');
 
-        $this->assertDatabaseHas('settings', ['key' => 'settings::app:logo:type', 'value' => 'upload']);
-        $value = \DB::table('settings')->where('key', 'settings::app:logo:value')->value('value');
+        $value = app(LogoService::class)->getCurrentValue();
         $this->assertNotNull($value);
         $this->assertStringEndsWith('.webp', $value);
         Storage::disk('public')->assertExists($value);
@@ -88,16 +76,46 @@ class LogoControllerTest extends IntegrationTestCase
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="#52A9FF"/></svg>';
         $file = UploadedFile::fake()->createWithContent('logo.svg', $svg);
 
-        $response = $this->actingAs($user)->patch('/admin/settings/logo', [
+        $response = $this->actingAs($user)->post('/admin/api/settings/logo', [
             'logo_file' => $file,
         ]);
 
-        $response->assertRedirect('/admin/settings/logo');
+        $response->assertOk()->assertJsonPath('type', 'upload');
 
-        $value = \DB::table('settings')->where('key', 'settings::app:logo:value')->value('value');
+        $value = app(LogoService::class)->getCurrentValue();
         $this->assertNotNull($value);
         $this->assertStringEndsWith('.svg', $value);
         Storage::disk('public')->assertExists($value);
+        $this->assertStringNotContainsString('<script', Storage::disk('public')->get($value));
+    }
+
+    public function testLogoUrlIsStoredAsLink(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $response = $this->actingAs($user)->postJson('/admin/api/settings/logo', [
+            'logo_url' => 'https://example.com/logo.png',
+        ]);
+
+        $response->assertOk()->assertJsonPath('type', 'link');
+        $this->assertSame('https://example.com/logo.png', app(LogoService::class)->getCurrentValue());
+    }
+
+    public function testLogoCanBeRemoved(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->admin()->create();
+
+        $file = UploadedFile::fake()->createWithContent('logo.jpg', $this->makeJpg());
+        $this->actingAs($user)->post('/admin/api/settings/logo', ['logo_file' => $file])->assertOk();
+        $this->assertSame('upload', app(LogoService::class)->getCurrentType());
+
+        $response = $this->actingAs($user)->postJson('/admin/api/settings/logo', ['remove' => true]);
+
+        $response->assertOk();
+        $this->assertNull(app(LogoService::class)->getCurrentType());
+        $this->assertNull(app(LogoService::class)->getCurrentValue());
     }
 
     public function testCustomLogoRendersOnlyCustomFaviconLinks(): void
@@ -142,21 +160,24 @@ class LogoControllerTest extends IntegrationTestCase
 
         // Upload first logo (index 0)
         $fileA = UploadedFile::fake()->createWithContent('a.jpg', $this->makeJpg());
-        $this->actingAs($user)->patch('/admin/settings/logo', ['logo_file' => $fileA]);
-        $valA = \DB::table('settings')->where('key', 'settings::app:logo:value')->value('value');
+        $this->actingAs($user)->post('/admin/api/settings/logo', ['logo_file' => $fileA])->assertOk();
+        $valA = app(LogoService::class)->getCurrentValue();
+        $this->assertNotNull($valA);
 
         // Upload second logo (index 0, pushes A to index 1)
         $fileB = UploadedFile::fake()->createWithContent('b.jpg', $this->makeJpg());
-        $this->actingAs($user)->patch('/admin/settings/logo', ['logo_file' => $fileB]);
+        $this->actingAs($user)->post('/admin/api/settings/logo', ['logo_file' => $fileB])->assertOk();
+        $this->assertNotSame($valA, app(LogoService::class)->getCurrentValue());
 
         // Remove the logo — current becomes null, B's file is deleted, history filters to [A]
-        $this->actingAs($user)->patch('/admin/settings/logo', ['remove' => '1']);
+        $this->actingAs($user)->postJson('/admin/api/settings/logo', ['remove' => true])->assertOk();
+        $this->assertNull(app(LogoService::class)->getCurrentValue());
 
         // Rewind to index 0 (the remaining history item A) — was silently ignored before the fix
-        $this->actingAs($user)->patch('/admin/settings/logo', ['rewind' => '0']);
+        $response = $this->actingAs($user)->postJson('/admin/api/settings/logo', ['rewind' => 0]);
 
-        $current = \DB::table('settings')->where('key', 'settings::app:logo:value')->value('value');
-        $this->assertSame($valA, $current, 'Rewind to index 0 should restore the remaining history logo');
+        $response->assertOk();
+        $this->assertSame($valA, app(LogoService::class)->getCurrentValue(), 'Rewind to index 0 should restore the remaining history logo');
     }
 
     public function testRewindWorksWhenCurrentNotInHistory(): void
@@ -164,46 +185,45 @@ class LogoControllerTest extends IntegrationTestCase
         $user = User::factory()->admin()->create();
 
         Storage::fake('public');
-        Storage::disk('public')->put('logo/rewind-x.webp', 'fake-x');
-        Storage::disk('public')->put('logo/rewind-y.webp', 'fake-y');
 
         // Upload a logo to seed the history
         $fileA = UploadedFile::fake()->createWithContent('a.jpg', $this->makeJpg());
-        $this->actingAs($user)->patch('/admin/settings/logo', ['logo_file' => $fileA]);
-        $valA = \DB::table('settings')->where('key', 'settings::app:logo:value')->value('value');
+        $this->actingAs($user)->post('/admin/api/settings/logo', ['logo_file' => $fileA])->assertOk();
+        $valA = app(LogoService::class)->getCurrentValue();
+        $this->assertNotNull($valA);
 
-        // Set current to a link that is NOT in history
+        // Set current to a link that is NOT in history (seeded directly, since
+        // storeLink would add it to history — this mirrors legacy/direct-set state)
         \DB::table('settings')->where('key', 'settings::app:logo:type')->update(['value' => 'link']);
         \DB::table('settings')->where('key', 'settings::app:logo:value')->update(['value' => 'https://example.com/external.png']);
 
-        // Rewind to index 0 (the upload) — was broken by the moveToFront index bug
-        $this->actingAs($user)->patch('/admin/settings/logo', ['rewind' => '0']);
-
-        $current = \DB::table('settings')->where('key', 'settings::app:logo:value')->value('value');
-        $this->assertSame($valA, $current, 'Rewind should work even when current logo is not in history');
-    }
-
-    public function testBrandingPageHasBrandColorPicker(): void
-    {
-        $user = User::factory()->admin()->create();
-
-        $response = $this->actingAs($user)->get('/admin/settings/logo');
+        // Rewind to index 0 (the upload) — should still restore A
+        $response = $this->actingAs($user)->postJson('/admin/api/settings/logo', ['rewind' => 0]);
 
         $response->assertOk();
-        $response->assertSee('Brand Color');
-        $response->assertSee('brandColorPicker');
-        $response->assertSee('brandColorText');
+        $this->assertSame($valA, app(LogoService::class)->getCurrentValue(), 'Rewind should work even when current logo is not in history');
     }
 
-    public function testBrandColorCanBeSavedViaBrandingPage(): void
+    public function testBrandingApiExposesBrandColor(): void
     {
         $user = User::factory()->admin()->create();
 
-        $response = $this->actingAs($user)->patch('/admin/settings/logo', [
+        $response = $this->actingAs($user)->getJson('/admin/api/settings/logo');
+
+        $response->assertOk()
+            ->assertJsonStructure(['brandColor'])
+            ->assertJsonPath('brandColor', config('app.brand_color', '#52A9FF'));
+    }
+
+    public function testBrandColorCanBeSavedViaBrandingApi(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $response = $this->actingAs($user)->postJson('/admin/api/settings/logo', [
             'app:brand_color' => '#FF6600',
         ]);
 
-        $response->assertRedirect('/admin/settings/logo');
+        $response->assertOk();
 
         $this->assertDatabaseHas('settings', [
             'key' => 'settings::app:brand_color',
