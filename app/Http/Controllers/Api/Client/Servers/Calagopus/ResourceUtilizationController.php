@@ -1,0 +1,39 @@
+<?php
+
+namespace Pterodactyl\Http\Controllers\Api\Client\Servers\Calagopus;
+
+use Carbon\Carbon;
+use Pterodactyl\Models\Server;
+use Illuminate\Cache\Repository;
+use Pterodactyl\Transformers\Api\Client\StatsTransformer;
+use Pterodactyl\Repositories\Calagopus\DaemonServerRepository;
+use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Pterodactyl\Http\Requests\Api\Client\Servers\GetServerRequest;
+
+class ResourceUtilizationController extends ClientApiController
+{
+    /**
+     * ResourceUtilizationController constructor.
+     */
+    public function __construct(private Repository $cache, private DaemonServerRepository $repository)
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Get server resource usage.
+     *
+     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
+     */
+    public function __invoke(GetServerRequest $request, Server $server): array
+    {
+        $key = "resources:$server->uuid";
+        $stats = $this->cache->remember($key, Carbon::now()->addSeconds(20), function () use ($server) {
+            return $this->repository->setServer($server)->getDetails();
+        });
+
+        return $this->fractal->item($stats)
+            ->transformWith($this->getTransformer(StatsTransformer::class))
+            ->toArray();
+    }
+}

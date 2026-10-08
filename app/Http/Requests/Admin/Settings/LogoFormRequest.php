@@ -13,7 +13,6 @@ class LogoFormRequest extends AdminFormRequest
             'logo_url' => 'nullable|url|max:2048',
             'remove' => 'nullable|boolean',
             'rewind' => 'nullable|integer|min:0',
-            'app:name' => 'nullable|string|max:191',
             'app:brand_color' => ['nullable', 'string', 'max:7', 'regex:/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/'],
         ];
     }
@@ -23,7 +22,6 @@ class LogoFormRequest extends AdminFormRequest
         return [
             'logo_file' => 'Logo File',
             'logo_url' => 'Logo URL',
-            'app:name' => 'Company Name',
             'app:brand_color' => 'Brand Color',
         ];
     }

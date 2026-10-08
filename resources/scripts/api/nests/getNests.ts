@@ -29,6 +29,8 @@ interface Nest {
     };
 }
 
+export type { Nest };
+
 export default (): Promise<Nest[]> => {
     return new Promise((resolve, reject) => {
         http.get('/api/client/nests')

@@ -12,6 +12,7 @@ import UserDropdown from './UserDropdown';
 
 interface AppHeaderProps {
     serverId?: string;
+    admin?: boolean;
 }
 
 const HeaderActions = memo(() => {
@@ -85,8 +86,8 @@ const SidebarLogo = memo(() => {
 });
 SidebarLogo.displayName = 'SidebarLogo';
 
-const StaticButtons = memo<{ serverId?: string }>(({ serverId }) => {
-    return <UserDropdown serverId={serverId} />;
+const StaticButtons = memo<{ serverId?: string; admin?: boolean }>(({ serverId, admin }) => {
+    return <UserDropdown serverId={serverId} admin={admin} />;
 });
 
 StaticButtons.displayName = 'StaticButtons';
@@ -108,7 +109,7 @@ const SlotActions = memo<{ actions: React.ReactNode }>(({ actions }) => {
 });
 SlotActions.displayName = 'SlotActions';
 
-const AppHeader = ({ serverId }: AppHeaderProps) => {
+const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
     const { headerActions, leftActions, centerActions, rightActions } = useHeader();
 
     const hasSlottedLayout = !headerActions && (leftActions || centerActions || rightActions);
@@ -125,7 +126,7 @@ const AppHeader = ({ serverId }: AppHeaderProps) => {
                 <SlotActions actions={centerActions} />
                 <div className='flex items-center gap-1.5 sm:gap-2 justify-end min-w-0 overflow-hidden'>
                     <SlotActions actions={rightActions} />
-                    <StaticButtons serverId={serverId} />
+                    <StaticButtons serverId={serverId} admin={admin} />
                 </div>
             </div>
         );
@@ -141,7 +142,7 @@ const AppHeader = ({ serverId }: AppHeaderProps) => {
             <HeaderActions />
             <div className='flex items-center gap-1.5 sm:gap-2 justify-end min-w-0 overflow-hidden flex-1'>
                 <SlotActions actions={rightActions} />
-                <StaticButtons serverId={serverId} />
+                <StaticButtons serverId={serverId} admin={admin} />
             </div>
         </div>
     );

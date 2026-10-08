@@ -6,15 +6,18 @@ enum DaemonType: string
 {
     case WINGS = 'wings';
     case ELYTRA = 'elytra';
+    case CALAGOPUS = 'calagopus';
 
     private const CLASS_MAP = [
         self::WINGS->value => \Pterodactyl\Models\Daemons\Wings::class,
         self::ELYTRA->value => \Pterodactyl\Models\Daemons\Elytra::class,
+        self::CALAGOPUS->value => \Pterodactyl\Models\Daemons\Calagopus::class,
     ];
 
     private const RESOURCE_MAP = [
         self::WINGS->value => \Pterodactyl\Http\Controllers\Api\Client\Servers\Wings\ResourceUtilizationController::class,
         self::ELYTRA->value => \Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra\ResourceUtilizationController::class,
+        self::CALAGOPUS->value => \Pterodactyl\Http\Controllers\Api\Client\Servers\Calagopus\ResourceUtilizationController::class,
     ];
 
     public static function all(): array

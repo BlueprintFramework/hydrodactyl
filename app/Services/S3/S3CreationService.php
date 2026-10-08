@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Services\S3;
 
+use Illuminate\Support\Facades\Cache;
 use Pterodactyl\Models\S3;
 use Pterodactyl\Contracts\Repository\S3RepositoryInterface;
 
@@ -13,6 +14,8 @@ class S3CreationService
 
     public function handle(array $data): S3
     {
+        Cache::forget('pterodactyl:s3:active');
+
         return $this->repository->create($data);
     }
 }

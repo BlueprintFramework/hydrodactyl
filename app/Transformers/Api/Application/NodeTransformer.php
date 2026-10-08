@@ -40,11 +40,14 @@ class NodeTransformer extends BaseTransformer
         $response[$node->getUpdatedAtColumn()] = $this->formatTimestamp($node->updated_at);
         $response[$node->getCreatedAtColumn()] = $this->formatTimestamp($node->created_at);
 
-        $resources = $node->servers()->where('exclude_from_resource_calculation', false)->select(['memory', 'disk'])->get();
+        $resources = $node->servers()
+            ->where('exclude_from_resource_calculation', false)
+            ->selectRaw('COALESCE(SUM(memory), 0) as sum_memory, COALESCE(SUM(disk), 0) as sum_disk')
+            ->first();
 
         $response['allocated_resources'] = [
-            'memory' => $resources->sum('memory'),
-            'disk' => $resources->sum('disk'),
+            'memory' => (int) ($resources->sum_memory ?? 0),
+            'disk' => (int) ($resources->sum_disk ?? 0),
         ];
 
         return $response;

@@ -253,7 +253,7 @@ class ServerGroupController extends ClientApiController
      */
     private function validateServerAccess($user, array $serverIds): void
     {
-        $accessible = $user->accessibleServers()->pluck('servers.id')->toArray();
+        $accessible = $user->accessibleServers()->whereIn('servers.id', $serverIds)->pluck('servers.id')->all();
         $unauthorized = array_diff($serverIds, $accessible);
 
         if (!empty($unauthorized)) {

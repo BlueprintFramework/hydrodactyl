@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int|null $node_id
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
+ * @property \Pterodactyl\Models\Node|null $node
+ * @property \Pterodactyl\Models\Database[]|\Illuminate\Database\Eloquent\Collection $databases
  */
 class DatabaseHost extends Model
 {

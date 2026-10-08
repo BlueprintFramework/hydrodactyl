@@ -27,6 +27,8 @@ import { ServerContext } from '@/state/server';
 
 const Editor = lazy(() => import('@/components/elements/editor/Editor'));
 
+const sortedLanguages = [...languages].sort((a, b) => a.name.localeCompare(b.name));
+
 const FileEditContainer = () => {
     const [error, setError] = useState('');
     const { action, '*': rawFilename } = useParams<{
@@ -232,7 +234,7 @@ const FileEditContainer = () => {
                         </svg>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className='max-h-50 overflow-auto z-99999' sideOffset={8}>
-                        <For each={languages.sort((a, b) => a.name.localeCompare(b.name))} memo>
+                        <For each={sortedLanguages} memo>
                             {(language) => (
                                 <DropdownMenuItem
                                     key={language.name}

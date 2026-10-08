@@ -65,6 +65,7 @@ const DatabasesContainer = () => {
             });
     };
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: databases.length would retrigger this fetch
     useEffect(() => {
         setLoading(!databases.length);
         clearFlashes('databases');
@@ -76,7 +77,7 @@ const DatabasesContainer = () => {
                 addError({ key: 'databases', message: httpErrorToHuman(error) });
             })
             .then(() => setLoading(false));
-    }, [clearFlashes, uuid, setDatabases, databases.length, addError]);
+    }, [clearFlashes, uuid, setDatabases, addError]);
 
     return (
         <ServerContentBlock className='p-0!' title={'Databases'} showFlashKey={'databases'}>

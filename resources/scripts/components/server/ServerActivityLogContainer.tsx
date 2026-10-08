@@ -1,5 +1,6 @@
 import { ArrowDownToLine, ClockArrowRotateLeft, Funnel, Magnifier, Xmark } from '@gravity-ui/icons';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDebounce } from 'use-debounce';
 import type { ActivityLogFilters } from '@/api/account/activity';
 import { useActivityLogs } from '@/api/server/activity';
 import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
@@ -25,6 +26,7 @@ const ServerActivityLogContainer = () => {
         sorts: { timestamp: -1 },
     });
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
     const [selectedEventType, setSelectedEventType] = useState('');
     const [showFilters, setShowFilters] = useState(false);
     const [dateRange, setDateRange] = useState('all');
@@ -47,13 +49,13 @@ const ServerActivityLogContainer = () => {
 
         let filtered = data.items;
 
-        if (searchTerm) {
+        if (debouncedSearchTerm) {
             filtered = filtered.filter(
                 (item) =>
-                    item.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    item.ip?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    item.relationships.actor?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    JSON.stringify(item.properties).toLowerCase().includes(searchTerm.toLowerCase()),
+                    item.event.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                    item.ip?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                    item.relationships.actor?.username?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                    JSON.stringify(item.properties).toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
             );
         }
 
@@ -85,9 +87,9 @@ const ServerActivityLogContainer = () => {
         }
 
         return { ...data, items: filtered };
-    }, [data, searchTerm, selectedEventType, dateRange]);
+    }, [data, debouncedSearchTerm, selectedEventType, dateRange]);
 
-    const exportLogs = () => {
+    const exportLogs = useCallback(() => {
         if (!filteredData?.items) return;
 
         const csvContent = [
@@ -112,7 +114,7 @@ const ServerActivityLogContainer = () => {
         a.download = `server-activity-log-${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         window.URL.revokeObjectURL(url);
-    };
+    }, [filteredData]);
 
     const clearAllFilters = () => {
         setFilters((value) => ({ ...value, filters: {} }));
@@ -143,7 +145,6 @@ const ServerActivityLogContainer = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-        // biome-ignore lint/correctness/useExhaustiveDependencies: handleKeyDown uses refs for callbacks
     }, [showFilters, exportLogs]);
 
     useEffect(() => {

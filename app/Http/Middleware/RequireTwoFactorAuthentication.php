@@ -37,10 +37,16 @@ class RequireTwoFactorAuthentication
     {
         /** @var \Pterodactyl\Models\User $user */
         $user = $request->user();
+
+        // Skip entirely for unauthenticated requests before doing any URI/route work.
+        if (!$user) {
+            return $next($request);
+        }
+
         $uri = rtrim($request->getRequestUri(), '/') . '/';
         $current = $request->route()->getName();
 
-        if (!$user || Str::startsWith($uri, ['/auth/']) || Str::startsWith($current, ['auth.', 'account.'])) {
+        if (Str::startsWith($uri, ['/auth/']) || Str::startsWith($current, ['auth.', 'account.'])) {
             return $next($request);
         }
 
