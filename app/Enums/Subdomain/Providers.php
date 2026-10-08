@@ -42,7 +42,7 @@ enum Providers: string
         $result = [];
         foreach (self::cases() as $case) {
             $result[$case->value] = [
-                'name' => $case->value,
+                'name' => __("admin/domains.providers.{$case->value}"),
                 'description' => __("admin/domains.providers.{$case->value}"),
             ];
         }

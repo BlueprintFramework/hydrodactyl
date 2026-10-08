@@ -8,8 +8,8 @@
 @section('content-header')
   <h1>{{ __('admin/domains.create.title') }}<small>{{ __('admin/domains.create.description') }}</small></h1>
   <ol class="breadcrumb">
-    <li><a href="{{ route('admin.index') }}">Admin</a></li>
-    <li><a href="{{ route('admin.settings') }}">Settings</a></li>
+    <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+    <li><a href="{{ route('admin.settings') }}">{{ __('admin/navigation.breadcrumb.settings') }}</a></li>
     <li><a href="{{ route('admin.settings.domains.index') }}">{{ __('admin/domains.breadcrumb_domains') }}</a></li>
     <li class="active">{{ __('admin/domains.create.title') }}</li>
   </ol>
@@ -27,7 +27,7 @@
           <div class="box-body">
             <div class="row">
               <div class="form-group col-md-6">
-                <label for="name" class="control-label">{{ __('admin/domains.domain_name') }} <span class="field-required"></span></label>
+                <label for="name" class="control-label">{{ __('admin/domains.domain_name') }} <span class="field-required">{{ __('strings.required') }}</span></label>
                 <div>
                   <input type="text" name="name" id="name" class="form-control" value="{{ old('name') }}"
                     placeholder="example.com" required />
@@ -35,7 +35,7 @@
                 </div>
               </div>
               <div class="form-group col-md-6">
-                <label for="dns_provider" class="control-label">{{ __('admin/domains.dns_provider') }} <span class="field-required"></span></label>
+                <label for="dns_provider" class="control-label">{{ __('admin/domains.dns_provider') }} <span class="field-required">{{ __('strings.required') }}</span></label>
                 <div>
                   <select name="dns_provider" id="dns_provider" class="form-control" required>
                     <option value="">{{ __('admin/domains.select_provider') }}</option>
@@ -219,7 +219,7 @@
                           <div class="form-group col-md-6">
                             <label for="dns_config_${key}" class="control-label">
                               ${field.description || key} 
-                              ${field.required ? '<span class="field-required"></span>' : ''}
+                              ${field.required ? '<span class="field-required">{{ __('strings.required') }}</span>' : ''}
                             </label>
                             <div>
                               <input type="${field.sensitive ? 'password' : 'text'}" 

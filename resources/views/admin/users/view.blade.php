@@ -73,7 +73,7 @@
                 <div class="box-body">
                     <div class="alert alert-success" style="display:none;margin-bottom:10px;" id="gen_pass"></div>
                     <div class="form-group no-margin-bottom">
-                        <label for="password" class="control-label">{{ __('strings.password') }} <span class="field-optional"></span></label>
+                        <label for="password" class="control-label">{{ __('strings.password') }} <span class="field-optional">{{ __('strings.optional') }}</span></label>
                         <div>
                             <input type="password" id="password" name="password" class="form-control form-autocomplete-stop">
                             <p class="text-muted small">{{ __('admin/user.view.password_help') }}</p>

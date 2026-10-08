@@ -261,7 +261,7 @@ class HetznerProvider implements DnsProviderInterface
             'api_token' => [
                 'type' => 'string',
                 'required' => true,
-                'description' => 'Hetzner Cloud API Token with read/write permissions',
+                'description' => __('admin/domains.schema.hetzner.api_token'),
                 'sensitive' => true,
             ],
         ];

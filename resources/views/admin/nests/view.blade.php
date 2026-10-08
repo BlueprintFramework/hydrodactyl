@@ -20,7 +20,7 @@
             <div class="box">
                 <div class="box-body">
                     <div class="form-group">
-                        <label class="control-label">{{ __('strings.name') }} <span class="field-required"></span></label>
+                        <label class="control-label">{{ __('strings.name') }} <span class="field-required">{{ __('strings.required') }}</span></label>
                         <div>
                             <input type="text" name="name" class="form-control" value="{{ $nest->name }}" />
                             <p class="text-muted"><small>{{ __('admin/nests.view.name_help') }}</small></p>

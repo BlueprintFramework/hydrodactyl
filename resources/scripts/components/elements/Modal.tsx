@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { DialogContext, type IconPosition, styles } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const variants = {
     open: {
@@ -69,6 +70,8 @@ const Modal: React.FC<ModalProps> = ({
     onDismissed,
     children,
 }) => {
+    const { t } = useTranslation();
+
     const isDismissable = useMemo(() => {
         return dismissable && !showSpinnerOverlay;
     }, [dismissable, showSpinnerOverlay]);
@@ -169,7 +172,7 @@ const Modal: React.FC<ModalProps> = ({
                                                             onClick={onDismissed}
                                                             className={`min-w-full`}
                                                         >
-                                                            Close
+                                                            {t('common.close')}
                                                         </Button>
                                                     </div>
                                                 )}

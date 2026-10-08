@@ -25,7 +25,7 @@
             <form action="{{ route('admin.servers.view.details', $server->id) }}" method="POST">
                 <div class="box-body">
                     <div class="form-group">
-                        <label for="name" class="control-label">{{ __('admin/server.view.details.server_name') }} <span class="field-required"></span></label>
+                        <label for="name" class="control-label">{{ __('admin/server.view.details.server_name') }} <span class="field-required">{{ __('strings.required') }}</span></label>
                         <input type="text" name="name" value="{{ old('name', $server->name) }}" class="form-control" />
                         <p class="text-muted small">{!! __('admin/server.view.details.character_limits') !!}</p>
                     </div>
@@ -35,7 +35,7 @@
                         <p class="text-muted small">{{ __('admin/server.view.details.external_identifier_help') }}</p>
                     </div>
                     <div class="form-group">
-                        <label for="pUserId" class="control-label">{{ __('admin/server.view.details.server_owner') }} <span class="field-required"></span></label>
+                        <label for="pUserId" class="control-label">{{ __('admin/server.view.details.server_owner') }} <span class="field-required">{{ __('strings.required') }}</span></label>
                         <select name="owner_id" class="form-control" id="pUserId">
                             <option value="{{ $server->owner_id }}" selected>{{ $server->user->email }}</option>
                         </select>

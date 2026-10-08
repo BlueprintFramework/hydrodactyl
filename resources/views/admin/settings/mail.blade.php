@@ -63,13 +63,13 @@
           </div>
           <div class="row">
             <div class="form-group col-md-6">
-              <label class="control-label">{{ __('strings.username') }} <span class="field-optional"></span></label>
+              <label class="control-label">{{ __('strings.username') }} <span class="field-optional">{{ __('strings.optional') }}</span></label>
               <input type="text" class="form-control" name="mail:mailers:smtp:username"
                 value="{{ old('mail:mailers:smtp:username', config('mail.mailers.smtp.username')) }}" />
               <p class="text-muted small" style="margin-top:4px;">{{ __('admin/settings.mail.smtp_username_help') }}</p>
             </div>
             <div class="form-group col-md-6">
-              <label class="control-label">{{ __('strings.password') }} <span class="field-optional"></span></label>
+              <label class="control-label">{{ __('strings.password') }} <span class="field-optional">{{ __('strings.optional') }}</span></label>
               <input type="password" class="form-control" name="mail:mailers:smtp:password" />
               <p class="text-muted small" style="margin-top:4px;">{!! __('admin/settings.mail.password_help') !!}</p>
             </div>
@@ -83,7 +83,7 @@
               <p class="text-muted small" style="margin-top:4px;">{{ __('admin/settings.mail.from_address_help') }}</p>
             </div>
             <div class="form-group col-md-6">
-              <label class="control-label">{{ __('admin/settings.mail.from_name') }} <span class="field-optional"></span></label>
+              <label class="control-label">{{ __('admin/settings.mail.from_name') }} <span class="field-optional">{{ __('strings.optional') }}</span></label>
               <input type="text" class="form-control" name="mail:from:name"
                 value="{{ old('mail:from:name', config('mail.from.name')) }}" />
               <p class="text-muted small" style="margin-top:4px;">{{ __('admin/settings.mail.from_name_help') }}</p>

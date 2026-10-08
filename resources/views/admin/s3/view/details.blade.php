@@ -25,7 +25,7 @@
             <form action="{{ route('admin.buckets.view.details', $s3->id) }}" method="POST">
                 <div class="box-body">
                     <div class="form-group">
-                        <label for="name" class="control-label">{{ __('strings.name') }} <span class="field-required"></span></label>
+                        <label for="name" class="control-label">{{ __('strings.name') }} <span class="field-required">{{ __('strings.required') }}</span></label>
                         <input type="text" name="name" value="{{ old('name', $s3->name) }}" class="form-control" required />
                         <p class="text-muted small">{{ __('admin/s3.view.details.name_help') }}</p>
                     </div>
@@ -35,12 +35,12 @@
                         <p class="text-muted small">{{ __('admin/s3.view.details.description_help') }}</p>
                     </div>
                     <div class="form-group">
-                        <label for="access_key" class="control-label">{{ __('admin/s3.view.details.access_key') }} <span class="field-required"></span></label>
+                        <label for="access_key" class="control-label">{{ __('admin/s3.view.details.access_key') }} <span class="field-required">{{ __('strings.required') }}</span></label>
                         <input type="text" name="access_key" value="{{ old('access_key', $s3->access_key) }}" class="form-control" required />
                         <p class="text-muted small">{{ __('admin/s3.view.details.access_key_help') }}</p>
                     </div>
                     <div class="form-group">
-                        <label for="secret_key" class="control-label">{{ __('admin/s3.view.details.secret_key') }} <span class="field-required"></span></label>
+                        <label for="secret_key" class="control-label">{{ __('admin/s3.view.details.secret_key') }} <span class="field-required">{{ __('strings.required') }}</span></label>
                         <input type="password" name="secret_key" value="{{ old('secret_key', $s3->secret_key) }}" class="form-control" required />
                         <p class="text-muted small">{{ __('admin/s3.view.details.secret_key_help') }}</p>
                     </div>
@@ -55,7 +55,7 @@
                         <p class="text-muted small">{!! __('admin/s3.view.details.region_help') !!}</p>
                     </div>
                     <div class="form-group">
-                        <label for="bucket_name" class="control-label">{{ __('admin/s3.view.details.bucket_name') }} <span class="field-required"></span></label>
+                        <label for="bucket_name" class="control-label">{{ __('admin/s3.view.details.bucket_name') }} <span class="field-required">{{ __('strings.required') }}</span></label>
                         <input type="text" name="bucket_name" value="{{ old('bucket_name', $s3->bucket_name) }}" class="form-control" required />
                         <p class="text-muted small">{{ __('admin/s3.view.details.bucket_name_help') }}</p>
                     </div>

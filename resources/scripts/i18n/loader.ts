@@ -60,8 +60,15 @@ export function matchLocale(value: string | null | undefined, codes: string[]): 
  * Every locale shipped with date-fns, resolved on demand. A language folder
  * dropped into `resources/lang` therefore localizes dates without any code
  * change, and the locale bundles are only downloaded when they are used.
+ *
+ * The CDN bundles (`locale/cdn.js`, `locale/cdn.min.js`) are explicitly
+ * excluded: they are side-effectful polyfills that log a migration warning
+ * when bundled and would otherwise run on every panel load.
  */
-const dateFnsModules = import.meta.glob<{ default: Locale }>('/node_modules/date-fns/locale/*.js');
+const dateFnsModules = import.meta.glob<{ default: Locale }>([
+    '/node_modules/date-fns/locale/*.js',
+    '!/node_modules/date-fns/locale/cdn*.js',
+]);
 
 const dateFnsCache = new Map<string, Locale>();
 

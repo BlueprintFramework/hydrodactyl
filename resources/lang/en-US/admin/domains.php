@@ -52,6 +52,29 @@ return [
         'hetzner' => 'Hetzner DNS Console',
         'route53' => 'AWS Route53 DNS Service',
     ],
+    'schema' => [
+        'bunny' => [
+            'api_key' => 'Bunny.net API Access Key (Account API Key)',
+            'zone_id' => 'Bunny.net DNS Zone ID (numeric)',
+        ],
+        'cloudflare' => [
+            'api_token' => 'Cloudflare API Token with Zone:Edit permissions',
+            'zone_id' => 'Cloudflare Zone ID',
+        ],
+        'dnsimple' => [
+            'api_token' => 'DNSimple API Access Token',
+            'account_id' => 'DNSimple Account ID (optional, auto-detected when omitted)',
+        ],
+        'hetzner' => [
+            'api_token' => 'Hetzner Cloud API Token with read/write permissions',
+        ],
+        'route53' => [
+            'access_key_id' => 'AWS Access Key ID with Route53 permissions',
+            'secret_access_key' => 'AWS Secret Access Key',
+            'hosted_zone_id' => 'Route53 Hosted Zone ID',
+            'region' => 'AWS Region (default: us-east-1)',
+        ],
+    ],
     'select_provider' => 'Select a DNS provider...',
     'status' => 'Status',
     'status_help' => 'Whether this domain should be available for subdomain creation.',

@@ -52,6 +52,29 @@ return [
         'hetzner' => 'Consola DNS de Hetzner',
         'route53' => 'Servicio DNS de AWS Route53',
     ],
+    'schema' => [
+        'bunny' => [
+            'api_key' => 'Clave de acceso de la API de Bunny.net (clave de API de la cuenta)',
+            'zone_id' => 'ID de la zona DNS de Bunny.net (numérico)',
+        ],
+        'cloudflare' => [
+            'api_token' => 'Token de API de Cloudflare con permisos Zone:Edit',
+            'zone_id' => 'ID de zona de Cloudflare',
+        ],
+        'dnsimple' => [
+            'api_token' => 'Token de acceso de la API de DNSimple',
+            'account_id' => 'ID de cuenta de DNSimple (opcional; se detecta automáticamente si se omite)',
+        ],
+        'hetzner' => [
+            'api_token' => 'Token de API de Hetzner Cloud con permisos de lectura y escritura',
+        ],
+        'route53' => [
+            'access_key_id' => 'ID de clave de acceso de AWS con permisos para Route53',
+            'secret_access_key' => 'Clave de acceso secreta de AWS',
+            'hosted_zone_id' => 'ID de la zona alojada de Route53',
+            'region' => 'Región de AWS (predeterminada: us-east-1)',
+        ],
+    ],
     'select_provider' => 'Selecciona un proveedor DNS...',
     'status' => 'Estado',
     'status_help' => 'Indica si este dominio debe estar disponible para la creación de subdominios.',

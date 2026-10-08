@@ -277,13 +277,13 @@ class CloudflareProvider implements DnsProviderInterface
             'api_token' => [
                 'type' => 'string',
                 'required' => true,
-                'description' => 'Cloudflare API Token with Zone:Edit permissions',
+                'description' => __('admin/domains.schema.cloudflare.api_token'),
                 'sensitive' => true,
             ],
             'zone_id' => [
                 'type' => 'string',
                 'required' => true,
-                'description' => 'Cloudflare Zone ID',
+                'description' => __('admin/domains.schema.cloudflare.zone_id'),
                 'sensitive' => false,
             ],
         ];

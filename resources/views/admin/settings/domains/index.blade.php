@@ -8,8 +8,8 @@
 @section('content-header')
   <h1>{{ __('admin/domains.index_title') }}<small>{{ __('admin/domains.index_description') }}</small></h1>
   <ol class="breadcrumb">
-    <li><a href="{{ route('admin.index') }}">Admin</a></li>
-    <li><a href="{{ route('admin.settings') }}">Settings</a></li>
+    <li><a href="{{ route('admin.index') }}">{{ __('admin/navigation.breadcrumb.admin') }}</a></li>
+    <li><a href="{{ route('admin.settings') }}">{{ __('admin/navigation.breadcrumb.settings') }}</a></li>
     <li class="active">{{ __('admin/domains.breadcrumb_domains') }}</li>
   </ol>
 @endsection
@@ -44,7 +44,7 @@
                   <tr>
                     <td><code>{{ $domain->name }}</code></td>
                     <td>
-                      <span class="label label-primary">{{ ucfirst($domain->dns_provider) }}</span>
+                      <span class="label label-primary">{{ __('admin/domains.providers.' . $domain->dns_provider) }}</span>
                     </td>
                     <td>
                       @if($domain->is_active)
