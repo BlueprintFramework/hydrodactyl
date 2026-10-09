@@ -38,7 +38,7 @@ class DownloadLinkService
             ->setScopes(JwtScope::BackupDownload)
             ->handle($backup->server->node, $user->id . $backup->server->uuid);
 
-        return sprintf('%s/download/backup?token=%s', $backup->server->node->getConnectionAddress(), $token->toString());
+        return sprintf('%s/download/backup?token=%s', $backup->server->node->getBrowserConnectionAddress(), $token->toString());
     }
 
     /**

@@ -34,6 +34,8 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:client_features:allocations:range_start',
     'pterodactyl:client_features:allocations:range_end',
     'pterodactyl:client_features:groups:enabled',
+    'pterodactyl:client_features:schedules:per_schedule_task_limit',
+    'pterodactyl:client_features:schedules:stuck_timeout',
     'pterodactyl:captcha:provider',
     'pterodactyl:captcha:turnstile:site_key',
     'pterodactyl:captcha:turnstile:secret_key',

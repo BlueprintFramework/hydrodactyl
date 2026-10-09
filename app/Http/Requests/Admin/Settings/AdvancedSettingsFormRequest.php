@@ -29,6 +29,8 @@ class AdvancedSettingsFormRequest extends AdminFormRequest
         'gt:pterodactyl:client_features:allocations:range_start',
       ],
       'pterodactyl:client_features:groups:enabled' => 'required|in:true,false',
+      'pterodactyl:client_features:schedules:per_schedule_task_limit' => 'required|integer|between:1,100',
+      'pterodactyl:client_features:schedules:stuck_timeout' => 'required|integer|between:901,86400',
     ];
   }
 
@@ -41,6 +43,8 @@ class AdvancedSettingsFormRequest extends AdminFormRequest
       'pterodactyl:client_features:allocations:range_start' => 'Starting Port',
       'pterodactyl:client_features:allocations:range_end' => 'Ending Port',
       'pterodactyl:client_features:groups:enabled' => 'Server Groups Enabled',
+      'pterodactyl:client_features:schedules:per_schedule_task_limit' => 'Tasks Per Schedule Limit',
+      'pterodactyl:client_features:schedules:stuck_timeout' => 'Stuck Schedule Timeout',
     ];
   }
 }

@@ -41,19 +41,30 @@ const getSiteName = () => {
         : 'Hydrodactyl';
 };
 
-const LogoSection = memo(() => {
+const LogoSection = memo(({ admin }: { admin?: boolean }) => {
     const siteName = getSiteName();
+    const className = 'sidebar-logo-link flex items-center shrink-0 h-8 min-w-0 gap-3 hydrodactyl';
 
-    return (
-        <NavLink
-            to={'/'}
-            className='sidebar-logo-link flex items-center shrink-0 h-8 min-w-0 gap-3 hydrodactyl'
-            aria-label={`${siteName} home page`}
-        >
+    const content = (
+        <>
             <Logo className='flex h-8 w-8 shrink-0 object-contain' />
             <span className='sidebar-logo-name hydrodactyl-logo content-center truncate text-sm font-semibold leading-none tracking-wide text-cream-50'>
                 {siteName}
             </span>
+        </>
+    );
+
+    if (admin) {
+        return (
+            <a href='/' className={className} aria-label={`${siteName} home page`}>
+                {content}
+            </a>
+        );
+    }
+
+    return (
+        <NavLink to={'/'} className={className} aria-label={`${siteName} home page`}>
+            {content}
         </NavLink>
     );
 });
@@ -76,10 +87,10 @@ const ToggleButton = memo(() => {
 });
 ToggleButton.displayName = 'ToggleButton';
 
-const SidebarLogo = memo(() => {
+const SidebarLogo = memo(({ admin }: { admin?: boolean }) => {
     return (
         <div className='sidebar-logo-container hidden lg:flex h-12 items-center flex-none relative'>
-            <LogoSection />
+            <LogoSection admin={admin} />
             <ToggleButton />
         </div>
     );
@@ -119,7 +130,7 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
         return (
             <div className='h-16 w-full py-4 pr-2 flex align-middle items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                    <SidebarLogo />
+                    <SidebarLogo admin={admin} />
                     <MobileSidebarToggle />
                     <SlotActions actions={leftActions} />
                 </div>
@@ -137,7 +148,7 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
         <div className='h-16 w-full py-4 pr-2 flex align-middle items-center'>
             <div className='flex items-center gap-2 flex-1'>
                 <MobileSidebarToggle />
-                <SidebarLogo />
+                <SidebarLogo admin={admin} />
             </div>
             <HeaderActions />
             <div className='flex items-center gap-1.5 sm:gap-2 justify-end min-w-0 overflow-hidden flex-1'>

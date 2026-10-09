@@ -21,7 +21,7 @@ class DomainFormRequest extends AdminFormRequest
                 'regex:/^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/',
                 $domainId ? "unique:domains,name,{$domainId}" : 'unique:domains,name',
             ],
-            'dns_provider' => 'required|string|in:cloudflare,hetzner,route53,bunny',
+            'dns_provider' => 'required|string|in:cloudflare,hetzner,route53,bunny,spaceship',
             'dns_config' => 'required|array',
             'dns_config.api_token' => 'required_if:dns_provider,cloudflare,hetzner|string|min:1',
             'dns_config.access_key_id' => 'required_if:dns_provider,route53|string|min:1',
@@ -29,7 +29,8 @@ class DomainFormRequest extends AdminFormRequest
             'dns_config.region' => 'sometimes|string|min:1',
             'dns_config.hosted_zone_id' => 'sometimes|string|min:1',
             'dns_config.zone_id' => 'sometimes|string|min:1',
-            'dns_config.api_key' => 'required_if:dns_provider,bunny|string|min:1',
+            'dns_config.api_key' => 'required_if:dns_provider,bunny,spaceship|string|min:1',
+            'dns_config.api_secret' => 'required_if:dns_provider,spaceship|string|min:1',
             'is_active' => 'sometimes|boolean',
             'is_default' => 'sometimes|boolean',
         ];
@@ -50,7 +51,8 @@ class DomainFormRequest extends AdminFormRequest
             'dns_config.api_token.required_if' => 'API token is required for Cloudflare.',
             'dns_config.access_key_id.required_if' => 'Access Key ID is required for Route53.',
             'dns_config.secret_access_key.required_if' => 'Secret Access Key is required for Route53.',
-            'dns_config.api_key.required_if' => 'Bunny.net API Access Key is required for Bunny.net.',
+            'dns_config.api_key.required_if' => 'API key is required for Bunny.net and Spaceship.',
+            'dns_config.api_secret.required_if' => 'API secret is required for Spaceship.',
         ];
     }
 
@@ -67,7 +69,8 @@ class DomainFormRequest extends AdminFormRequest
             'dns_config.secret_access_key' => 'Secret Access Key',
             'dns_config.region' => 'AWS Region',
             'dns_config.hosted_zone_id' => 'Hosted Zone ID',
-            'dns_config.api_key' => 'Bunny.net API Access Key',
+            'dns_config.api_key' => 'API key',
+            'dns_config.api_secret' => 'API secret',
         ];
     }
 

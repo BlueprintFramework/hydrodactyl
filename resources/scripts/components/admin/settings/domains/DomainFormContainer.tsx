@@ -155,7 +155,7 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                         {Object.entries(schema ?? {}).map(([key, field]) => (
                             <Field
                                 key={key}
-                                label={labelFor(key)}
+                                label={field.label ?? labelFor(key)}
                                 hint={field.description}
                                 error={errors[`dns_config.${key}`]}
                             >

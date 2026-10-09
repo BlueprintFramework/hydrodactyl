@@ -19,6 +19,7 @@ export interface DomainProvider {
 
 export interface ProviderSchemaField {
     type: string;
+    label?: string;
     required: boolean;
     description: string;
     sensitive?: boolean;

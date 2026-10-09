@@ -13,6 +13,8 @@ export interface AdvancedSettings {
     'pterodactyl:client_features:allocations:range_start': number | null;
     'pterodactyl:client_features:allocations:range_end': number | null;
     'pterodactyl:client_features:groups:enabled': boolean;
+    'pterodactyl:client_features:schedules:per_schedule_task_limit': number;
+    'pterodactyl:client_features:schedules:stuck_timeout': number;
 }
 
 export interface MailSettings {

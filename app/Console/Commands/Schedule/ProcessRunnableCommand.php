@@ -27,7 +27,9 @@ class ProcessRunnableCommand extends Command
             ->whereRelation('server', fn (Builder $builder) => $builder->whereNull('status'))
             ->where('is_active', true)
             ->where('is_processing', false)
-            ->whereRaw('next_run_at <= NOW()')
+            ->where(function (Builder $builder) {
+                $builder->whereNull('next_run_at')->orWhere('next_run_at', '<=', now());
+            })
             ->get();
 
         if ($schedules->count() < 1) {
@@ -69,7 +71,7 @@ class ProcessRunnableCommand extends Command
                 'schedule' => $schedule->name,
                 'hash' => $schedule->hashid,
             ]));
-        } catch (\Throwable|\Exception $exception) {
+        } catch (\Throwable $exception) {
             Log::error($exception, ['schedule_id' => $schedule->id]);
 
             $this->error("An error was encountered while processing Schedule #$schedule->id: " . $exception->getMessage());
@@ -78,7 +80,9 @@ class ProcessRunnableCommand extends Command
 
     protected function cleanupStuckSchedules(): void
     {
-        $timeout = 600;
+        // This should stop schedules from being wrongfully stopped due to max in-panel timeout
+        // being 600
+        $timeout = (int) config('pterodactyl.client_features.schedules.stuck_timeout', 1800);
 
         $stuck = Schedule::query()
             ->where('is_processing', true)
