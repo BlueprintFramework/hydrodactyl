@@ -127,7 +127,7 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                 <div
                     {...dragHandleProps}
                     className={`opacity-0 group-hover:opacity-100 transition-opacity duration-150 text-cream-400/50 hover:text-cream-200 cursor-grab active:cursor-grabbing p-1 -ml-2 rounded flex items-center justify-center shrink-0 select-none ${dragHandleProps?.className || ''}`}
-                    title='Przeciągnij, aby zmienić kolejność'
+                    title='Drag to reorder'
                 >
                     <Grip className='w-4 h-4 pointer-events-none' />
                 </div>
