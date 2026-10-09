@@ -14,6 +14,7 @@ use Pterodactyl\Repositories\Eloquent\TaskRepository;
 use Pterodactyl\Exceptions\Http\HttpForbiddenException;
 use Pterodactyl\Transformers\Api\Client\TaskTransformer;
 use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
+use Pterodactyl\Services\Schedules\ScheduleTaskSequenceService;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Pterodactyl\Exceptions\Service\ServiceLimitExceededException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -27,6 +28,7 @@ class ScheduleTaskController extends ClientApiController
     public function __construct(
         private ConnectionInterface $connection,
         private TaskRepository $repository,
+        private ScheduleTaskSequenceService $sequenceService,
     ) {
         parent::__construct();
     }
@@ -66,9 +68,7 @@ class ScheduleTaskController extends ClientApiController
             // the sequence id of all tasks that are greater than or equal to the request sequence
             // id to be one greater than the current value.
             if ($requestSequenceId < $sequenceId) {
-                $schedule->tasks()
-                    ->where('sequence_id', '>=', $requestSequenceId)
-                    ->increment('sequence_id');
+                $this->sequenceService->shift($schedule, $requestSequenceId, $sequenceId - 1, 1);
                 $sequenceId = $requestSequenceId;
             }
 
@@ -116,17 +116,7 @@ class ScheduleTaskController extends ClientApiController
             }
 
             // Shift all other tasks in the schedule up or down to make room for the new task.
-            if ($sequenceId < $task->sequence_id) {
-                $schedule->tasks()
-                    ->where('sequence_id', '>=', $sequenceId)
-                    ->where('sequence_id', '<', $task->sequence_id)
-                    ->increment('sequence_id');
-            } elseif ($sequenceId > $task->sequence_id) {
-                $schedule->tasks()
-                    ->where('sequence_id', '>', $task->sequence_id)
-                    ->where('sequence_id', '<=', $sequenceId)
-                    ->decrement('sequence_id');
-            }
+            $this->sequenceService->move($schedule, $task, $sequenceId);
 
             $this->repository->update($task->id, [
                 'sequence_id' => $sequenceId,
@@ -162,13 +152,16 @@ class ScheduleTaskController extends ClientApiController
             throw new HttpForbiddenException('You do not have permission to perform this action.');
         }
 
+        if ($task->is_queued || $task->is_processing) {
+            throw new HttpForbiddenException('Cannot delete a task that is currently queued or processing.');
+        }
+
         $sequenceId = $task->sequence_id;
 
         $task->delete();
 
-        $schedule->tasks()
-            ->where('sequence_id', '>', $sequenceId)
-            ->decrement('sequence_id');
+        $maxSequenceId = (int) $schedule->tasks()->max('sequence_id');
+        $this->sequenceService->shift($schedule, $sequenceId + 1, $maxSequenceId, -1);
 
         Activity::event('server:task.delete')->subject($schedule, $task)->property('name', $schedule->name)->log();
 

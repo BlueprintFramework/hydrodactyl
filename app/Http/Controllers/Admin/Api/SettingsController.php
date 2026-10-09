@@ -64,6 +64,8 @@ class SettingsController extends Controller
                 'pterodactyl:client_features:allocations:range_start' => $this->config->get('pterodactyl.client_features.allocations.range_start'),
                 'pterodactyl:client_features:allocations:range_end' => $this->config->get('pterodactyl.client_features.allocations.range_end'),
                 'pterodactyl:client_features:groups:enabled' => (bool) $this->config->get('pterodactyl.client_features.groups.enabled'),
+                'pterodactyl:client_features:schedules:per_schedule_task_limit' => (int) $this->config->get('pterodactyl.client_features.schedules.per_schedule_task_limit', 10),
+                'pterodactyl:client_features:schedules:stuck_timeout' => (int) $this->config->get('pterodactyl.client_features.schedules.stuck_timeout', 1800),
             ],
             'mail' => [
                 'enabled' => $this->config->get('mail.default') === 'smtp',

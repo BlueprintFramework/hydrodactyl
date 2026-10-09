@@ -16,6 +16,8 @@ interface Props {
     rangeStart: number | null;
     rangeEnd: number | null;
     groupsEnabled: boolean;
+    perScheduleTaskLimit: number;
+    stuckTimeout: number;
     onSaved: () => void;
 }
 
@@ -37,6 +39,8 @@ const AdvancedForm = ({
     rangeStart,
     rangeEnd,
     groupsEnabled,
+    perScheduleTaskLimit,
+    stuckTimeout,
     onSaved,
 }: Props) => {
     const [values, setValues] = useState({
@@ -46,6 +50,8 @@ const AdvancedForm = ({
         rangeStart: rangeStart === null ? '' : String(rangeStart),
         rangeEnd: rangeEnd === null ? '' : String(rangeEnd),
         groupsEnabled,
+        perScheduleTaskLimit: String(perScheduleTaskLimit),
+        stuckTimeout: String(stuckTimeout),
     });
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -62,6 +68,8 @@ const AdvancedForm = ({
                 'pterodactyl:client_features:allocations:range_start': values.rangeStart,
                 'pterodactyl:client_features:allocations:range_end': values.rangeEnd,
                 'pterodactyl:client_features:groups:enabled': String(values.groupsEnabled),
+                'pterodactyl:client_features:schedules:per_schedule_task_limit': values.perScheduleTaskLimit,
+                'pterodactyl:client_features:schedules:stuck_timeout': values.stuckTimeout,
             });
             await onSaved();
             toast.success('Settings saved.');
@@ -149,6 +157,38 @@ const AdvancedForm = ({
                 </Field>
             </div>
 
+            <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
+                <h2 className='text-sm font-semibold text-cream-50'>Schedules</h2>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <Field
+                        label='Tasks Per Schedule'
+                        error={errors['pterodactyl:client_features:schedules:per_schedule_task_limit']}
+                        hint='The maximum number of tasks a single schedule may have.'
+                    >
+                        <Input.Text
+                            type='number'
+                            min={1}
+                            max={100}
+                            value={values.perScheduleTaskLimit}
+                            onChange={(e) => setValues({ ...values, perScheduleTaskLimit: e.target.value })}
+                        />
+                    </Field>
+                    <Field
+                        label='Stuck Schedule Timeout'
+                        error={errors['pterodactyl:client_features:schedules:stuck_timeout']}
+                        hint='Seconds before a schedule that is still processing is treated as stuck and reset. Must be greater than the maximum task delay (900 seconds).'
+                    >
+                        <Input.Text
+                            type='number'
+                            min={901}
+                            max={86400}
+                            value={values.stuckTimeout}
+                            onChange={(e) => setValues({ ...values, stuckTimeout: e.target.value })}
+                        />
+                    </Field>
+                </div>
+            </div>
+
             <div className='flex justify-end'>
                 <Button type='submit' disabled={submitting}>
                     Save
@@ -177,6 +217,8 @@ const AdvancedSettings = () => {
             rangeStart={data.advanced['pterodactyl:client_features:allocations:range_start']}
             rangeEnd={data.advanced['pterodactyl:client_features:allocations:range_end']}
             groupsEnabled={data.advanced['pterodactyl:client_features:groups:enabled']}
+            perScheduleTaskLimit={data.advanced['pterodactyl:client_features:schedules:per_schedule_task_limit']}
+            stuckTimeout={data.advanced['pterodactyl:client_features:schedules:stuck_timeout']}
             onSaved={mutate}
         />
     );
