@@ -98,8 +98,8 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - name: Enable pnpm
-        run: corepack enable
+      - name: Set up pnpm
+        run: npm install -g pnpm@11.3.0
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
