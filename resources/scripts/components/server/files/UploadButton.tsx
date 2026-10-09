@@ -1,13 +1,60 @@
 import axios from 'axios';
+import { join } from 'pathe';
 import { useEffect, useRef, useState } from 'react';
+import createDirectory from '@/api/server/files/createDirectory';
 import getFileUploadUrl from '@/api/server/files/getFileUploadUrl';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/elements/DropdownMenu';
 import { ModalMask } from '@/components/elements/Modal';
 import FadeTransition from '@/components/elements/transitions/FadeTransition';
 import { Button } from '@/components/ui/button';
+import { cleanDirectoryPath } from '@/helpers';
 import useEventListener from '@/plugins/useEventListener';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { useFlashKey } from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
+import {
+    type CollectedUpload,
+    collectFromEntries,
+    collectFromFileList,
+    getEmptyDirectories,
+    getFileSystemEntries,
+    getRelativeDirectory,
+    type UploadCandidate,
+} from './uploadDirectory';
+
+// Limit how many uploads run at once so a large folder does not open hundreds of
+// connections at the same time.
+const MAX_CONCURRENT_UPLOADS = 3;
+
+const runPool = async (tasks: (() => Promise<unknown>)[], limit: number): Promise<void> => {
+    const queue = [...tasks];
+    let failed = false;
+
+    const workers = Array.from({ length: Math.min(limit, queue.length) }, async () => {
+        while (!failed && queue.length > 0) {
+            const task = queue.shift();
+            if (!task) {
+                continue;
+            }
+
+            try {
+                await task();
+            } catch (error) {
+                // Stop the remaining uploads as soon as one of them fails.
+                failed = true;
+
+                throw error;
+            }
+        }
+    });
+
+    await Promise.all(workers);
+};
 
 function isFileOrDirectory(event: DragEvent): boolean {
     if (!event.dataTransfer?.types) {
@@ -19,24 +66,33 @@ function isFileOrDirectory(event: DragEvent): boolean {
 
 const UploadButton = () => {
     const fileUploadInput = useRef<HTMLInputElement>(null);
-    const [timeouts, _] = useState<NodeJS.Timeout[]>([]);
+    const folderUploadInput = useRef<HTMLInputElement>(null);
     const [visible, setVisible] = useState(false);
     const { mutate } = useFileManagerSwr();
-    const { addError, clearAndAddHttpError } = useFlashKey('files');
+    const { clearAndAddHttpError } = useFlashKey('files');
 
     const name = ServerContext.useStoreState((state) => state.server.data?.name);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
-    const { clearFileUploads, removeFileUpload, pushFileUpload } = ServerContext.useStoreActions(
+    const { clearFileUploads, removeFileUpload, pushFileUpload, setUploadProgress } = ServerContext.useStoreActions(
         (actions) => actions.files,
     );
+
+    // `webkitdirectory` is a non-standard attribute that TypeScript does not know about,
+    // so it is applied directly to the input.
+    useEffect(() => {
+        if (folderUploadInput.current) {
+            folderUploadInput.current.setAttribute('webkitdirectory', '');
+            folderUploadInput.current.setAttribute('directory', '');
+        }
+    }, []);
 
     useEventListener(
         'dragenter',
         (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (isFileOrDirectory(e)) {
+            if (isFileOrDirectory(e as DragEvent)) {
                 return setVisible(true);
             }
         },
@@ -49,46 +105,92 @@ const UploadButton = () => {
         if (visible) setVisible(false);
     });
 
-    useEffect(() => {
-        return () => timeouts.forEach(clearTimeout);
-    }, [timeouts.forEach]);
+    const uploadCandidate = async (serverUuid: string, candidate: UploadCandidate, controller: AbortController) => {
+        // The daemon writes the file to `directory/<filename>`, creating parent folders as
+        // needed, so pointing `directory` at the file's relative folder preserves the tree.
+        const targetDirectory = cleanDirectoryPath(join(directory, getRelativeDirectory(candidate.relativePath)));
 
-    const onFileSubmission = (files: FileList) => {
+        const url = await getFileUploadUrl(serverUuid);
+        await axios.post(
+            url,
+            { files: candidate.file },
+            {
+                signal: controller.signal,
+                headers: { 'Content-Type': 'multipart/form-data' },
+                params: { directory: targetDirectory },
+                onUploadProgress: (event) => setUploadProgress({ name: candidate.relativePath, loaded: event.loaded }),
+            },
+        );
+    };
+
+    const onFileSubmission = (collected: CollectedUpload) => {
         clearAndAddHttpError();
-        const list = Array.from(files);
-        if (list.some((file) => !file.size || (!file.type && file.size === 4096))) {
-            return addError('Folder uploads are not supported at this time.', 'Error');
+
+        if (!uuid || (collected.files.length === 0 && collected.directories.length === 0)) {
+            return;
         }
 
-        const uploads = list.map((file) => {
+        const serverUuid = uuid;
+        const tasks: (() => Promise<unknown>)[] = [];
+
+        // Create empty folders explicitly. Folders that contain files are created by the
+        // daemon when the files inside them are written.
+        for (const relativeDirectory of getEmptyDirectories(collected)) {
+            tasks.push(() => createDirectory(serverUuid, directory, relativeDirectory));
+        }
+
+        for (const candidate of collected.files) {
             const controller = new AbortController();
             pushFileUpload({
-                name: file.name,
-                data: { abort: controller, loaded: 0, total: file.size },
+                name: candidate.relativePath,
+                data: { abort: controller, loaded: 0, total: candidate.file.size },
             });
 
-            return () =>
-                getFileUploadUrl(uuid).then((url) =>
-                    axios
-                        .post(
-                            url,
-                            { files: file },
-                            {
-                                signal: controller.signal,
-                                headers: { 'Content-Type': 'multipart/form-data' },
-                                params: { directory },
-                            },
-                        )
-                        .then(() => timeouts.push(setTimeout(() => removeFileUpload(file.name), 500))),
-                );
-        });
+            tasks.push(async () => {
+                await uploadCandidate(serverUuid, candidate, controller);
+                removeFileUpload(candidate.relativePath);
+            });
+        }
 
-        Promise.all(uploads.map((fn) => fn()))
+        void runPool(tasks, MAX_CONCURRENT_UPLOADS)
             .then(() => mutate())
             .catch((error) => {
                 clearFileUploads();
-                clearAndAddHttpError(error);
+
+                // Aborting an upload (for example by cancelling it) is not an error worth
+                // surfacing to the user.
+                if (!axios.isCancel(error)) {
+                    clearAndAddHttpError(error);
+                }
             });
+    };
+
+    const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setVisible(false);
+
+        // The data transfer items are only valid during this event, so the entries must be
+        // captured synchronously before any asynchronous reading takes place.
+        const entries = e.dataTransfer?.items ? getFileSystemEntries(e.dataTransfer.items) : [];
+        if (entries.length > 0) {
+            void collectFromEntries(entries).then(onFileSubmission).catch(clearAndAddHttpError);
+
+            return;
+        }
+
+        if (e.dataTransfer?.files?.length) {
+            onFileSubmission(collectFromFileList(e.dataTransfer.files));
+        }
+    };
+
+    const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.currentTarget.files) {
+            onFileSubmission(collectFromFileList(e.currentTarget.files));
+        }
+
+        // Reset the input so the same files or folder can be selected again.
+        e.currentTarget.value = '';
     };
 
     return (
@@ -98,19 +200,8 @@ const UploadButton = () => {
                     className='flex'
                     onClick={() => setVisible(false)}
                     onDragOver={(e) => e.preventDefault()}
-                    // why doesn't vanilla pterodactyl have this?
-                    onDragLeave={() => {
-                        setVisible(false);
-                    }}
-                    onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        setVisible(false);
-                        if (!e.dataTransfer?.files.length) return;
-
-                        onFileSubmission(e.dataTransfer.files);
-                    }}
+                    onDragLeave={() => setVisible(false)}
+                    onDrop={onDrop}
                 >
                     <div className={'w-full flex items-center justify-center pointer-events-none'}>
                         <div
@@ -150,23 +241,19 @@ const UploadButton = () => {
                     </div>
                 </ModalMask>
             </FadeTransition>
-            <input
-                type={'file'}
-                ref={fileUploadInput}
-                className={`hidden`}
-                onChange={(e) => {
-                    if (!e.currentTarget.files) return;
-
-                    onFileSubmission(e.currentTarget.files);
-                    if (fileUploadInput.current) {
-                        fileUploadInput.current.files = null;
-                    }
-                }}
-                multiple
-            />
-            <Button variant='secondary' onClick={() => fileUploadInput.current?.click()}>
-                Upload
-            </Button>
+            <input type='file' ref={fileUploadInput} className={'hidden'} onChange={onInputChange} multiple />
+            <input type='file' ref={folderUploadInput} className={'hidden'} onChange={onInputChange} multiple />
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant='secondary'>Upload</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent sideOffset={8}>
+                    <DropdownMenuItem onSelect={() => fileUploadInput.current?.click()}>Upload Files</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => folderUploadInput.current?.click()}>
+                        Upload Folder
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </>
     );
 };
