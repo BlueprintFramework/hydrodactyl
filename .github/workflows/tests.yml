@@ -92,6 +92,21 @@ jobs:
             echo "DB_PORT=3307" >> .env
           fi
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend assets
+        run: pnpm build
+
       - name: Run tests
         run: php vendor/bin/phpunit
 

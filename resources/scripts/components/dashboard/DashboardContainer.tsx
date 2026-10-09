@@ -1,4 +1,4 @@
-import { Server, Xmark, Grip } from '@gravity-ui/icons';
+import { Grip, Server, Xmark } from '@gravity-ui/icons';
 import { useStoreState } from 'easy-peasy';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
