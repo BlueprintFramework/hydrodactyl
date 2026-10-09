@@ -148,18 +148,18 @@ class S3Controller extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Connection successful! A 10MB test file was uploaded as "' . $key . '".',
+                'message' => __('admin/s3.view.details.test_connection_success', ['key' => $key]),
             ]);
         } catch (AwsException $e) {
             $error = $e->getAwsErrorMessage() ?: $e->getMessage();
             return response()->json([
                 'success' => false,
-                'message' => 'S3 error: ' . $error,
+                'message' => __('admin/s3.view.details.test_connection_s3_error', ['error' => $error]),
             ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Connection failed: ' . $e->getMessage(),
+                'message' => __('admin/s3.view.details.test_connection_failed_error', ['error' => $e->getMessage()]),
             ], 400);
         }
     }

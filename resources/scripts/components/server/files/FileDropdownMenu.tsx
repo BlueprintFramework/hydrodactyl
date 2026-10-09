@@ -72,7 +72,12 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
         compressFiles(uuid, directory, [file.name])
             .then(() => mutate())
             .then(() => toast.success(t('server.files.archive_success')))
-            .catch((error) => clearAndAddHttpError({ key: 'files', error }));
+            .catch((error: { code?: string }) => {
+                clearAndAddHttpError({
+                    key: 'files',
+                    error: error?.code === 'ECONNABORTED' ? new Error(t('server.files.archive_timeout')) : error,
+                });
+            });
     };
 
     const doUnarchive = () => {
@@ -82,7 +87,12 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
         decompressFiles(uuid, directory, file.name)
             .then(() => mutate())
             .then(() => toast.success(t('server.files.unarchive_success')))
-            .catch((error) => clearAndAddHttpError({ key: 'files', error }));
+            .catch((error: { code?: string }) => {
+                clearAndAddHttpError({
+                    key: 'files',
+                    error: error?.code === 'ECONNABORTED' ? new Error(t('server.files.unarchive_timeout')) : error,
+                });
+            });
     };
 
     return (

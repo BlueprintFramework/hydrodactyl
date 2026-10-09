@@ -78,7 +78,23 @@ const useLogAnalysis = () => {
             } catch (err) {
                 if (!mountedRef.current) return;
 
-                const errorMessage = err instanceof Error ? err.message : t('server.features.mclogs.analysis_failed');
+                const rawMessage = err instanceof Error ? err.message : '';
+                const looksLikeMissingLog =
+                    /latest\.log/i.test(rawMessage) ||
+                    /not found/i.test(rawMessage) ||
+                    /no log content/i.test(rawMessage);
+
+                let errorMessage = rawMessage || t('server.features.mclogs.analysis_failed');
+
+                // Map the known English fallbacks from the API layer to localized copy.
+                if (/latest\.log|no log content/i.test(rawMessage)) {
+                    errorMessage = t('server.features.mclogs.no_log_content');
+                } else if (/not found/i.test(rawMessage)) {
+                    errorMessage = t('server.features.mclogs.log_not_found');
+                } else if (/failed to analyze|HTTP error/i.test(rawMessage)) {
+                    errorMessage = t('server.features.mclogs.analysis_failed');
+                }
+
                 setError(errorMessage);
                 console.error('Mclogs analysis failed:', err);
 
@@ -86,11 +102,6 @@ const useLogAnalysis = () => {
                 setShowCard(true);
 
                 // Only show error toast for manual analysis and unexpected errors
-                const looksLikeMissingLog =
-                    /latest\.log/i.test(errorMessage) ||
-                    /not found/i.test(errorMessage) ||
-                    /no log content/i.test(errorMessage);
-
                 if (!looksLikeMissingLog && showToast) {
                     toast.error(t('server.features.mclogs.analysis_failed'));
                 }

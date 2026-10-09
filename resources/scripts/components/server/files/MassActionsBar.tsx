@@ -39,7 +39,12 @@ const MassActionsBar = () => {
         compressFiles(uuid, directory, selectedFiles)
             .then(() => mutate())
             .then(() => setSelectedFiles([]))
-            .catch((error) => clearAndAddHttpError({ key: 'files', error }))
+            .catch((error: { code?: string }) => {
+                clearAndAddHttpError({
+                    key: 'files',
+                    error: error?.code === 'ECONNABORTED' ? new Error(t('server.files.archive_timeout')) : error,
+                });
+            })
             .then(() => setLoading(false));
     };
 
