@@ -1,43 +1,49 @@
-import { Xmark } from '@gravity-ui/icons';
-import * as Tooltip from '@radix-ui/react-tooltip';
+import { FileArrowUp, Xmark } from '@gravity-ui/icons';
 import { useContext, useEffect, useState } from 'react';
-import Code from '@/components/elements/Code';
 import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
 import { Button } from '@/components/ui/button';
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import asDialog from '@/hoc/asDialog';
-
+import { bytesToString } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
 import { ServerContext } from '@/state/server';
 
-// TODO: Make it more pretty
-const CircleProgress = ({ progress, className }: { progress: number; className?: string }) => {
-    const radius = 12;
+const ProgressBar = ({ percent, className }: { percent: number; className?: string }) => (
+    <div className={cn('h-1.5 w-full overflow-hidden rounded-full bg-[#ffffff12]', className)}>
+        <div
+            className='h-full rounded-full bg-brand transition-[width] duration-300 ease-out'
+            style={{ width: `${percent}%` }}
+        />
+    </div>
+);
+
+const ProgressRing = ({ percent, size = 30, stroke = 3 }: { percent: number; size?: number; stroke?: number }) => {
+    const radius = (size - stroke) / 2;
     const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (progress / 100) * circumference;
+    const offset = circumference - (percent / 100) * circumference;
 
     return (
-        <svg className={className} viewBox='0 0 32 32' role='img' aria-label={`${progress.toFixed(0)}% complete`}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className='-rotate-90' aria-hidden='true'>
             <circle
-                stroke='currentColor'
-                strokeWidth='4'
-                fill='transparent'
+                cx={size / 2}
+                cy={size / 2}
                 r={radius}
-                cx='16'
-                cy='16'
-                className='opacity-25'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth={stroke}
+                className='opacity-20'
             />
             <circle
-                className='transition-all duration-300'
-                stroke='currentColor'
-                strokeWidth='4'
-                strokeLinecap='round'
-                fill='transparent'
+                cx={size / 2}
+                cy={size / 2}
                 r={radius}
-                cx='16'
-                cy='16'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth={stroke}
+                strokeLinecap='round'
                 strokeDasharray={circumference}
                 strokeDashoffset={offset}
-                transform='rotate(-90 16 16)'
+                className='transition-all duration-300'
             />
         </svg>
     );
@@ -52,74 +58,87 @@ const FileUploadList = () => {
     );
 
     return (
-        <Tooltip.Provider>
-            <div className={'space-y-2 mt-6'}>
-                {uploads.map(([name, file]) => (
-                    <div key={name} className={'flex items-center space-x-3 bg-zinc-700 p-3 rounded-sm'}>
-                        <Tooltip.Root delayDuration={200}>
-                            <Tooltip.Trigger asChild>
-                                <div className={'shrink-0'}>
-                                    <CircleProgress progress={(file.loaded / file.total) * 100} className={'w-6 h-6'} />
+        <TooltipProvider delayDuration={200}>
+            <div className={'space-y-4 mt-5'}>
+                {uploads.map(([name, file]) => {
+                    const percent = file.total > 0 ? Math.min(100, (file.loaded / file.total) * 100) : 0;
+                    const separator = name.lastIndexOf('/');
+                    const basename = separator === -1 ? name : name.slice(separator + 1);
+                    const folder = separator === -1 ? '' : name.slice(0, separator);
+
+                    return (
+                        <div
+                            key={name}
+                            className='rounded-xl border border-[#ffffff0e] bg-[#3333332a] p-3 transition-colors hover:border-[#ffffff1c]'
+                        >
+                            <div className='flex items-center gap-3'>
+                                <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#ffffff08] text-brand-400'>
+                                    <FileArrowUp width={18} height={18} fill='currentColor' />
                                 </div>
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                                <Tooltip.Content
-                                    side='left'
-                                    className='px-2 py-1 text-sm bg-gray-800 text-gray-100 rounded shadow-lg z-9999'
-                                    sideOffset={5}
-                                >
-                                    {`${Math.floor((file.loaded / file.total) * 100)}%`}
-                                    <Tooltip.Arrow className='fill-gray-800' />
-                                </Tooltip.Content>
-                            </Tooltip.Portal>
-                        </Tooltip.Root>
-                        <Code className={'flex-1 truncate'}>{name}</Code>
-                        <Tooltip.Root delayDuration={200}>
-                            <Tooltip.Trigger asChild>
-                                <Button
-                                    variant='secondary'
-                                    size='sm'
-                                    onClick={cancelFileUpload.bind(this, name)}
-                                    className='hover:!text-red-400'
-                                >
-                                    <Xmark />
-                                </Button>
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                                <Tooltip.Content
-                                    side='right'
-                                    className='px-2 py-1 text-sm bg-gray-800 text-red-400 rounded shadow-lg z-9999'
-                                    sideOffset={5}
-                                >
-                                    Cancel
-                                    <Tooltip.Arrow className='fill-gray-800' />
-                                </Tooltip.Content>
-                            </Tooltip.Portal>
-                        </Tooltip.Root>
-                    </div>
-                ))}
+                                <div className='min-w-0 flex-1'>
+                                    <div className='flex items-baseline justify-between gap-3'>
+                                        <p className='truncate text-sm font-semibold text-neutral-200' title={name}>
+                                            {basename}
+                                        </p>
+                                        <span className='shrink-0 text-xs font-semibold tabular-nums text-neutral-400'>
+                                            {Math.floor(percent)}%
+                                        </span>
+                                    </div>
+                                    {folder !== '' && <p className='truncate text-[11px] text-neutral-500'>{folder}</p>}
+                                    <div className='mt-2 flex items-center gap-3'>
+                                        <ProgressBar percent={percent} className='flex-1' />
+                                        <span className='shrink-0 text-[11px] tabular-nums text-neutral-500'>
+                                            {bytesToString(file.loaded)} / {bytesToString(file.total)}
+                                        </span>
+                                    </div>
+                                </div>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant='attention'
+                                            size='sm'
+                                            className='h-8 w-8 shrink-0 p-0'
+                                            onClick={() => cancelFileUpload(name)}
+                                            aria-label={`Cancel upload of ${basename}`}
+                                        >
+                                            <Xmark width={16} height={16} fill='currentColor' />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side='left'>Cancel upload</TooltipContent>
+                                </Tooltip>
+                            </div>
+                        </div>
+                    );
+                })}
                 <Dialog.Footer>
-                    <Button variant='destructive' onClick={() => clearFileUploads()}>
-                        Cancel Uploads
+                    <Button variant='attention'>
+                        Cancel all
                     </Button>
                     <Button variant='secondary' onClick={close}>
-                        Close
+                        Hide
                     </Button>
                 </Dialog.Footer>
             </div>
-        </Tooltip.Provider>
+        </TooltipProvider>
     );
 };
 
 const FileUploadListDialog = asDialog({
     title: 'File Uploads',
-    description: 'The following files are being uploaded to your server.',
+    description: 'Files are transferring to your server.',
 })(FileUploadList);
 
 const FileManagerStatus = () => {
     const [open, setOpen] = useState(false);
 
     const count = ServerContext.useStoreState((state) => Object.keys(state.files.uploads).length);
+    const overall = ServerContext.useStoreState((state) => {
+        const uploads = Object.values(state.files.uploads);
+        const total = uploads.reduce((sum, upload) => sum + upload.total, 0);
+        const loaded = uploads.reduce((sum, upload) => sum + upload.loaded, 0);
+
+        return total > 0 ? Math.round((loaded / total) * 100) : 0;
+    });
 
     useEffect(() => {
         if (count === 0) {
@@ -128,54 +147,29 @@ const FileManagerStatus = () => {
     }, [count]);
 
     return (
-        <Tooltip.Provider>
+        <TooltipProvider delayDuration={200}>
             {count > 0 && (
-                <Tooltip.Root delayDuration={200}>
-                    <Tooltip.Trigger asChild>
+                <Tooltip>
+                    <TooltipTrigger asChild>
                         <Button
                             variant='secondary'
                             size='sm'
-                            className='w-10 h-10 p-0'
-                            onClick={() => {
-                                setOpen(true);
-                            }}
+                            className='relative h-10 w-10 p-0'
+                            onClick={() => setOpen(true)}
                         >
-                            <svg
-                                className='animate-spin h-5 w-5 text-white'
-                                xmlns='http://www.w3.org/2000/svg'
-                                fill='none'
-                                viewBox='0 0 24 24'
-                                aria-hidden='true'
-                            >
-                                <circle
-                                    className='opacity-25'
-                                    cx='12'
-                                    cy='12'
-                                    r='10'
-                                    stroke='currentColor'
-                                    strokeWidth='4'
-                                ></circle>
-                                <path
-                                    className='opacity-75'
-                                    fill='currentColor'
-                                    d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                                ></path>
-                            </svg>
+                            <ProgressRing percent={overall} />
+                            <span className='absolute inset-0 flex items-center justify-center text-[9px] font-bold tabular-nums text-cream-400'>
+                                {overall}%
+                            </span>
                         </Button>
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                        <Tooltip.Content
-                            side='top'
-                            className='px-2 py-1 text-sm bg-gray-800 text-gray-100 rounded shadow-lg'
-                            sideOffset={5}
-                        >
-                            {`${count} files are uploading, click to view`}
-                        </Tooltip.Content>
-                    </Tooltip.Portal>
-                </Tooltip.Root>
+                    </TooltipTrigger>
+                    <TooltipContent side='top'>
+                        {count} {count === 1 ? 'file' : 'files'} uploading — click to view
+                    </TooltipContent>
+                </Tooltip>
             )}
             <FileUploadListDialog open={open} onClose={() => setOpen(false)} />
-        </Tooltip.Provider>
+        </TooltipProvider>
     );
 };
 

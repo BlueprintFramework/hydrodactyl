@@ -1,3 +1,4 @@
+import { ArrowUpFromLine, ChevronDown, FolderOpen } from '@gravity-ui/icons';
 import axios from 'axios';
 import { join } from 'pathe';
 import { useEffect, useRef, useState } from 'react';
@@ -7,6 +8,9 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
     DropdownMenuTrigger,
 } from '@/components/elements/DropdownMenu';
 import { ModalMask } from '@/components/elements/Modal';
@@ -64,6 +68,11 @@ function isFileOrDirectory(event: DragEvent): boolean {
     return event.dataTransfer.types.some((value) => value.toLowerCase() === 'files');
 }
 
+const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
+
+const fileUploadShortcut = isMac ? '⌘O' : 'Ctrl+O';
+const folderUploadShortcut = isMac ? '⇧⌘O' : 'Ctrl+Shift+O';
+
 const UploadButton = () => {
     const fileUploadInput = useRef<HTMLInputElement>(null);
     const folderUploadInput = useRef<HTMLInputElement>(null);
@@ -101,8 +110,26 @@ const UploadButton = () => {
 
     useEventListener('dragexit', () => setVisible(false), { capture: true });
 
-    useEventListener('keydown', () => {
-        if (visible) setVisible(false);
+    useEventListener('keydown', (e) => {
+        const event = e as KeyboardEvent;
+
+        // Any key press dismisses the drag overlay.
+        if (visible) {
+            setVisible(false);
+        }
+
+        if (!(event.ctrlKey || event.metaKey) || event.altKey || event.key.toLowerCase() !== 'o') {
+            return;
+        }
+
+        // Don't hijack the shortcut while the user is typing in an input.
+        const target = event.target as HTMLElement | null;
+        if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) {
+            return;
+        }
+
+        event.preventDefault();
+        (event.shiftKey ? folderUploadInput : fileUploadInput).current?.click();
     });
 
     const uploadCandidate = async (serverUuid: string, candidate: UploadCandidate, controller: AbortController) => {
@@ -243,17 +270,45 @@ const UploadButton = () => {
             </FadeTransition>
             <input type='file' ref={fileUploadInput} className={'hidden'} onChange={onInputChange} multiple />
             <input type='file' ref={folderUploadInput} className={'hidden'} onChange={onInputChange} multiple />
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant='secondary'>Upload</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent sideOffset={8}>
-                    <DropdownMenuItem onSelect={() => fileUploadInput.current?.click()}>Upload Files</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => folderUploadInput.current?.click()}>
-                        Upload Folder
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <div className='inline-flex'>
+                <Button
+                    variant='secondary'
+                    className='gap-2 rounded-r-none border-r-0'
+                    onClick={() => fileUploadInput.current?.click()}
+                    title={`Upload files to ${directory}`}
+                >
+                    <ArrowUpFromLine width={16} height={16} fill='currentColor' />
+                    Upload
+                </Button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            variant='secondary'
+                            className='rounded-l-none px-2'
+                            aria-label='More upload options'
+                            title='More upload options'
+                        >
+                            <ChevronDown width={16} height={16} fill='currentColor' />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='start' sideOffset={8} className='min-w-[13rem]'>
+                        <DropdownMenuLabel className='text-xs font-normal text-neutral-400'>
+                            Upload to <span className='font-mono text-neutral-200'>{directory}</span>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className='gap-2' onSelect={() => fileUploadInput.current?.click()}>
+                            <ArrowUpFromLine width={16} height={16} fill='currentColor' />
+                            Upload Files
+                            <DropdownMenuShortcut>{fileUploadShortcut}</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className='gap-2' onSelect={() => folderUploadInput.current?.click()}>
+                            <FolderOpen width={16} height={16} fill='currentColor' />
+                            Upload Folder
+                            <DropdownMenuShortcut>{folderUploadShortcut}</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
         </>
     );
 };
