@@ -148,6 +148,14 @@ const AdminShell = () => {
             end: true,
         },
         {
+            to: '/settings',
+            icon: Settings02Icon,
+            text: 'Settings',
+            tabName: 'settings',
+            ref: NavigationSettings,
+            end: false,
+        },
+        {
             to: '/servers',
             icon: ServerStack02Icon,
             text: 'Servers',
@@ -213,17 +221,9 @@ const AdminShell = () => {
             end: false,
         },
         {
-            to: '/settings',
-            icon: Settings02Icon,
-            text: 'Settings',
-            tabName: 'settings',
-            ref: NavigationSettings,
-            end: false,
-        },
-        {
             to: '/api',
             icon: Key01Icon,
-            text: 'Application API',
+            text: 'API',
             minimizedText: 'API',
             tabName: 'api',
             ref: NavigationApi,
