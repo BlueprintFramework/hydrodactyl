@@ -14,6 +14,7 @@ This project follows [Semantic Versioning](http://semver.org) guidelines.
 ### Added
 - Added support for the Calagopus Wings daemon type: node configuration and auto-deploy, the full client API, and its backup drivers (`ddup-bak`, `btrfs`, `zfs`, `restic`, `proxmox-backup-server`, `kopia`).
 - Added Calagopus node system information, live stats, a log viewer, and remote upgrade to the admin node page.
+- Added Spaceship as a DNS provider for subdomains.
 
 ### Changed
 - Updated Paper egg to download the server jar without corruption.

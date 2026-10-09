@@ -18,7 +18,7 @@ class DomainsController extends Controller
     /**
      * DNS providers that can actually be saved (see DomainFormRequest).
      */
-    private const ALLOWED_PROVIDERS = ['cloudflare', 'hetzner', 'route53', 'bunny'];
+    private const ALLOWED_PROVIDERS = ['cloudflare', 'hetzner', 'route53', 'bunny', 'spaceship'];
 
     /**
      * Return every configured domain along with the available providers.
