@@ -8,6 +8,7 @@ use Znck\Eloquent\Traits\BelongsToThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -168,6 +169,7 @@ class Server extends Model
         'threads' => 'nullable|regex:/^[0-9-,]+$/',
         'oom_disabled' => 'sometimes|boolean',
         'exclude_from_resource_calculation' => 'sometimes|boolean',
+        'software_enabled' => 'sometimes|boolean',
         'disk' => 'required|numeric|min:0',
         'allocation_id' => 'required|bail|unique:servers|exists:allocations,id',
         'nest_id' => 'required|exists:nests,id',
@@ -196,6 +198,7 @@ class Server extends Model
         'cpu' => 'integer',
         'oom_disabled' => 'boolean',
         'exclude_from_resource_calculation' => 'boolean',
+        'software_enabled' => 'boolean',
         'allocation_id' => 'integer',
         'nest_id' => 'integer',
         'egg_id' => 'integer',
@@ -203,6 +206,7 @@ class Server extends Model
         'allocation_limit' => 'integer',
         'backup_limit' => 'integer',
         'backup_storage_limit' => 'integer',
+        'group_id' => 'integer',
         self::CREATED_AT => 'datetime',
         self::UPDATED_AT => 'datetime',
         'deleted_at' => 'datetime',
@@ -462,6 +466,14 @@ class Server extends Model
     public function activeSubdomain(): HasOne
     {
         return $this->hasOne(ServerSubdomain::class)->where('is_active', true);
+    }
+
+    /**
+     * Get the group this server belongs to.
+     */
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(ServerGroup::class, 'group_id');
     }
 
     /**

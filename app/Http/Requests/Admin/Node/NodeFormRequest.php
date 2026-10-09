@@ -4,7 +4,8 @@ namespace Pterodactyl\Http\Requests\Admin\Node;
 
 use Pterodactyl\Rules\Fqdn;
 use Pterodactyl\Models\Node;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
+use Pterodactyl\Enums\Daemon\DaemonType;
 use Pterodactyl\Http\Requests\Admin\AdminFormRequest;
 
 class NodeFormRequest extends AdminFormRequest
@@ -14,9 +15,12 @@ class NodeFormRequest extends AdminFormRequest
      */
     public function rules(): array
     {
+        $daemonType = ['required', 'string', Rule::in(DaemonType::values())];
+
         if ($this->method() === 'PATCH') {
             $rules = Node::getRulesForUpdate($this->route()->parameter('node'));
             $rules['internal_fqdn'] = ['nullable', 'string', Fqdn::make('scheme')];
+            $rules['daemonType'] = $daemonType;
 
             return $rules;
         }
@@ -24,7 +28,7 @@ class NodeFormRequest extends AdminFormRequest
         $data = Node::getRules();
         $data['fqdn'][] = Fqdn::make('scheme');
         $data['internal_fqdn'] = ['nullable', 'string', Fqdn::make('scheme')];
-        log::info("rules", [$data]);
+        $data['daemonType'] = $daemonType;
 
         return $data;
     }

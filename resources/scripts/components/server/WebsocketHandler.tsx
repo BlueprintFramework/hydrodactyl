@@ -45,6 +45,13 @@ function WebsocketHandler() {
             setError('connecting');
             setConnectionState(false);
         });
+        socket.on('SOCKET_RECONNECT', () => {
+            setConnectionState(false);
+            // The token that got us here may have just expired (it is only valid
+            // for 10 minutes), so fetch a fresh one during the backoff window.
+            // It is applied on the next open rather than sent to the dead socket.
+            updateToken(uuid, socket);
+        });
         socket.on('status', (status) => setServerStatus(status));
 
         socket.on('daemon error', (message) => {
@@ -119,15 +126,21 @@ function WebsocketHandler() {
         // clean close event may never fire — so the console is left empty until a
         // manual page reload. When the tab becomes visible again (or the network
         // comes back online), give pending close events a moment to settle, then
-        // force a reconnect if we're no longer connected. On reconnect the socket
-        // re-authenticates and the Console component re-requests SEND_LOGS, so the
-        // buffer refills automatically.
+        // force a reconnect if the socket is no longer live. On reconnect the
+        // socket re-authenticates and `connected` flips back to true, so the
+        // Console re-runs its listeners (clear + SEND_LOGS) and the buffer
+        // refills automatically.
         let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
         const attemptReconnect = () => {
             if (reconnectTimer) clearTimeout(reconnectTimer);
-            reconnectTimer = window.setTimeout(() => {
+            reconnectTimer = setTimeout(() => {
                 const socket = instanceRef.current;
-                if (socket && !connectedRef.current) {
+                // Reconnect if the store thinks we're disconnected, OR if the
+                // socket is actually dead but `connected` went stale (mobile
+                // tabs are frozen and killed without a clean close event, so the
+                // flag stays true while the socket is long gone).
+                if (socket && (!connectedRef.current || !socket.isConnected())) {
+                    setConnectionState(false);
                     socket.reconnect();
                 }
             }, 300);
@@ -135,15 +148,22 @@ function WebsocketHandler() {
         const onVisibility = () => {
             if (document.visibilityState === 'visible') attemptReconnect();
         };
+        // Restoring a page from the back/forward cache keeps the DOM but the
+        // websocket is long gone, so reconnect as well.
+        const onPageShow = (event: PageTransitionEvent) => {
+            if (event.persisted) attemptReconnect();
+        };
 
         document.addEventListener('visibilitychange', onVisibility);
         window.addEventListener('online', attemptReconnect);
+        window.addEventListener('pageshow', onPageShow);
         return () => {
             document.removeEventListener('visibilitychange', onVisibility);
             window.removeEventListener('online', attemptReconnect);
+            window.removeEventListener('pageshow', onPageShow);
             if (reconnectTimer) clearTimeout(reconnectTimer);
         };
-    }, []);
+    }, [setConnectionState]);
 
     return error ? (
         <FadeTransition duration='duration-150' show>

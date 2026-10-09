@@ -14,6 +14,7 @@ export class CaptchaManager {
             enabled: false,
             provider: 'none',
             siteKey: '',
+            serverUrl: '',
             scriptIncludes: [],
         };
 
@@ -93,6 +94,7 @@ export class CaptchaManager {
         try {
             const config: CaptchaRenderConfig = {
                 siteKey: this.config.siteKey,
+                serverUrl: this.config.serverUrl,
                 theme: 'auto',
                 size: 'normal',
                 onSuccess: (token: string) => this.handleSuccess(token),

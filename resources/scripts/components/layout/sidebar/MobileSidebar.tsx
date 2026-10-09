@@ -20,15 +20,17 @@ interface NavItemData {
     ref: RefObject<HTMLAnchorElement | null>;
     end: boolean;
     permission?: string | string[];
+    hardNav?: boolean;
 }
 
 interface MobileSidebarProps {
     navItems: NavItemData[];
     bottomNavItems?: NavItemData[];
+    admin?: boolean;
 }
 
-const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavItemData[] }>(
-    ({ navItems, bottomNavItems }) => {
+const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavItemData[]; admin?: boolean }>(
+    ({ navItems, bottomNavItems, admin }) => {
         const { setMobileOpen, isMobileOpen } = useSidebar();
         const location = useLocation();
 
@@ -48,13 +50,16 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
             };
         }, [isMobileOpen]);
 
-        if (!isMobileOpen) return null;
-
         return (
-            <div className='lg:hidden fixed inset-0 z-[9999]'>
+            <div
+                className={cn(
+                    'lg:hidden fixed inset-0 z-[9999] transition-opacity duration-300',
+                    isMobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                )}
+            >
                 <button
                     type='button'
-                    className='absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default'
+                    className='absolute inset-0 bg-black/60 backdrop-blur-sm cursor-default transition-opacity duration-300'
                     onClick={() => setMobileOpen(false)}
                     aria-label='Close menu'
                     aria-hidden='true'
@@ -66,17 +71,29 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                         'sidebar-container absolute top-0 left-0 h-full w-[300px] max-w-[85vw] shrink-0',
                         'flex flex-col bg-bg-lowered border-r border-mocha-400',
                         'rounded-none overflow-y-auto overflow-x-hidden',
+                        'transition-transform duration-300 ease-out',
+                        isMobileOpen ? 'translate-x-0' : '-translate-x-full',
                     )}
                     data-sidebar-minimized='false'
                 >
                     <div className='mobile-sidebar-logo h-16 flex items-center flex-none'>
-                        <NavLink
-                            to='/'
-                            className='flex h-8 w-fit shrink-0 items-center hydrodactyl-logo'
-                            aria-label='Hydrodactyl home page'
-                        >
-                            <Logo className='h-8 w-8 shrink-0 object-contain' />
-                        </NavLink>
+                        {admin ? (
+                            <a
+                                href='/'
+                                className='flex h-8 w-fit shrink-0 items-center hydrodactyl-logo'
+                                aria-label='Hydrodactyl home page'
+                            >
+                                <Logo className='h-8 w-8 shrink-0 object-contain' />
+                            </a>
+                        ) : (
+                            <NavLink
+                                to='/'
+                                className='flex h-8 w-fit shrink-0 items-center hydrodactyl-logo'
+                                aria-label='Hydrodactyl home page'
+                            >
+                                <Logo className='h-8 w-8 shrink-0 object-contain' />
+                            </NavLink>
+                        )}
                     </div>
 
                     <ul className='flex flex-col text-sm'>
@@ -91,6 +108,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                                     lastItem={index === navItems.length - 1}
                                     permission={item.permission}
                                     onNavClick={() => setMobileOpen(false)}
+                                    hardNav={item.hardNav}
                                 />
                             </li>
                         ))}
@@ -108,6 +126,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                                         lastItem={index === bottomNavItems.length - 1}
                                         permission={item.permission}
                                         onNavClick={() => setMobileOpen(false)}
+                                        hardNav={item.hardNav}
                                     />
                                 </li>
                             ))}
@@ -138,8 +157,8 @@ const MobileSidebarToggle = memo(() => {
 
 MobileSidebarToggle.displayName = 'MobileSidebarToggle';
 
-export default function MobileSidebar({ navItems, bottomNavItems = [] }: MobileSidebarProps) {
-    return <MobileSidebarPanel navItems={navItems} bottomNavItems={bottomNavItems} />;
+export default function MobileSidebar({ navItems, bottomNavItems = [], admin }: MobileSidebarProps) {
+    return <MobileSidebarPanel navItems={navItems} bottomNavItems={bottomNavItems} admin={admin} />;
 }
 
 export { MobileSidebarToggle };

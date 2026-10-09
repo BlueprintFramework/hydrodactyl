@@ -7,6 +7,7 @@ use Carbon\CarbonImmutable;
 use Webmozart\Assert\Assert;
 use Pterodactyl\Models\Backup;
 use Pterodactyl\Models\Server;
+use Pterodactyl\Enums\BackupAdapter;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Extensions\Backups\BackupManager;
 use Pterodactyl\Repositories\Eloquent\BackupRepository;
@@ -88,10 +89,11 @@ class InitiateBackupService
         // Check if the server has reached or exceeded its backup limit.
         // completed_at == null will cover any ongoing backups, while is_successful == true will cover any completed backups.
         $successful = $this->repository->getNonFailedBackups($server);
+        $successfulCount = $successful->count();
         if ($server->backup_limit == null) {
-            $server->backup_limit = $successful->count() + 1;
+            $server->backup_limit = $successfulCount + 1;
         };
-        if (!$server->backup_limit || $successful->count() >= $server->backup_limit) {
+        if (!$server->backup_limit || $successfulCount >= $server->backup_limit) {
             // Do not allow the user to continue if this server is already at its limit and can't override.
             if ($server->backup_limit == null) {
                 $server->backup_limit = 12;
@@ -114,18 +116,23 @@ class InitiateBackupService
         }
 
         return $this->connection->transaction(function () use ($server, $name) {
+            $disk = BackupAdapter::tryFrom($server->node->backupDisk);
+            $adapter = in_array($disk, [BackupAdapter::Wings, BackupAdapter::S3], true)
+                ? $disk
+                : BackupAdapter::Wings;
+
             /** @var Backup $backup */
             $backup = $this->repository->create([
                 'server_id' => $server->id,
                 'uuid' => Uuid::uuid4()->toString(),
                 'name' => trim($name) ?: sprintf('Backup at %s', CarbonImmutable::now()->toDateTimeString()),
                 'ignored_files' => array_values($this->ignoredFiles ?? []),
-                'disk' => $server->node->backupDisk,
+                'disk' => $adapter->value,
                 'is_locked' => $this->isLocked,
             ], true, true);
 
             $this->daemonBackupRepository->setServer($server)
-                ->setBackupAdapter($server->node->backupDisk)
+                ->setBackupAdapter($adapter->value)
                 ->backup($backup);
 
             return $backup;

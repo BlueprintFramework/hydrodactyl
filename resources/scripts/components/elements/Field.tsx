@@ -21,7 +21,7 @@ const Field = forwardRef<HTMLInputElement, Props>(
                         </label>
                     )}
                     <input
-                        className='px-4 py-2 rounded-lg outline-hidden bg-[#ffffff17] text-base sm:text-sm'
+                        className='w-full px-4 py-2.5 rounded-lg outline-hidden bg-mocha-500/60 border border-cream-500/15 text-cream-400 text-base sm:text-sm placeholder:text-cream-400/40 transition-colors focus:border-cream-500/40 focus:bg-mocha-500/80'
                         id={id}
                         {...field}
                         {...props}

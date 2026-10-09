@@ -82,10 +82,10 @@ const AccountApiContainer = () => {
     };
 
     return (
-        <PageContentBlock title={'Api Key'}>
+        <PageContentBlock title={'API Key'}>
             <FlashMessageRender byKey='account:api-keys' />
             <ApiKeyModal visible={apiKey.length > 0} onModalDismissed={() => setApiKey('')} apiKey={apiKey} />
-            <ServerHeader title='Api Keys' />
+            <ServerHeader title='API Keys' />
 
             <CreateApiKeyModal
                 open={showCreateModal}

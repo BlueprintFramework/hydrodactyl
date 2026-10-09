@@ -1,6 +1,7 @@
 import { ArrowsRotateRight } from '@gravity-ui/icons';
 import { type Actions, useStoreActions } from 'easy-peasy';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { httpErrorToHuman } from '@/api/http';
 import type { ServerDatabase } from '@/api/server/databases/getServerDatabases';
 import rotateDatabasePassword from '@/api/server/databases/rotateDatabasePassword';
@@ -31,7 +32,10 @@ const RotatePasswordButton = ({
 
         if (!server) return;
         rotateDatabasePassword(server.uuid, databaseId)
-            .then((database) => onUpdate(database))
+            .then((database) => {
+                onUpdate(database);
+                toast.success('A new password was generated');
+            })
             .catch((error) => {
                 console.error(error);
                 addFlash({
@@ -49,7 +53,7 @@ const RotatePasswordButton = ({
     };
 
     return (
-        <Button onClick={rotate} className='flex-none'>
+        <Button onClick={rotate} size={'icon'} shape={'round'} className='flex-none'>
             <div className='flex justify-center items-center'>
                 {!loading && <ArrowsRotateRight width={22} height={22} />}
                 {loading && <Spinner size={'small'} />}

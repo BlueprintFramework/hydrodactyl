@@ -55,15 +55,30 @@ export default defineConfig({
 
         outDir: 'public/build',
 
-        rollupOptions: {
+        rolldownOptions: {
             input: [path.resolve('resources/scripts/index.tsx'), path.resolve('resources/scripts/admin/index.tsx')],
             output: {
-                // @ts-expect-error It won't fail lol
-                manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                        // @ts-expect-error It won't fail lol
-                        return id.toString().split('node_modules/')[1].split('/')[0].toString();
-                    }
+                codeSplitting: {
+                    groups: [
+                        {
+                            name: (moduleId) => {
+                                if (!moduleId.includes('node_modules')) {
+                                    return null;
+                                }
+
+                                // Extract the real package name from either an npm layout
+                                // (node_modules/<pkg>) or a pnpm layout
+                                // (node_modules/.pnpm/<pkg>@<ver>/node_modules/<pkg>), including
+                                // scoped packages such as @hugeicons/core-free-icons.
+                                const match =
+                                    /node_modules\/(?:\.pnpm\/[^/]+\/node_modules\/)?((?:@[^/]+\/)?[^/]+)/.exec(
+                                        moduleId,
+                                    );
+
+                                return match ? match[1] : null;
+                            },
+                        },
+                    ],
                 },
             },
         },

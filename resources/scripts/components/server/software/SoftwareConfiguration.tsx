@@ -7,8 +7,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/elements/DropdownMenu';
 import { Switch } from '@/components/elements/SwitchV2';
-import TitledGreyBox from '@/components/elements/TitledGreyBox';
 import { Button } from '@/components/ui/button';
+import SoftwareCard from './SoftwareCard';
 import type { Egg } from './types';
 
 interface Props {
@@ -51,16 +51,16 @@ const SoftwareConfiguration = ({
     onReview,
 }: Props) => (
     <div className='space-y-6'>
-        <TitledGreyBox title={`Configure ${selectedEgg?.attributes.name}`}>
+        <SoftwareCard title={`Configure ${selectedEgg?.attributes.name}`}>
             {eggPreview && (
                 <div className='space-y-6'>
                     <div className='space-y-4'>
-                        <h3 className='text-lg font-semibold text-neutral-200'>Software Configuration</h3>
+                        <h3 className='text-lg font-semibold text-cream-100'>Software Configuration</h3>
                         <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
                             <div>
                                 <label
                                     htmlFor='startup_command'
-                                    className='text-sm font-medium text-neutral-300 block mb-2'
+                                    className='text-sm font-medium text-cream-400 block mb-2'
                                 >
                                     Startup Command
                                 </label>
@@ -70,9 +70,9 @@ const SoftwareConfiguration = ({
                                     onChange={(e) => onStartupChange(e.target.value)}
                                     placeholder='Enter custom startup command...'
                                     rows={3}
-                                    className='w-full px-3 py-2 bg-[#ffffff08] border border-[#ffffff12] rounded-lg text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none focus:border-brand transition-colors font-mono resize-none'
+                                    className='w-full px-3 py-2 bg-mocha-400/60 border border-mocha-300/60 rounded-lg text-sm text-cream-100 placeholder:text-cream-400/40 focus:outline-none focus:border-brand-400/60 transition-colors font-mono resize-none'
                                 />
-                                <p className='text-xs text-neutral-400 mt-1'>
+                                <p className='text-xs text-cream-400/70 mt-1'>
                                     Use variables like{' '}
                                     {eggPreview.variables
                                         .map((v) => `{{${v.env_variable}}}`)
@@ -84,7 +84,7 @@ const SoftwareConfiguration = ({
                             <div>
                                 <label
                                     htmlFor='docker_image_trigger'
-                                    className='text-sm font-medium text-neutral-300 block mb-2'
+                                    className='text-sm font-medium text-cream-400 block mb-2'
                                 >
                                     Docker Image
                                 </label>
@@ -94,13 +94,13 @@ const SoftwareConfiguration = ({
                                             <button
                                                 id='docker_image_trigger'
                                                 type='button'
-                                                className='w-full px-3 py-2 bg-[#ffffff08] border border-[#ffffff12] rounded-lg text-sm text-neutral-200 focus:outline-none focus:border-brand transition-colors text-left flex items-center justify-between hover:border-[#ffffff20]'
+                                                className='w-full px-3 py-2 bg-mocha-400/60 border border-mocha-300/60 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-brand-400/60 transition-colors text-left flex items-center justify-between hover:border-brand-400/60'
                                             >
                                                 <span className='truncate'>
                                                     {selectedDockerImage || 'Select image...'}
                                                 </span>
                                                 <svg
-                                                    className='w-4 h-4 text-neutral-400 flex-shrink-0'
+                                                    className='w-4 h-4 text-cream-400/70 flex-shrink-0'
                                                     fill='none'
                                                     stroke='currentColor'
                                                     viewBox='0 0 24 24'
@@ -133,12 +133,12 @@ const SoftwareConfiguration = ({
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 ) : (
-                                    <div className='w-full px-3 py-2 bg-[#ffffff08] border border-[#ffffff12] rounded-lg text-sm text-neutral-200'>
+                                    <div className='w-full px-3 py-2 bg-mocha-400/60 border border-mocha-300/60 rounded-lg text-sm text-cream-100'>
                                         {(eggPreview.docker_images && Object.keys(eggPreview.docker_images)[0]) ||
                                             'Default Image'}
                                     </div>
                                 )}
-                                <p className='text-xs text-neutral-400 mt-1'>
+                                <p className='text-xs text-cream-400/70 mt-1'>
                                     Container runtime environment for your server
                                 </p>
                             </div>
@@ -147,14 +147,14 @@ const SoftwareConfiguration = ({
 
                     {eggPreview.variables.length > 0 && (
                         <div className='space-y-4'>
-                            <h3 className='text-lg font-semibold text-neutral-200'>Environment Variables</h3>
+                            <h3 className='text-lg font-semibold text-cream-100'>Environment Variables</h3>
                             <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
                                 {eggPreview.variables.map((variable) => (
                                     <div key={variable.env_variable} className='space-y-3'>
                                         <div>
                                             <label
                                                 htmlFor={variable.env_variable}
-                                                className='text-sm font-medium text-neutral-200 block mb-1'
+                                                className='text-sm font-medium text-cream-100 block mb-1'
                                             >
                                                 {variable.name}
                                                 {!variable.user_editable && (
@@ -168,13 +168,13 @@ const SoftwareConfiguration = ({
                                                     </span>
                                                 )}
                                                 {variable.user_editable && !variable.rules.includes('required') && (
-                                                    <span className='ml-2 px-2 py-0.5 text-xs bg-neutral-500/20 text-neutral-400 rounded'>
+                                                    <span className='ml-2 px-2 py-0.5 text-xs bg-mocha-400/60 text-cream-400/70 rounded'>
                                                         Optional
                                                     </span>
                                                 )}
                                             </label>
                                             {variable.description && (
-                                                <p className='text-xs text-neutral-400 mb-2'>{variable.description}</p>
+                                                <p className='text-xs text-cream-400/70 mb-2'>{variable.description}</p>
                                             )}
                                         </div>
 
@@ -188,10 +188,10 @@ const SoftwareConfiguration = ({
                                                         onVariableChange(variable.env_variable, e.target.value)
                                                     }
                                                     placeholder={variable.default_value || 'Enter value...'}
-                                                    className={`w-full px-3 py-2 bg-[#ffffff08] border rounded-lg text-sm text-neutral-200 placeholder:text-neutral-500 focus:outline-none transition-colors ${
+                                                    className={`w-full px-3 py-2 bg-mocha-400/60 border rounded-lg text-sm text-cream-100 placeholder:text-cream-400/40 focus:outline-none transition-colors ${
                                                         variableErrors[variable.env_variable]
                                                             ? 'border-red-500 focus:border-red-500'
-                                                            : 'border-[#ffffff12] focus:border-brand'
+                                                            : 'border-mocha-300/60 focus:border-brand-400/60'
                                                     }`}
                                                 />
                                                 {variableErrors[variable.env_variable] && (
@@ -201,7 +201,7 @@ const SoftwareConfiguration = ({
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className='w-full px-3 py-2 bg-[#ffffff04] border border-[#ffffff08] rounded-lg text-sm text-neutral-300 font-mono'>
+                                            <div className='w-full px-3 py-2 bg-mocha-600 border border-mocha-400 rounded-lg text-sm text-cream-400 font-mono'>
                                                 {pendingVariables[variable.env_variable] ||
                                                     variable.default_value ||
                                                     'Not set'}
@@ -209,9 +209,9 @@ const SoftwareConfiguration = ({
                                         )}
 
                                         <div className='flex justify-between text-xs'>
-                                            <span className='text-neutral-500 font-mono'>{variable.env_variable}</span>
+                                            <span className='text-cream-400/50 font-mono'>{variable.env_variable}</span>
                                             {variable.rules && (
-                                                <span className='text-neutral-500'>Rules: {variable.rules}</span>
+                                                <span className='text-cream-400/50'>Rules: {variable.rules}</span>
                                             )}
                                         </div>
                                     </div>
@@ -221,17 +221,17 @@ const SoftwareConfiguration = ({
                     )}
 
                     <div className='space-y-4'>
-                        <h3 className='text-lg font-semibold text-neutral-200'>Safety Options</h3>
+                        <h3 className='text-lg font-semibold text-cream-100'>Safety Options</h3>
                         <div className='space-y-3'>
-                            <div className='flex items-center justify-between p-4 bg-[#ffffff08] border border-[#ffffff12] rounded-lg hover:border-[#ffffff20] transition-colors'>
+                            <div className='flex items-center justify-between p-4 bg-mocha-400/60 border border-mocha-300/60 rounded-lg hover:border-brand-400/60 transition-colors'>
                                 <div className='flex-1 min-w-0 pr-4'>
                                     <label
                                         htmlFor='create-backup-switch'
-                                        className='text-sm font-medium text-neutral-200 block mb-1'
+                                        className='text-sm font-medium text-cream-100 block mb-1'
                                     >
                                         Create Backup
                                     </label>
-                                    <p className='text-xs text-neutral-400 leading-relaxed'>
+                                    <p className='text-xs text-cream-400/70 leading-relaxed'>
                                         {backupLimit !== 0 && (backupLimit === null || backupCount < backupLimit)
                                             ? 'Automatically create a backup before applying changes'
                                             : backupLimit === 0
@@ -251,15 +251,15 @@ const SoftwareConfiguration = ({
                                 </div>
                             </div>
 
-                            <div className='flex items-center justify-between p-4 bg-[#ffffff08] border border-[#ffffff12] rounded-lg hover:border-[#ffffff20] transition-colors'>
+                            <div className='flex items-center justify-between p-4 bg-mocha-400/60 border border-mocha-300/60 rounded-lg hover:border-brand-400/60 transition-colors'>
                                 <div className='flex-1 min-w-0 pr-4'>
                                     <label
                                         htmlFor='wipe-files-switch'
-                                        className='text-sm font-medium text-neutral-200 block mb-1'
+                                        className='text-sm font-medium text-cream-100 block mb-1'
                                     >
                                         Wipe Files
                                     </label>
-                                    <p className='text-xs text-neutral-400 leading-relaxed'>
+                                    <p className='text-xs text-cream-400/70 leading-relaxed'>
                                         Delete all files before installing new software
                                     </p>
                                 </div>
@@ -284,7 +284,7 @@ const SoftwareConfiguration = ({
                     Review Changes
                 </Button>
             </div>
-        </TitledGreyBox>
+        </SoftwareCard>
     </div>
 );
 

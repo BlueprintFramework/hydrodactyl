@@ -35,7 +35,7 @@ x-common:
 services:
     database:
         image: mariadb:10.5
-        restart: always
+        restart: no
         command: --default-authentication-plugin=mysql_native_password
         volumes:
             - './srv/database:/var/lib/mysql'
@@ -47,14 +47,14 @@ services:
         #     - '3306:3306'
     cache:
         image: redis:alpine
-        restart: always
+        restart: no
     panel:
         build:
             context: .
             args:
                 DEV: "true"
         image: hydrodactyl:develop
-        restart: always
+        restart: no
         ports:
             - '3000:80'
             # - '443:443'
@@ -92,68 +92,61 @@ services:
             DB_HOST: 'database'
             DB_PORT: '3306'
             HASHIDS_LENGTH: 8
-            WINGS_INTERNAL_IP: 'elytra'
+            WINGS_INTERNAL_IP: 'wings'
             WINGS_DIR: '${PWD}/srv/'
             HYDRODACTYL_DOCKER_DEV: 'true'
             MAIL_HOST: 'mailhog'
             MAIL_PORT: 1025
             MAIL_DRIVER: 'smtp'
             APP_BACKUP_DRIVER: 's3'
-            AWS_DEFAULT_REGION: 'us-west-2'
-            AWS_ACCESS_KEY_ID: 'minioadmin'
-            AWS_SECRET_ACCESS_KEY: 'minioadmin'
+            AWS_DEFAULT_REGION: 'us-east-1'
+            AWS_ACCESS_KEY_ID: 'garage'
+            AWS_SECRET_ACCESS_KEY: 'garage'
             AWS_BACKUPS_BUCKET: 'hydrodactyl'
-            AWS_ENDPOINT: 'http://minio:9000'
+            AWS_ENDPOINT: 'http://garage:3900'
             AWS_USE_PATH_STYLE_ENDPOINT: 'true'
 
-    minio:
-        image: quay.io/minio/minio:latest
-        hostname: minio
+    garage:
+        image: dxflrs/garage:v2.2.0
+        hostname: garage
         expose:
-            - '9000'
-            - '9001'
+            - '3900'
+            - '3901'
+            - '3903'
         volumes:
-            - ./srv/data1-1:/data1
-            - ./srv/data1-2:/data2
-        command: server --console-address ":9001" http://minio/data{1...2}
+            - ./srv/garage:/var/lib/garage
+            - ./srv/garage.toml:/etc/garage.toml
         environment:
-            MINIO_ROOT_USER: minioadmin
-            MINIO_ROOT_PASSWORD: minioadmin
+            GARAGE_ADMIN_TOKEN: 'dev-admin-token'
 
-    createbuckets:
-        image: quay.io/minio/mc:latest
+    garage-setup:
+        image: amazon/aws-cli:latest
         depends_on:
-            - minio
+            - garage
         entrypoint: >
             /bin/sh -c "
-              until mc alias set local http://minio:9000 minioadmin minioadmin; do
-                echo 'Waiting for MinIO to be ready...'
-                sleep 2
-              done &&
-              mc mb --ignore-existing local/hydrodactyl &&
-              echo 'Bucket created.'
+              echo 'Waiting for Garage to be ready...'
+              sleep 5
+              echo 'Setup complete. Configure Garage via admin API or CLI.'
+              exit 0
             "
 
-    elytra:
-        # The default Wings image doesn't work on macOS Docker
-        # This fork simply removes the incompatible `io.priority` cgroup v2 flag
-        # For Linux users, you can use the default image by uncommenting the line below
-        # image: ghcr.io/pterodactyl/wings:latest
-        image: ghcr.io/pyrohost/elytra:dev
-        restart: always
+    wings:
+        image: ghcr.io/pterodactyl/wings:latest
+        restart: no
         ports:
             - '8080:8080'
             - '2022:2022'
         tty: true
         environment:
             TZ: 'UTC'
-            ELYTRA_UID: 988
-            ELYTRA_GID: 988
-            ELYTRA_USERNAME: elytra
+            WINGS_UID: 988
+            WINGS_GID: 988
+            WINGS_USERNAME: pterodactyl
         volumes:
             - '/var/run/docker.sock:/var/run/docker.sock'
             - '/etc/ssl/certs:/etc/ssl/certs:ro'
-            - './srv/pterodactyl/config/:/etc/elytra/'
+            - './srv/pterodactyl/config/:/etc/pterodactyl/'
 
             # The volumes below need to be the exact same path in the container as on the host.
             #
@@ -163,10 +156,10 @@ services:
             # If you change these from $PWD, make sure to update `WINGS_DIR` in the panel service too.
             # Do not change anything but the $PWD part as this is also hardcoded in the container.
 
-            - './srv/elytra/tmp/:${PWD}/srv/elytra/tmp/'
-            - './srv/elytra/docker/containers/:${PWD}/srv/elytra/docker/containers/'
-            - './srv/elytra/:${PWD}/srv/elytra/'
-            - './srv/elytra/logs/:${PWD}/srv/elytra/logs/'
+            - './srv/pterodactyl/tmp/:${PWD}/srv/pterodactyl/tmp/'
+            - './srv/pterodactyl/docker/containers/:${PWD}/srv/pterodactyl/docker/containers/'
+            - './srv/pterodactyl/:${PWD}/srv/pterodactyl/'
+            - './srv/pterodactyl/logs/:${PWD}/srv/pterodactyl/logs/'
 
 
     mailpit:

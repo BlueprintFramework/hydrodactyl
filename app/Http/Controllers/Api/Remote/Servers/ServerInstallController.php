@@ -18,12 +18,10 @@ class ServerInstallController extends Controller
     /**
      * ServerInstallController constructor.
      */
-    public function __construct(private ServerRepository $repository, private EventDispatcher $eventDispatcher)
-    {
-    }
+    public function __construct(private ServerRepository $repository, private EventDispatcher $eventDispatcher) {}
 
     /**
-     * Get server install info
+     * Get server install info.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
      */
@@ -40,7 +38,7 @@ class ServerInstallController extends Controller
     }
 
     /**
-     * Report server install result
+     * Report server install result.
      *
      * @throws \Pterodactyl\Exceptions\Repository\RecordNotFoundException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException

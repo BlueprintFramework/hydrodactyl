@@ -1,3 +1,5 @@
+import { Copy01Icon, Tick02Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import { FitAddon } from '@xterm/addon-fit';
 import { SearchAddon } from '@xterm/addon-search';
 import { WebLinksAddon } from '@xterm/addon-web-links';
@@ -6,10 +8,13 @@ import { useSidebar } from '@/contexts/SidebarContext';
 import '@xterm/xterm/css/xterm.css';
 import './console.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { useDebouncedCallback } from 'use-debounce';
 
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
+import { getTerminalBufferText } from '@/components/server/console/consoleBuffer';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
+import { Button } from '@/components/ui/button';
 import KeyboardShortcut from '@/components/ui/keyboard-shortcut';
 
 import { cn } from '@/lib/utils';
@@ -66,9 +71,8 @@ const Console = () => {
     const isTransferring = ServerContext.useStoreState((state) => state.server.data?.isTransferring);
     const [history, setHistory] = usePersistedState<string[]>(`${serverId}:command_history`, []);
     const [historyIndex, setHistoryIndex] = useState(-1);
-    // Bumped when the tab becomes visible again so the listeners effect re-runs
-    // (clear + SEND_LOGS) and refills a terminal left blank after backgrounding.
-    const [visibilityTick, setVisibilityTick] = useState(0);
+    const [copiedConsole, setCopiedConsole] = useState(false);
+    const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const { isMinimized: _isMinimized } = useSidebar();
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -202,20 +206,49 @@ const Console = () => {
         document.addEventListener('keydown', handleGlobalKeyDown);
         document.addEventListener('copy', handleCopy);
 
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible' && connected && instance) {
-                terminal.clear();
-                instance.send(SocketRequest.SEND_LOGS);
-            }
-        };
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-
         return () => {
             document.removeEventListener('keydown', handleGlobalKeyDown);
             document.removeEventListener('copy', handleCopy);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, [handleGlobalKeyDown, handleCopy, connected, instance, terminal]);
+    }, [handleGlobalKeyDown, handleCopy]);
+
+    // Copy the entire console buffer (including scrollback) in one click, so
+    // users don't have to scroll up and select the output by hand.
+    const handleCopyConsole = useCallback(() => {
+        const content = getTerminalBufferText(terminal.buffer.active);
+
+        if (!content) {
+            toast.error('There is nothing in the console to copy yet.');
+            return;
+        }
+
+        if (!navigator.clipboard) {
+            toast.error('Clipboard is not available in this context.');
+            return;
+        }
+
+        navigator.clipboard
+            .writeText(content)
+            .then(() => {
+                setCopiedConsole(true);
+                toast.success('Copied console output to clipboard.');
+
+                if (copyResetTimerRef.current) {
+                    clearTimeout(copyResetTimerRef.current);
+                }
+                copyResetTimerRef.current = setTimeout(() => setCopiedConsole(false), 2000);
+            })
+            .catch(() => toast.error('Failed to copy console output to the clipboard.'));
+    }, [terminal]);
+
+    useEffect(
+        () => () => {
+            if (copyResetTimerRef.current) {
+                clearTimeout(copyResetTimerRef.current);
+            }
+        },
+        [],
+    );
 
     // Auto-focus input on component mount
     useEffect(() => {
@@ -289,10 +322,6 @@ const Console = () => {
         debouncedFit();
     }, [debouncedFit]);
 
-    // visibilityTick is an intentional trigger dep: it isn't read in the body, it
-    // only forces this effect to re-run (clear + SEND_LOGS) when the tab becomes
-    // visible again, so a terminal left blank after backgrounding refills.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: visibilityTick is a deliberate re-run trigger
     useEffect(() => {
         const listeners: Record<string, (s: string) => void> = {
             [SocketEvent.STATUS]: handlePowerChangeEvent,
@@ -342,23 +371,7 @@ const Console = () => {
         handleDaemonErrorOutput,
         handlePowerChangeEvent,
         handleTransferStatus,
-        visibilityTick,
     ]);
-
-    // On phones, backgrounding the app (home screen) freezes this component, so
-    // when the user returns the socket is often still/again connected (stats keep
-    // flowing) but the terminal can be left blank — its effects never re-ran while
-    // frozen. Bumping visibilityTick on return re-runs the listeners effect above
-    // (clear + SEND_LOGS), repopulating the console instead of leaving it empty.
-    useEffect(() => {
-        const onVisibility = () => {
-            if (document.visibilityState === 'visible') {
-                setVisibilityTick((tick) => tick + 1);
-            }
-        };
-        document.addEventListener('visibilitychange', onVisibility);
-        return () => document.removeEventListener('visibilitychange', onVisibility);
-    }, []);
 
     return (
         <div className='flex w-full h-full'>
@@ -373,11 +386,29 @@ const Console = () => {
                         // stutters on phones), and overscroll-behavior:contain keeps it from
                         // chaining to the page. Desktop (mouse) is untouched. This is the
                         // "separate the xterm console from the console page" behaviour.
-                        'console-terminal-host bg-bg-raised border-mocha-400 p-4 flex min-h-[260px] lg:flex-1 lg:min-h-0 flex-col overflow-hidden rounded-t-2xl border text-sm',
+                        'console-terminal-host bg-bg-raised border-mocha-400 p-4 flex min-h-65 lg:flex-1 lg:min-h-0 flex-col overflow-hidden rounded-t-2xl border text-sm relative',
                         canSendCommands ? 'rounded-b-none border-b-0' : 'rounded-b-2xl',
                     )}
                 >
                     <div className='h-full' ref={ref} />
+                    <Button
+                        type='button'
+                        variant='secondary'
+                        size='sm'
+                        shape='round'
+                        className='absolute top-4 right-4 z-20 gap-1.5 bg-mocha-400/90 backdrop-blur'
+                        onClick={handleCopyConsole}
+                        aria-label={'Copy full console output'}
+                        title={'Copy full console output'}
+                    >
+                        <HugeiconsIcon
+                            size={16}
+                            strokeWidth={2}
+                            icon={copiedConsole ? Tick02Icon : Copy01Icon}
+                            className='size-4'
+                        />
+                        {copiedConsole ? 'Copied' : 'Copy'}
+                    </Button>
                 </div>
 
                 {canSendCommands && (

@@ -30,7 +30,7 @@ import useFlash from '@/plugins/useFlash';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 
-import { useUnifiedBackups } from '../useUnifiedBackups';
+import { useBackupMutations } from '../useBackupMutations';
 
 interface Props {
     backup: ServerBackup;
@@ -55,7 +55,7 @@ const BackupContextMenu = ({ backup }: Props) => {
         renameBackup,
         toggleBackupLock,
         refresh,
-    } = useUnifiedBackups();
+    } = useBackupMutations();
     const hasTwoFactor = useStoreState((state: ApplicationStore) => state.user.data?.useTotp || false);
 
     const doDownload = () => {

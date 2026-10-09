@@ -4,6 +4,7 @@ namespace Pterodactyl\Providers;
 
 use Psr\Log\LoggerInterface as Log;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -31,6 +32,7 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:client_features:allocations:enabled',
     'pterodactyl:client_features:allocations:range_start',
     'pterodactyl:client_features:allocations:range_end',
+    'pterodactyl:client_features:groups:enabled',
     'pterodactyl:captcha:provider',
     'pterodactyl:captcha:turnstile:site_key',
     'pterodactyl:captcha:turnstile:secret_key',
@@ -38,6 +40,9 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:captcha:hcaptcha:secret_key',
     'pterodactyl:captcha:recaptcha:site_key',
     'pterodactyl:captcha:recaptcha:secret_key',
+    'pterodactyl:captcha:cap:site_key',
+    'pterodactyl:captcha:cap:secret_key',
+    'pterodactyl:captcha:cap:server_url',
   ];
 
 
@@ -64,6 +69,7 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:captcha:turnstile:secret_key',
     'pterodactyl:captcha:hcaptcha:secret_key',
     'pterodactyl:captcha:recaptcha:secret_key',
+    'pterodactyl:captcha:cap:secret_key',
   ];
 
   /**
@@ -78,9 +84,11 @@ class SettingsServiceProvider extends ServiceProvider
     }
 
     try {
-      $values = $settings->all()->mapWithKeys(function ($setting) {
-        return [$setting->key => $setting->value];
-      })->toArray();
+      $values = Cache::remember(
+        'pterodactyl:settings:all',
+        now()->addHour(),
+        fn () => $settings->all()->mapWithKeys(fn ($setting) => [$setting->key => $setting->value])->toArray()
+      );
     } catch (QueryException $exception) {
       $log->notice('A query exception was encountered while trying to load settings from the database: ' . $exception->getMessage());
 

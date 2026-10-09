@@ -35,7 +35,7 @@ x-common:
 services:
     database:
         image: mariadb:10.5
-        restart: always
+        restart: no
         command: --default-authentication-plugin=mysql_native_password
         volumes:
           - '/srv/pterodactyl/database:/var/lib/mysql'
@@ -45,10 +45,10 @@ services:
             MYSQL_USER: 'pterodactyl'
     cache:
         image: redis:alpine
-        restart: always
+        restart: no
     panel:
         image: ghcr.io/blueprintframework/hydrodactyl:latest
-        restart: always
+        restart: no
         ports:
             - '80:80'
             - '443:443'

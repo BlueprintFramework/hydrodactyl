@@ -22,7 +22,6 @@
         "guzzlehttp/guzzle": "^7.12.1",
         "hashids/hashids": "~5.0.2",
         "knuckleswtf/scribe": "^5.11",
-        "laracasts/utilities": "^3.2",
         "laravel/framework": "^13.0",
         "laravel/helpers": "^1.8",
         "laravel/sanctum": "^4.3",

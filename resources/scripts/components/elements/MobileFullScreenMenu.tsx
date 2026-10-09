@@ -109,6 +109,7 @@ const ServerMobileNavItem = ({ route, serverId, onClose }: ServerMobileNavItemPr
     // Feature limits from server state
     const featureLimits = ServerContext.useStoreState((state) => state.server.data?.featureLimits);
     const eggFeatures = ServerContext.useStoreState((state) => state.server.data?.eggFeatures);
+    const softwareEnabled = ServerContext.useStoreState((state) => state.server.data?.softwareEnabled);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
 
     // State for subdomain support check (only for network route)
@@ -146,6 +147,11 @@ const ServerMobileNavItem = ({ route, serverId, onClose }: ServerMobileNavItemPr
     // Hide when an egg-feature gate is defined and the server's egg doesn't
     // advertise a matching feature (e.g. the installer on a non-Minecraft server).
     if (route.eggFeature && !(eggFeatures ?? []).some((feature) => route.eggFeature?.test(feature))) {
+        return null;
+    }
+
+    // Hide the built-in Software page when it has been disabled for this server.
+    if (route.requiresSoftware && softwareEnabled === false) {
         return null;
     }
 

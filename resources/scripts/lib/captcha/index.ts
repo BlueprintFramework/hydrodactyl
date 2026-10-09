@@ -11,6 +11,7 @@ export type {
 
 export { BaseCaptchaProvider } from './CaptchaProvider';
 export { CaptchaProviderFactory } from './CaptchaProviderFactory';
+export { CapProvider } from './providers/CapProvider';
 export { HCaptchaProvider } from './providers/HCaptchaProvider';
 export { NullProvider } from './providers/NullProvider';
 export { RecaptchaProvider } from './providers/RecaptchaProvider';

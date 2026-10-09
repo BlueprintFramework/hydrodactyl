@@ -163,7 +163,7 @@ class Node extends Model
         'maintenance_mode' => false,
         'use_separate_fqdns' => false,
         'daemonType' => 'wings',
-        'backupDisk' => 'local',
+        'backupDisk' => 'wings',
     ];
 
 

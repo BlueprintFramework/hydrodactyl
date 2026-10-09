@@ -15,6 +15,11 @@ export interface Allocation {
     isDefault: boolean;
 }
 
+export interface ServerGroupMembership {
+    id: number;
+    name: string;
+}
+
 export interface Server {
     id: string;
     internalId: number | string;
@@ -46,10 +51,12 @@ export interface Server {
         backupStorageMb: number | null;
     };
     isTransferring: boolean;
+    softwareEnabled: boolean;
     variables: ServerEggVariable[];
     allocations: Allocation[];
     egg: string;
     daemonType: string;
+    group: ServerGroupMembership | null;
 }
 
 export const rawDataToServerObject = ({ attributes: data }: FractalResponseData): Server => ({
@@ -71,6 +78,7 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
     eggFeatures: data.egg_features || [],
     featureLimits: { ...data.feature_limits },
     isTransferring: data.is_transferring,
+    softwareEnabled: data.software_enabled !== false,
     variables: ((data.relationships?.variables as FractalResponseList | undefined)?.data || []).map(
         rawDataToServerEggVariable,
     ),
@@ -79,6 +87,7 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
     ),
     egg: data.egg,
     daemonType: data.daemonType,
+    group: data.groups ? { id: data.groups.id, name: data.groups.name } : null,
 });
 
 export default async (uuid: string): Promise<[Server, string[]]> => {

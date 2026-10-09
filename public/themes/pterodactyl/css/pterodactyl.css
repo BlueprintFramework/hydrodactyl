@@ -528,7 +528,10 @@ body {
         0 2px 4px 0 rgba(0, 0, 0, 0.08);
 }
 
-.skin-blue .main-sidebar,
+.skin-blue .main-sidebar {
+    border-right: 1px solid #222222;
+}
+
 .skin-blue .main-header .logo {
     border-right: 1px solid #222222;
     display: flex;

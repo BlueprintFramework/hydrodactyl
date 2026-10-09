@@ -12,7 +12,7 @@ class ServerConfigurationStructureService
      */
     public function __construct(
         private EnvironmentService $environment,
-        private StartupCommandService $startupCommandService
+        private StartupCommandService $startupCommandService,
     ) {
     }
 
@@ -57,7 +57,7 @@ class ServerConfigurationStructureService
             'build' => [
                 'memory_limit' => $server->memory + $server->overhead_memory,
                 'swap' => $server->swap,
-                'io_weight' => $server->io,
+                'io_weight' => $this->resolveIoWeight($server),
                 'cpu_limit' => $server->cpu,
                 'threads' => $server->threads,
                 'disk_space' => $server->disk,
@@ -91,6 +91,23 @@ class ServerConfigurationStructureService
                 'file_denylist' => $server->egg->inherit_file_denylist,
             ],
         ];
+    }
+
+    /**
+     * Resolve the block-IO weight to send for a server.
+     *
+     * Calagopus runs crun, which fails hard when the cgroup v2 "io" controller is
+     * not available (as is common under rootless Podman). Unless blkio weights
+     * are explicitly enabled for Calagopus, omit the value so those hosts can
+     * still create server and installer containers.
+     */
+    protected function resolveIoWeight(Server $server): ?int
+    {
+        if (config('calagopus.omit_io_weight', true) && $server->node?->daemonType === 'calagopus') {
+            return null;
+        }
+
+        return $server->io;
     }
 
     /**

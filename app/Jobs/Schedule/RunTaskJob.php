@@ -17,6 +17,7 @@ use Pterodactyl\Repositories\Wings\DaemonCommandRepository;
 use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
 use Pterodactyl\Exceptions\Service\Backup\BackupFailedException;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
+use Pterodactyl\Services\Backups\Calagopus\InitiateBackupService as CalagopusInitiateBackupService;
 
 class RunTaskJob extends Job implements ShouldQueue
 {
@@ -38,6 +39,7 @@ class RunTaskJob extends Job implements ShouldQueue
         DaemonCommandRepository $commandRepository,
         ElytraJobService $elytraJobService,
         InitiateBackupService $backupService,
+        CalagopusInitiateBackupService $calagopusBackupService,
         DaemonPowerRepository $powerRepository,
     ) {
         // Do not process a task that is not set to active, unless it's been manually triggered.
@@ -103,13 +105,17 @@ class RunTaskJob extends Job implements ShouldQueue
                             $backupService
                                 ->setIgnoredFiles($ignoredFiles)
                                 ->handle($server, null, true);
+                        } elseif (strtolower($server->node->daemonType) === 'calagopus') {
+                            $calagopusBackupService
+                                ->setIgnoredFiles($ignoredFiles)
+                                ->handle($server, null, true);
                         } else {
                             $elytraJobService->submitJob(
                                 $server,
                                 'backup_create',
                                 [
                                     'operation' => 'create',
-                                    'adapter' => config('backups.default', 'elytra'),
+                                    'adapter' => $server->node->backupDisk,
                                     'ignored' => implode("\n", $ignoredFiles),
                                     'name' => 'Scheduled Backup - ' . now()->format('Y-m-d H:i'),
                                     'is_automatic' => true,

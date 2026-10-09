@@ -5,7 +5,6 @@ namespace Pterodactyl\Http\ViewComposers;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Pterodactyl\Services\Helpers\AssetHashService;
 use Pterodactyl\Services\Captcha\CaptchaManager;
 use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 
@@ -13,6 +12,9 @@ class AssetComposer
 {
   protected CaptchaManager $captcha;
   protected SettingsRepositoryInterface $settings;
+
+  /** @var array<string, bool> Per-request filesystem existence cache. */
+  private static array $storageExistsCache = [];
 
   public function __construct(CaptchaManager $captcha, SettingsRepositoryInterface $settings)
   {
@@ -28,10 +30,14 @@ class AssetComposer
     $logoType = config('app.logo.type');
     $logoValue = config('app.logo.value');
     $logoUrl = match ($logoType) {
-      'upload' => ($logoValue && Storage::disk('public')->exists($logoValue)) ? url('storage/' . $logoValue) : null,
+      'upload' => ($logoValue && $this->storageExists($logoValue)) ? url('storage/' . $logoValue) : null,
       'link' => $logoValue,
       default => null,
     };
+
+    // Resolve the captcha provider once and reuse the driver instance.
+    $provider = $this->captcha->getDefaultDriver();
+    $driver = $provider !== 'none' ? $this->captcha->driver() : null;
 
     $view->with('siteConfiguration', [
       'name' => config('app.name') ?? 'Hydrodactyl',
@@ -40,35 +46,25 @@ class AssetComposer
       'logo' => $logoUrl,
       'customNavItems' => $this->getCustomNavItems(),
       'captcha' => [
-        'enabled' => $this->captcha->getDefaultDriver() !== 'none',
-        'provider' => $this->captcha->getDefaultDriver(),
-        'siteKey' => $this->getSiteKeyForCurrentProvider(),
+        'enabled' => $provider !== 'none',
+        'provider' => $provider,
+        'siteKey' => !is_null($driver) && method_exists($driver, 'getSiteKey') ? $driver->getSiteKey() : '',
+        'serverUrl' => !is_null($driver) && method_exists($driver, 'getServerUrl') ? $driver->getServerUrl() : '',
         'scriptIncludes' => $this->captcha->getScriptIncludes(),
       ],
     ]);
   }
 
   /**
-   * Get the site key for the currently active captcha provider.
+   * Memoize a Storage::exists() check for the duration of the request.
    */
-  private function getSiteKeyForCurrentProvider(): string
+  private function storageExists(string $path): bool
   {
-    $provider = $this->captcha->getDefaultDriver();
-
-    if ($provider === 'none') {
-      return '';
+    if (!array_key_exists($path, self::$storageExistsCache)) {
+      self::$storageExistsCache[$path] = Storage::disk('public')->exists($path);
     }
 
-    try {
-      $driver = $this->captcha->driver();
-      if (method_exists($driver, 'getSiteKey')) {
-        return $driver->getSiteKey();
-      }
-    } catch (\Exception $e) {
-      // Silently fail to avoid exposing errors to frontend
-    }
-
-    return '';
+    return self::$storageExistsCache[$path];
   }
 
   private function getCustomNavItems(): array

@@ -17,6 +17,17 @@
     --color-brand-800: oklch(0.3887 0.0962 49.79);
     --color-brand-900: oklch(0.2451 0.0546 53.64);
 
+    --color-hydro-50: #eef7ff;
+    --color-hydro-100: #d9edff;
+    --color-hydro-200: #bce1ff;
+    --color-hydro-300: #8ecdff;
+    --color-hydro-400: #6bb9ff;
+    --color-hydro-500: #52a9ff;
+    --color-hydro-600: #3a8ce6;
+    --color-hydro-700: #2f70ba;
+    --color-hydro-800: #2a5c95;
+    --color-hydro-900: #274e79;
+
     --color-cream-100: #fffdfa;
     --color-cream-200: #fff8f0;
     --color-cream-300: #fff5eb;
@@ -47,9 +58,26 @@
 
     --color-brand-grad: radial-gradient(109.26% 109.26% at 49.83% 13.37%, #ff343c 0%, #f06f53 100%);
     --color-brand: #fa4e49;
+    --color-hydro: #52a9ff;
+
+    --color-accent: var(--color-cream-400);
+    --color-accent-foreground: var(--color-mocha-500);
 
     --transition-duration-250: 250ms;
 
+    --animate-group-fly-in: groupFlyIn 0.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+
     --font-schibsted: "Schibsted Grotesk", sans-serif;
     --font-manrope: "Manrope", serif;
+}
+
+@keyframes groupFlyIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

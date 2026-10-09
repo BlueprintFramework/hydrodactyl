@@ -1,95 +1,133 @@
-# Just a list of To-do's for the Hydrodactyl Redesign
+<h1 align="center">Todolist</h1>
 
-- [ ] Wings needs to be fully automated, right now you have to change multiple settings
-  - [ ] debug
-  - [ ] machine-id
+<br/>
 
-- [x] Auth Pages
-  - [x] Login Page
-  - [x] Password Reset
-  - [x] 2fa
-- [ ] Homepage
-  - [ ] Search Bar
-    - [x] Design
-    - [x] Keyboard Shortcut
-    - [ ] Search Functionality
-  - [x] Servers Page(Server list)
-  - [x] Api Keys Page
-  - [x] SSH Keys Page
-  - [x] Settings Page
-  - [x] Sidebar
-- [ ] Server Pages
-  - [x] Sidebar
-  - [ ] Console Page
-    - [x] Console
-    - [ ] Graphs
-    - [x] Power Actions
-    - [ ] Features
-      - [ ] Minecraft Eula
-      - [ ] Java Version
-      - [ ] McLogs Feature
-      - [ ] Hytale Feature
-      - [ ] Steam Disk Space
-  - [ ] Files
-    - [ ] Actual Explorer(Rework the entire file explorer system)
-      - [ ] Shift + Click to select a range of files
-      - [ ] Better handeling of path changes
-      - [ ] Context button for ease of use of Actions
-      - [ ] More icons for file Mime Data
-    - [ ] File Editor
-    - [ ] Decrease Editor Bundle Size
-  - [ ] Database
-    - [ ] New Database Model
-    - [ ] Better Display of databases
-    - [ ] Postgres Support
-  - [ ] Backups
-   - [ ] New less cluttered way to show backups
-   - [ ] Option in admin panel to Change how many backups are allowed to be made in a set period
-   - [ ] Shift + Click to select a range of backups
-  - [ ] Network
-    - [x] I've got nothing tbh, just needs to have color changes and the range of fixes I do to pages
-    - [ ] Dropdown for Subdomain Management
-  - [ ] Users
-    - [ ] Permission Groups
-    - [ ] Permission "Presets"
-    - [ ] Less Cluttered Design
-  - [ ] Startup
-    - [ ] Copy Env Variables with a click
-    - [ ] Redesigned "Startup Command" Field
-    - [ ] Better Docker Image Selector
-  - [ ] Schedules
-    - [x] Less Cluttered "Create New Schedule" Modal
-    - [ ] Option for admins and Users to create **Custom Actions** that are able to be used
-      - [ ] Send http Request
-      - [ ] Interact with another Owned Server
-        - [ ] New user Permission called **"Actions Interactable"** or smth
-    - [ ] New Actions to help user
-      - [ ] Alert on Failure
-        - [ ] Email
-        - [ ] Discord
-        - [ ] Slack
-        - [ ] Mattermost
-  - [ ] Activity
-    - [ ] Redone and Fixed Filters
-      - [ ] Currently only searches the current page
-      - [ ] Just doesn't feel good
-    - [ ] Better Filters
-  - [ ] Software
-    - [ ] Redone page with more "Verbose" options and WAY more splitting
-    - [ ] Reduce File size from ~1300 lines to multiple files with ~200-400 lines each
-    - [ ] Simplified Logic
-    - [ ] More Performant
+A living roadmap of the features and improvements planned for Hydrodactyl. Checked items reflect the current state of the `main` branch.
 
-## General Changes that need to be made
+> [!NOTE]
+> Hydrodactyl is under active development. This list is not exhaustive — check [DEV.md](./DEV.md) and the open issues on GitHub for the latest status.
 
-- [ ] Redesigned Dropdown Menu
-  - [ ] Backups Page
-  - [ ] Files Page
-  - [ ] Software/Shell page
-  - [ ] Startup Page
+## Wings Automation
 
-## Future Plans
+- [ ] Fully automate Wings configuration
+  - [ ] Automate debug mode configuration
+  - [ ] Automate machine-id configuration
 
-- [ ] Admin panel Redesign
-  - [ ] Convert Admin panel to React using Interia
-  - [ ] Redesign admin panel to match Client side Better
+## Auth Pages
+
+- [x] Login Page
+- [x] Password Reset Page
+- [x] 2FA Page
+
+## Homepage
+
+- [x] Search Bar (server search, sorting & filtering)
+  - [x] Design layout
+  - [x] Keyboard shortcut integration (`Cmd + K`)
+  - [x] Search functionality
+- [x] Servers Page (server list)
+- [x] API Keys Page
+- [x] SSH Keys Page
+- [x] Settings Page
+- [x] Sidebar Navigation
+
+## Server Pages
+
+- [x] Sidebar Navigation
+
+### Console
+
+- [x] Console view
+- [x] System resource graphs
+- [x] Power actions
+- [x] Server Features
+  - [x] Minecraft EULA prompt
+  - [x] Java version selector
+  - [x] McLogs integration
+  - [x] Hytale feature support
+  - [x] Steam disk space meter
+
+### Files
+
+- [x] File Explorer System
+  - [ ] Shift + Click range selection
+  - [x] Improved path change handling (breadcrumbs)
+  - [x] Context action menu
+  - [x] File MIME-type icons
+- [ ] File Editor
+  - [ ] Reduce editor bundle size
+
+### Databases
+
+- [x] New database model
+- [x] Redesigned database display UI
+- [x] PostgreSQL support
+
+### Backups
+
+- [x] Redesigned, less cluttered backup list UI
+- [ ] Admin panel setting for backup creation limits per time period
+- [ ] Shift + Click range selection for backups
+
+### Network
+
+- [x] General UI fixes and color scheme updates
+- [x] Subdomain Management (Cloudflare, Bunny.net, and more)
+
+### Users
+
+- [ ] Permission Groups
+- [ ] Permission Presets
+- [ ] Clean up / de-clutter interface
+
+### Startup
+
+- [x] One-click copy for environment variables
+- [x] Redesigned "Startup Command" field
+- [x] Improved Docker Image Selector
+
+### Schedules
+
+- [x] De-clutter "Create New Schedule" modal
+- [ ] Custom Actions system (Admins & Users)
+  - [ ] Send HTTP Request action
+  - [ ] Interact with another owned server
+    - [ ] Add "Actions Interactable" user permission
+- [ ] Failure Alert Notifications
+  - [ ] Email alerts
+  - [ ] Discord webhooks
+  - [ ] Slack integration
+  - [ ] Mattermost integration
+
+### Activity
+
+- [x] Filter system
+- [ ] Fix search restricted to current page (enable global search)
+- [ ] Improve search/filter UX & overall feel
+
+### Software
+
+- [x] Redesigned page with verbose configuration options
+- [x] Modularized code (split into ~200–400 line components)
+- [x] Simplified component logic
+- [ ] Optimize page performance
+
+## Marketplace
+
+- [x] Native plugin/mod installer (Modrinth, Hangar, Spiget)
+- [x] Install history and management
+- [x] Marketplace client API
+
+## General Changes
+
+- [x] Redesigned dropdown menus across pages
+- [x] Backups Page
+- [x] Files Page
+- [x] Software / Shell Page
+- [x] Startup Page
+
+## In Progress
+
+- [ ] Admin Panel Redesign
+  - [ ] Convert Admin Panel pages to React (dashboard overview is done)
+  - [ ] Redesign UI to match Client-side styling

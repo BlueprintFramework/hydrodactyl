@@ -12,6 +12,7 @@ import UserDropdown from './UserDropdown';
 
 interface AppHeaderProps {
     serverId?: string;
+    admin?: boolean;
 }
 
 const HeaderActions = memo(() => {
@@ -40,19 +41,30 @@ const getSiteName = () => {
         : 'Hydrodactyl';
 };
 
-const LogoSection = memo(() => {
+const LogoSection = memo(({ admin }: { admin?: boolean }) => {
     const siteName = getSiteName();
+    const className = 'sidebar-logo-link flex items-center shrink-0 h-8 min-w-0 gap-3 hydrodactyl';
 
-    return (
-        <NavLink
-            to={'/'}
-            className='sidebar-logo-link flex items-center shrink-0 h-8 min-w-0 gap-3 hydrodactyl-logo'
-            aria-label={`${siteName} home page`}
-        >
+    const content = (
+        <>
             <Logo className='flex h-8 w-8 shrink-0 object-contain' />
-            <span className='sidebar-logo-name truncate text-sm font-semibold leading-none tracking-wide text-cream-50'>
+            <span className='sidebar-logo-name hydrodactyl-logo content-center truncate text-sm font-semibold leading-none tracking-wide text-cream-50'>
                 {siteName}
             </span>
+        </>
+    );
+
+    if (admin) {
+        return (
+            <a href='/' className={className} aria-label={`${siteName} home page`}>
+                {content}
+            </a>
+        );
+    }
+
+    return (
+        <NavLink to={'/'} className={className} aria-label={`${siteName} home page`}>
+            {content}
         </NavLink>
     );
 });
@@ -75,42 +87,73 @@ const ToggleButton = memo(() => {
 });
 ToggleButton.displayName = 'ToggleButton';
 
-const SidebarLogo = memo(() => {
+const SidebarLogo = memo(({ admin }: { admin?: boolean }) => {
     return (
         <div className='sidebar-logo-container hidden lg:flex h-12 items-center flex-none relative'>
-            <LogoSection />
+            <LogoSection admin={admin} />
             <ToggleButton />
         </div>
     );
 });
 SidebarLogo.displayName = 'SidebarLogo';
 
-const StaticButtons = memo<{ serverId?: string }>(({ serverId }) => {
-    return (
-        <>
-            {/* <Button size={'sm'} variant={'secondary'} className='px-3 gap-1 rounded-full'>
-        <div className='flex flex-row items-center gap-1.5'>
-          <HugeiconsIcon size={16} strokeWidth={2} icon={AiSearch02Icon} className='size-4' />
-          Search
-        </div>
-      </Button> */}
-            <UserDropdown serverId={serverId} />
-        </>
-    );
+const StaticButtons = memo<{ serverId?: string; admin?: boolean }>(({ serverId, admin }) => {
+    return <UserDropdown serverId={serverId} admin={admin} />;
 });
 
 StaticButtons.displayName = 'StaticButtons';
 
-const AppHeader = ({ serverId }: AppHeaderProps) => {
-    return (
-        <div className='h-16 w-full py-4 pr-2 flex align-middle items-center justify-between'>
-            <div className='flex items-center gap-2'>
-                <MobileSidebarToggle />
-                <SidebarLogo />
+const SlotActions = memo<{ actions: React.ReactNode }>(({ actions }) => {
+    if (!actions) return null;
+
+    if (Array.isArray(actions)) {
+        return (
+            <>
+                {actions.map((action, index) => (
+                    <Fragment key={index}>{action}</Fragment>
+                ))}
+            </>
+        );
+    }
+
+    return <>{actions}</>;
+});
+SlotActions.displayName = 'SlotActions';
+
+const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
+    const { headerActions, leftActions, centerActions, rightActions } = useHeader();
+
+    const hasSlottedLayout = !headerActions && (leftActions || centerActions || rightActions);
+
+    // Dashboard Page
+    if (hasSlottedLayout) {
+        return (
+            <div className='h-16 w-full py-4 pr-2 flex align-middle items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                    <SidebarLogo admin={admin} />
+                    <MobileSidebarToggle />
+                    <SlotActions actions={leftActions} />
+                </div>
+                <SlotActions actions={centerActions} />
+                <div className='flex items-center gap-1.5 sm:gap-2 justify-end min-w-0 overflow-hidden'>
+                    <SlotActions actions={rightActions} />
+                    <StaticButtons serverId={serverId} admin={admin} />
+                </div>
             </div>
-            <div className='flex items-center gap-1.5 sm:gap-2 h-full w-full justify-end min-w-0'>
-                <HeaderActions />
-                <StaticButtons serverId={serverId} />
+        );
+    }
+
+    // Servers page
+    return (
+        <div className='h-16 w-full py-4 pr-2 flex align-middle items-center'>
+            <div className='flex items-center gap-2 flex-1'>
+                <MobileSidebarToggle />
+                <SidebarLogo admin={admin} />
+            </div>
+            <HeaderActions />
+            <div className='flex items-center gap-1.5 sm:gap-2 justify-end min-w-0 overflow-hidden flex-1'>
+                <SlotActions actions={rightActions} />
+                <StaticButtons serverId={serverId} admin={admin} />
             </div>
         </div>
     );

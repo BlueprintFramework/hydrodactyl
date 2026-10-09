@@ -23,8 +23,16 @@ use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
 Route::get('/', [Client\ClientController::class, 'index'])->name('api:client.index');
 Route::get('/filter-options', [Client\ClientController::class, 'filterOptions'])->name('api:client.filter-options');
 Route::get('/permissions', [Client\ClientController::class, 'permissions']);
-Route::get('/version', function () {
-    return response()->json(['version' => config('app.version')]);
+Route::get('/version', [Client\ClientController::class, 'version']);
+
+Route::prefix('/server-groups')->group(function () {
+    Route::get('/', [Client\ServerGroupController::class, 'index'])->name('api:client.server-groups.index');
+    Route::post('/', [Client\ServerGroupController::class, 'store'])->name('api:client.server-groups.store');
+    Route::put('/{serverGroup}', [Client\ServerGroupController::class, 'update'])->name('api:client.server-groups.update');
+    Route::delete('/{serverGroup}', [Client\ServerGroupController::class, 'destroy'])->name('api:client.server-groups.destroy');
+    Route::post('/{serverGroup}/servers', [Client\ServerGroupController::class, 'addServers'])->name('api:client.server-groups.servers.add');
+    Route::delete('/{serverGroup}/servers', [Client\ServerGroupController::class, 'removeServers'])->name('api:client.server-groups.servers.remove');
+    Route::put('/reorder', [Client\ServerGroupController::class, 'reorder'])->name('api:client.server-groups.reorder');
 });
 
 Route::prefix('/nests')->group(function () {
@@ -143,4 +151,20 @@ Route::group([
     'prefix' => 'servers/elytra',
 ], function () {
     require __DIR__ . '/servers/elytra.php';
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Client Control API (Calagopus)
+|--------------------------------------------------------------------------
+|
+| Endpoint: /api/client/servers/calagopus/{server}
+|
+*/
+
+Route::group([
+    'prefix' => 'servers/calagopus',
+], function () {
+    require __DIR__ . '/servers/calagopus.php';
 });
