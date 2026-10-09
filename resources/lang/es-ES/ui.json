@@ -814,15 +814,15 @@
             "installing": "Instalando",
             "installing_ellipsis": "Instalando…",
             "load_more": "Cargar más",
-            "loader": "Loader",
+            "loader": "Cargador",
             "loading": "Cargando…",
             "loading_versions": "Cargando versiones…",
             "manage": "Gestionar",
             "mods": "Mods",
             "no_description": "No se ha proporcionado ninguna descripción.",
             "no_results": "No hay resultados. Prueba con otra búsqueda.",
-            "no_versions": "No hay versiones disponibles. Prueba con otro loader.",
-            "no_versions_loader": "No hay versiones disponibles para {{loader}}. Prueba con otro loader.",
+            "no_versions": "No hay versiones disponibles. Prueba con otro cargador.",
+            "no_versions_loader": "No hay versiones disponibles para {{loader}}. Prueba con otro cargador.",
             "nothing_to_show": "No hay nada que mostrar ahora mismo.",
             "open_project_page": "{{title}}: abrir la página del proyecto",
             "plugins": "Plugins",
@@ -835,10 +835,10 @@
             "title": "Instalador",
             "title_plugins_mods": "Plugins y mods",
             "unknown_author": "Autor desconocido",
-            "version_type_alpha": "Alpha",
+            "version_type_alpha": "Alfa",
             "version_type_beta": "Beta",
             "version_type_other": "Otra",
-            "version_type_release": "Release"
+            "version_type_release": "Estable"
         },
         "network": {
             "allocations_count": "{{count}} asignaciones",
@@ -1238,239 +1238,239 @@
             "permissions": {
                 "activity": {
                     "description": "Permisos que controlan el acceso de un usuario a los registros de actividad del servidor.",
-                    "title": "activity"
+                    "title": "Actividad"
                 },
                 "activity_read": {
                     "description": "Permite a un usuario ver los registros de actividad del servidor.",
-                    "title": "read"
+                    "title": "Lectura"
                 },
                 "allocation": {
                     "description": "Permisos que controlan la capacidad de un usuario de modificar las asignaciones de puertos de este servidor.",
-                    "title": "allocation"
+                    "title": "Asignaciones"
                 },
                 "allocation_create": {
                     "description": "Permite a un usuario asignar asignaciones adicionales al servidor.",
-                    "title": "create"
+                    "title": "Crear"
                 },
                 "allocation_delete": {
                     "description": "Permite a un usuario eliminar una asignación del servidor.",
-                    "title": "delete"
+                    "title": "Eliminar"
                 },
                 "allocation_read": {
                     "description": "Permite a un usuario ver todas las asignaciones asignadas actualmente a este servidor. Los usuarios con cualquier nivel de acceso a este servidor siempre pueden ver la asignación principal.",
-                    "title": "read"
+                    "title": "Lectura"
                 },
                 "allocation_update": {
                     "description": "Permite a un usuario cambiar la asignación principal del servidor y adjuntar notas a cada asignación.",
-                    "title": "update"
+                    "title": "Actualizar"
                 },
                 "backup": {
                     "description": "Permisos que controlan la capacidad de un usuario de generar y gestionar copias de seguridad del servidor.",
-                    "title": "backup"
+                    "title": "Copias de seguridad"
                 },
                 "backup_create": {
                     "description": "Permite a un usuario crear nuevas copias de seguridad para este servidor.",
-                    "title": "create"
+                    "title": "Crear"
                 },
                 "backup_delete": {
                     "description": "Permite a un usuario eliminar copias de seguridad del sistema.",
-                    "title": "delete"
+                    "title": "Eliminar"
                 },
                 "backup_download": {
                     "description": "Permite a un usuario descargar una copia de seguridad del servidor. Peligro: esto permite a un usuario acceder a todos los archivos del servidor incluidos en la copia de seguridad.",
-                    "title": "download"
+                    "title": "Descargar"
                 },
                 "backup_read": {
                     "description": "Permite a un usuario ver todas las copias de seguridad que existen para este servidor.",
-                    "title": "read"
+                    "title": "Lectura"
                 },
                 "backup_restore": {
                     "description": "Permite a un usuario restaurar una copia de seguridad del servidor. Peligro: esto permite al usuario eliminar todos los archivos del servidor durante el proceso.",
-                    "title": "restore"
+                    "title": "Restaurar"
                 },
                 "control": {
                     "description": "Permisos que controlan la capacidad de un usuario de controlar el estado de encendido de un servidor o de enviar comandos.",
-                    "title": "control"
+                    "title": "Control"
                 },
                 "control_console": {
                     "description": "Permite a un usuario enviar comandos a la instancia del servidor a través de la consola.",
-                    "title": "console"
+                    "title": "Consola"
                 },
                 "control_restart": {
                     "description": "Permite a un usuario reiniciar el servidor. Esto le permite iniciar el servidor si está apagado, pero no dejarlo en un estado completamente detenido.",
-                    "title": "restart"
+                    "title": "Reiniciar"
                 },
                 "control_start": {
                     "description": "Permite a un usuario iniciar el servidor si está detenido.",
-                    "title": "start"
+                    "title": "Iniciar"
                 },
                 "control_stop": {
                     "description": "Permite a un usuario detener un servidor si está en ejecución.",
-                    "title": "stop"
+                    "title": "Detener"
                 },
                 "database": {
                     "description": "Permisos que controlan el acceso de un usuario a la gestión de bases de datos de este servidor.",
-                    "title": "database"
+                    "title": "Bases de datos"
                 },
                 "database_create": {
                     "description": "Permite a un usuario crear una nueva base de datos para este servidor.",
-                    "title": "create"
+                    "title": "Crear"
                 },
                 "database_delete": {
                     "description": "Permite a un usuario eliminar una instancia de base de datos de este servidor.",
-                    "title": "delete"
+                    "title": "Eliminar"
                 },
                 "database_read": {
                     "description": "Permite a un usuario ver la base de datos asociada a este servidor.",
-                    "title": "read"
+                    "title": "Lectura"
                 },
                 "database_update": {
                     "description": "Permite a un usuario rotar la contraseña de una instancia de base de datos. Si el usuario no tiene el permiso view_password, no verá la contraseña actualizada.",
-                    "title": "update"
+                    "title": "Actualizar"
                 },
                 "database_view_password": {
                     "description": "Permite a un usuario ver la contraseña asociada a una instancia de base de datos de este servidor.",
-                    "title": "view_password"
+                    "title": "Ver contraseña"
                 },
                 "file": {
                     "description": "Permisos que controlan la capacidad de un usuario de modificar el sistema de archivos de este servidor.",
-                    "title": "file"
+                    "title": "Archivos"
                 },
                 "file_archive": {
                     "description": "Permite a un usuario archivar el contenido de un directorio, así como descomprimir archivos existentes en el sistema.",
-                    "title": "archive"
+                    "title": "Archivar"
                 },
                 "file_create": {
                     "description": "Permite a un usuario crear archivos y carpetas adicionales a través del panel o mediante subida directa.",
-                    "title": "create"
+                    "title": "Crear"
                 },
                 "file_delete": {
                     "description": "Permite a un usuario eliminar archivos o directorios.",
-                    "title": "delete"
+                    "title": "Eliminar"
                 },
                 "file_read": {
                     "description": "Permite a un usuario ver el contenido de un directorio, pero no ver el contenido de los archivos ni descargarlos.",
-                    "title": "read"
+                    "title": "Lectura"
                 },
                 "file_read_content": {
                     "description": "Permite a un usuario ver el contenido de un archivo concreto. Esto también permitirá al usuario descargar archivos.",
-                    "title": "read-content"
+                    "title": "Leer contenido"
                 },
                 "file_sftp": {
                     "description": "Permite a un usuario conectarse por SFTP y gestionar los archivos del servidor usando los demás permisos de archivos asignados.",
-                    "title": "sftp"
+                    "title": "SFTP"
                 },
                 "file_update": {
                     "description": "Permite a un usuario actualizar el contenido de un archivo o directorio existente.",
-                    "title": "update"
+                    "title": "Actualizar"
                 },
                 "mod": {
                     "description": "Permisos que controlan el acceso de un usuario a la descarga y actualización de mods.",
-                    "title": "mod"
+                    "title": "Mods"
                 },
                 "mod_download": {
                     "description": "Permite a un usuario descargar mods al servidor",
-                    "title": "download"
+                    "title": "Descargar"
                 },
                 "mod_loader": {
                     "description": "Permite a un usuario cambiar el loader para el que descargar",
-                    "title": "loader"
+                    "title": "Cargador"
                 },
                 "mod_resolver": {
                     "description": "Permite a un usuario acceder al solucionador de dependencias",
-                    "title": "resolver"
+                    "title": "Resolutor"
                 },
                 "mod_update": {
                     "description": "Permite a un usuario actualizar los mods instalados actualmente",
-                    "title": "update"
+                    "title": "Actualizar"
                 },
                 "mod_version": {
                     "description": "Permite a un usuario cambiar la versión para la que descargar",
-                    "title": "version"
+                    "title": "Versión"
                 },
                 "schedule": {
                     "description": "Permisos que controlan el acceso de un usuario a la gestión de tareas programadas de este servidor.",
-                    "title": "schedule"
+                    "title": "Tareas programadas"
                 },
                 "schedule_create": {
                     "description": "Permite a un usuario crear nuevas tareas programadas para este servidor.",
-                    "title": "create"
+                    "title": "Crear"
                 },
                 "schedule_delete": {
                     "description": "Permite a un usuario eliminar tareas programadas de este servidor.",
-                    "title": "delete"
+                    "title": "Eliminar"
                 },
                 "schedule_read": {
                     "description": "Permite a un usuario ver las tareas programadas y las tareas asociadas a ellas para este servidor.",
-                    "title": "read"
+                    "title": "Lectura"
                 },
                 "schedule_update": {
                     "description": "Permite a un usuario actualizar las tareas programadas y sus tareas para este servidor.",
-                    "title": "update"
+                    "title": "Actualizar"
                 },
                 "settings": {
                     "description": "Permisos que controlan el acceso de un usuario a los ajustes de este servidor.",
-                    "title": "settings"
+                    "title": "Ajustes"
                 },
                 "settings_reinstall": {
                     "description": "Permite a un usuario iniciar una reinstalación de este servidor.",
-                    "title": "reinstall"
+                    "title": "Reinstalar"
                 },
                 "settings_rename": {
                     "description": "Permite a un usuario cambiar el nombre de este servidor y su descripción.",
-                    "title": "rename"
+                    "title": "Renombrar"
                 },
                 "startup": {
                     "description": "Permisos que controlan la capacidad de un usuario de ver los parámetros de inicio de este servidor.",
-                    "title": "startup"
+                    "title": "Inicio"
                 },
                 "startup_command": {
                     "description": "Permite a un usuario modificar el comando de inicio del servidor.",
-                    "title": "command"
+                    "title": "Comando"
                 },
                 "startup_docker_image": {
                     "description": "Permite a un usuario modificar la imagen de Docker usada al ejecutar el servidor.",
-                    "title": "docker-image"
+                    "title": "Imagen de Docker"
                 },
                 "startup_read": {
                     "description": "Permite a un usuario ver las variables de inicio de un servidor.",
-                    "title": "read"
+                    "title": "Lectura"
                 },
                 "startup_software": {
                     "description": "Permite a un usuario modificar el juego o software usado para el servidor.",
-                    "title": "software"
+                    "title": "Software"
                 },
                 "startup_update": {
                     "description": "Permite a un usuario modificar las variables de inicio del servidor.",
-                    "title": "update"
+                    "title": "Actualizar"
                 },
                 "user": {
                     "description": "Permisos que permiten a un usuario gestionar otros subusuarios en un servidor. Nunca podrán editar su propia cuenta ni asignar permisos que ellos mismos no tengan.",
-                    "title": "user"
+                    "title": "Usuarios"
                 },
                 "user_create": {
                     "description": "Permite a un usuario crear nuevos subusuarios para el servidor.",
-                    "title": "create"
+                    "title": "Crear"
                 },
                 "user_delete": {
                     "description": "Permite a un usuario eliminar un subusuario del servidor.",
-                    "title": "delete"
+                    "title": "Eliminar"
                 },
                 "user_read": {
                     "description": "Permite al usuario ver los subusuarios y sus permisos para el servidor.",
-                    "title": "read"
+                    "title": "Lectura"
                 },
                 "user_update": {
                     "description": "Permite a un usuario modificar otros subusuarios.",
-                    "title": "update"
+                    "title": "Actualizar"
                 },
                 "websocket": {
                     "description": "Permite al usuario conectarse al websocket del servidor, lo que le da acceso a ver la salida de la consola y las estadísticas del servidor en tiempo real.",
-                    "title": "websocket"
+                    "title": "Websocket"
                 },
                 "websocket_connect": {
                     "description": "Permite a un usuario conectarse a la instancia de websocket de un servidor para transmitir la consola.",
-                    "title": "connect"
+                    "title": "Conectar"
                 }
             },
             "permissions_assigned": "{{count}} permisos asignados",

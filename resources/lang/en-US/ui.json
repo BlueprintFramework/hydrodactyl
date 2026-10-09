@@ -1238,239 +1238,239 @@
             "permissions": {
                 "activity": {
                     "description": "Permissions that control a user's access to the server activity logs.",
-                    "title": "activity"
+                    "title": "Activity"
                 },
                 "activity_read": {
                     "description": "Allows a user to view the activity logs for the server.",
-                    "title": "read"
+                    "title": "Read"
                 },
                 "allocation": {
                     "description": "Permissions that control a user's ability to modify the port allocations for this server.",
-                    "title": "allocation"
+                    "title": "Allocation"
                 },
                 "allocation_create": {
                     "description": "Allows a user to assign additional allocations to the server.",
-                    "title": "create"
+                    "title": "Create"
                 },
                 "allocation_delete": {
                     "description": "Allows a user to delete an allocation from the server.",
-                    "title": "delete"
+                    "title": "Delete"
                 },
                 "allocation_read": {
                     "description": "Allows a user to view all allocations currently assigned to this server. Users with any level of access to this server can always view the primary allocation.",
-                    "title": "read"
+                    "title": "Read"
                 },
                 "allocation_update": {
                     "description": "Allows a user to change the primary server allocation and attach notes to each allocation.",
-                    "title": "update"
+                    "title": "Update"
                 },
                 "backup": {
                     "description": "Permissions that control a user's ability to generate and manage server backups.",
-                    "title": "backup"
+                    "title": "Backup"
                 },
                 "backup_create": {
                     "description": "Allows a user to create new backups for this server.",
-                    "title": "create"
+                    "title": "Create"
                 },
                 "backup_delete": {
                     "description": "Allows a user to remove backups from the system.",
-                    "title": "delete"
+                    "title": "Delete"
                 },
                 "backup_download": {
                     "description": "Allows a user to download a backup for the server. Danger: this allows a user to access all files for the server in the backup.",
-                    "title": "download"
+                    "title": "Download"
                 },
                 "backup_read": {
                     "description": "Allows a user to view all backups that exist for this server.",
-                    "title": "read"
+                    "title": "Read"
                 },
                 "backup_restore": {
                     "description": "Allows a user to restore a backup for the server. Danger: this allows the user to delete all of the server files in the process.",
-                    "title": "restore"
+                    "title": "Restore"
                 },
                 "control": {
                     "description": "Permissions that control a user's ability to control the power state of a server, or send commands.",
-                    "title": "control"
+                    "title": "Control"
                 },
                 "control_console": {
                     "description": "Allows a user to send commands to the server instance via the console.",
-                    "title": "console"
+                    "title": "Console"
                 },
                 "control_restart": {
                     "description": "Allows a user to perform a server restart. This allows them to start the server if it is offline, but not put the server in a completely stopped state.",
-                    "title": "restart"
+                    "title": "Restart"
                 },
                 "control_start": {
                     "description": "Allows a user to start the server if it is stopped.",
-                    "title": "start"
+                    "title": "Start"
                 },
                 "control_stop": {
                     "description": "Allows a user to stop a server if it is running.",
-                    "title": "stop"
+                    "title": "Stop"
                 },
                 "database": {
                     "description": "Permissions that control a user's access to the database management for this server.",
-                    "title": "database"
+                    "title": "Database"
                 },
                 "database_create": {
                     "description": "Allows a user to create a new database for this server.",
-                    "title": "create"
+                    "title": "Create"
                 },
                 "database_delete": {
                     "description": "Allows a user to remove a database instance from this server.",
-                    "title": "delete"
+                    "title": "Delete"
                 },
                 "database_read": {
                     "description": "Allows a user to view the database associated with this server.",
-                    "title": "read"
+                    "title": "Read"
                 },
                 "database_update": {
                     "description": "Allows a user to rotate the password on a database instance. If the user does not have the view_password permission they will not see the updated password.",
-                    "title": "update"
+                    "title": "Update"
                 },
                 "database_view_password": {
                     "description": "Allows a user to view the password associated with a database instance for this server.",
-                    "title": "view_password"
+                    "title": "View Password"
                 },
                 "file": {
                     "description": "Permissions that control a user's ability to modify the filesystem for this server.",
-                    "title": "file"
+                    "title": "File"
                 },
                 "file_archive": {
                     "description": "Allows a user to archive the contents of a directory as well as decompress existing archives on the system.",
-                    "title": "archive"
+                    "title": "Archive"
                 },
                 "file_create": {
                     "description": "Allows a user to create additional files and folders via the Panel or direct upload.",
-                    "title": "create"
+                    "title": "Create"
                 },
                 "file_delete": {
                     "description": "Allows a user to delete files or directories.",
-                    "title": "delete"
+                    "title": "Delete"
                 },
                 "file_read": {
                     "description": "Allows a user to view the contents of a directory, but not view the contents of or download files.",
-                    "title": "read"
+                    "title": "Read"
                 },
                 "file_read_content": {
                     "description": "Allows a user to view the contents of a given file. This will also allow the user to download files.",
-                    "title": "read-content"
+                    "title": "Read Content"
                 },
                 "file_sftp": {
                     "description": "Allows a user to connect to SFTP and manage server files using the other assigned file permissions.",
-                    "title": "sftp"
+                    "title": "SFTP"
                 },
                 "file_update": {
                     "description": "Allows a user to update the contents of an existing file or directory.",
-                    "title": "update"
+                    "title": "Update"
                 },
                 "mod": {
                     "description": "Permissions that control a user's access to downloading and updating mods.",
-                    "title": "mod"
+                    "title": "Mod"
                 },
                 "mod_download": {
                     "description": "Allows a user to download mods to the server",
-                    "title": "download"
+                    "title": "Download"
                 },
                 "mod_loader": {
                     "description": "Allows a user to change what loader to download for",
-                    "title": "loader"
+                    "title": "Loader"
                 },
                 "mod_resolver": {
                     "description": "Allows a user to access the Dependency Resolver",
-                    "title": "resolver"
+                    "title": "Resolver"
                 },
                 "mod_update": {
                     "description": "Allows a user to update Currently installed mods",
-                    "title": "update"
+                    "title": "Update"
                 },
                 "mod_version": {
                     "description": "Allows a user to change what version to download for",
-                    "title": "version"
+                    "title": "Version"
                 },
                 "schedule": {
                     "description": "Permissions that control a user's access to the schedule management for this server.",
-                    "title": "schedule"
+                    "title": "Schedule"
                 },
                 "schedule_create": {
                     "description": "Allows a user to create new schedules for this server.",
-                    "title": "create"
+                    "title": "Create"
                 },
                 "schedule_delete": {
                     "description": "Allows a user to delete schedules for this server.",
-                    "title": "delete"
+                    "title": "Delete"
                 },
                 "schedule_read": {
                     "description": "Allows a user to view schedules and the tasks associated with them for this server.",
-                    "title": "read"
+                    "title": "Read"
                 },
                 "schedule_update": {
                     "description": "Allows a user to update schedules and schedule tasks for this server.",
-                    "title": "update"
+                    "title": "Update"
                 },
                 "settings": {
                     "description": "Permissions that control a user's access to the settings for this server.",
-                    "title": "settings"
+                    "title": "Settings"
                 },
                 "settings_reinstall": {
                     "description": "Allows a user to trigger a reinstall of this server.",
-                    "title": "reinstall"
+                    "title": "Reinstall"
                 },
                 "settings_rename": {
                     "description": "Allows a user to rename this server and change the description of it.",
-                    "title": "rename"
+                    "title": "Rename"
                 },
                 "startup": {
                     "description": "Permissions that control a user's ability to view this server's startup parameters.",
-                    "title": "startup"
+                    "title": "Startup"
                 },
                 "startup_command": {
                     "description": "Allows a user to modify the startup command for the server.",
-                    "title": "command"
+                    "title": "Command"
                 },
                 "startup_docker_image": {
                     "description": "Allows a user to modify the Docker image used when running the server.",
-                    "title": "docker-image"
+                    "title": "Docker Image"
                 },
                 "startup_read": {
                     "description": "Allows a user to view the startup variables for a server.",
-                    "title": "read"
+                    "title": "Read"
                 },
                 "startup_software": {
                     "description": "Allows a user to modify the game / software used for the server.",
-                    "title": "software"
+                    "title": "Software"
                 },
                 "startup_update": {
                     "description": "Allows a user to modify the startup variables for the server.",
-                    "title": "update"
+                    "title": "Update"
                 },
                 "user": {
                     "description": "Permissions that allow a user to manage other subusers on a server. They will never be able to edit their own account, or assign permissions they do not have themselves.",
-                    "title": "user"
+                    "title": "User"
                 },
                 "user_create": {
                     "description": "Allows a user to create new subusers for the server.",
-                    "title": "create"
+                    "title": "Create"
                 },
                 "user_delete": {
                     "description": "Allows a user to delete a subuser from the server.",
-                    "title": "delete"
+                    "title": "Delete"
                 },
                 "user_read": {
                     "description": "Allows the user to view subusers and their permissions for the server.",
-                    "title": "read"
+                    "title": "Read"
                 },
                 "user_update": {
                     "description": "Allows a user to modify other subusers.",
-                    "title": "update"
+                    "title": "Update"
                 },
                 "websocket": {
                     "description": "Allows the user to connect to the server websocket, giving them access to view console output and realtime server stats.",
-                    "title": "websocket"
+                    "title": "Websocket"
                 },
                 "websocket_connect": {
                     "description": "Allows a user to connect to the websocket instance for a server to stream the console.",
-                    "title": "connect"
+                    "title": "Connect"
                 }
             },
             "permissions_assigned": "{{count}} permissions assigned",

@@ -105,6 +105,9 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
     const { clearFlashes, clearAndAddHttpError } = useStoreActions(
         (actions: Actions<ApplicationStore>) => actions.flashes,
     );
+    const getPermissions = useStoreActions(
+        (actions: Actions<ApplicationStore>) => actions.permissions.getPermissions,
+    );
 
     const isRootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
     const permissions = useStoreState((state) => state.permissions.data);
@@ -134,6 +137,13 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
             clearAndAddHttpError({ key: flashKey, error });
         }
     };
+
+    useEffect(() => {
+        getPermissions().catch((error) => {
+            console.error(error);
+            clearAndAddHttpError({ key: flashKey, error });
+        });
+    }, [getPermissions, clearAndAddHttpError, flashKey]);
 
     useEffect(
         () => () => {
