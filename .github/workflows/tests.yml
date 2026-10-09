@@ -99,7 +99,9 @@ jobs:
           cache: pnpm
 
       - name: Set up pnpm
-        run: npm install -g pnpm@11.3.0
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.3.0
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
