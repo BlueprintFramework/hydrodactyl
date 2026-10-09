@@ -92,16 +92,16 @@ jobs:
             echo "DB_PORT=3307" >> .env
           fi
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.3.0
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.3.0
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
