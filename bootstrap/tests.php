@@ -7,6 +7,8 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 
 require __DIR__ . '/../vendor/autoload.php';
 
+define('LARAVEL_START', microtime(true));
+
 $app = require __DIR__ . '/app.php';
 
 /** @var Pterodactyl\Console\Kernel $kernel */
