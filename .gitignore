@@ -63,3 +63,16 @@ nix/mariadb/
 mariadb_data/
 .env.lerd_override
 .env.before_lerd
+
+# Local AI tooling (never commit)
+/.claude/
+/.cursor/
+/.gemini/
+/.junie/
+/.mcp.json
+/opencode.json
+/GEMINI.md
+/.github/copilot-instructions.md
+
+# Local environment artifact (lerd PHP version pin)
+/.php-version
