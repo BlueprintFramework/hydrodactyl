@@ -3,6 +3,7 @@
 namespace Pterodactyl\Enums\Subdomain;
 
 use Pterodactyl\Services\Dns\Providers\BunnyProvider;
+use Pterodactyl\Services\Dns\Providers\MarqueProvider;
 use Pterodactyl\Services\Dns\Providers\HetznerProvider;
 use Pterodactyl\Services\Dns\Providers\Route53Provider;
 use Pterodactyl\Services\Dns\Providers\DNSimpleProvider;
@@ -17,6 +18,7 @@ enum Providers: string
     case DNSIMPLE = 'dnsimple';
     case BUNNY = 'bunny';
     case SPACESHIP = 'spaceship';
+    case MARQUE = 'marque';
 
     private const CLASS_MAP = [
         self::CLOUDFLARE->value => CloudflareProvider::class,
@@ -25,6 +27,7 @@ enum Providers: string
         self::DNSIMPLE->value => DNSimpleProvider::class,
         self::BUNNY->value => BunnyProvider::class,
         self::SPACESHIP->value => SpaceshipProvider::class,
+        self::MARQUE->value => MarqueProvider::class,
     ];
 
     private const DESCRIPTION_MAP = [
@@ -34,6 +37,7 @@ enum Providers: string
         self::DNSIMPLE->value => 'DNSimple Service',
         self::BUNNY->value => 'Bunny.net DNS Service',
         self::SPACESHIP->value => 'Spaceship DNS Service',
+        self::MARQUE->value => 'Marque DNS Service',
     ];
 
     public static function all(): array

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Pterodactyl\Http\Controllers\Admin;
 use Pterodactyl\Http\Controllers\Base;
+use Pterodactyl\Http\Controllers\Admin;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +58,8 @@ Route::group(['prefix' => 'api'], function () {
     Route::group(['prefix' => 'settings/domains'], function () {
         Route::get('/', [Admin\Api\DomainsController::class, 'index'])->name('admin.api.settings.domains');
         Route::get('/providers/{provider}/schema', [Admin\Api\DomainsController::class, 'schema']);
+        Route::get('/atproto/sessions', [Admin\Api\AtprotoOAuthController::class, 'index']);
+        Route::delete('/atproto/sessions/{session}', [Admin\Api\AtprotoOAuthController::class, 'destroy']);
         Route::post('/', [Admin\Api\DomainsController::class, 'store']);
         Route::post('/test-connection', [Admin\Api\DomainsController::class, 'testConnection']);
         Route::patch('/{domain}', [Admin\Api\DomainsController::class, 'update']);
@@ -219,6 +221,7 @@ Route::get('/settings/captcha', [Admin\AppController::class, 'index'])->name('ad
 Route::get('/settings/custom-navigation', [Admin\AppController::class, 'index'])->name('admin.settings.custom-navigation');
 Route::get('/settings/domains', [Admin\AppController::class, 'index'])->name('admin.settings.domains.index');
 Route::get('/settings/domains/new', [Admin\AppController::class, 'index'])->name('admin.settings.domains.create');
+Route::get('/settings/domains/connect/atproto', [Admin\Api\AtprotoOAuthController::class, 'start'])->name('admin.settings.domains.atproto.start');
 Route::get('/settings/domains/{id}', [Admin\AppController::class, 'index'])->where('id', '[0-9]+')->name('admin.settings.domains.edit');
 Route::get('/settings/logo', [Admin\AppController::class, 'index'])->name('admin.settings.logo');
 

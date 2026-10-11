@@ -41,6 +41,13 @@ export interface DomainsResponse {
     providers: Record<string, DomainProvider>;
 }
 
+export interface AtprotoSession {
+    id: string;
+    handle: string | null;
+    did: string;
+    authorized_at: string | null;
+}
+
 export const getDomains = (): Promise<DomainsResponse> =>
     http.get('/admin/api/settings/domains').then(({ data }) => data);
 
@@ -58,3 +65,9 @@ export const deleteDomain = (id: number): Promise<void> =>
 
 export const testDomainConnection = (values: Pick<DomainValues, 'dns_provider' | 'dns_config'>): Promise<void> =>
     http.post('/admin/api/settings/domains/test-connection', values).then(() => undefined);
+
+export const getAtprotoSessions = (): Promise<AtprotoSession[]> =>
+    http.get('/admin/api/settings/domains/atproto/sessions').then(({ data }) => data.data);
+
+export const deleteAtprotoSession = (id: string): Promise<void> =>
+    http.delete(`/admin/api/settings/domains/atproto/sessions/${id}`).then(() => undefined);

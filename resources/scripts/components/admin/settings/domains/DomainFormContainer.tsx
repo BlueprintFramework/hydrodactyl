@@ -1,11 +1,13 @@
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
+    type AtprotoSession,
     createDomain,
     type Domain,
     type DomainProvider,
     deleteDomain,
+    getAtprotoSessions,
     type ProviderSchema,
     testDomainConnection,
     updateDomain,
@@ -36,6 +38,7 @@ interface Props {
 
 const DomainForm = ({ providers, domain, onSaved }: Props) => {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [name, setName] = useState(domain?.name ?? '');
     const [provider, setProvider] = useState(domain?.dns_provider ?? Object.keys(providers)[0] ?? '');
     const [config, setConfig] = useState<Record<string, string>>(domain?.dns_config ?? {});
@@ -46,8 +49,43 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
     const [deleting, setDeleting] = useState(false);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [atprotoIdentifier, setAtprotoIdentifier] = useState('');
+    const [atprotoSessions, setAtprotoSessions] = useState<AtprotoSession[]>([]);
 
     const { data: schema } = useProviderSchema(provider);
+    const isMarque = provider === 'marque';
+
+    // Pick up the results of the AT Protocol OAuth connect round-trip.
+    useEffect(() => {
+        const session = searchParams.get('atproto_session');
+        const error = searchParams.get('atproto_error');
+
+        if (session) {
+            setConfig((current) => ({ ...current, session_id: session }));
+            toast.success('AT Protocol account connected.');
+        }
+
+        if (error) {
+            toast.error(error);
+        }
+
+        if (session || error) {
+            const next = new URLSearchParams(searchParams);
+            next.delete('atproto_session');
+            next.delete('atproto_error');
+            setSearchParams(next, { replace: true });
+        }
+    }, [searchParams, setSearchParams]);
+
+    useEffect(() => {
+        if (!isMarque) {
+            return;
+        }
+
+        getAtprotoSessions()
+            .then(setAtprotoSessions)
+            .catch(() => setAtprotoSessions([]));
+    }, [isMarque]);
 
     const payload = () => ({
         name,
@@ -91,6 +129,18 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
         } finally {
             setTesting(false);
         }
+    };
+
+    const connectAtproto = () => {
+        const identifier = atprotoIdentifier.trim();
+        if (!identifier) {
+            toast.error('Enter an AT Protocol handle or DID first.');
+            return;
+        }
+
+        const returnUrl = `${window.location.pathname}${window.location.search}`;
+        const query = new URLSearchParams({ identifier, return: returnUrl });
+        window.location.href = `/admin/settings/domains/connect/atproto?${query.toString()}`;
     };
 
     const remove = async () => {
@@ -151,26 +201,102 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                 <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
                     <h2 className='text-sm font-semibold text-cream-50'>Provider Configuration</h2>
                     {errors.dns_config && <p className='text-xs text-brand-600'>{errors.dns_config}</p>}
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        {Object.entries(schema ?? {}).map(([key, field]) => (
+
+                    {isMarque ? (
+                        <div className='space-y-4'>
                             <Field
-                                key={key}
-                                label={field.label ?? labelFor(key)}
-                                hint={field.description}
-                                error={errors[`dns_config.${key}`]}
+                                label='AT Protocol account'
+                                hint='DNS records are written to the connected account’s repository. Connect the account that owns this domain.'
+                                error={errors['dns_config.session_id']}
                             >
-                                <Input.Text
-                                    type={field.sensitive ? 'password' : 'text'}
-                                    autoComplete='off'
-                                    value={config[key] ?? field.default ?? ''}
-                                    onChange={(e) => setConfig({ ...config, [key]: e.target.value })}
+                                <Dropdown
+                                    value={config.session_id ?? ''}
+                                    onChange={(value) => setConfig({ ...config, session_id: value })}
+                                    placeholder='No account connected'
+                                    options={atprotoSessions.map((session) => ({
+                                        value: session.id,
+                                        label: session.handle ?? session.did,
+                                        description: session.did,
+                                    }))}
                                 />
                             </Field>
-                        ))}
-                        {schema && Object.keys(schema).length === 0 && (
-                            <p className='text-xs text-cream-400/60'>This provider has no configuration options.</p>
-                        )}
-                    </div>
+                            <div className='grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 items-center'>
+                                <Field
+                                    label='Connect a new account'
+                                    hint='Enter a handle (e.g. you.bsky.social) or DID.'
+                                >
+                                    <Input.Text
+                                        autoComplete='off'
+                                        placeholder='you.bsky.social'
+                                        value={atprotoIdentifier}
+                                        onChange={(e) => setAtprotoIdentifier(e.target.value)}
+                                    />
+                                </Field>
+                                <Button type='button' variant='secondary' onClick={connectAtproto}>
+                                    Connect with AT Protocol
+                                </Button>
+                            </div>
+
+                            <div className='space-y-4 border-t border-mocha-400 pt-4'>
+                                <p className='text-xs text-cream-400/60'>
+                                    Or authenticate with an app password. This is only used when no account is connected
+                                    above.
+                                </p>
+                                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                    <Field label='Handle or DID' error={errors['dns_config.identifier']}>
+                                        <Input.Text
+                                            autoComplete='off'
+                                            placeholder='you.bsky.social'
+                                            value={config.identifier ?? ''}
+                                            onChange={(e) => setConfig({ ...config, identifier: e.target.value })}
+                                        />
+                                    </Field>
+                                    <Field label='App password' error={errors['dns_config.app_password']}>
+                                        <Input.Text
+                                            type='password'
+                                            autoComplete='off'
+                                            value={config.app_password ?? ''}
+                                            onChange={(e) => setConfig({ ...config, app_password: e.target.value })}
+                                        />
+                                    </Field>
+                                    <Field
+                                        label='PDS URL'
+                                        hint='Optional. Leave empty to discover it automatically.'
+                                        error={errors['dns_config.pds_url']}
+                                    >
+                                        <Input.Text
+                                            autoComplete='off'
+                                            placeholder='https://bsky.social'
+                                            value={config.pds_url ?? ''}
+                                            onChange={(e) => setConfig({ ...config, pds_url: e.target.value })}
+                                        />
+                                    </Field>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                            {Object.entries(schema ?? {}).map(([key, field]) => (
+                                <Field
+                                    key={key}
+                                    label={field.label ?? labelFor(key)}
+                                    hint={field.description}
+                                    error={errors[`dns_config.${key}`]}
+                                >
+                                    <Input.Text
+                                        type={field.sensitive ? 'password' : 'text'}
+                                        autoComplete='off'
+                                        value={config[key] ?? field.default ?? ''}
+                                        onChange={(e) => setConfig({ ...config, [key]: e.target.value })}
+                                    />
+                                </Field>
+                            ))}
+                            {schema && Object.keys(schema).length === 0 && (
+                                <p className='text-xs text-cream-400/60'>This provider has no configuration options.</p>
+                            )}
+                        </div>
+                    )}
+
                     <div>
                         <Button type='button' variant='secondary' onClick={test} disabled={testing}>
                             Test Connection
