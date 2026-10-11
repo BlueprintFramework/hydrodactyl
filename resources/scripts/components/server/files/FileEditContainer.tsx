@@ -125,7 +125,10 @@ const FileEditContainer = () => {
     }
 
     return (
-        <PageContentBlock title={action === 'edit' ? `Editing ${filename}` : `New File`} className='p-0! h-full'>
+        <PageContentBlock
+            title={action === 'edit' ? `Editing ${filename}` : `New File`}
+            className='p-0! h-full overflow-hidden!'
+        >
             <FlashMessageRender byKey={'files:view'} />
 
             <ErrorBoundary>
@@ -160,7 +163,7 @@ const FileEditContainer = () => {
                 }}
             />
 
-            <div className='h-full relative bg-[#ffffff11] border-[1px] border-[#ffffff07] border-t-0 [&>div>div]:h-full [&>div>div]:outline-hidden! w-full flex-grow order-20 lg:order-none'>
+            <div className='relative min-h-0 flex-1 bg-[#ffffff11] border-[1px] border-[#ffffff07] border-t-0 [&>div]:h-full [&_.cm-editor]:h-full [&_.cm-editor]:outline-hidden! w-full order-20 lg:order-none'>
                 <Editor
                     filename={filename}
                     initialContent={content}

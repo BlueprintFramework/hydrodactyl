@@ -1,15 +1,8 @@
-import { ChevronDown, ChevronUp } from '@gravity-ui/icons';
 import { useEffect, useState } from 'react';
 import setSelectedDockerImage from '@/api/server/setSelectedDockerImage';
 import getServerStartup from '@/api/swr/getServerStartup';
 import Can from '@/components/elements/Can';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuTrigger,
-} from '@/components/elements/DropdownMenu';
+import Dropdown from '@/components/elements/Dropdown';
 import Modal from '@/components/elements/Modal';
 import Spinner from '@/components/elements/Spinner';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
@@ -31,7 +24,6 @@ const MATCH_ERRORS = [
 const JavaVersionModalFeature = () => {
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [dropDownOpen, setDropDownOpen] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState('');
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
@@ -95,37 +87,21 @@ const JavaVersionModalFeature = () => {
                 <div className={`mt-6 flex flex-row justify-end items-center gap-3 my-4`}>
                     <Can action={'startup.docker-image'}>
                         <Spinner size='small' visible={!data || isValidating} />
-                        <DropdownMenu onOpenChange={(open) => setDropDownOpen(open)}>
-                            <DropdownMenuTrigger asChild>
-                                <button
-                                    type='button'
-                                    className='flex items-center justify-center h-8 px-4 text-sm font-medium text-white transition-colors duration-150 bg-linear-to-b from-[#ffffff10] to-[#ffffff09] border border-[#ffffff15] rounded-xl shadow-xs hover:from-[#ffffff05] hover:to-[#ffffff04] cursor-pointer'
-                                    disabled={!data}
-                                >
-                                    {selectedVersion
-                                        .split(':')
-                                        .pop()
-                                        ?.split('_')
-                                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                                        .join(' ') || 'Select a version'}
-                                    {dropDownOpen ? (
-                                        <ChevronUp fill={'currentColor'} className={`ml-2 w-[16px] h-[16px]`} />
-                                    ) : (
-                                        <ChevronDown fill={'currentColor'} className={`ml-2 w-[16px] h-[16px]`} />
-                                    )}
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className='z-99999' sideOffset={8}>
-                                <DropdownMenuRadioGroup value={selectedVersion} onValueChange={setSelectedVersion}>
-                                    {data &&
-                                        Object.keys(data.dockerImages).map((key) => (
-                                            <DropdownMenuRadioItem key={key} value={data.dockerImages[key] || ''}>
-                                                {key}
-                                            </DropdownMenuRadioItem>
-                                        ))}
-                                </DropdownMenuRadioGroup>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Dropdown
+                            value={selectedVersion}
+                            onChange={setSelectedVersion}
+                            disabled={!data}
+                            placeholder='Select a version'
+                            triggerClassName='h-8 w-auto px-4'
+                            options={
+                                data
+                                    ? Object.keys(data.dockerImages).map((key) => ({
+                                          value: data.dockerImages[key] || '',
+                                          label: key,
+                                      }))
+                                    : []
+                            }
+                        />
                     </Can>
                     {/* <Button variant={Options.Variant.Secondary} onClick={() => setVisible(false)}>
             Cancel

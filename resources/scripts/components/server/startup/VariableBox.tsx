@@ -1,21 +1,15 @@
-import { ChevronDown, ChevronUp, Lock } from '@gravity-ui/icons';
+import { Lock } from '@gravity-ui/icons';
 import debounce from 'debounce';
+import { useStoreState } from 'easy-peasy';
 import { memo, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import type { ServerEggVariable } from '@/api/server/types';
 import updateStartupVariable from '@/api/server/updateStartupVariable';
 import getServerStartup from '@/api/swr/getServerStartup';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuTrigger,
-} from '@/components/elements/DropdownMenu';
+import Dropdown from '@/components/elements/Dropdown';
 import InputSpinner from '@/components/elements/InputSpinner';
 import { Switch } from '@/components/elements/SwitchV2';
 import { Input } from '@/components/elements/TextInput';
-import FlashMessageRender from '@/components/FlashMessageRender';
 import useFlash from '@/plugins/useFlash';
 import { usePermissions } from '@/plugins/usePermissions';
 import { ServerContext } from '@/state/server';
@@ -31,9 +25,8 @@ const VariableBox = ({ variable }: Props) => {
     const [loading, setLoading] = useState(false);
     const [canEdit] = usePermissions(['startup.update']);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
+    const error = useStoreState((state) => state.flashes.items.find((flash) => flash.key === FLASH_KEY)?.message ?? '');
     const { mutate } = getServerStartup(uuid);
-    const [dropDownOpen, setDropDownOpen] = useState(false);
-
     const setVariableValue = debounce((value: string) => {
         setLoading(true);
         clearFlashes(FLASH_KEY);
@@ -65,115 +58,82 @@ const VariableBox = ({ variable }: Props) => {
     const selectValues = variable.rules.find((v) => v.startsWith('in:'))?.split(',') || [];
 
     return (
-        <div className='flex flex-col justify-between gap-4 bg-linear-to-b from-[#ffffff08] to-[#ffffff05] border-[1px] border-[#ffffff15] p-4 sm:p-5 rounded-xl hover:border-[#ffffff20] transition-all'>
-            <FlashMessageRender byKey={FLASH_KEY} />
-            <div className='space-y-3'>
-                <div className='flex flex-col items-baseline sm:flex-row sm:justify-between gap-2 sm:gap-3'>
-                    <div className='flex items-center gap-2 min-w-0'>
-                        {!variable.isEditable && (
-                            <Lock
-                                width={22}
-                                height={22}
-                                fill={'currentColor'}
-                                className='text-neutral-500 w-4 h-4 flex-shrink-0'
-                            />
-                        )}
-                        <span className='text-sm font-medium text-neutral-200 break-words'>{variable.name}</span>
-                    </div>
-                    <div className='text-xs leading-5 text-neutral-500 font-mono rounded w-fit'>
-                        {variable.envVariable}
-                    </div>
+        <div className='flex flex-col gap-3 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8'>
+            <div className='min-w-0 flex-1'>
+                <div className='flex items-center gap-2'>
+                    {!variable.isEditable && (
+                        <Lock width={16} height={16} fill='currentColor' className='shrink-0 text-zinc-500' />
+                    )}
+                    <span className='text-sm text-zinc-100'>{variable.name}</span>
                 </div>
-                <p className='text-xs sm:text-sm text-neutral-400 leading-relaxed break-words'>
-                    {variable.description}
-                </p>
+                <p className='mt-0.5 font-mono text-xs text-zinc-500'>{variable.envVariable}</p>
+                {variable.description && (
+                    <p className='mt-2 text-sm leading-relaxed text-zinc-400'>{variable.description}</p>
+                )}
             </div>
-            <InputSpinner visible={loading}>
-                {useSwitch ? (
-                    <div className='flex items-center justify-between p-3 sm:p-4 bg-linear-to-b from-[#ffffff06] to-[#ffffff03] border border-[#ffffff10] rounded-xl'>
-                        <span className='text-sm font-medium text-neutral-300'>
-                            {isStringSwitch
-                                ? variable.serverValue === 'true'
-                                    ? 'Enabled'
-                                    : 'Disabled'
-                                : variable.serverValue === '1'
-                                  ? 'On'
-                                  : 'Off'}
-                        </span>
-                        <Switch
-                            disabled={!canEdit || !variable.isEditable}
-                            name={variable.envVariable}
-                            defaultChecked={
-                                isStringSwitch ? variable.serverValue === 'true' : variable.serverValue === '1'
-                            }
-                            onCheckedChange={() => {
-                                if (canEdit && variable.isEditable) {
-                                    if (isStringSwitch) {
-                                        setVariableValue(variable.serverValue === 'true' ? 'false' : 'true');
-                                    } else {
-                                        setVariableValue(variable.serverValue === '1' ? '0' : '1');
+            <div className='relative w-full sm:w-[28rem] sm:shrink-0'>
+                {error && (
+                    <p className='absolute right-0 bottom-full mb-1 max-w-full truncate text-xs text-red-400'>
+                        {error}
+                    </p>
+                )}
+                <InputSpinner visible={loading}>
+                    {useSwitch ? (
+                        <div className='flex items-center justify-between gap-3'>
+                            <span className='text-sm text-zinc-300'>
+                                {isStringSwitch
+                                    ? variable.serverValue === 'true'
+                                        ? 'Enabled'
+                                        : 'Disabled'
+                                    : variable.serverValue === '1'
+                                      ? 'On'
+                                      : 'Off'}
+                            </span>
+                            <Switch
+                                disabled={!canEdit || !variable.isEditable}
+                                name={variable.envVariable}
+                                defaultChecked={
+                                    isStringSwitch ? variable.serverValue === 'true' : variable.serverValue === '1'
+                                }
+                                onCheckedChange={() => {
+                                    if (canEdit && variable.isEditable) {
+                                        if (isStringSwitch) {
+                                            setVariableValue(variable.serverValue === 'true' ? 'false' : 'true');
+                                        } else {
+                                            setVariableValue(variable.serverValue === '1' ? '0' : '1');
+                                        }
                                     }
+                                }}
+                            />
+                        </div>
+                    ) : selectValues.length > 0 && (variable.serverValue ?? variable.defaultValue) ? (
+                        <Dropdown
+                            value={variable.serverValue ?? ''}
+                            onChange={setVariableValue}
+                            disabled={!canEdit || !variable.isEditable}
+                            triggerClassName='font-mono'
+                            options={selectValues.map((selectValue) => {
+                                const value = selectValue.replace('in:', '');
+                                return { value, label: value };
+                            })}
+                        />
+                    ) : (
+                        <Input
+                            className='w-full'
+                            onKeyUp={(e) => {
+                                if (canEdit && variable.isEditable) {
+                                    setVariableValue(e.currentTarget.value);
                                 }
                             }}
+                            readOnly={!canEdit || !variable.isEditable}
+                            name={variable.envVariable}
+                            defaultValue={variable.serverValue ?? ''}
+                            placeholder={variable.defaultValue || 'Enter value...'}
+                            disabled={!canEdit || !variable.isEditable}
                         />
-                    </div>
-                ) : selectValues.length > 0 && (variable.serverValue ?? variable.defaultValue) ? (
-                    <DropdownMenu onOpenChange={(open) => setDropDownOpen(open)}>
-                        <DropdownMenuTrigger asChild>
-                            <button
-                                type='button'
-                                className='w-full flex items-center justify-between gap-3 h-11 sm:h-12 px-3 sm:px-4 text-sm font-medium text-white transition-all duration-200 bg-linear-to-b from-[#ffffff10] to-[#ffffff09] border border-[#ffffff15] rounded-xl hover:from-[#ffffff15] hover:to-[#ffffff10] hover:border-[#ffffff25] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation'
-                                disabled={!canEdit || !variable.isEditable}
-                            >
-                                <span className='font-mono text-neutral-200 truncate text-left'>
-                                    {variable.serverValue}
-                                </span>
-                                {dropDownOpen ? (
-                                    <ChevronUp
-                                        width={22}
-                                        height={22}
-                                        fill={'currentColor'}
-                                        className='w-[14px] h-[14px] opacity-60 flex-shrink-0'
-                                    />
-                                ) : (
-                                    <ChevronDown
-                                        width={22}
-                                        height={22}
-                                        fill={'currentColor'}
-                                        className='w-[14px] h-[14px] opacity-60 flex-shrink-0'
-                                    />
-                                )}
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className='z-99999' sideOffset={8}>
-                            <DropdownMenuRadioGroup value={variable.serverValue ?? ''} onValueChange={setVariableValue}>
-                                {selectValues.map((selectValue) => (
-                                    <DropdownMenuRadioItem
-                                        key={selectValue.replace('in:', '')}
-                                        value={selectValue.replace('in:', '')}
-                                    >
-                                        {selectValue.replace('in:', '')}
-                                    </DropdownMenuRadioItem>
-                                ))}
-                            </DropdownMenuRadioGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                ) : (
-                    <Input
-                        className='w-full h-11 sm:h-12 text-sm sm:text-base'
-                        onKeyUp={(e) => {
-                            if (canEdit && variable.isEditable) {
-                                setVariableValue(e.currentTarget.value);
-                            }
-                        }}
-                        readOnly={!canEdit || !variable.isEditable}
-                        name={variable.envVariable}
-                        defaultValue={variable.serverValue ?? ''}
-                        placeholder={variable.defaultValue || 'Enter value...'}
-                        disabled={!canEdit || !variable.isEditable}
-                    />
-                )}
-            </InputSpinner>
+                    )}
+                </InputSpinner>
+            </div>
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import { ChevronDown, Funnel, Magnifier, TrashBin } from '@gravity-ui/icons';
+import { ChevronDown, Magnifier, TrashBin } from '@gravity-ui/icons';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -11,18 +11,13 @@ import type {
     MarketplaceType,
 } from '@/api/server/marketplace';
 import { getMarketplaceGameVersions, getMarketplaceLoaders, searchMarketplace } from '@/api/server/marketplace';
+import Dropdown from '@/components/elements/Dropdown';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { ServerContext } from '@/state/server';
 import { destinationFolder, isMinecraftCapable, loadersFor } from './eggFeatures';
@@ -483,98 +478,48 @@ const InstallerContainer = () => {
                                 />
                             </div>
 
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button
-                                        type='button'
-                                        className='inline-flex items-center gap-2 rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 text-sm text-cream-400 focus:border-brand-400/60 focus:outline-none'
-                                    >
-                                        {source === ALL_PROVIDERS ? 'All Providers' : sourceLabel(source)}
-                                        <ChevronDown
-                                            width={14}
-                                            height={14}
-                                            fill='currentColor'
-                                            className='text-cream-400/40'
-                                        />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align='end'>
-                                    <DropdownMenuRadioGroup value={source} onValueChange={setSource}>
-                                        <DropdownMenuRadioItem value={ALL_PROVIDERS}>
-                                            All Providers
-                                        </DropdownMenuRadioItem>
-                                        {sources.map((s) => (
-                                            <DropdownMenuRadioItem key={s.key} value={s.key}>
-                                                {sourceLabel(s.key)}
-                                            </DropdownMenuRadioItem>
-                                        ))}
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <Dropdown
+                                value={source}
+                                onChange={setSource}
+                                triggerClassName='w-auto rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 hover:bg-mocha-400/50'
+                                options={[
+                                    { value: ALL_PROVIDERS, label: 'All Providers' },
+                                    ...sources.map((s) => ({ value: s.key, label: sourceLabel(s.key) })),
+                                ]}
+                            />
 
                             {tabLoaders.length > 1 && (
-                                <div className='flex items-center gap-2 rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-2'>
-                                    <Funnel width={16} height={16} fill='currentColor' className='text-cream-400/40' />
-                                    <select
-                                        value={loader ?? ''}
-                                        onChange={(e) => setLoader(e.target.value || null)}
-                                        className='bg-transparent text-sm text-cream-400 focus:outline-none'
-                                        aria-label='Loader'
-                                    >
-                                        {tabLoaders.map((l) => (
-                                            <option key={l} value={l} className='bg-mocha-500'>
-                                                {l}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <Dropdown
+                                    value={loader ?? ''}
+                                    onChange={(value) => setLoader(value || null)}
+                                    triggerClassName='w-auto rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 hover:bg-mocha-400/50'
+                                    options={tabLoaders.map((l) => ({ value: l, label: l }))}
+                                />
                             )}
 
                             {Object.keys(gameVersions).length > 0 && (
                                 <>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <button
-                                                type='button'
-                                                className='inline-flex items-center gap-2 rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 text-sm text-cream-400 focus:border-brand-400/60 focus:outline-none'
-                                            >
-                                                {releaseType.charAt(0).toUpperCase() + releaseType.slice(1)}
-                                                <ChevronDown
-                                                    width={14}
-                                                    height={14}
-                                                    fill='currentColor'
-                                                    className='text-cream-400/40'
-                                                />
-                                            </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align='end'>
-                                            <DropdownMenuRadioGroup
-                                                value={releaseType}
-                                                onValueChange={(t) => {
-                                                    setReleaseType(t);
-                                                    setGameVersion((gameVersions[t] ?? [])[0] ?? null);
-                                                }}
-                                            >
-                                                {['release', 'snapshot', 'beta', 'alpha']
-                                                    .filter((t) => gameVersions[t])
-                                                    .concat(
-                                                        Object.keys(gameVersions)
-                                                            .filter(
-                                                                (t) =>
-                                                                    !['release', 'snapshot', 'beta', 'alpha'].includes(
-                                                                        t,
-                                                                    ),
-                                                            )
-                                                            .sort(),
+                                    <Dropdown
+                                        value={releaseType}
+                                        onChange={(t) => {
+                                            setReleaseType(t);
+                                            setGameVersion((gameVersions[t] ?? [])[0] ?? null);
+                                        }}
+                                        triggerClassName='w-auto rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 hover:bg-mocha-400/50'
+                                        options={['release', 'snapshot', 'beta', 'alpha']
+                                            .filter((t) => gameVersions[t])
+                                            .concat(
+                                                Object.keys(gameVersions)
+                                                    .filter(
+                                                        (t) => !['release', 'snapshot', 'beta', 'alpha'].includes(t),
                                                     )
-                                                    .map((t) => (
-                                                        <DropdownMenuRadioItem key={t} value={t}>
-                                                            {t.charAt(0).toUpperCase() + t.slice(1)}
-                                                        </DropdownMenuRadioItem>
-                                                    ))}
-                                            </DropdownMenuRadioGroup>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                                    .sort(),
+                                            )
+                                            .map((t) => ({
+                                                value: t,
+                                                label: t.charAt(0).toUpperCase() + t.slice(1),
+                                            }))}
+                                    />
 
                                     <VersionDropdown
                                         versions={gameVersions[releaseType] ?? []}

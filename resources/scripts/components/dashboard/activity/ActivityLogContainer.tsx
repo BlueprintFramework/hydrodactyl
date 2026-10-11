@@ -3,10 +3,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { type ActivityLogFilters, useActivityLogs } from '@/api/account/activity';
 import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
+import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
-import Select from '@/components/elements/Select';
 import Spinner from '@/components/elements/Spinner';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import FlashMessageRender from '@/components/FlashMessageRender';
@@ -263,25 +263,16 @@ const ActivityLogContainer = () => {
                                     >
                                         Event Type
                                     </label>
-                                    <Select
+                                    <Dropdown
                                         id='activity-event-type'
                                         value={selectedEventType}
-                                        onChange={(e) => setSelectedEventType(e.target.value)}
-                                        className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-zinc-500 transition-colors duration-150'
-                                    >
-                                        <option value='' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            All Events
-                                        </option>
-                                        {eventTypes.map((type) => (
-                                            <option
-                                                key={type}
-                                                value={type}
-                                                style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
-                                            >
-                                                {type}
-                                            </option>
-                                        ))}
-                                    </Select>
+                                        onChange={setSelectedEventType}
+                                        placeholder='All Events'
+                                        options={[
+                                            { value: '', label: 'All Events' },
+                                            ...eventTypes.map((type) => ({ value: type, label: type })),
+                                        ]}
+                                    />
                                 </div>
 
                                 <div>
@@ -291,28 +282,18 @@ const ActivityLogContainer = () => {
                                     >
                                         Time Range
                                     </label>
-                                    <Select
+                                    <Dropdown
                                         id='activity-time-range'
                                         value={dateRange}
-                                        onChange={(e) => setDateRange(e.target.value)}
-                                        className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-zinc-500 transition-colors duration-150'
-                                    >
-                                        <option value='all' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            All Time
-                                        </option>
-                                        <option value='1h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            Last Hour
-                                        </option>
-                                        <option value='24h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            Last 24 Hours
-                                        </option>
-                                        <option value='7d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            Last 7 Days
-                                        </option>
-                                        <option value='30d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            Last 30 Days
-                                        </option>
-                                    </Select>
+                                        onChange={setDateRange}
+                                        options={[
+                                            { value: 'all', label: 'All Time' },
+                                            { value: '1h', label: 'Last Hour' },
+                                            { value: '24h', label: 'Last 24 Hours' },
+                                            { value: '7d', label: 'Last 7 Days' },
+                                            { value: '30d', label: 'Last 30 Days' },
+                                        ]}
+                                    />
                                 </div>
 
                                 <div className='flex items-end'>

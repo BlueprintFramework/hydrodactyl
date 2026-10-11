@@ -20,11 +20,22 @@ interface Props {
     options: DropdownOption[];
     placeholder?: string;
     className?: string;
+    /** Classes for the trigger button. Defaults to a full-width field. */
+    triggerClassName?: string;
     disabled?: boolean;
     id?: string;
 }
 
-const Dropdown = ({ value, onChange, options, placeholder = 'Select…', className, disabled, id }: Props) => {
+const Dropdown = ({
+    value,
+    onChange,
+    options,
+    placeholder = 'Select…',
+    className,
+    triggerClassName,
+    disabled,
+    id,
+}: Props) => {
     const selected = options.find((option) => option.value === value);
 
     return (
@@ -38,6 +49,7 @@ const Dropdown = ({ value, onChange, options, placeholder = 'Select…', classNa
                         'flex w-full items-center justify-between gap-2 rounded-lg bg-[#ffffff11] px-4 py-2 text-left text-sm text-cream-100 outline-none transition-colors',
                         'hover:bg-[#ffffff17] focus-visible:ring-2 focus-visible:ring-hydro-500/40',
                         'disabled:cursor-not-allowed disabled:opacity-50',
+                        triggerClassName,
                         className,
                     )}
                 >
