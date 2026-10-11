@@ -3,5 +3,5 @@
 ])
 
 @section('container')
-    <div id="app"></div>
+    <div data-hydrodactyl-app id="app"></div>
 @endsection
