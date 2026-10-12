@@ -18,6 +18,7 @@
     <env name="MAIL_MAILER" value="array"/>
     <env name="SESSION_DRIVER" value="array"/>
     <env name="QUEUE_CONNECTION" value="sync"/>
+    <ini name="memory_limit" value="1024M"/>
   </php>
   <source>
     <include>

@@ -48,7 +48,8 @@ class SubuserCreationService
                 try {
                     $user = $this->userRepository->findFirstWhere([['username', '=', mb_strtolower($identifier)]]);
                 } catch (RecordNotFoundException) {
-                    if (!filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+                    // FUCK YOU LARAVEL
+                    if (!preg_match('/^.+@.+\..+$/', $identifier)) {
                         throw new DisplayException('No account uses that username. Enter their email to invite them.');
                     }
 
