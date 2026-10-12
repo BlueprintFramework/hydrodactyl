@@ -31,6 +31,8 @@ class AdvancedSettingsFormRequest extends AdminFormRequest
       'pterodactyl:client_features:groups:enabled' => 'required|in:true,false',
       'pterodactyl:client_features:schedules:per_schedule_task_limit' => 'required|integer|between:1,100',
       'pterodactyl:client_features:schedules:stuck_timeout' => 'required|integer|between:901,86400',
+      'pterodactyl:client_features:resource_history:enabled' => 'required|in:true,false',
+      'pterodactyl:client_features:resource_history:samples' => 'required|integer|between:20,2147483647',
     ];
   }
 
@@ -45,6 +47,8 @@ class AdvancedSettingsFormRequest extends AdminFormRequest
       'pterodactyl:client_features:groups:enabled' => 'Server Groups Enabled',
       'pterodactyl:client_features:schedules:per_schedule_task_limit' => 'Tasks Per Schedule Limit',
       'pterodactyl:client_features:schedules:stuck_timeout' => 'Stuck Schedule Timeout',
+      'pterodactyl:client_features:resource_history:enabled' => 'Resource History Enabled',
+      'pterodactyl:client_features:resource_history:samples' => 'Resource History Samples',
     ];
   }
 }

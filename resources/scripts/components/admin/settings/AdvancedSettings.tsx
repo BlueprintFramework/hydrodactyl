@@ -18,6 +18,8 @@ interface Props {
     groupsEnabled: boolean;
     perScheduleTaskLimit: number;
     stuckTimeout: number;
+    resourceHistoryEnabled: boolean;
+    resourceHistorySamples: number;
     onSaved: () => void;
 }
 
@@ -41,6 +43,8 @@ const AdvancedForm = ({
     groupsEnabled,
     perScheduleTaskLimit,
     stuckTimeout,
+    resourceHistoryEnabled,
+    resourceHistorySamples,
     onSaved,
 }: Props) => {
     const [values, setValues] = useState({
@@ -52,6 +56,8 @@ const AdvancedForm = ({
         groupsEnabled,
         perScheduleTaskLimit: String(perScheduleTaskLimit),
         stuckTimeout: String(stuckTimeout),
+        resourceHistoryEnabled,
+        resourceHistorySamples: String(resourceHistorySamples),
     });
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -70,6 +76,8 @@ const AdvancedForm = ({
                 'pterodactyl:client_features:groups:enabled': String(values.groupsEnabled),
                 'pterodactyl:client_features:schedules:per_schedule_task_limit': values.perScheduleTaskLimit,
                 'pterodactyl:client_features:schedules:stuck_timeout': values.stuckTimeout,
+                'pterodactyl:client_features:resource_history:enabled': String(values.resourceHistoryEnabled),
+                'pterodactyl:client_features:resource_history:samples': values.resourceHistorySamples,
             });
             await onSaved();
             toast.success('Settings saved.');
@@ -158,6 +166,34 @@ const AdvancedForm = ({
             </div>
 
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
+                <h2 className='text-sm font-semibold text-cream-50'>Resource History</h2>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <Field
+                        label='Status'
+                        error={errors['pterodactyl:client_features:resource_history:enabled']}
+                        hint='Record resource usage so the console graphs are filled in on page load.'
+                    >
+                        <Toggle
+                            value={values.resourceHistoryEnabled}
+                            onChange={(value) => setValues({ ...values, resourceHistoryEnabled: value })}
+                        />
+                    </Field>
+                    <Field
+                        label='Samples Per Server'
+                        error={errors['pterodactyl:client_features:resource_history:samples']}
+                        hint='How many readings to keep for each server. At least 20, since that is what the graphs draw.'
+                    >
+                        <Input.Text
+                            type='number'
+                            min={20}
+                            value={values.resourceHistorySamples}
+                            onChange={(e) => setValues({ ...values, resourceHistorySamples: e.target.value })}
+                        />
+                    </Field>
+                </div>
+            </div>
+
+            <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
                 <h2 className='text-sm font-semibold text-cream-50'>Schedules</h2>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <Field
@@ -219,6 +255,8 @@ const AdvancedSettings = () => {
             groupsEnabled={data.advanced['pterodactyl:client_features:groups:enabled']}
             perScheduleTaskLimit={data.advanced['pterodactyl:client_features:schedules:per_schedule_task_limit']}
             stuckTimeout={data.advanced['pterodactyl:client_features:schedules:stuck_timeout']}
+            resourceHistoryEnabled={data.advanced['pterodactyl:client_features:resource_history:enabled']}
+            resourceHistorySamples={data.advanced['pterodactyl:client_features:resource_history:samples']}
             onSaved={mutate}
         />
     );

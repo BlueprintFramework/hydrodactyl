@@ -58,7 +58,7 @@ const VariableBox = ({ variable }: Props) => {
     const selectValues = variable.rules.find((v) => v.startsWith('in:'))?.split(',') || [];
 
     return (
-        <div className='flex flex-col gap-3 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8'>
+        <div className='flex flex-col gap-3 border-b border-[#ffffff10] py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8'>
             <div className='min-w-0 flex-1'>
                 <div className='flex items-center gap-2'>
                     {!variable.isEditable && (

@@ -36,7 +36,9 @@ class SettingsControllerTest extends IntegrationTestCase
             ->getJson('/admin/api/settings')
             ->assertOk()
             ->assertJsonPath('advanced.pterodactyl:client_features:schedules:per_schedule_task_limit', 10)
-            ->assertJsonPath('advanced.pterodactyl:client_features:schedules:stuck_timeout', 1800);
+            ->assertJsonPath('advanced.pterodactyl:client_features:schedules:stuck_timeout', 1800)
+            ->assertJsonPath('advanced.pterodactyl:client_features:resource_history:enabled', true)
+            ->assertJsonPath('advanced.pterodactyl:client_features:resource_history:samples', 20);
     }
 
     /**
@@ -56,6 +58,8 @@ class SettingsControllerTest extends IntegrationTestCase
                 'pterodactyl:client_features:groups:enabled' => 'true',
                 'pterodactyl:client_features:schedules:per_schedule_task_limit' => 25,
                 'pterodactyl:client_features:schedules:stuck_timeout' => 3600,
+                'pterodactyl:client_features:resource_history:enabled' => 'true',
+                'pterodactyl:client_features:resource_history:samples' => 20,
             ])
             ->assertOk();
 
@@ -86,6 +90,8 @@ class SettingsControllerTest extends IntegrationTestCase
                 'pterodactyl:client_features:groups:enabled' => 'true',
                 'pterodactyl:client_features:schedules:per_schedule_task_limit' => 0,
                 'pterodactyl:client_features:schedules:stuck_timeout' => 900,
+                'pterodactyl:client_features:resource_history:enabled' => 'true',
+                'pterodactyl:client_features:resource_history:samples' => 20,
             ]);
 
         $response->assertStatus(422);

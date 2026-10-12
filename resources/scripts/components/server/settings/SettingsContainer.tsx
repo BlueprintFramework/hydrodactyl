@@ -1,3 +1,4 @@
+import { Bug, FolderArrowUpIn, Gear, ArrowsRotateRight } from '@gravity-ui/icons';
 import { type Actions, useStoreActions, useStoreState } from 'easy-peasy';
 import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
@@ -24,9 +25,8 @@ interface Values {
     description: string;
 }
 
-const rowClass = 'flex items-baseline justify-between gap-4 border-b border-[#ffffff10] py-2.5';
-const sectionClass =
-    'grid grid-cols-1 gap-4 border-b border-[#ffffff10] py-10 first:pt-0 last:border-b-0 last:pb-0 sm:grid-cols-[14rem_minmax(0,1fr)] sm:gap-10';
+const rowClass = 'flex items-baseline justify-between gap-4 py-2.5';
+const sectionClass = 'grid grid-cols-1 gap-4 py-10 first:pt-0 sm:grid-cols-[14rem_minmax(0,1fr)] sm:gap-10';
 
 const SettingsContainer = () => {
     const username = useStoreState((state) => state.user.data?.username);
@@ -101,6 +101,12 @@ const SettingsContainer = () => {
             </Dialog.Confirm>
 
             <div className='mx-auto flex w-full max-w-4xl flex-col px-4 py-8 sm:px-14 sm:py-14'>
+                <div className='mb-10'>
+                    <h1 className='text-2xl font-semibold tracking-tight text-cream-100'>Settings</h1>
+                    <p className='mt-2 max-w-sm text-sm text-cream-400/70'>
+                        Change the name, connection details, and installation for this server.
+                    </p>
+                </div>
                 <FlashMessageRender byKey={'settings'} />
 
                 <Can action={'settings.rename'}>
@@ -117,8 +123,11 @@ const SettingsContainer = () => {
                     >
                         <Form className={sectionClass}>
                             <div>
-                                <h2 className='text-sm font-medium text-zinc-100'>Server details</h2>
-                                <p className='mt-1 text-sm text-zinc-400'>
+                                <h2 className='flex items-center gap-2 text-sm font-medium text-cream-200'>
+                                    <Gear width={16} height={16} className='text-cream-400/70' />
+                                    Server details
+                                </h2>
+                                <p className='mt-1 text-sm text-cream-400/70'>
                                     The name and description shown for this server.
                                 </p>
                             </div>
@@ -137,72 +146,84 @@ const SettingsContainer = () => {
                     </Formik>
                 </Can>
 
-                <Can action={'file.sftp'}>
-                    <section className={sectionClass}>
-                        <div>
-                            <h2 className='text-sm font-medium text-zinc-100'>SFTP</h2>
-                            <p className='mt-1 text-sm text-zinc-400'>
-                                Connect with the same password you use for this panel. Click a value to copy it.
-                            </p>
-                        </div>
-                        <div className='flex flex-col gap-4'>
-                            <div className='max-w-lg'>
+                <section className={sectionClass}>
+                    <div>
+                        <h2 className='flex items-center gap-2 text-sm font-medium text-cream-200'>
+                            <FolderArrowUpIn width={16} height={16} className='text-cream-400/70' />
+                            Details
+                        </h2>
+                        <p className='mt-1 text-sm text-cream-400/70'>
+                            SFTP connection info and debug identifiers for this server. Connect with the same password
+                            you use for this panel. Click a value to copy it.
+                        </p>
+                    </div>
+                    <div className='flex flex-col gap-4'>
+                        <div className='max-w-lg'>
+                            <Can action={'file.sftp'}>
                                 <div className={rowClass}>
-                                    <span className='text-xs text-zinc-500'>Address</span>
+                                    <span className='flex items-center gap-2 text-xs text-cream-400/50'>
+                                        <FolderArrowUpIn width={14} height={14} />
+                                        SFTP address
+                                    </span>
                                     <CopyOnClick text={sftpAddress}>
-                                        <span className='cursor-pointer truncate font-mono text-sm text-zinc-200 hover:text-zinc-50'>
+                                        <span className='cursor-pointer truncate font-mono text-sm text-cream-200 hover:text-cream-50'>
                                             {sftpAddress}
                                         </span>
                                     </CopyOnClick>
                                 </div>
                                 <div className={rowClass}>
-                                    <span className='text-xs text-zinc-500'>Username</span>
+                                    <span className='flex items-center gap-2 text-xs text-cream-400/50'>
+                                        <FolderArrowUpIn width={14} height={14} />
+                                        SFTP username
+                                    </span>
                                     <CopyOnClick text={sftpUsername}>
-                                        <span className='cursor-pointer truncate font-mono text-sm text-zinc-200 hover:text-zinc-50'>
+                                        <span className='cursor-pointer truncate font-mono text-sm text-cream-200 hover:text-cream-50'>
                                             {sftpUsername}
                                         </span>
                                     </CopyOnClick>
                                 </div>
+                            </Can>
+                            <div className={rowClass}>
+                                <span className='flex items-center gap-2 text-xs text-cream-400/50'>
+                                    <Bug width={14} height={14} />
+                                    Node
+                                </span>
+                                <CopyOnClick text={node}>
+                                    <span className='cursor-pointer truncate font-mono text-sm text-cream-200 hover:text-cream-50'>
+                                        {node}
+                                    </span>
+                                </CopyOnClick>
                             </div>
+                            <div className={rowClass}>
+                                <span className='flex items-center gap-2 text-xs text-cream-400/50'>
+                                    <Bug width={14} height={14} />
+                                    Server ID
+                                </span>
+                                <CopyOnClick text={uuid}>
+                                    <span className='cursor-pointer truncate font-mono text-sm text-cream-200 hover:text-cream-50'>
+                                        {uuid}
+                                    </span>
+                                </CopyOnClick>
+                            </div>
+                        </div>
+                        <Can action={'file.sftp'}>
                             <div>
                                 <a href={`sftp://${sftpUsername}@${ip(sftp.ip)}:${sftp.port}`}>
                                     <Button variant='secondary'>Launch SFTP</Button>
                                 </a>
                             </div>
-                        </div>
-                    </section>
-                </Can>
-
-                <section className={sectionClass}>
-                    <div>
-                        <h2 className='text-sm font-medium text-zinc-100'>Debug</h2>
-                        <p className='mt-1 text-sm text-zinc-400'>Click a value to copy it.</p>
-                    </div>
-                    <div className='max-w-lg'>
-                        <div className={rowClass}>
-                            <span className='text-xs text-zinc-500'>Node</span>
-                            <CopyOnClick text={node}>
-                                <span className='cursor-pointer truncate font-mono text-sm text-zinc-200 hover:text-zinc-50'>
-                                    {node}
-                                </span>
-                            </CopyOnClick>
-                        </div>
-                        <div className={rowClass}>
-                            <span className='text-xs text-zinc-500'>Server ID</span>
-                            <CopyOnClick text={uuid}>
-                                <span className='cursor-pointer truncate font-mono text-sm text-zinc-200 hover:text-zinc-50'>
-                                    {uuid}
-                                </span>
-                            </CopyOnClick>
-                        </div>
+                        </Can>
                     </div>
                 </section>
 
                 <Can action={'settings.reinstall'}>
                     <section className={sectionClass}>
                         <div>
-                            <h2 className='text-sm font-medium text-zinc-100'>Reinstall</h2>
-                            <p className='mt-1 text-sm text-zinc-400'>
+                            <h2 className='flex items-center gap-2 text-sm font-medium text-cream-200'>
+                                <ArrowsRotateRight width={16} height={16} className='text-cream-400/70' />
+                                Reinstall
+                            </h2>
+                            <p className='mt-1 text-sm text-cream-400/70'>
                                 Stops the server and runs its installation script again. Files can be deleted or
                                 modified, so back up anything you need first.
                             </p>

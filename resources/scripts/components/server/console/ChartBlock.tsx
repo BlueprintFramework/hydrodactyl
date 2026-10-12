@@ -1,23 +1,29 @@
+import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ChartBlockProps {
     title: string;
-    legend?: React.ReactNode;
-    children: React.ReactNode;
+    value?: ReactNode;
+    hint?: ReactNode;
+    children: ReactNode;
     className?: string;
 }
 
-export default ({ title, legend, children, className }: ChartBlockProps) => (
+export default ({ title, value, hint, children, className }: ChartBlockProps) => (
     <div
-        className={cn(
-            'group p-4 relative rounded-xl border-[1px] border-[#ffffff11] bg-[#110f0d] flex flex-col gap-2',
-            className,
-        )}
+        className={cn('group relative overflow-hidden rounded-2xl border border-mocha-400 bg-mocha-500 p-4', className)}
     >
-        <div className={'flex items-center justify-between'}>
-            <h3 className={'font-extrabold text-sm'}>{title}</h3>
-            {legend && <div className={'text-sm flex items-center'}>{legend}</div>}
+        <div className='flex items-start justify-between gap-3'>
+            <div className='min-w-0'>
+                <div className='flex items-center gap-2'>
+                    <p className='truncate text-sm font-medium text-cream-200'>{title}</p>
+                </div>
+                {hint && <p className='mt-1 text-[11px] leading-none text-cream-400/40 tabular-nums'>{hint}</p>}
+            </div>
+            {value && (
+                <div className='shrink-0 text-right text-lg font-semibold leading-tight text-cream-50'>{value}</div>
+            )}
         </div>
-        <div className={'z-10 overflow-hidden rounded-lg'}>{children}</div>
+        <div className='relative mt-3 h-32 overflow-hidden'>{children}</div>
     </div>
 );
