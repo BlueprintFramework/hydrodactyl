@@ -25,6 +25,8 @@ interface Values {
 }
 
 const rowClass = 'flex items-baseline justify-between gap-4 border-b border-[#ffffff10] py-2.5';
+const sectionClass =
+    'grid grid-cols-1 gap-4 border-b border-[#ffffff10] py-10 first:pt-0 last:border-b-0 last:pb-0 sm:grid-cols-[14rem_minmax(0,1fr)] sm:gap-10';
 
 const SettingsContainer = () => {
     const username = useStoreState((state) => state.user.data?.username);
@@ -98,7 +100,7 @@ const SettingsContainer = () => {
                 you wish to continue?
             </Dialog.Confirm>
 
-            <div className='flex flex-col gap-12 px-4 py-8 sm:px-14 sm:py-14'>
+            <div className='mx-auto flex w-full max-w-4xl flex-col px-4 py-8 sm:px-14 sm:py-14'>
                 <FlashMessageRender byKey={'settings'} />
 
                 <Can action={'settings.rename'}>
@@ -113,73 +115,70 @@ const SettingsContainer = () => {
                             description: string().nullable(),
                         })}
                     >
-                        <Form>
-                            <section className='flex flex-col gap-4'>
-                                <div className='flex items-start justify-between gap-4'>
-                                    <div>
-                                        <h2 className='text-sm font-medium text-zinc-100'>Server details</h2>
-                                        <p className='mt-1 text-sm text-zinc-400'>
-                                            The name and description shown for this server.
-                                        </p>
-                                    </div>
-                                    <Button variant='secondary' type='submit' className='shrink-0'>
+                        <Form className={sectionClass}>
+                            <div>
+                                <h2 className='text-sm font-medium text-zinc-100'>Server details</h2>
+                                <p className='mt-1 text-sm text-zinc-400'>
+                                    The name and description shown for this server.
+                                </p>
+                            </div>
+                            <div className='flex flex-col gap-4'>
+                                <div className='flex max-w-lg flex-col gap-4'>
+                                    <Field id={'name'} name={'name'} label={'Name'} type={'text'} />
+                                    <Field id={'description'} name={'description'} label={'Description'} type={'text'} />
+                                </div>
+                                <div>
+                                    <Button variant='secondary' type='submit'>
                                         Save
                                     </Button>
                                 </div>
-                                <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                                    <Field id={'name'} name={'name'} label={'Name'} type={'text'} />
-                                    <Field
-                                        id={'description'}
-                                        name={'description'}
-                                        label={'Description'}
-                                        type={'text'}
-                                    />
-                                </div>
-                            </section>
+                            </div>
                         </Form>
                     </Formik>
                 </Can>
 
                 <Can action={'file.sftp'}>
-                    <section className='flex flex-col gap-4'>
-                        <div className='flex items-start justify-between gap-4'>
-                            <div>
-                                <h2 className='text-sm font-medium text-zinc-100'>SFTP</h2>
-                                <p className='mt-1 text-sm text-zinc-400'>
-                                    Connect with the same password you use for this panel. Click a value to copy it.
-                                </p>
-                            </div>
-                            <a href={`sftp://${sftpUsername}@${ip(sftp.ip)}:${sftp.port}`}>
-                                <Button variant='secondary' className='shrink-0'>
-                                    Launch SFTP
-                                </Button>
-                            </a>
+                    <section className={sectionClass}>
+                        <div>
+                            <h2 className='text-sm font-medium text-zinc-100'>SFTP</h2>
+                            <p className='mt-1 text-sm text-zinc-400'>
+                                Connect with the same password you use for this panel. Click a value to copy it.
+                            </p>
                         </div>
-                        <div className='grid grid-cols-1 gap-x-10 sm:grid-cols-2'>
-                            <div className={rowClass}>
-                                <span className='text-xs text-zinc-500'>Address</span>
-                                <CopyOnClick text={sftpAddress}>
-                                    <span className='cursor-pointer truncate font-mono text-sm text-zinc-200 hover:text-zinc-50'>
-                                        {sftpAddress}
-                                    </span>
-                                </CopyOnClick>
+                        <div className='flex flex-col gap-4'>
+                            <div className='max-w-lg'>
+                                <div className={rowClass}>
+                                    <span className='text-xs text-zinc-500'>Address</span>
+                                    <CopyOnClick text={sftpAddress}>
+                                        <span className='cursor-pointer truncate font-mono text-sm text-zinc-200 hover:text-zinc-50'>
+                                            {sftpAddress}
+                                        </span>
+                                    </CopyOnClick>
+                                </div>
+                                <div className={rowClass}>
+                                    <span className='text-xs text-zinc-500'>Username</span>
+                                    <CopyOnClick text={sftpUsername}>
+                                        <span className='cursor-pointer truncate font-mono text-sm text-zinc-200 hover:text-zinc-50'>
+                                            {sftpUsername}
+                                        </span>
+                                    </CopyOnClick>
+                                </div>
                             </div>
-                            <div className={rowClass}>
-                                <span className='text-xs text-zinc-500'>Username</span>
-                                <CopyOnClick text={sftpUsername}>
-                                    <span className='cursor-pointer truncate font-mono text-sm text-zinc-200 hover:text-zinc-50'>
-                                        {sftpUsername}
-                                    </span>
-                                </CopyOnClick>
+                            <div>
+                                <a href={`sftp://${sftpUsername}@${ip(sftp.ip)}:${sftp.port}`}>
+                                    <Button variant='secondary'>Launch SFTP</Button>
+                                </a>
                             </div>
                         </div>
                     </section>
                 </Can>
 
-                <section className='flex flex-col gap-2'>
-                    <h2 className='text-sm font-medium text-zinc-100'>Debug</h2>
-                    <p className='text-sm text-zinc-400'>Click a value to copy it.</p>
-                    <div className='mt-2 grid grid-cols-1 gap-x-10 sm:grid-cols-2'>
+                <section className={sectionClass}>
+                    <div>
+                        <h2 className='text-sm font-medium text-zinc-100'>Debug</h2>
+                        <p className='mt-1 text-sm text-zinc-400'>Click a value to copy it.</p>
+                    </div>
+                    <div className='max-w-lg'>
                         <div className={rowClass}>
                             <span className='text-xs text-zinc-500'>Node</span>
                             <CopyOnClick text={node}>
@@ -200,22 +199,19 @@ const SettingsContainer = () => {
                 </section>
 
                 <Can action={'settings.reinstall'}>
-                    <section className='flex items-start justify-between gap-4'>
+                    <section className={sectionClass}>
                         <div>
                             <h2 className='text-sm font-medium text-zinc-100'>Reinstall</h2>
-                            <p className='mt-1 max-w-xl text-sm text-zinc-400'>
+                            <p className='mt-1 text-sm text-zinc-400'>
                                 Stops the server and runs its installation script again. Files can be deleted or
                                 modified, so back up anything you need first.
                             </p>
                         </div>
-                        <Button
-                            variant='attention'
-                            className='shrink-0'
-                            onClick={() => setModalVisible(true)}
-                            disabled={loading}
-                        >
-                            Reinstall server
-                        </Button>
+                        <div className='content-center'>
+                            <Button variant='attention' onClick={() => setModalVisible(true)} disabled={loading}>
+                                Reinstall server
+                            </Button>
+                        </div>
                     </section>
                 </Can>
             </div>
