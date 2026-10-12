@@ -1,16 +1,14 @@
-import { AntennaSignal, Calendar, Copy, Database, FolderOpen, Gear, Person, Server, Shield } from '@gravity-ui/icons';
+import { ChevronRight } from '@gravity-ui/icons';
 import { type Actions, useStoreActions, useStoreState } from 'easy-peasy';
-import { Form, Formik } from 'formik';
-import { useEffect } from 'react';
+import { Form, Formik, useField } from 'formik';
+import { useEffect, useState } from 'react';
 import { array, object, string } from 'yup';
 import createOrUpdateSubuser from '@/api/server/users/createOrUpdateSubuser';
-import Can from '@/components/elements/Can';
+import { Checkbox } from '@/components/elements/CheckboxNew';
 import Field from '@/components/elements/Field';
+import { Switch } from '@/components/elements/SwitchV2';
 import FlashMessageRender from '@/components/FlashMessageRender';
-import PermissionRow from '@/components/server/users/PermissionRow';
 import { Button } from '@/components/ui/button';
-import { useTranslation } from '@/i18n/I18nProvider';
-import type { TranslationKey } from '@/i18n/types';
 import { useDeepCompareMemo } from '@/plugins/useDeepCompareMemo';
 import { usePermissions } from '@/plugins/usePermissions';
 import type { ApplicationStore } from '@/state';
@@ -29,90 +27,154 @@ interface Props {
     flashKey: string;
     isSubmitting?: boolean;
     setIsSubmitting?: (submitting: boolean) => void;
+    identifier?: string;
+    onIdentifierChange?: (value: string) => void;
 }
 
-const ICON_MAP: Record<string, typeof Shield> = {
-    control: Server,
-    user: Person,
-    file: FolderOpen,
-    backup: Copy,
-    allocation: AntennaSignal,
-    startup: Gear,
-    database: Database,
-    schedule: Calendar,
+const rowClass = 'flex items-start justify-between gap-4 border-b border-[#ffffff10] py-3';
+
+const PermissionGroup = ({
+    name,
+    description,
+    keys,
+    editable,
+    canEdit,
+}: {
+    name: string;
+    description: string;
+    keys: { key: string; description: string }[];
+    editable: string[];
+    canEdit: boolean;
+}) => {
+    const [{ value }, , { setValue }] = useField<string[]>('permissions');
+    const permissions = keys.map((item) => `${name}.${item.key}`);
+    const granted = permissions.filter((permission) => value.includes(permission));
+    const editableHere = permissions.filter((permission) => editable.includes(permission));
+    const allGranted = permissions.length > 0 && granted.length === permissions.length;
+    const someGranted = granted.length > 0 && !allGranted;
+    const [open, setOpen] = useState(granted.length > 0);
+
+    const setGroup = (on: boolean) => {
+        const kept = value.filter((permission) => !permissions.includes(permission));
+        setValue(on ? [...kept, ...editableHere] : kept);
+    };
+
+    const toggle = (permission: string) => {
+        setValue(value.includes(permission) ? value.filter((item) => item !== permission) : [...value, permission]);
+    };
+
+    return (
+        <div>
+            <div className={rowClass}>
+                <div className='min-w-0 flex-1'>
+                    <button
+                        type='button'
+                        className='flex cursor-pointer items-center gap-2 text-left'
+                        aria-expanded={open}
+                        onClick={() => setOpen((current) => !current)}
+                    >
+                        <ChevronRight
+                            width={16}
+                            height={16}
+                            fill='currentColor'
+                            className={`shrink-0 text-zinc-400 transition-transform ${open ? 'rotate-90' : ''}`}
+                        />
+                        <span className='text-sm capitalize text-zinc-100'>{name}</span>
+                        <span className='text-xs text-zinc-500'>
+                            {granted.length}/{permissions.length}
+                        </span>
+                    </button>
+                    <p className='mt-1 pl-6 text-sm text-zinc-400'>{description}</p>
+                </div>
+                <Switch
+                    checked={allGranted || someGranted}
+                    disabled={!canEdit || editableHere.length === 0}
+                    aria-label={`Grant every ${name} permission`}
+                    className={someGranted ? 'opacity-60' : undefined}
+                    onCheckedChange={(checked) => setGroup(someGranted ? true : checked)}
+                />
+            </div>
+            {open && (
+                <div className='grid grid-cols-1 gap-x-10 pb-2 pl-6 sm:grid-cols-2'>
+                    {keys.map((item) => {
+                        const permission = `${name}.${item.key}`;
+                        const disabled = !canEdit || !editable.includes(permission);
+                        const checked = value.includes(permission);
+
+                        const inputId = `permission-${permission}`;
+
+                        return (
+                            <div key={permission}>
+                                <input
+                                    id={inputId}
+                                    type='checkbox'
+                                    className='absolute h-px w-px overflow-hidden opacity-0'
+                                    checked={checked}
+                                    disabled={disabled}
+                                    onChange={() => toggle(permission)}
+                                />
+                                <label
+                                    htmlFor={inputId}
+                                    className={`flex items-start gap-3 border-b border-[#ffffff08] py-2.5 ${
+                                        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                                    }`}
+                                >
+                                    <Checkbox
+                                        checked={checked}
+                                        disabled={disabled}
+                                        tabIndex={-1}
+                                        aria-hidden
+                                        className='pointer-events-none mt-0.5 data-[state=checked]:bg-brand-500/70 data-[state=checked]:border-brand-500/70'
+                                    />
+                                    <span className='min-w-0'>
+                                        <span className='block font-mono text-xs text-zinc-200'>{item.key}</span>
+                                        {item.description && (
+                                            <span className='mt-0.5 block text-xs leading-relaxed text-zinc-500'>
+                                                {item.description}
+                                            </span>
+                                        )}
+                                    </span>
+                                </label>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
 };
 
-const PermissionIcon = ({ name }: { name: string }) => {
-    const Icon = ICON_MAP[name] ?? Shield;
-    return <Icon width={22} height={22} fill='currentColor' className='text-brand flex-shrink-0 mt-0.5' />;
-};
-
-const CATEGORY_KEYS: Record<string, { description: TranslationKey; title: TranslationKey }> = {
-    activity: {
-        description: 'server.users.permissions.activity.description',
-        title: 'server.users.permissions.activity.title',
-    },
-    allocation: {
-        description: 'server.users.permissions.allocation.description',
-        title: 'server.users.permissions.allocation.title',
-    },
-    backup: {
-        description: 'server.users.permissions.backup.description',
-        title: 'server.users.permissions.backup.title',
-    },
-    control: {
-        description: 'server.users.permissions.control.description',
-        title: 'server.users.permissions.control.title',
-    },
-    database: {
-        description: 'server.users.permissions.database.description',
-        title: 'server.users.permissions.database.title',
-    },
-    file: {
-        description: 'server.users.permissions.file.description',
-        title: 'server.users.permissions.file.title',
-    },
-    mod: {
-        description: 'server.users.permissions.mod.description',
-        title: 'server.users.permissions.mod.title',
-    },
-    schedule: {
-        description: 'server.users.permissions.schedule.description',
-        title: 'server.users.permissions.schedule.title',
-    },
-    settings: {
-        description: 'server.users.permissions.settings.description',
-        title: 'server.users.permissions.settings.title',
-    },
-    startup: {
-        description: 'server.users.permissions.startup.description',
-        title: 'server.users.permissions.startup.title',
-    },
-    user: {
-        description: 'server.users.permissions.user.description',
-        title: 'server.users.permissions.user.title',
-    },
-    websocket: {
-        description: 'server.users.permissions.websocket.description',
-        title: 'server.users.permissions.websocket.title',
-    },
-};
-
-const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmitting, setIsSubmitting }: Props) => {
-    const { t } = useTranslation();
+const UserFormComponent = ({
+    subuser,
+    onSuccess,
+    onCancel,
+    flashKey,
+    isSubmitting,
+    setIsSubmitting,
+    identifier,
+    onIdentifierChange,
+}: Props) => {
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const appendSubuser = ServerContext.useStoreActions((actions) => actions.subusers.appendSubuser);
     const { clearFlashes, clearAndAddHttpError } = useStoreActions(
         (actions: Actions<ApplicationStore>) => actions.flashes,
     );
-    const getPermissions = useStoreActions(
-        (actions: Actions<ApplicationStore>) => actions.permissions.getPermissions,
-    );
 
     const isRootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
     const permissions = useStoreState((state) => state.permissions.data);
+    const getPermissions = useStoreActions((actions: Actions<ApplicationStore>) => actions.permissions.getPermissions);
     const loggedInPermissions = ServerContext.useStoreState((state) => state.server.permissions);
     const [canEditUser] = usePermissions(subuser ? ['user.update'] : ['user.create']);
+    const permissionsReady = Object.keys(permissions).length > 0;
+
+    useEffect(() => {
+        if (permissionsReady) return;
+
+        getPermissions().catch((error) => {
+            console.error(error);
+            clearAndAddHttpError({ key: flashKey, error });
+        });
+    }, [permissionsReady, getPermissions, flashKey, clearAndAddHttpError]);
 
     const editablePermissions = useDeepCompareMemo(() => {
         const list = Object.keys(permissions).flatMap((key) =>
@@ -123,6 +185,17 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
         }
         return list.filter((key) => loggedInPermissions.indexOf(key) >= 0);
     }, [isRootAdmin, permissions, loggedInPermissions]);
+
+    const groups = Object.keys(permissions)
+        .filter((key) => key !== 'websocket')
+        .map((key) => ({
+            name: key,
+            description: permissions[key]?.description ?? '',
+            keys: Object.keys(permissions[key]?.keys ?? {}).map((pkey) => ({
+                key: pkey,
+                description: permissions[key]?.keys?.[pkey] ?? '',
+            })),
+        }));
 
     const submit = async (values: Values) => {
         if (setIsSubmitting) setIsSubmitting(true);
@@ -138,47 +211,12 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
         }
     };
 
-    useEffect(() => {
-        getPermissions().catch((error) => {
-            console.error(error);
-            clearAndAddHttpError({ key: flashKey, error });
-        });
-    }, [getPermissions, clearAndAddHttpError, flashKey]);
-
     useEffect(
         () => () => {
             clearFlashes(flashKey);
         },
         [flashKey, clearFlashes],
     );
-
-    const getCategoryKeys = (key: string) => Object.keys(permissions[key]?.keys ?? {});
-    const getCategoryPermissions = (key: string) => getCategoryKeys(key).map((pkey) => `${key}.${pkey}`);
-
-    const toggleAll = (values: Values, setFieldValue: (field: string, value: unknown) => void) => {
-        const allPermissions = editablePermissions;
-        const allSelected = allPermissions.every((p) => values.permissions.includes(p));
-        setFieldValue('permissions', allSelected ? [] : [...allPermissions]);
-    };
-
-    const toggleCategory = (key: string, values: Values, setFieldValue: (field: string, value: unknown) => void) => {
-        const categoryPermissions = getCategoryPermissions(key);
-        const allSelected = categoryPermissions.every((p) => values.permissions.includes(p));
-        if (allSelected) {
-            setFieldValue(
-                'permissions',
-                values.permissions.filter((p) => !categoryPermissions.includes(p)),
-            );
-        } else {
-            const newPermissions = [...values.permissions];
-            categoryPermissions.forEach((p) => {
-                if (!newPermissions.includes(p) && editablePermissions.includes(p)) {
-                    newPermissions.push(p);
-                }
-            });
-            setFieldValue('permissions', newPermissions);
-        }
-    };
 
     return (
         <>
@@ -188,161 +226,100 @@ const UserFormComponent = ({ subuser, onSuccess, onCancel, flashKey, isSubmittin
                 onSubmit={submit}
                 initialValues={
                     {
-                        email: subuser?.email || '',
+                        email: subuser?.email || identifier || '',
                         permissions: subuser?.permissions || [],
                     } as Values
                 }
                 validationSchema={object().shape({
-                    email: string()
-                        .max(191, t('server.users.email_max'))
-                        .email(t('server.users.email_invalid'))
-                        .required(t('server.users.email_invalid')),
+                    email: string().max(191, 'That is too long.').required('Enter a username or email address.'),
                     permissions: array().of(string()),
                 })}
             >
-                {({ setFieldValue, values }) => {
-                    const allSelected = editablePermissions.every((p) => values.permissions.includes(p));
-                    const isCategoryAllSelected = (key: string) =>
-                        getCategoryPermissions(key).every((p) => values.permissions.includes(p));
+                {({ values, setFieldValue }) => {
+                    const allSelected =
+                        editablePermissions.length > 0 &&
+                        editablePermissions.every((permission) => values.permissions.includes(permission));
+
                     return (
-                        <Form className='space-y-6'>
+                        <Form className='flex flex-col gap-12'>
                             {!subuser && (
-                                <div className='rounded-xl p-6'>
-                                    <div className='flex items-center gap-3 mb-6'>
-                                        <div className='w-10 h-10 rounded-lg bg-mocha-400 flex items-center justify-center'>
-                                            <Person
-                                                width={22}
-                                                height={22}
-                                                fill='currentColor'
-                                                className='w-5 h-5 text-brand'
-                                            />
-                                        </div>
-                                        <h3 className='text-xl font-semibold text-zinc-100'>
-                                            {t('server.users.user_information')}
-                                        </h3>
+                                <section className='flex flex-col gap-4'>
+                                    <div className='max-w-md'>
+                                        <Field
+                                            id='email'
+                                            name='email'
+                                            label='Username or email'
+                                            placeholder='username or email'
+                                            description='An existing username, or an email to invite someone new.'
+                                            onChange={(event) => onIdentifierChange?.(event.currentTarget.value)}
+                                        />
                                     </div>
-                                    <Field
-                                        name='email'
-                                        label={t('server.users.email_label')}
-                                        description={t('server.users.email_description')}
-                                    />
-                                </div>
+                                </section>
                             )}
 
-                            <div className='rounded-xl p-6'>
-                                <div className='flex items-center justify-between mb-6'>
-                                    <div className='flex items-center gap-3'>
-                                        <div className='w-10 h-10 rounded-lg bg-brand/20 flex items-center justify-center'>
-                                            <Gear
-                                                width={22}
-                                                height={22}
-                                                fill='currentColor'
-                                                className='w-5 h-5 text-brand'
-                                            />
-                                        </div>
-                                        <h3 className='text-xl font-semibold text-zinc-100'>
-                                            {t('server.users.detailed_permissions')}
-                                        </h3>
+                            <section className='flex flex-col'>
+                                <div className='mb-2 flex items-start justify-between gap-4'>
+                                    <div>
+                                        <h2 className='text-sm font-medium text-zinc-100'>Permissions</h2>
+                                        <p className='mt-1 max-w-xl text-sm text-zinc-400'>
+                                            Flip a group to grant everything in it. Open it if you only want some.
+                                            {!isRootAdmin && loggedInPermissions[0] !== '*' && (
+                                                <> You can only hand out permissions you have yourself.</>
+                                            )}
+                                        </p>
                                     </div>
-                                    {canEditUser && (
+                                    {canEditUser && permissionsReady && (
                                         <Button
                                             variant='secondary'
                                             size='sm'
                                             type='button'
-                                            onClick={() => toggleAll(values, setFieldValue)}
+                                            className='shrink-0'
+                                            onClick={() =>
+                                                setFieldValue(
+                                                    'permissions',
+                                                    allSelected ? [] : [...editablePermissions],
+                                                )
+                                            }
                                         >
-                                            {allSelected
-                                                ? t('server.users.deselect_all')
-                                                : t('server.users.select_all')}
+                                            {allSelected ? 'Clear all' : 'Grant all'}
                                         </Button>
                                     )}
                                 </div>
 
-                                {!isRootAdmin && loggedInPermissions[0] !== '*' && (
-                                    <div className='mb-6 p-4 bg-brand/10 border border-brand/20 rounded-lg'>
-                                        <div className='flex items-center gap-3 mb-2'>
-                                            <Shield
-                                                width={22}
-                                                height={22}
-                                                fill='currentColor'
-                                                className='w-5 h-5 text-brand'
+                                {permissionsReady ? (
+                                    <div>
+                                        {groups.map((group) => (
+                                            <PermissionGroup
+                                                key={group.name}
+                                                name={group.name}
+                                                description={group.description}
+                                                keys={group.keys}
+                                                editable={editablePermissions}
+                                                canEdit={canEditUser}
                                             />
-                                            <span className='text-sm font-semibold text-brand'>
-                                                {t('server.users.permission_restriction_title')}
-                                            </span>
-                                        </div>
-                                        <p className='text-sm text-zinc-300 leading-relaxed'>
-                                            {t('server.users.permission_restriction_description')}
-                                        </p>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className='flex items-center justify-center py-16'>
+                                        <div className='h-6 w-6 animate-spin rounded-full border-b-2 border-brand' />
                                     </div>
                                 )}
+                            </section>
 
-                                <div className='space-y-4'>
-                                    {Object.keys(permissions)
-                                        .filter((key) => key !== 'websocket')
-                                        .map((key) => {
-                                            const category = CATEGORY_KEYS[key];
-
-                                            return (
-                                                <div key={key} className='border border-[#ffffff12] rounded-lg p-4'>
-                                                    <div className='flex items-start justify-between mb-3'>
-                                                        <div className='flex items-start gap-3 flex-1 min-w-0'>
-                                                            <PermissionIcon name={key} />
-                                                            <div className='flex-1 min-w-0'>
-                                                                <h4 className='font-medium text-zinc-200'>
-                                                                    {category ? t(category.title) : key}
-                                                                </h4>
-                                                                <p className='text-xs text-zinc-400 mt-1 break-words'>
-                                                                    {category
-                                                                        ? t(category.description)
-                                                                        : permissions[key]?.description}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        {canEditUser && (
-                                                            <Button
-                                                                variant='secondary'
-                                                                size='sm'
-                                                                type='button'
-                                                                onClick={() =>
-                                                                    toggleCategory(key, values, setFieldValue)
-                                                                }
-                                                            >
-                                                                {isCategoryAllSelected(key)
-                                                                    ? t('server.users.deselect_all')
-                                                                    : t('server.users.select_all')}
-                                                            </Button>
-                                                        )}
-                                                    </div>
-
-                                                    <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-                                                        {getCategoryKeys(key).map((pkey) => (
-                                                            <PermissionRow
-                                                                key={`permission_${key}.${pkey}`}
-                                                                permission={`${key}.${pkey}`}
-                                                                disabled={
-                                                                    !canEditUser ||
-                                                                    !editablePermissions.includes(`${key}.${pkey}`)
-                                                                }
-                                                            />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                </div>
-                            </div>
-
-                            <Can action={subuser ? 'user.update' : 'user.create'}>
-                                <div className='flex gap-3 justify-end pt-4 border-t border-[#ffffff12]'>
-                                    <Button variant='secondary' type='button' onClick={onCancel}>
-                                        {t('common.cancel')}
+                            {canEditUser && (
+                                <div className='flex justify-end gap-3'>
+                                    <Button variant='ghost' type='button' onClick={onCancel}>
+                                        Cancel
                                     </Button>
-                                    <Button variant='attention' type='submit' disabled={isSubmitting}>
-                                        {subuser ? t('server.users.save_changes') : t('server.users.invite_user')}
+                                    <Button
+                                        variant='secondary'
+                                        type='submit'
+                                        disabled={isSubmitting || !permissionsReady}
+                                    >
+                                        {subuser ? 'Save' : 'Invite'}
                                     </Button>
                                 </div>
-                            </Can>
+                            )}
                         </Form>
                     );
                 }}

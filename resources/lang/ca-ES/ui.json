@@ -506,6 +506,7 @@
     "panel": {
         "account_menu": "Menú del compte",
         "admin_panel": "Panell d'administració",
+        "client_panel": "Panell de client",
         "close_menu": "Tanca el menú",
         "command_menu": "Menú global d'ordres",
         "home_page": "Pàgina d'inici de {{name}}",
@@ -639,6 +640,7 @@
             "status_cancelled": "Cancel·lada",
             "status_completed": "Completada",
             "status_failed": "Fallida",
+            "status_in_progress": "En progrés…",
             "status_pending": "Pendent",
             "status_running": "En curs ({{progress}}%)",
             "storage_total": "{{used}} en total (Repositori: {{repository}}, Heredades: {{legacy}})",

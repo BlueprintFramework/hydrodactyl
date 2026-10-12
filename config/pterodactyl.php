@@ -117,6 +117,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Egg Imports
+    |--------------------------------------------------------------------------
+    |
+    | A comma-separated list of hosts that an egg may be imported from when
+    | using the URL import feature.
+    */
+
+    'eggs' => [
+        'allowed_import_hosts' => env('ALLOWED_EGG_HOSTS', ''),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Client Features
     |--------------------------------------------------------------------------
     |
@@ -132,6 +145,12 @@ return [
         'schedules' => [
             // The total number of tasks that can exist for any given schedule at once.
             'per_schedule_task_limit' => env('PTERODACTYL_PER_SCHEDULE_TASK_LIMIT', 10),
+
+            // The number of seconds a schedule may remain in the processing state before it
+            // is treated as stuck and reset. This must be larger than the maximum time offset
+            // that can be applied to a task (900 seconds), otherwise schedules that are
+            // legitimately waiting on a delayed task will be reset and run again.
+            'stuck_timeout' => env('PTERODACTYL_SCHEDULE_STUCK_TIMEOUT', 1800),
         ],
 
         'allocations' => [
@@ -142,6 +161,12 @@ return [
 
         'groups' => [
             'enabled' => env('PTERODACTYL_CLIENT_GROUPS_ENABLED', true),
+        ],
+
+        'resource_history' => [
+            'enabled' => env('PTERODACTYL_RESOURCE_HISTORY_ENABLED', true),
+
+            'samples' => env('PTERODACTYL_RESOURCE_HISTORY_SAMPLES', 20),
         ],
     ],
 

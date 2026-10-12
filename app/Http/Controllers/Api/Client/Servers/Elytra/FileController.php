@@ -93,7 +93,7 @@ class FileController extends ClientApiController
             'attributes' => [
                 'url' => sprintf(
                     '%s/download/file?token=%s',
-                    $server->node->getConnectionAddress(),
+                    $server->node->getBrowserConnectionAddress(),
                     $token->toString()
                 ),
             ],

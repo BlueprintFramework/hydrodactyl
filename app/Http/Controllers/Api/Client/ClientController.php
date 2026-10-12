@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Client;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Permission;
@@ -32,7 +33,7 @@ class ClientController extends ClientApiController
         $builder = QueryBuilder::for(
             Server::query()->with(array_merge(
                 $this->getIncludesForTransformer($transformer, ['node']),
-                ['group']
+                ['group', 'allocations', 'egg', 'transfer', 'subusers']
             ))
         )->allowedFilters([
             'uuid',
@@ -84,7 +85,7 @@ class ClientController extends ClientApiController
             } else {
                 $builder = $type === 'admin-all'
                     ? $builder
-                    : $builder->whereNotIn('servers.id', $user->accessibleServers()->pluck('id')->all());
+                    : $builder->whereNotIn('servers.id', $user->accessibleServers()->select('servers.id'));
             }
         } elseif ($type === 'owner') {
             $builder = $builder->where('servers.owner_id', $user->id);
@@ -94,7 +95,7 @@ class ClientController extends ClientApiController
             });
         } else {
             // Default + 'all': every server the user can access (owned + subuser on).
-            $builder = $builder->whereIn('servers.id', $user->accessibleServers()->pluck('id')->all());
+            $builder = $builder->whereIn('servers.id', $user->accessibleServers()->select('servers.id'));
         }
 
         // Filter by group if specified
@@ -117,7 +118,7 @@ class ClientController extends ClientApiController
 
         $baseQuery = Server::query();
         if (!$user->root_admin) {
-            $baseQuery->whereIn('servers.id', $user->accessibleServers()->pluck('id')->all());
+            $baseQuery->whereIn('servers.id', $user->accessibleServers()->select('servers.id'));
         }
 
         $accessibleIds = (clone $baseQuery)->select('servers.id');
@@ -178,6 +179,14 @@ class ClientController extends ClientApiController
                 'groups_enabled' => config('pterodactyl.client_features.groups.enabled', true),
             ],
         ];
+    }
+
+    /**
+     * Return the panel version.
+     */
+    public function version(): JsonResponse
+    {
+        return response()->json(['version' => config('app.version')]);
     }
 
     /**

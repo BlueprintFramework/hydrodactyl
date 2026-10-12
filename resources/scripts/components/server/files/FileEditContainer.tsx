@@ -28,6 +28,8 @@ import { ServerContext } from '@/state/server';
 
 const Editor = lazy(() => import('@/components/elements/editor/Editor'));
 
+const sortedLanguages = [...languages].sort((a, b) => a.name.localeCompare(b.name));
+
 const FileEditContainer = () => {
     const { t } = useTranslation();
     const [error, setError] = useState('');
@@ -127,7 +129,7 @@ const FileEditContainer = () => {
     return (
         <PageContentBlock
             title={action === 'edit' ? t('server.files.editing', { filename }) : t('server.files.new_file')}
-            className='p-0! h-full'
+            className='p-0! h-full overflow-hidden!'
         >
             <FlashMessageRender byKey={'files:view'} />
 
@@ -163,7 +165,7 @@ const FileEditContainer = () => {
                 }}
             />
 
-            <div className='h-full relative bg-[#ffffff11] border-[1px] border-[#ffffff07] border-t-0 [&>div>div]:h-full [&>div>div]:outline-hidden! w-full flex-grow order-20 lg:order-none'>
+            <div className='relative min-h-0 flex-1 bg-[#ffffff11] border-[1px] border-[#ffffff07] border-t-0 [&>div]:h-full [&_.cm-editor]:h-full [&_.cm-editor]:outline-hidden! w-full order-20 lg:order-none'>
                 <Editor
                     filename={filename}
                     initialContent={content}
@@ -237,7 +239,7 @@ const FileEditContainer = () => {
                         </svg>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className='max-h-50 overflow-auto z-99999' sideOffset={8}>
-                        <For each={languages.sort((a, b) => a.name.localeCompare(b.name))} memo>
+                        <For each={sortedLanguages} memo>
                             {(language) => (
                                 <DropdownMenuItem
                                     key={language.name}

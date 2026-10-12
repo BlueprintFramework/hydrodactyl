@@ -23,10 +23,10 @@ class LocationRepository extends EloquentRepository implements LocationRepositor
      */
     public function getAllWithDetails(): Collection
     {
-        $locations = $this->getBuilder()->withCount('nodes', 'servers')->get($this->getColumns());
+        $locations = $this->getBuilder()->with('nodes.servers')->withCount('nodes', 'servers')->get($this->getColumns());
 
         foreach ($locations as $location) {
-            $nodes = $location->nodes()->with('servers')->get();
+            $nodes = $location->nodes;
 
             $totalMemory = 0;
             $allocatedMemory = 0;

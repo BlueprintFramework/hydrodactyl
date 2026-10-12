@@ -15,8 +15,6 @@ import {
 import type { ComponentType, LazyExoticComponent, SVGProps } from 'react';
 import { lazy } from 'react';
 
-import type { TranslationKey } from '@/i18n/types';
-
 // Every route-level page container is lazy-loaded so each screen is split into
 // its own chunk and only fetched when that route is actually visited.
 const AccountApiContainer = lazy(() => import('@/components/dashboard/AccountApiContainer'));
@@ -61,7 +59,7 @@ interface RouteDefinition {
     path?: string;
     // If undefined is passed this route is still rendered into the router itself
     // but no navigation link is displayed in the sub-navigation menu.
-    name: TranslationKey | undefined;
+    name: string | undefined;
     component: RouteComponent;
     end?: boolean;
 }
@@ -90,6 +88,11 @@ export interface ServerRouteDefinition extends RouteDefinition {
      */
     eggFeature?: RegExp;
     /**
+     * When true, the route is only available when the server has the built-in
+     * Software page enabled. Hides the nav item and blocks the route otherwise.
+     */
+    requiresSoftware?: boolean;
+    /**
      * Route path patterns that should highlight this nav item.
      * Used for matching nested routes to parent nav items.
      */
@@ -108,26 +111,26 @@ const routes: Routes = {
         {
             route: '',
             path: '',
-            name: 'navigation.account',
+            name: 'Account',
             component: AccountOverviewContainer,
             end: true,
         },
         {
             route: 'api',
             path: 'api',
-            name: 'navigation.api_credentials',
+            name: 'API Credentials',
             component: AccountApiContainer,
         },
         {
             route: 'ssh',
             path: 'ssh',
-            name: 'navigation.ssh_keys',
+            name: 'SSH Keys',
             component: AccountSSHContainer,
         },
         {
             route: 'activity',
             path: 'activity',
-            name: 'navigation.activity',
+            name: 'Activity',
             component: ActivityLogContainer,
         },
     ],
@@ -136,7 +139,7 @@ const routes: Routes = {
             route: '',
             path: '',
             permission: null,
-            name: 'navigation.home',
+            name: 'Home',
             component: ServerConsoleContainer,
             icon: House,
             end: true,
@@ -145,7 +148,7 @@ const routes: Routes = {
             route: 'files/*',
             path: 'files',
             permission: 'file.*',
-            name: 'navigation.files',
+            name: 'Files',
             component: FileManagerContainer,
             icon: FolderOpen,
             highlightPatterns: [/^\/server\/[^/]+\/files(\/.*)?$/],
@@ -161,7 +164,7 @@ const routes: Routes = {
             route: 'databases/*',
             path: 'databases',
             permission: 'database.*',
-            name: 'navigation.databases',
+            name: 'Databases',
             component: DatabasesContainer,
             icon: Database,
             featureLimit: 'databases',
@@ -171,7 +174,7 @@ const routes: Routes = {
             route: 'backups/*',
             path: 'backups',
             permission: 'backup.*',
-            name: 'navigation.backups',
+            name: 'Backups',
             component: BackupContainer,
             icon: CloudArrowUpIn,
             featureLimit: 'backups',
@@ -181,19 +184,10 @@ const routes: Routes = {
             route: 'network/*',
             path: 'network',
             permission: 'allocation.*',
-            name: 'navigation.networking',
+            name: 'Networking',
             component: NetworkContainer,
             icon: BranchesDown,
             featureLimit: 'network',
-            end: true,
-        },
-        {
-            route: 'users/*',
-            path: 'users',
-            permission: 'user.*',
-            name: 'navigation.users',
-            component: UsersContainer,
-            icon: Persons,
             end: true,
         },
         {
@@ -211,10 +205,19 @@ const routes: Routes = {
             isSubRoute: true,
         },
         {
+            route: 'users/*',
+            path: 'users',
+            permission: 'user.*',
+            name: 'Users',
+            component: UsersContainer,
+            icon: Persons,
+            end: true,
+        },
+        {
             route: 'startup/*',
             path: 'startup',
             permission: ['startup.read', 'startup.update', 'startup.docker-image'],
-            name: 'navigation.startup',
+            name: 'Startup',
             component: StartupContainer,
             icon: Terminal,
             end: true,
@@ -223,7 +226,7 @@ const routes: Routes = {
             route: 'schedules/*',
             path: 'schedules',
             permission: 'schedule.*',
-            name: 'navigation.schedules',
+            name: 'Schedules',
             component: ScheduleContainer,
             icon: ClockArrowRotateLeft,
             highlightPatterns: [/^\/server\/[^/]+\/schedules(\/\d+)?$/],
@@ -239,7 +242,7 @@ const routes: Routes = {
             route: 'settings/*',
             path: 'settings',
             permission: ['settings.*', 'file.sftp'],
-            name: 'navigation.settings',
+            name: 'Settings',
             component: SettingsContainer,
             icon: Gear,
             end: true,
@@ -248,7 +251,7 @@ const routes: Routes = {
             route: 'activity/*',
             path: 'activity',
             permission: 'activity.*',
-            name: 'navigation.activity',
+            name: 'Activity',
             component: ServerActivityLogContainer,
             icon: PencilToLine,
             end: true,
@@ -257,16 +260,17 @@ const routes: Routes = {
             route: 'shell/*',
             path: 'shell',
             permission: 'startup.software',
-            name: 'navigation.software',
+            name: 'Software',
             component: SoftwareContainer,
             icon: Box,
             end: true,
+            requiresSoftware: true,
         },
         {
             route: 'installer/*',
             path: 'installer',
             permission: 'mod.download',
-            name: 'navigation.installer',
+            name: 'Installer',
             component: InstallerContainer,
             icon: ArrowDownToLine,
             end: true,

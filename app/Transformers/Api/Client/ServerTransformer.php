@@ -79,6 +79,7 @@ class ServerTransformer extends BaseClientTransformer
             // This field is deprecated, please use "status".
             'is_installing' => !$server->isInstalled(),
             'is_transferring' => !is_null($server->transfer),
+            'software_enabled' => is_null($server->software_enabled) ? true : (bool) $server->software_enabled,
             'daemon_type' => $server->node->daemonType,
             'backup_disk' => $server->node->backupDisk,
             'groups' => $server->group ? [

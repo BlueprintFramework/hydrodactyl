@@ -12,6 +12,9 @@ class AssetComposer
 {
     use AvailableLanguages;
 
+    /** @var array<string, bool> Per-request filesystem existence cache. */
+    private static array $storageExistsCache = [];
+
     protected CaptchaManager $captcha;
     protected SettingsRepositoryInterface $settings;
 
@@ -29,10 +32,14 @@ class AssetComposer
         $logoType = config('app.logo.type');
         $logoValue = config('app.logo.value');
         $logoUrl = match ($logoType) {
-            'upload' => ($logoValue && Storage::disk('public')->exists($logoValue)) ? url('storage/' . $logoValue) : null,
+            'upload' => ($logoValue && $this->storageExists($logoValue)) ? url('storage/' . $logoValue) : null,
             'link' => $logoValue,
             default => null,
         };
+
+        // Resolve the captcha provider once and reuse the driver instance.
+        $provider = $this->captcha->getDefaultDriver();
+        $driver = $provider !== 'none' ? $this->captcha->driver() : null;
 
         $view->with('siteConfiguration', [
             'name' => config('app.name') ?? 'Hydrodactyl',
@@ -41,65 +48,29 @@ class AssetComposer
             'logo' => $logoUrl,
             'customNavItems' => $this->getCustomNavItems(),
             'locales' => collect($this->getAvailableLanguages(true))
-              ->map(fn ($name, $code) => ['code' => $code, 'name' => $name])
-              ->values()
-              ->all(),
+                ->map(fn ($name, $code) => ['code' => $code, 'name' => $name])
+                ->values()
+                ->all(),
             'captcha' => [
-                'enabled' => $this->captcha->getDefaultDriver() !== 'none',
-                'provider' => $this->captcha->getDefaultDriver(),
-                'siteKey' => $this->getSiteKeyForCurrentProvider(),
-                'serverUrl' => $this->getServerUrlForCurrentProvider(),
+                'enabled' => $provider !== 'none',
+                'provider' => $provider,
+                'siteKey' => !is_null($driver) && method_exists($driver, 'getSiteKey') ? $driver->getSiteKey() : '',
+                'serverUrl' => !is_null($driver) && method_exists($driver, 'getServerUrl') ? $driver->getServerUrl() : '',
                 'scriptIncludes' => $this->captcha->getScriptIncludes(),
             ],
         ]);
     }
 
     /**
-     * Get the server URL for the currently active captcha provider.
-     *
-     * Only Cap needs a server URL; other providers return an empty string.
+     * Memoize a Storage::exists() check for the duration of the request.
      */
-    private function getServerUrlForCurrentProvider(): string
+    private function storageExists(string $path): bool
     {
-        $provider = $this->captcha->getDefaultDriver();
-
-        if ($provider === 'none') {
-            return '';
+        if (!array_key_exists($path, self::$storageExistsCache)) {
+            self::$storageExistsCache[$path] = Storage::disk('public')->exists($path);
         }
 
-        try {
-            $driver = $this->captcha->driver();
-            if (method_exists($driver, 'getServerUrl')) {
-                return $driver->getServerUrl();
-            }
-        } catch (\Exception $e) {
-            // Silently fail to avoid exposing errors to frontend
-        }
-
-        return '';
-    }
-
-    /**
-     * Get the site key for the currently active captcha provider.
-     */
-    private function getSiteKeyForCurrentProvider(): string
-    {
-        $provider = $this->captcha->getDefaultDriver();
-
-        if ($provider === 'none') {
-            return '';
-        }
-
-        try {
-            $driver = $this->captcha->driver();
-            if (method_exists($driver, 'getSiteKey')) {
-                return $driver->getSiteKey();
-            }
-        } catch (\Exception $e) {
-            // Silently fail to avoid exposing errors to frontend
-        }
-
-        return '';
+        return self::$storageExistsCache[$path];
     }
 
     private function getCustomNavItems(): array
@@ -111,24 +82,24 @@ class AssetComposer
         }
 
         return collect($items)
-          ->take(3)
-          ->map(function (array $item): ?array {
-              $label = trim((string) ($item['label'] ?? ''));
-              $url = trim((string) ($item['url'] ?? ''));
-              $icon = trim((string) ($item['icon'] ?? 'link'));
+            ->take(3)
+            ->map(function (array $item): ?array {
+                $label = trim((string) ($item['label'] ?? ''));
+                $url = trim((string) ($item['url'] ?? ''));
+                $icon = trim((string) ($item['icon'] ?? 'link'));
 
-              if ($label === '' || $url === '') {
-                  return null;
-              }
+                if ($label === '' || $url === '') {
+                    return null;
+                }
 
-              return [
-                  'label' => $label,
-                  'url' => $url,
-                  'icon' => $icon !== '' ? $icon : 'link',
-              ];
-          })
-          ->filter()
-          ->values()
-          ->toArray();
+                return [
+                    'label' => $label,
+                    'url' => $url,
+                    'icon' => $icon !== '' ? $icon : 'link',
+                ];
+            })
+            ->filter()
+            ->values()
+            ->toArray();
     }
 }

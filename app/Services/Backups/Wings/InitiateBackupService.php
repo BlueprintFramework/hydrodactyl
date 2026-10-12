@@ -89,10 +89,11 @@ class InitiateBackupService
         // Check if the server has reached or exceeded its backup limit.
         // completed_at == null will cover any ongoing backups, while is_successful == true will cover any completed backups.
         $successful = $this->repository->getNonFailedBackups($server);
+        $successfulCount = $successful->count();
         if ($server->backup_limit == null) {
-            $server->backup_limit = $successful->count() + 1;
+            $server->backup_limit = $successfulCount + 1;
         };
-        if (!$server->backup_limit || $successful->count() >= $server->backup_limit) {
+        if (!$server->backup_limit || $successfulCount >= $server->backup_limit) {
             // Do not allow the user to continue if this server is already at its limit and can't override.
             if ($server->backup_limit == null) {
                 $server->backup_limit = 12;

@@ -1,4 +1,4 @@
-import { ChevronDown, Funnel, Magnifier, TrashBin } from '@gravity-ui/icons';
+import { ChevronDown, Magnifier, TrashBin } from '@gravity-ui/icons';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -11,20 +11,13 @@ import type {
     MarketplaceType,
 } from '@/api/server/marketplace';
 import { getMarketplaceGameVersions, getMarketplaceLoaders, searchMarketplace } from '@/api/server/marketplace';
+import Dropdown from '@/components/elements/Dropdown';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { useTranslation } from '@/i18n/I18nProvider';
-import type { TranslationKey } from '@/i18n/types';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { ServerContext } from '@/state/server';
 import { destinationFolder, isMinecraftCapable, loadersFor } from './eggFeatures';
@@ -33,9 +26,9 @@ import { type InstalledEntry, type InstalledItem, readAllInstalled, removeInstal
 import { sourceLabel } from './sources';
 import VersionPicker from './VersionPicker';
 
-const TABS: { key: MarketplaceType; label: TranslationKey; hint: TranslationKey }[] = [
-    { key: 'plugin', label: 'server.installer.plugins', hint: 'server.installer.tab_plugins_hint' },
-    { key: 'mod', label: 'server.installer.mods', hint: 'server.installer.tab_mods_hint' },
+const TABS: { key: MarketplaceType; label: string; hint: string }[] = [
+    { key: 'plugin', label: 'Plugins', hint: 'Install server plugins into /plugins' },
+    { key: 'mod', label: 'Mods', hint: 'Install mods into /mods' },
 ];
 
 const PAGE_SIZE = 24;
@@ -70,7 +63,6 @@ const VersionDropdown = ({
     value: string | null;
     onChange: (v: string | null) => void;
 }) => {
-    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [filter, setFilter] = useState('');
     const parentRef = useRef<HTMLDivElement>(null);
@@ -101,7 +93,7 @@ const VersionDropdown = ({
                     type='button'
                     className='inline-flex items-center gap-2 rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 text-sm text-cream-400 focus:border-brand-400/60 focus:outline-none'
                 >
-                    {value ?? t('server.installer.any')}
+                    {value ?? 'Any'}
                     <ChevronDown width={14} height={14} fill='currentColor' className='text-cream-400/40' />
                 </button>
             </DropdownMenuTrigger>
@@ -109,7 +101,7 @@ const VersionDropdown = ({
                 <div className='shrink-0 border-b border-mocha-400 p-2'>
                     <input
                         type='text'
-                        placeholder={t('server.installer.filter_versions_placeholder')}
+                        placeholder='Filter versions…'
                         className='w-full rounded-lg border border-mocha-400 bg-mocha-500 px-2 py-1 text-xs text-cream-400 placeholder:text-cream-400/40 focus:outline-none'
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
@@ -160,7 +152,6 @@ interface PickerCtx {
 }
 
 const InstallerContainer = () => {
-    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const eggFeatures = ServerContext.useStoreState((state) => state.server.data?.eggFeatures ?? []);
     const variables = ServerContext.useStoreState((state) => state.server.data?.variables ?? []);
@@ -338,7 +329,7 @@ const InstallerContainer = () => {
                 })
                 .catch((err) => {
                     if (id !== requestId.current) return;
-                    setError(httpErrorToHuman(err) || t('server.installer.error_search'));
+                    setError(httpErrorToHuman(err) || 'Failed to search the marketplace.');
                     setResults([]);
                     setHasMore(false);
                 })
@@ -348,7 +339,7 @@ const InstallerContainer = () => {
         }, 350);
 
         return () => clearTimeout(handle);
-    }, [uuid, tab, source, query, loader, gameVersion, t]);
+    }, [uuid, tab, source, query, loader, gameVersion]);
 
     const loadMore = useCallback(() => {
         if (!uuid || loadingMore || !hasMore) return;
@@ -370,9 +361,9 @@ const InstallerContainer = () => {
                 setResults((prev) => [...prev, ...fresh]);
                 setHasMore(fresh.length >= PAGE_SIZE);
             })
-            .catch((err) => toast.error(httpErrorToHuman(err) || t('server.installer.error_load_more')))
+            .catch((err) => toast.error(httpErrorToHuman(err) || 'Failed to load more results.'))
             .finally(() => setLoadingMore(false));
-    }, [uuid, loadingMore, hasMore, results, tab, source, query, loader, gameVersion, t]);
+    }, [uuid, loadingMore, hasMore, results, tab, source, query, loader, gameVersion]);
 
     const tabLoaders = useMemo(() => loadersFor(eggFeatures, tab, knownLoaders), [eggFeatures, tab, knownLoaders]);
 
@@ -384,10 +375,10 @@ const InstallerContainer = () => {
 
     const onInstalled = useCallback(
         (filename: string) => {
-            toast.success(t('server.installer.install_complete', { filename }));
+            toast.success(`${filename} installed. Restart your server to load it.`);
             refreshInstalled();
         },
-        [refreshInstalled, t],
+        [refreshInstalled],
     );
 
     const uninstall = useCallback(
@@ -399,15 +390,15 @@ const InstallerContainer = () => {
                 const dir = destinationFolder(item.type);
                 await deleteFiles(uuid, dir, [item.entry.filename]);
                 await removeInstall(uuid, dir, item.source, item.projectId);
-                toast.success(t('server.installer.remove_success', { filename: item.entry.filename }));
+                toast.success(`Removed ${item.entry.filename}`);
                 refreshInstalled();
             } catch (err) {
-                toast.error(httpErrorToHuman(err) || t('server.installer.error_remove'));
+                toast.error(httpErrorToHuman(err) || 'Failed to remove the file.');
             } finally {
                 setRemovingKey(null);
             }
         },
-        [uuid, refreshInstalled, t],
+        [uuid, refreshInstalled],
     );
 
     const pickerInstalledEntry = useMemo(() => {
@@ -421,11 +412,14 @@ const InstallerContainer = () => {
     }
 
     return (
-        <ServerContentBlock title={t('server.installer.title')}>
+        <ServerContentBlock title='Installer'>
             <ServerHeader />
             <div className='space-y-6'>
-                <MainPageHeader direction='column' title={t('server.installer.title_plugins_mods')}>
-                    <p className='text-cream-400/60'>{t('server.installer.description')}</p>
+                <MainPageHeader direction='column' title='Plugins & Mods'>
+                    <p className='text-cream-400/60'>
+                        Browse and install plugins and mods straight onto your server. Files are downloaded directly on
+                        the daemon and placed into the correct folder.
+                    </p>
                 </MainPageHeader>
 
                 <div className='inline-flex rounded-xl border border-mocha-300/50 bg-mocha-400/50 p-1'>
@@ -435,15 +429,13 @@ const InstallerContainer = () => {
                             type='button'
                             onClick={() => setView(v)}
                             className={cn(
-                                'rounded-lg px-4 py-2 text-sm font-medium transition',
+                                'rounded-lg px-4 py-2 text-sm font-medium capitalize transition',
                                 view === v
                                     ? 'bg-brand-400/70 text-mocha-500'
                                     : 'text-cream-400/70 hover:bg-mocha-300/40',
                             )}
                         >
-                            {v === 'installed'
-                                ? t('server.installer.installed_count', { count: installedItems.length })
-                                : t('server.installer.browse')}
+                            {v === 'installed' ? `Installed (${installedItems.length})` : 'Browse'}
                         </button>
                     ))}
                 </div>
@@ -455,7 +447,7 @@ const InstallerContainer = () => {
                                 <button
                                     key={entry.key}
                                     type='button'
-                                    title={t(entry.hint)}
+                                    title={entry.hint}
                                     onClick={() => setTab(entry.key)}
                                     className={cn(
                                         'rounded-lg px-4 py-2 text-sm font-medium transition',
@@ -464,7 +456,7 @@ const InstallerContainer = () => {
                                             : 'text-cream-400/70 hover:bg-mocha-300/40',
                                     )}
                                 >
-                                    {t(entry.label)}
+                                    {entry.label}
                                 </button>
                             ))}
                         </div>
@@ -481,109 +473,53 @@ const InstallerContainer = () => {
                                     type='text'
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
-                                    placeholder={
-                                        tab === 'plugin'
-                                            ? t('server.installer.search_plugins_placeholder')
-                                            : t('server.installer.search_mods_placeholder')
-                                    }
+                                    placeholder={`Search ${tab === 'plugin' ? 'plugins' : 'mods'}…`}
                                     className='w-full rounded-xl border border-mocha-300/50 bg-mocha-400/50 py-3 pl-11 pr-4 text-sm text-cream-400 placeholder:text-cream-400/40 focus:border-brand-400/60 focus:outline-none'
                                 />
                             </div>
 
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <button
-                                        type='button'
-                                        className='inline-flex items-center gap-2 rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 text-sm text-cream-400 focus:border-brand-400/60 focus:outline-none'
-                                    >
-                                        {source === ALL_PROVIDERS
-                                            ? t('server.installer.all_providers')
-                                            : sourceLabel(source)}
-                                        <ChevronDown
-                                            width={14}
-                                            height={14}
-                                            fill='currentColor'
-                                            className='text-cream-400/40'
-                                        />
-                                    </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align='end'>
-                                    <DropdownMenuRadioGroup value={source} onValueChange={setSource}>
-                                        <DropdownMenuRadioItem value={ALL_PROVIDERS}>
-                                            {t('server.installer.all_providers')}
-                                        </DropdownMenuRadioItem>
-                                        {sources.map((s) => (
-                                            <DropdownMenuRadioItem key={s.key} value={s.key}>
-                                                {sourceLabel(s.key)}
-                                            </DropdownMenuRadioItem>
-                                        ))}
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <Dropdown
+                                value={source}
+                                onChange={setSource}
+                                triggerClassName='w-auto rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 hover:bg-mocha-400/50'
+                                options={[
+                                    { value: ALL_PROVIDERS, label: 'All Providers' },
+                                    ...sources.map((s) => ({ value: s.key, label: sourceLabel(s.key) })),
+                                ]}
+                            />
 
                             {tabLoaders.length > 1 && (
-                                <div className='flex items-center gap-2 rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-2'>
-                                    <Funnel width={16} height={16} fill='currentColor' className='text-cream-400/40' />
-                                    <select
-                                        value={loader ?? ''}
-                                        onChange={(e) => setLoader(e.target.value || null)}
-                                        className='bg-transparent text-sm text-cream-400 focus:outline-none'
-                                        aria-label={t('server.installer.loader')}
-                                    >
-                                        {tabLoaders.map((l) => (
-                                            <option key={l} value={l} className='bg-mocha-500'>
-                                                {l}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <Dropdown
+                                    value={loader ?? ''}
+                                    onChange={(value) => setLoader(value || null)}
+                                    triggerClassName='w-auto rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 hover:bg-mocha-400/50'
+                                    options={tabLoaders.map((l) => ({ value: l, label: l }))}
+                                />
                             )}
 
                             {Object.keys(gameVersions).length > 0 && (
                                 <>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <button
-                                                type='button'
-                                                className='inline-flex items-center gap-2 rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 text-sm text-cream-400 focus:border-brand-400/60 focus:outline-none'
-                                            >
-                                                {releaseType.charAt(0).toUpperCase() + releaseType.slice(1)}
-                                                <ChevronDown
-                                                    width={14}
-                                                    height={14}
-                                                    fill='currentColor'
-                                                    className='text-cream-400/40'
-                                                />
-                                            </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align='end'>
-                                            <DropdownMenuRadioGroup
-                                                value={releaseType}
-                                                onValueChange={(t) => {
-                                                    setReleaseType(t);
-                                                    setGameVersion((gameVersions[t] ?? [])[0] ?? null);
-                                                }}
-                                            >
-                                                {['release', 'snapshot', 'beta', 'alpha']
-                                                    .filter((t) => gameVersions[t])
-                                                    .concat(
-                                                        Object.keys(gameVersions)
-                                                            .filter(
-                                                                (t) =>
-                                                                    !['release', 'snapshot', 'beta', 'alpha'].includes(
-                                                                        t,
-                                                                    ),
-                                                            )
-                                                            .sort(),
+                                    <Dropdown
+                                        value={releaseType}
+                                        onChange={(t) => {
+                                            setReleaseType(t);
+                                            setGameVersion((gameVersions[t] ?? [])[0] ?? null);
+                                        }}
+                                        triggerClassName='w-auto rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 hover:bg-mocha-400/50'
+                                        options={['release', 'snapshot', 'beta', 'alpha']
+                                            .filter((t) => gameVersions[t])
+                                            .concat(
+                                                Object.keys(gameVersions)
+                                                    .filter(
+                                                        (t) => !['release', 'snapshot', 'beta', 'alpha'].includes(t),
                                                     )
-                                                    .map((t) => (
-                                                        <DropdownMenuRadioItem key={t} value={t}>
-                                                            {t.charAt(0).toUpperCase() + t.slice(1)}
-                                                        </DropdownMenuRadioItem>
-                                                    ))}
-                                            </DropdownMenuRadioGroup>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                                    .sort(),
+                                            )
+                                            .map((t) => ({
+                                                value: t,
+                                                label: t.charAt(0).toUpperCase() + t.slice(1),
+                                            }))}
+                                    />
 
                                     <VersionDropdown
                                         versions={gameVersions[releaseType] ?? []}
@@ -603,13 +539,11 @@ const InstallerContainer = () => {
                         {loading && results.length === 0 ? (
                             <div className='flex items-center justify-center gap-2 py-20 text-cream-400/60'>
                                 <Spinner size='small' />
-                                <span className='text-sm'>{t('server.installer.loading')}</span>
+                                <span className='text-sm'>Loading…</span>
                             </div>
                         ) : results.length === 0 && !error ? (
                             <div className='rounded-2xl border border-mocha-300/50 bg-mocha-400/50 py-20 text-center text-cream-400/60'>
-                                {query.trim()
-                                    ? t('server.installer.no_results')
-                                    : t('server.installer.nothing_to_show')}
+                                {query.trim() ? 'No results. Try a different search.' : 'Nothing to show right now.'}
                             </div>
                         ) : (
                             <>
@@ -633,9 +567,7 @@ const InstallerContainer = () => {
                                             className='gap-2'
                                         >
                                             {loadingMore && <Spinner size='small' />}
-                                            {loadingMore
-                                                ? t('server.installer.loading')
-                                                : t('server.installer.load_more')}
+                                            {loadingMore ? 'Loading…' : 'Load more'}
                                         </Button>
                                     </div>
                                 )}
@@ -648,7 +580,7 @@ const InstallerContainer = () => {
                     <div className='space-y-3'>
                         {installedItems.length === 0 ? (
                             <div className='rounded-2xl border border-mocha-300/50 bg-mocha-400/50 py-16 text-center text-cream-400/60'>
-                                {t('server.installer.empty_installed')}
+                                You have not installed any plugins or mods yet. Switch to Browse to get started.
                             </div>
                         ) : (
                             installedItems.map((item) => {
@@ -708,7 +640,7 @@ const InstallerContainer = () => {
                                                     )
                                                 }
                                             >
-                                                {t('server.installer.manage')}
+                                                Manage
                                             </Button>
                                             <Button
                                                 size='sm'

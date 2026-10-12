@@ -29,7 +29,7 @@ class ApiKeyController extends ClientApiController
      */
     public function store(StoreApiKeyRequest $request): array
     {
-        if ($request->user()->apiKeys->count() >= 25) {
+        if ($request->user()->apiKeys()->count() >= 25) {
             throw new DisplayException(__('exceptions.client.api_keys.limit_reached'));
         }
 

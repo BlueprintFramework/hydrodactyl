@@ -8,16 +8,16 @@ export const StatusPillHeader = () => {
     const status = ServerContext.useStoreState((state) => state.status.value);
 
     return (
-        <div className={cn('relative transition rounded-full flex items-center')}>
+        <div className='relative h-4 w-4 shrink-0'>
             <div
                 className={cn(
-                    'transition rounded-full h-4 w-4',
+                    'absolute inset-0 rounded-full transition',
                     status === 'offline' ? 'bg-red-500' : status === 'running' ? 'bg-green-500' : 'bg-yellow-500',
                 )}
             ></div>
             <div
                 className={cn(
-                    'transition rounded-full h-4 w-4 animate-ping absolute opacity-45',
+                    'absolute inset-0 animate-ping rounded-full opacity-45 transition',
                     status === 'offline' ? 'hidden' : status === 'running' ? 'bg-green-500' : 'bg-yellow-500',
                 )}
             ></div>

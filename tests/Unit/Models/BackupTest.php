@@ -3,8 +3,8 @@
 namespace Pterodactyl\Tests\Unit\Models;
 
 use Pterodactyl\Models\Backup;
-use Pterodactyl\Enums\BackupAdapter;
 use Pterodactyl\Tests\TestCase;
+use Pterodactyl\Enums\BackupAdapter;
 
 class BackupTest extends TestCase
 {
@@ -42,6 +42,32 @@ class BackupTest extends TestCase
     {
         $backup = new Backup(['disk' => BackupAdapter::RusticLocal]);
         $this->assertTrue($backup->isLocal());
+    }
+
+    public function testCalagopusAdaptersRoundTripFromTheirStringValues()
+    {
+        $adapters = [
+            'ddup-bak' => BackupAdapter::DdupBak,
+            'btrfs' => BackupAdapter::Btrfs,
+            'zfs' => BackupAdapter::Zfs,
+            'restic' => BackupAdapter::Restic,
+            'proxmox-backup-server' => BackupAdapter::Pbs,
+            'kopia' => BackupAdapter::Kopia,
+        ];
+
+        foreach ($adapters as $value => $adapter) {
+            $backup = new Backup(['disk' => $value]);
+
+            $this->assertSame($adapter, $backup->disk);
+            $this->assertTrue($backup->disk->isCalagopus());
+        }
+    }
+
+    public function testIsLocalReturnsTrueForCalagopusLocalDrivers()
+    {
+        foreach ([BackupAdapter::DdupBak, BackupAdapter::Btrfs, BackupAdapter::Zfs] as $adapter) {
+            $this->assertTrue((new Backup(['disk' => $adapter]))->isLocal());
+        }
     }
 
     public function testGetRepositoryTypeReturnsLocalForRusticLocal()

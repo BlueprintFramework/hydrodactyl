@@ -29,6 +29,10 @@ class AdvancedSettingsFormRequest extends AdminFormRequest
         'gt:pterodactyl:client_features:allocations:range_start',
       ],
       'pterodactyl:client_features:groups:enabled' => 'required|in:true,false',
+      'pterodactyl:client_features:schedules:per_schedule_task_limit' => 'required|integer|between:1,100',
+      'pterodactyl:client_features:schedules:stuck_timeout' => 'required|integer|between:901,86400',
+      'pterodactyl:client_features:resource_history:enabled' => 'required|in:true,false',
+      'pterodactyl:client_features:resource_history:samples' => 'required|integer|between:20,2147483647',
     ];
   }
 
@@ -41,6 +45,10 @@ class AdvancedSettingsFormRequest extends AdminFormRequest
       'pterodactyl:client_features:allocations:range_start' => __('validation.attributes.pterodactyl:client_features:allocations:range_start'),
       'pterodactyl:client_features:allocations:range_end' => __('validation.attributes.pterodactyl:client_features:allocations:range_end'),
       'pterodactyl:client_features:groups:enabled' => __('validation.attributes.pterodactyl:client_features:groups:enabled'),
+      'pterodactyl:client_features:schedules:per_schedule_task_limit' => __('validation.attributes.pterodactyl:client_features:schedules:per_schedule_task_limit'),
+      'pterodactyl:client_features:schedules:stuck_timeout' => __('validation.attributes.pterodactyl:client_features:schedules:stuck_timeout'),
+      'pterodactyl:client_features:resource_history:enabled' => __('validation.attributes.pterodactyl:client_features:resource_history:enabled'),
+      'pterodactyl:client_features:resource_history:samples' => __('validation.attributes.pterodactyl:client_features:resource_history:samples'),
     ];
   }
 }

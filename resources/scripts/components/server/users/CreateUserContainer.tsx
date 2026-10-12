@@ -1,53 +1,47 @@
-import { ChevronLeft } from '@gravity-ui/icons';
+import { Person } from '@gravity-ui/icons';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import UserFormComponent from '@/components/server/users/UserFormComponent';
-import { Button } from '@/components/ui/button';
-import { useTranslation } from '@/i18n/I18nProvider';
 import { ServerContext } from '@/state/server';
 
 const CreateUserContainer = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [identifier, setIdentifier] = useState('');
 
     const serverId = ServerContext.useStoreState((state) => state.server.data?.id);
+    const trimmed = identifier.trim();
+    const isEmail = trimmed.includes('@');
 
-    const handleSuccess = () => {
-        navigate(`/server/${serverId}/users`);
-    };
-
-    const handleCancel = () => {
-        navigate(`/server/${serverId}/users`);
-    };
+    const back = () => navigate(`/server/${serverId}/users`);
 
     return (
-        <ServerContentBlock title={t('server.users.create_title')} className='p-0!' showFlashKey={'users'}>
+        <ServerContentBlock title={'Invite User'} className='p-0!' showFlashKey={'users'}>
             <ServerHeader />
-            <div className='px-2 pt-2 sm:px-14 sm:pt-14 flex flex-col sm:flex-row items-center gap-4'>
-                <div className='flex gap-2'>
-                    <Button
-                        variant='secondary'
-                        onClick={() => navigate(`/server/${serverId}/users`)}
-                        className='gap-2'
-                        disabled={isSubmitting}
-                    >
-                        <ChevronLeft width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                        {t('server.users.back_to_users')}
-                    </Button>
+            <div className='flex flex-col gap-8 px-4 py-8 sm:px-14 sm:py-14'>
+                <div className='flex items-center gap-4 rounded-xl border border-[#ffffff10] bg-[#ffffff08] px-4 py-4'>
+                    <div className='flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#ffffff11]'>
+                        <Person width={22} height={22} fill='currentColor' className='text-zinc-400' />
+                    </div>
+                    <div className='min-w-0'>
+                        <h1 className='truncate text-sm font-medium text-zinc-100'>{trimmed || 'New user'}</h1>
+                        <p className='mt-1 truncate text-xs text-zinc-400'>
+                            {trimmed
+                                ? isEmail
+                                    ? 'Inviting by email'
+                                    : 'Adding an existing username'
+                                : 'Enter a username or email below.'}
+                        </p>
+                    </div>
                 </div>
-            </div>
-
-            <div className='px-2 sm:px-14 pt-6'>
-                <h1 className='text-[52px] font-extrabold leading-[98%] tracking-[-0.14rem] mb-8'>
-                    {t('server.users.create_heading')}
-                </h1>
                 <UserFormComponent
-                    onSuccess={handleSuccess}
-                    onCancel={handleCancel}
+                    identifier={identifier}
+                    onIdentifierChange={setIdentifier}
+                    onSuccess={back}
+                    onCancel={back}
                     flashKey='user:create'
                     isSubmitting={isSubmitting}
                     setIsSubmitting={setIsSubmitting}

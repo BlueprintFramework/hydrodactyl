@@ -90,12 +90,8 @@ class NodeRepository extends EloquentRepository implements NodeRepositoryInterfa
             $node->load('location');
         }
 
-        // This is quite ugly and can probably be improved down the road.
-        // And by probably, I mean it should.
         if (is_null($node->servers_count) || $refresh) {
-            $node->load('servers');
-            $node->setRelation('servers_count', count($node->getRelation('servers')));
-            unset($node->servers);
+            $node->loadCount('servers');
         }
 
         return $node;
@@ -140,24 +136,26 @@ class NodeRepository extends EloquentRepository implements NodeRepositoryInterfa
      */
     public function getNodesForServerCreation(): Collection
     {
-        return $this->getBuilder()->with('allocations')->get()->map(function (Node $item) {
-            $filtered = $item->getRelation('allocations')->where('server_id', null)->map(function ($map) {
-                return collect($map)->only(['id', 'ip', 'port']);
-            });
+        // Large nodes can have huge allocation lists; filter them in the query instead.
+        return $this->getBuilder()
+            ->with(['allocations' => function ($query) {
+                $query->whereNull('server_id')->select(['id', 'node_id', 'ip', 'port']);
+            }])
+            ->get()
+            ->map(function (Node $item) {
+                $ports = $item->getRelation('allocations')->map(function ($allocation) {
+                    return [
+                        'id' => $allocation->id,
+                        'text' => sprintf('%s:%s', $allocation->ip, $allocation->port),
+                    ];
+                })->values();
 
-            $item->ports = $filtered->map(function ($map) {
                 return [
-                    'id' => $map['id'],
-                    'text' => sprintf('%s:%s', $map['ip'], $map['port']),
+                    'id' => $item->id,
+                    'text' => $item->name,
+                    'allocations' => $ports,
                 ];
             })->values();
-
-            return [
-                'id' => $item->id,
-                'text' => $item->name,
-                'allocations' => $item->ports,
-            ];
-        })->values();
     }
 
     /**

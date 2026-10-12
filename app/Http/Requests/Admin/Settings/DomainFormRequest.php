@@ -21,7 +21,7 @@ class DomainFormRequest extends AdminFormRequest
                 'regex:/^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/',
                 $domainId ? "unique:domains,name,{$domainId}" : 'unique:domains,name',
             ],
-            'dns_provider' => 'required|string|in:cloudflare,hetzner,route53,bunny',
+            'dns_provider' => 'required|string|in:cloudflare,hetzner,route53,bunny,spaceship,marque',
             'dns_config' => 'required|array',
             'dns_config.api_token' => 'required_if:dns_provider,cloudflare,hetzner|string|min:1',
             'dns_config.access_key_id' => 'required_if:dns_provider,route53|string|min:1',
@@ -29,7 +29,12 @@ class DomainFormRequest extends AdminFormRequest
             'dns_config.region' => 'sometimes|string|min:1',
             'dns_config.hosted_zone_id' => 'sometimes|string|min:1',
             'dns_config.zone_id' => 'sometimes|string|min:1',
-            'dns_config.api_key' => 'required_if:dns_provider,bunny|string|min:1',
+            'dns_config.session_id' => 'sometimes|nullable|uuid',
+            'dns_config.identifier' => 'sometimes|nullable|string',
+            'dns_config.app_password' => 'sometimes|nullable|string',
+            'dns_config.pds_url' => 'sometimes|nullable|string',
+            'dns_config.api_key' => 'required_if:dns_provider,bunny,spaceship|string|min:1',
+            'dns_config.api_secret' => 'required_if:dns_provider,spaceship|string|min:1',
             'is_active' => 'sometimes|boolean',
             'is_default' => 'sometimes|boolean',
         ];
@@ -51,6 +56,7 @@ class DomainFormRequest extends AdminFormRequest
             'dns_config.access_key_id.required_if' => __('validation.json_api.dns_access_key_id_required'),
             'dns_config.secret_access_key.required_if' => __('validation.json_api.dns_secret_access_key_required'),
             'dns_config.api_key.required_if' => __('validation.json_api.dns_api_key_required'),
+            'dns_config.api_secret.required_if' => __('validation.json_api.dns_api_secret_required'),
         ];
     }
 
@@ -67,7 +73,12 @@ class DomainFormRequest extends AdminFormRequest
             'dns_config.secret_access_key' => __('validation.attributes.dns_config.secret_access_key'),
             'dns_config.region' => __('validation.attributes.dns_config.region'),
             'dns_config.hosted_zone_id' => __('validation.attributes.dns_config.hosted_zone_id'),
+            'dns_config.session_id' => __('validation.attributes.dns_config.session_id'),
+            'dns_config.identifier' => __('validation.attributes.dns_config.identifier'),
+            'dns_config.app_password' => __('validation.attributes.dns_config.app_password'),
+            'dns_config.pds_url' => __('validation.attributes.dns_config.pds_url'),
             'dns_config.api_key' => __('validation.attributes.dns_config.api_key'),
+            'dns_config.api_secret' => __('validation.attributes.dns_config.api_secret'),
         ];
     }
 

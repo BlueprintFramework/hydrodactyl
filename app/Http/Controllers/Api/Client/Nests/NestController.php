@@ -23,7 +23,7 @@ class NestController extends ClientApiController
      */
     public function index(): array
     {
-        $nests = $this->repository->all();
+        $nests = $this->repository->getWithEggs();
 
         return $this->fractal->collection($nests)
         ->transformWith($this->getTransformer(NestTransformer::class))

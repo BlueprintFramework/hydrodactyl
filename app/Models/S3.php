@@ -117,7 +117,7 @@ class S3 extends Model
             'region' => $this->region ?: 'us-east-1',
             'endpoint' => $this->endpoint,
             'force_path_style' => $this->use_path_style_endpoint,
-            'prefix' => env('RUSTIC_S3_PREFIX', 'rustic-repos/'),
+            'prefix' => config('backups.disks.rustic_s3.prefix', 'rustic-repos/'),
         ];
     }
 }

@@ -13,9 +13,10 @@ interface RenderedNavItem {
     lastItem?: boolean;
     permission?: string | string[];
     onNavClick?: () => void;
+    hardNav?: boolean;
 }
 
-const NavItem = memo(({ to, icon, text, itemRef, end, permission, onNavClick }: RenderedNavItem) => {
+const NavItem = memo(({ to, icon, text, itemRef, end, permission, onNavClick, hardNav }: RenderedNavItem) => {
     const isExternal = /^https?:\/\//i.test(to);
     const className = 'nav-item flex items-center duration-200 select-none font-medium relative opacity-40 ';
     const content = (
@@ -35,6 +36,10 @@ const NavItem = memo(({ to, icon, text, itemRef, end, permission, onNavClick }: 
             rel='noreferrer'
             title={text}
         >
+            {content}
+        </a>
+    ) : hardNav ? (
+        <a href={to} className={className} ref={itemRef} draggable={false} onClick={onNavClick}>
             {content}
         </a>
     ) : (

@@ -39,7 +39,7 @@ class S3DeletionServiceTest extends TestCase
             ->andReturn($s3);
 
         $this->serverRepository->shouldReceive('findCountWhere')
-            ->with([['s3_id', '=', 1]])
+            ->with([['bucket', '=', 1]])
             ->andReturn(0);
 
         $this->repository->shouldReceive('delete')
@@ -61,7 +61,7 @@ class S3DeletionServiceTest extends TestCase
             ->andReturn($s3);
 
         $this->serverRepository->shouldReceive('findCountWhere')
-            ->with([['s3_id', '=', 2]])
+            ->with([['bucket', '=', 2]])
             ->andReturn(1);
 
         $this->translator->shouldReceive('get')

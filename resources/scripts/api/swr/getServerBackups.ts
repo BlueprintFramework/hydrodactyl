@@ -61,6 +61,11 @@ export default () => {
         {
             revalidateOnFocus: false,
             revalidateOnReconnect: true,
+            // Wings/Calagopus do not emit live backup progress events, so poll
+            // while a backup is running to pick up its completion (or failure)
+            // without needing a page reload. Polling stops once nothing is pending.
+            refreshInterval: (data) =>
+                data?.items?.some((backup) => !backup.isSuccessful && backup.completedAt === null) ? 3000 : 0,
         },
     );
 };

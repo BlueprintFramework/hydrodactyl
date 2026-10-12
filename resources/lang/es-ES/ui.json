@@ -506,6 +506,7 @@
     "panel": {
         "account_menu": "Menú de cuenta",
         "admin_panel": "Panel de administración",
+        "client_panel": "Panel de cliente",
         "close_menu": "Cerrar menú",
         "command_menu": "Menú de comandos global",
         "home_page": "Página de inicio de {{name}}",
@@ -639,6 +640,7 @@
             "status_cancelled": "Cancelada",
             "status_completed": "Completada",
             "status_failed": "Fallida",
+            "status_in_progress": "En curso…",
             "status_pending": "Pendiente",
             "status_running": "En ejecución ({{progress}} %)",
             "storage_total": "{{used}} en total (repositorio: {{repository}}, heredadas: {{legacy}})",

@@ -3,6 +3,7 @@
 namespace Pterodactyl\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Pterodactyl\Models\Server;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
 class MaintenanceMiddleware
@@ -21,9 +22,9 @@ class MaintenanceMiddleware
     {
         /** @var \Pterodactyl\Models\Server $server */
         $server = $request->attributes->get('server');
-        $node = $server->getRelation('node');
+        $node = $server?->getRelation('node');
 
-        if ($node->maintenance_mode) {
+        if ($node?->maintenance_mode) {
             return $this->response->view('errors.maintenance');
         }
 

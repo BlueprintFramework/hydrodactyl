@@ -1,11 +1,12 @@
 import { ArrowDownToLine, ArrowRotateLeft, Funnel, Magnifier, Xmark } from '@gravity-ui/icons';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useDebounce } from 'use-debounce';
 import { type ActivityLogFilters, useActivityLogs } from '@/api/account/activity';
 import ActivityLogEntry from '@/components/elements/activity/ActivityLogEntry';
+import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
-import Select from '@/components/elements/Select';
 import Spinner from '@/components/elements/Spinner';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import FlashMessageRender from '@/components/FlashMessageRender';
@@ -25,6 +26,7 @@ const ActivityLogContainer = () => {
         sorts: { timestamp: -1 },
     });
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
     const [selectedEventType, setSelectedEventType] = useState('');
     const [showFilters, setShowFilters] = useState(false);
     const [autoRefresh, setAutoRefresh] = useState(false);
@@ -49,13 +51,13 @@ const ActivityLogContainer = () => {
 
         let filtered = data.items;
 
-        if (searchTerm) {
+        if (debouncedSearchTerm) {
             filtered = filtered.filter(
                 (item) =>
-                    item.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    item.ip?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    item.relationships.actor?.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    JSON.stringify(item.properties).toLowerCase().includes(searchTerm.toLowerCase()),
+                    item.event.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                    item.ip?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                    item.relationships.actor?.username?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                    JSON.stringify(item.properties).toLowerCase().includes(debouncedSearchTerm.toLowerCase()),
             );
         }
 
@@ -87,9 +89,9 @@ const ActivityLogContainer = () => {
         }
 
         return { ...data, items: filtered };
-    }, [data, searchTerm, selectedEventType, dateRange]);
+    }, [data, debouncedSearchTerm, selectedEventType, dateRange]);
 
-    const exportLogs = () => {
+    const exportLogs = useCallback(() => {
         if (!filteredData?.items) return;
 
         const csvContent = [
@@ -120,7 +122,7 @@ const ActivityLogContainer = () => {
         a.download = `activity-log-${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         window.URL.revokeObjectURL(url);
-    };
+    }, [filteredData]);
 
     const clearAllFilters = () => {
         setFilters((value) => ({ ...value, filters: {} }));
@@ -155,7 +157,6 @@ const ActivityLogContainer = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-        // biome-ignore lint/correctness/useExhaustiveDependencies: handleKeyDown uses refs for callbacks
     }, [showFilters, autoRefresh, exportLogs]);
 
     useEffect(() => {
@@ -273,25 +274,19 @@ const ActivityLogContainer = () => {
                                     >
                                         {t('account.activity.event_type')}
                                     </label>
-                                    <Select
+                                    <Dropdown
                                         id='activity-event-type'
                                         value={selectedEventType}
-                                        onChange={(e) => setSelectedEventType(e.target.value)}
-                                        className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-zinc-500 transition-colors duration-150'
-                                    >
-                                        <option value='' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            {t('account.activity.all_events')}
-                                        </option>
-                                        {eventTypes.map((type) => (
-                                            <option
-                                                key={type}
-                                                value={type}
-                                                style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
-                                            >
-                                                {activityEventLabel(t, type)}
-                                            </option>
-                                        ))}
-                                    </Select>
+                                        onChange={setSelectedEventType}
+                                        placeholder={t('account.activity.all_events')}
+                                        options={[
+                                            { value: '', label: t('account.activity.all_events') },
+                                            ...eventTypes.map((type) => ({
+                                                value: type,
+                                                label: activityEventLabel(t, type),
+                                            })),
+                                        ]}
+                                    />
                                 </div>
 
                                 <div>
@@ -301,28 +296,18 @@ const ActivityLogContainer = () => {
                                     >
                                         {t('account.activity.time_range')}
                                     </label>
-                                    <Select
+                                    <Dropdown
                                         id='activity-time-range'
                                         value={dateRange}
-                                        onChange={(e) => setDateRange(e.target.value)}
-                                        className='w-full px-3 py-2 bg-zinc-800 border border-zinc-600 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-zinc-500 transition-colors duration-150'
-                                    >
-                                        <option value='all' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            {t('account.activity.all_time')}
-                                        </option>
-                                        <option value='1h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            {t('account.activity.last_hour')}
-                                        </option>
-                                        <option value='24h' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            {t('account.activity.last_24_hours')}
-                                        </option>
-                                        <option value='7d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            {t('account.activity.last_7_days')}
-                                        </option>
-                                        <option value='30d' style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}>
-                                            {t('account.activity.last_30_days')}
-                                        </option>
-                                    </Select>
+                                        onChange={setDateRange}
+                                        options={[
+                                            { value: 'all', label: t('account.activity.all_time') },
+                                            { value: '1h', label: t('account.activity.last_hour') },
+                                            { value: '24h', label: t('account.activity.last_24_hours') },
+                                            { value: '7d', label: t('account.activity.last_7_days') },
+                                            { value: '30d', label: t('account.activity.last_30_days') },
+                                        ]}
+                                    />
                                 </div>
 
                                 <div className='flex items-end'>

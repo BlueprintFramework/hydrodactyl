@@ -1,4 +1,4 @@
-import { ChevronLeft, Person } from '@gravity-ui/icons';
+import { Person } from '@gravity-ui/icons';
 import { type Actions, useStoreActions } from 'easy-peasy';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -8,14 +8,11 @@ import getServerSubusers from '@/api/server/users/getServerSubusers';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import UserFormComponent from '@/components/server/users/UserFormComponent';
-import { Button } from '@/components/ui/button';
-import { useTranslation } from '@/i18n/I18nProvider';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 import type { Subuser } from '@/state/server/subusers';
 
 const EditUserContainer = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,48 +48,52 @@ const EditUserContainer = () => {
         }
     }, [fetching, subuser, subusers, navigate, serverId]);
 
-    const handleBack = () => {
-        navigate(`/server/${serverId}/users`);
-    };
-
+    const back = () => navigate(`/server/${serverId}/users`);
     const isLoading = fetching || (!subuser && subusers.length === 0);
 
     return (
-        <ServerContentBlock title={t('server.users.edit_title')} className='p-0!'>
+        <ServerContentBlock title={'Edit User'} className='p-0!'>
             {subuser && <ServerHeader />}
 
-            <div className='px-2 pt-2 sm:px-14 sm:pt-14 flex flex-col sm:flex-row items-center gap-4'>
-                <div className='flex gap-2'>
-                    <Button variant='secondary' onClick={handleBack} className='gap-2' disabled={isSubmitting}>
-                        <ChevronLeft width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                        {t('server.users.back_to_users')}
-                    </Button>
-                </div>
-            </div>
-
             {isLoading ? (
-                <div className='flex items-center justify-center py-12'>
-                    <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-brand'></div>
+                <div className='flex items-center justify-center py-24'>
+                    <div className='h-6 w-6 animate-spin rounded-full border-b-2 border-brand' />
                 </div>
             ) : !subuser ? (
-                <div className='flex flex-col items-center justify-center min-h-[60vh] py-12 px-4'>
-                    <div className='text-center'>
-                        <div className='w-16 h-16 mx-auto mb-4 rounded-full bg-[#ffffff11] flex items-center justify-center'>
-                            <Person width={22} height={22} className='w-8 h-8 text-zinc-400' fill='currentColor' />
-                        </div>
-                        <h3 className='text-lg font-medium text-zinc-200 mb-2'>{t('server.users.not_found_title')}</h3>
-                        <p className='text-sm text-zinc-400 max-w-sm'>{t('server.users.not_found_description')}</p>
-                    </div>
+                <div className='px-4 py-16 text-center sm:px-14'>
+                    <h1 className='text-sm font-medium text-zinc-100'>User not found</h1>
+                    <p className='mt-1 text-sm text-zinc-400'>That person is not on this server anymore.</p>
                 </div>
             ) : (
-                <div className='px-2 sm:px-14 pt-6'>
-                    <h1 className='text-[52px] font-extrabold leading-[98%] tracking-[-0.14rem] mb-8'>
-                        {t('server.users.edit_heading', { email: subuser.email })}
-                    </h1>
+                <div className='flex flex-col gap-12 px-4 py-8 sm:px-14 sm:py-14'>
+                    <div className='flex items-center gap-4 rounded-xl border border-[#ffffff10] bg-[#ffffff08] px-4 py-4'>
+                        <div className='flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#ffffff11]'>
+                            {subuser.image ? (
+                                <img className='h-full w-full object-cover' src={`${subuser.image}?s=400`} alt='' />
+                            ) : (
+                                <Person width={22} height={22} fill='currentColor' className='text-zinc-400' />
+                            )}
+                        </div>
+                        <div className='min-w-0'>
+                            <div className='flex items-center gap-2'>
+                                <h1 className='truncate text-sm font-medium text-zinc-100'>{subuser.username}</h1>
+                                <span
+                                    className={`shrink-0 rounded px-2 py-0.5 text-xs font-medium ${
+                                        subuser.twoFactorEnabled
+                                            ? 'border border-green-500/30 bg-green-500/20 text-green-300'
+                                            : 'border border-zinc-500/30 bg-zinc-500/20 text-zinc-400'
+                                    }`}
+                                >
+                                    {subuser.twoFactorEnabled ? 'MFA Enabled' : 'MFA Disabled'}
+                                </span>
+                            </div>
+                            <p className='mt-1 truncate text-xs text-zinc-400'>{subuser.email}</p>
+                        </div>
+                    </div>
                     <UserFormComponent
                         subuser={subuser}
-                        onSuccess={handleBack}
-                        onCancel={handleBack}
+                        onSuccess={back}
+                        onCancel={back}
                         flashKey='user:edit'
                         isSubmitting={isSubmitting}
                         setIsSubmitting={setIsSubmitting}

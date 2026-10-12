@@ -21,15 +21,17 @@ interface NavItemData {
     ref: RefObject<HTMLAnchorElement | null>;
     end: boolean;
     permission?: string | string[];
+    hardNav?: boolean;
 }
 
 interface MobileSidebarProps {
     navItems: NavItemData[];
     bottomNavItems?: NavItemData[];
+    admin?: boolean;
 }
 
-const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavItemData[] }>(
-    ({ navItems, bottomNavItems }) => {
+const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavItemData[]; admin?: boolean }>(
+    ({ navItems, bottomNavItems, admin }) => {
         const { setMobileOpen, isMobileOpen } = useSidebar();
         const location = useLocation();
         const { t } = useTranslation();
@@ -77,13 +79,23 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                     data-sidebar-minimized='false'
                 >
                     <div className='mobile-sidebar-logo h-16 flex items-center flex-none'>
-                        <NavLink
-                            to='/'
-                            className='flex h-8 w-fit shrink-0 items-center hydrodactyl-logo'
-                            aria-label={t('panel.home_page', { name: 'Hydrodactyl' })}
-                        >
-                            <Logo className='h-8 w-8 shrink-0 object-contain' />
-                        </NavLink>
+                        {admin ? (
+                            <a
+                                href='/'
+                                className='flex h-8 w-fit shrink-0 items-center hydrodactyl-logo'
+                                aria-label={t('panel.home_page', { name: 'Hydrodactyl' })}
+                            >
+                                <Logo className='h-8 w-8 shrink-0 object-contain' />
+                            </a>
+                        ) : (
+                            <NavLink
+                                to='/'
+                                className='flex h-8 w-fit shrink-0 items-center hydrodactyl-logo'
+                                aria-label={t('panel.home_page', { name: 'Hydrodactyl' })}
+                            >
+                                <Logo className='h-8 w-8 shrink-0 object-contain' />
+                            </NavLink>
+                        )}
                     </div>
 
                     <ul className='flex flex-col text-sm'>
@@ -98,6 +110,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                                     lastItem={index === navItems.length - 1}
                                     permission={item.permission}
                                     onNavClick={() => setMobileOpen(false)}
+                                    hardNav={item.hardNav}
                                 />
                             </li>
                         ))}
@@ -115,6 +128,7 @@ const MobileSidebarPanel = memo<{ navItems: NavItemData[]; bottomNavItems: NavIt
                                         lastItem={index === bottomNavItems.length - 1}
                                         permission={item.permission}
                                         onNavClick={() => setMobileOpen(false)}
+                                        hardNav={item.hardNav}
                                     />
                                 </li>
                             ))}
@@ -146,8 +160,8 @@ const MobileSidebarToggle = memo(() => {
 
 MobileSidebarToggle.displayName = 'MobileSidebarToggle';
 
-export default function MobileSidebar({ navItems, bottomNavItems = [] }: MobileSidebarProps) {
-    return <MobileSidebarPanel navItems={navItems} bottomNavItems={bottomNavItems} />;
+export default function MobileSidebar({ navItems, bottomNavItems = [], admin }: MobileSidebarProps) {
+    return <MobileSidebarPanel navItems={navItems} bottomNavItems={bottomNavItems} admin={admin} />;
 }
 
 export { MobileSidebarToggle };
