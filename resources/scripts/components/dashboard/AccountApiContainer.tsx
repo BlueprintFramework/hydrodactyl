@@ -1,5 +1,4 @@
 import { Eye, EyeSlash, Key, Plus, TrashBin } from '@gravity-ui/icons';
-import { format } from 'date-fns';
 import { type Actions, useStoreActions } from 'easy-peasy';
 import type { FormikHelpers } from 'formik';
 import { lazy, useEffect, useState } from 'react';
@@ -17,6 +16,7 @@ import VirtualizedList from '@/components/elements/VirtualizedList';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
+import { formatDateTime } from '@/lib/formatters';
 import { useFlashKey } from '@/plugins/useFlash';
 import type { ApplicationStore } from '@/state';
 import ServerHeader from '../HeaderManger';
@@ -29,7 +29,7 @@ interface CreateValues {
 }
 
 const AccountApiContainer = () => {
-    const { t, dateFnsLocale } = useTranslation();
+    const { t, locale } = useTranslation();
     const [deleteIdentifier, setDeleteIdentifier] = useState('');
     const [keys, setKeys] = useState<ApiKey[]>([]);
     const [loading, setLoading] = useState(true);
@@ -141,9 +141,7 @@ const AccountApiContainer = () => {
                                             <span>
                                                 {t('account.api_keys.last_used')}{' '}
                                                 {key.lastUsedAt
-                                                    ? format(key.lastUsedAt, 'MMM d, yyyy HH:mm', {
-                                                          locale: dateFnsLocale,
-                                                      })
+                                                    ? formatDateTime(key.lastUsedAt, locale, 'medium')
                                                     : t('common.never')}
                                             </span>
                                             <div className='flex items-center gap-2 hover:cursor-pointer'>

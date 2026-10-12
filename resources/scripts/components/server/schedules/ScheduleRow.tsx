@@ -1,5 +1,4 @@
 import { Calendar, Pencil, TrashBin } from '@gravity-ui/icons';
-import { format } from 'date-fns';
 import { type Actions, useStoreActions } from 'easy-peasy';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +10,7 @@ import { Dialog } from '@/components/elements/dialog';
 import ScheduleCronRow from '@/components/server/schedules/ScheduleCronRow';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
+import { formatDateTime } from '@/lib/formatters';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 
@@ -20,7 +20,7 @@ interface Props {
 }
 
 const ScheduleRow = ({ schedule, onDeleted }: Props) => {
-    const { t, dateFnsLocale } = useTranslation();
+    const { t, locale } = useTranslation();
     const [visible, setVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -57,7 +57,7 @@ const ScheduleRow = ({ schedule, onDeleted }: Props) => {
                             <p className='text-xs text-zinc-400'>
                                 {t('server.schedules.last_run_at')}{' '}
                                 {schedule.lastRunAt
-                                    ? format(schedule.lastRunAt, "MMM do 'at' h:mma", { locale: dateFnsLocale })
+                                    ? formatDateTime(schedule.lastRunAt, locale, 'long')
                                     : t('common.not_available')}
                             </p>
                         </div>

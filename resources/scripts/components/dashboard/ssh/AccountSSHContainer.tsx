@@ -1,5 +1,4 @@
 import { Eye, EyeSlash, Key, Plus, TrashBin } from '@gravity-ui/icons';
-import { format } from 'date-fns';
 import { type Actions, useStoreActions } from 'easy-peasy';
 import { Field, Form, Formik, type FormikHelpers } from 'formik';
 import { useEffect, useState } from 'react';
@@ -17,6 +16,7 @@ import FlashMessageRender from '@/components/FlashMessageRender';
 import ServerHeader from '@/components/HeaderManger';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
+import { formatDateTime } from '@/lib/formatters';
 import { useFlashKey } from '@/plugins/useFlash';
 import type { ApplicationStore } from '@/state';
 
@@ -26,7 +26,7 @@ interface CreateValues {
 }
 
 const AccountSSHContainer = () => {
-    const { t, dateFnsLocale } = useTranslation();
+    const { t, locale } = useTranslation();
     const [deleteKey, setDeleteKey] = useState<{
         name: string;
         fingerprint: string;
@@ -216,9 +216,7 @@ const AccountSSHContainer = () => {
                                                     <div className='flex items-center gap-4 text-xs text-zinc-400'>
                                                         <span>
                                                             {t('account.ssh.added')}{' '}
-                                                            {format(key.createdAt, 'MMM d, yyyy HH:mm', {
-                                                                locale: dateFnsLocale,
-                                                            })}
+                                                            {formatDateTime(key.createdAt, locale, 'medium')}
                                                         </span>
                                                         <div className='flex items-center gap-2'>
                                                             <span>{t('account.ssh.fingerprint')}</span>

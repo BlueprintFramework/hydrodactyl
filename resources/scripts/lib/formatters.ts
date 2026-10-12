@@ -40,4 +40,29 @@ function ip(value: string): string {
     return /([a-f0-9:]+:+)+[a-f0-9]+/.test(value) ? `[${value}]` : value;
 }
 
-export { bytesToString, formatNumber, ip, mbToBytes };
+type DateTimeStyle = 'long' | 'medium' | 'full';
+
+/**
+ * Format an absolute date and time following the conventions of the given
+ * locale. `long` is used where there is room (tooltips, detail rows), `medium`
+ * for compact tables and `full` adds seconds for timestamps where precision
+ * matters (e.g. backup creation time).
+ */
+function formatDateTime(value: Date | number | string, locale = 'en-US', style: DateTimeStyle = 'medium'): string {
+    const date = value instanceof Date ? value : new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return '';
+    }
+
+    const options: Intl.DateTimeFormatOptions =
+        style === 'medium'
+            ? { dateStyle: 'medium', timeStyle: 'short' }
+            : style === 'full'
+              ? { dateStyle: 'long', timeStyle: 'medium' }
+              : { dateStyle: 'long', timeStyle: 'short' };
+
+    return new Intl.DateTimeFormat(locale, options).format(date);
+}
+
+export { bytesToString, formatDateTime, formatNumber, ip, mbToBytes };

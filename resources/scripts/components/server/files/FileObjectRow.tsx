@@ -1,5 +1,5 @@
 import { File, FileZipper, FolderOpenFill } from '@gravity-ui/icons';
-import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
+import { differenceInHours, formatDistanceToNow } from 'date-fns';
 import { join } from 'pathe';
 import { memo, type ReactNode } from 'react';
 import isEqual from 'react-fast-compare';
@@ -10,7 +10,7 @@ import { ContextMenu, ContextMenuTrigger } from '@/components/elements/ContextMe
 import SelectFileCheckbox from '@/components/server/files/SelectFileCheckbox';
 import { encodePathSegments } from '@/helpers';
 import { useTranslation } from '@/i18n/I18nProvider';
-import { bytesToString } from '@/lib/formatters';
+import { bytesToString, formatDateTime } from '@/lib/formatters';
 import { usePermissions } from '@/plugins/usePermissions';
 // import FileDropdownMenu from '@/components/server/files/FileDropdownMenu';
 import { ServerContext } from '@/state/server';
@@ -77,7 +77,7 @@ const FileObjectRow = ({ file }: { file: FileObject }) => {
                             title={file.modifiedAt.toString()}
                         >
                             {Math.abs(differenceInHours(file.modifiedAt, new Date())) > 48
-                                ? format(file.modifiedAt, 'MMM do, yyyy h:mma', { locale: dateFnsLocale })
+                                ? formatDateTime(file.modifiedAt, locale, 'medium')
                                 : formatDistanceToNow(file.modifiedAt, { addSuffix: true, locale: dateFnsLocale })}
                         </div>
                     </MemoizedClickable>

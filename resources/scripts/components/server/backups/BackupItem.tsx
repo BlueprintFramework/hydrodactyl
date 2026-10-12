@@ -1,12 +1,12 @@
 import { Cloud, CloudArrowUpIn, Lock } from '@gravity-ui/icons';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 
 import Can from '@/components/elements/Can';
 import { Checkbox } from '@/components/elements/CheckboxNew';
 import Spinner from '@/components/elements/Spinner';
 import { useTranslation } from '@/i18n/I18nProvider';
 
-import { bytesToString } from '@/lib/formatters';
+import { bytesToString, formatDateTime } from '@/lib/formatters';
 
 import useFlash from '@/plugins/useFlash';
 
@@ -187,7 +187,7 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
                 <p className='text-xs text-zinc-500 uppercase tracking-wide mb-1'>{t('server.backups.created')}</p>
                 <p
                     className='text-sm text-zinc-300 font-medium'
-                    title={format(backup.createdAt, 'ddd, MMMM do, yyyy HH:mm:ss', { locale: dateFnsLocale })}
+                    title={formatDateTime(backup.createdAt, locale, 'full')}
                 >
                     {formatDistanceToNow(backup.createdAt, {
                         includeSeconds: true,

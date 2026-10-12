@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 import isEqual from 'react-fast-compare';
 import { useParams } from 'react-router-dom';
@@ -16,6 +15,7 @@ import ScheduleTaskRow from '@/components/server/schedules/ScheduleTaskRow';
 import TaskDetailsModal from '@/components/server/schedules/TaskDetailsModal';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
+import { formatDateTime } from '@/lib/formatters';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -34,7 +34,7 @@ const ActivePill = ({ active }: { active: boolean }) => {
 };
 
 const ScheduleEditContainer = () => {
-    const { t, dateFnsLocale } = useTranslation();
+    const { t, locale } = useTranslation();
     const { id: scheduleId } = useParams<'id'>();
 
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
@@ -115,7 +115,7 @@ const ScheduleEditContainer = () => {
                             <p className={`mt-1 text-sm`}>
                                 <strong>{t('server.schedules.last_run_at')}&nbsp;</strong>
                                 {schedule.lastRunAt ? (
-                                    format(schedule.lastRunAt, "MMM do 'at' h:mma", { locale: dateFnsLocale })
+                                    formatDateTime(schedule.lastRunAt, locale, 'long')
                                 ) : (
                                     <span>{t('common.not_available')}</span>
                                 )}
@@ -125,7 +125,7 @@ const ScheduleEditContainer = () => {
 
                                 <strong>{t('server.schedules.next_run_at')}&nbsp;</strong>
                                 {schedule.nextRunAt ? (
-                                    format(schedule.nextRunAt, "MMM do 'at' h:mma", { locale: dateFnsLocale })
+                                    formatDateTime(schedule.nextRunAt, locale, 'long')
                                 ) : (
                                     <span>{t('common.not_available')}</span>
                                 )}
