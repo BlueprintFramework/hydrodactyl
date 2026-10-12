@@ -113,7 +113,7 @@ class SettingsController extends ClientApiController
 
         $server->forceFill(['image' => $defaultImage])->saveOrFail();
 
-        Activity::event('server:startup.image.reverted')
+        Activity::event('server:startup.image-reverted')
             ->property([
                 'old' => $original,
                 'new' => $defaultImage,

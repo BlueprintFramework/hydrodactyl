@@ -20,6 +20,26 @@ return [
             'fail' => 'Inici de sessió SFTP fallit',
         ],
     ],
+    'backup' => [
+        'bulk_delete' => 'Ha eliminat :backup_count còpies de seguretat',
+        'create' => 'Ha creat la còpia de seguretat :backup_name',
+        'delete' => 'Ha eliminat la còpia de seguretat :backup_name',
+        'delete_all' => 'Ha eliminat les :backup_count còpies de seguretat',
+        'download' => 'Ha descarregat la còpia de seguretat :backup_name',
+        'lock' => 'Ha canviat el bloqueig de la còpia de seguretat :backup_name',
+        'rename' => 'Ha canviat el nom de la còpia de seguretat :old_name a :new_name',
+        'restore' => 'Ha restaurat la còpia de seguretat :backup_name',
+    ],
+    'event' => [
+        'password-reset' => 'Ha sol·licitat un restabliment de contrasenya',
+    ],
+    'job' => [
+        'cancel' => 'Ha cancel·lat el treball :job_id',
+        'create' => 'Ha creat un treball de :job_type (:job_id)',
+    ],
+    'setup' => [
+        'admin-created' => 'Ha creat el primer compte d\'administrador mitjançant l\'assistent de configuració',
+    ],
     'user' => [
         'account' => [
             'email-changed' => 'Ha canviat el correu electrònic de :old a :new',
@@ -82,6 +102,19 @@ return [
             'write' => 'Ha escrit contingut nou a :file',
             'upload' => 'Ha iniciat la pujada d\'un fitxer',
             'uploaded' => 'Ha pujat :directory:file',
+            'compress' => 'Ha comprimit :count fitxers a :directory',
+            'delete' => 'Ha eliminat :count fitxers a :directory',
+            'delete-trash' => 'Ha eliminat permanentment :count fitxers de la paperera',
+            'rename' => 'Ha canviat el nom de :count fitxers a :directory',
+            'restore-trash' => 'Ha restaurat :count fitxers de la paperera',
+            'trash' => 'Ha mogut :count fitxers a la paperera',
+        ],
+        'modrinth' => [
+            'install' => 'Ha instal·lat el mod :project (:version)',
+            'install-modpack' => 'Ha instal·lat el modpack :project_title (:version)',
+            'uninstall' => 'Ha desinstal·lat el mod :project',
+            'update' => 'Ha actualitzat el mod :project a :version',
+            'update-all' => 'Ha actualitzat :count mods',
         ],
         'sftp' => [
             'denied' => 'Ha bloquejat l\'accés SFTP a causa dels permisos',
@@ -116,10 +149,17 @@ return [
         'settings' => [
             'rename' => 'Ha canviat el nom del servidor de :old a :new',
             'description' => 'Ha canviat la descripció del servidor de :old a :new',
+            'egg' => 'Ha canviat l\'ou del servidor de :original_egg_id a :new_egg_id',
+            'egg-preview' => 'Ha previsualitzat un canvi d\'ou a :preview_egg_id',
+        ],
+        'software' => [
+            'change-queued' => 'Ha posat en cua un canvi de programari de l\'ou :from_egg a l\'ou :to_egg',
         ],
         'startup' => [
             'edit' => 'Ha canviat la variable :variable de ":old" a ":new"',
             'image' => 'Ha actualitzat la imatge de Docker del servidor de :old a :new',
+            'command' => 'Ha canviat l\'ordre d\'inici de ":old" a ":new"',
+            'image-reverted' => 'Ha revertit la imatge de Docker de :old a :new',
         ],
         'subuser' => [
             'create' => 'Ha afegit :email com a subusuari',

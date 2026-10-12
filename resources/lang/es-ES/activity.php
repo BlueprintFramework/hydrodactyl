@@ -20,6 +20,26 @@ return [
             'fail' => 'Inicio de sesión SFTP fallido',
         ],
     ],
+    'backup' => [
+        'bulk_delete' => 'Eliminó :backup_count copias de seguridad',
+        'create' => 'Creó la copia de seguridad :backup_name',
+        'delete' => 'Eliminó la copia de seguridad :backup_name',
+        'delete_all' => 'Eliminó las :backup_count copias de seguridad',
+        'download' => 'Descargó la copia de seguridad :backup_name',
+        'lock' => 'Cambió el bloqueo de la copia de seguridad :backup_name',
+        'rename' => 'Renombró la copia de seguridad :old_name a :new_name',
+        'restore' => 'Restauró la copia de seguridad :backup_name',
+    ],
+    'event' => [
+        'password-reset' => 'Solicitó un restablecimiento de contraseña',
+    ],
+    'job' => [
+        'cancel' => 'Canceló el trabajo :job_id',
+        'create' => 'Creó un trabajo de :job_type (:job_id)',
+    ],
+    'setup' => [
+        'admin-created' => 'Creó la primera cuenta de administrador mediante el asistente de configuración',
+    ],
     'user' => [
         'account' => [
             'email-changed' => 'Cambió el correo electrónico de :old a :new',
@@ -82,6 +102,19 @@ return [
             'write' => 'Escribió contenido nuevo en :file',
             'upload' => 'Inició la subida de un archivo',
             'uploaded' => 'Subió :directory:file',
+            'compress' => 'Comprimió :count archivos en :directory',
+            'delete' => 'Eliminó :count archivos en :directory',
+            'delete-trash' => 'Eliminó permanentemente :count archivos de la papelera',
+            'rename' => 'Renombró :count archivos en :directory',
+            'restore-trash' => 'Restauró :count archivos de la papelera',
+            'trash' => 'Movió :count archivos a la papelera',
+        ],
+        'modrinth' => [
+            'install' => 'Instaló el mod :project (:version)',
+            'install-modpack' => 'Instaló el modpack :project_title (:version)',
+            'uninstall' => 'Desinstaló el mod :project',
+            'update' => 'Actualizó el mod :project a :version',
+            'update-all' => 'Actualizó :count mods',
         ],
         'sftp' => [
             'denied' => 'Bloqueó el acceso SFTP debido a los permisos',
@@ -116,10 +149,17 @@ return [
         'settings' => [
             'rename' => 'Renombró el servidor de :old a :new',
             'description' => 'Cambió la descripción del servidor de :old a :new',
+            'egg' => 'Cambió el huevo del servidor de :original_egg_id a :new_egg_id',
+            'egg-preview' => 'Previsualizó un cambio de huevo a :preview_egg_id',
+        ],
+        'software' => [
+            'change-queued' => 'Puso en cola un cambio de software del huevo :from_egg al :to_egg',
         ],
         'startup' => [
             'edit' => 'Cambió la variable :variable de ":old" a ":new"',
             'image' => 'Actualizó la imagen de Docker del servidor de :old a :new',
+            'command' => 'Cambió el comando de inicio de ":old" a ":new"',
+            'image-reverted' => 'Revirtió la imagen de Docker de :old a :new',
         ],
         'subuser' => [
             'create' => 'Añadió :email como subusuario',

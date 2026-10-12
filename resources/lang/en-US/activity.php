@@ -20,6 +20,26 @@ return [
             'fail' => 'Failed SFTP log in',
         ],
     ],
+    'backup' => [
+        'bulk_delete' => 'Deleted :backup_count backups',
+        'create' => 'Created backup :backup_name',
+        'delete' => 'Deleted backup :backup_name',
+        'delete_all' => 'Deleted all :backup_count backups',
+        'download' => 'Downloaded backup :backup_name',
+        'lock' => 'Toggled lock for backup :backup_name',
+        'rename' => 'Renamed backup :old_name to :new_name',
+        'restore' => 'Restored backup :backup_name',
+    ],
+    'event' => [
+        'password-reset' => 'Requested a password reset',
+    ],
+    'job' => [
+        'cancel' => 'Cancelled job :job_id',
+        'create' => 'Created a :job_type job (:job_id)',
+    ],
+    'setup' => [
+        'admin-created' => 'Created the first administrator account via the setup flow',
+    ],
     'user' => [
         'account' => [
             'email-changed' => 'Changed email from :old to :new',
@@ -82,6 +102,19 @@ return [
             'write' => 'Wrote new content to :file',
             'upload' => 'Began a file upload',
             'uploaded' => 'Uploaded :directory:file',
+            'compress' => 'Compressed :count files in :directory',
+            'delete' => 'Deleted :count files in :directory',
+            'delete-trash' => 'Permanently deleted :count files from the trash',
+            'rename' => 'Renamed :count files in :directory',
+            'restore-trash' => 'Restored :count files from the trash',
+            'trash' => 'Moved :count files to the trash',
+        ],
+        'modrinth' => [
+            'install' => 'Installed mod :project (:version)',
+            'install-modpack' => 'Installed modpack :project_title (:version)',
+            'uninstall' => 'Uninstalled mod :project',
+            'update' => 'Updated mod :project to :version',
+            'update-all' => 'Updated :count mods',
         ],
         'sftp' => [
             'denied' => 'Blocked SFTP access due to permissions',
@@ -116,10 +149,17 @@ return [
         'settings' => [
             'rename' => 'Renamed the server from :old to :new',
             'description' => 'Changed the server description from :old to :new',
+            'egg' => 'Changed the server egg from :original_egg_id to :new_egg_id',
+            'egg-preview' => 'Previewed an egg change to :preview_egg_id',
+        ],
+        'software' => [
+            'change-queued' => 'Queued a software change from egg :from_egg to :to_egg',
         ],
         'startup' => [
             'edit' => 'Changed the :variable variable from ":old" to ":new"',
             'image' => 'Updated the Docker Image for the server from :old to :new',
+            'command' => 'Changed the startup command from ":old" to ":new"',
+            'image-reverted' => 'Reverted the Docker image from :old to :new',
         ],
         'subuser' => [
             'create' => 'Added :email as a subuser',
