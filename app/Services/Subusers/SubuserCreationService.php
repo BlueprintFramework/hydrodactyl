@@ -9,6 +9,7 @@ use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Services\Users\UserCreationService;
 use Pterodactyl\Repositories\Eloquent\SubuserRepository;
 use Pterodactyl\Contracts\Repository\UserRepositoryInterface;
+use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Exceptions\Repository\RecordNotFoundException;
 use Pterodactyl\Exceptions\Service\Subuser\UserIsServerOwnerException;
 use Pterodactyl\Exceptions\Service\Subuser\ServerSubuserExistsException;
@@ -39,29 +40,39 @@ class SubuserCreationService
     public function handle(Server $server, string $email, array $permissions): Subuser
     {
         return $this->connection->transaction(function () use ($server, $email, $permissions) {
+            $identifier = trim($email);
+
             try {
-                $user = $this->userRepository->findFirstWhere([['email', '=', $email]]);
-
-                if ($server->owner_id === $user->id) {
-                    throw new UserIsServerOwnerException(trans('exceptions.subusers.user_is_owner'));
-                }
-
-                $subuserCount = $this->subuserRepository->findCountWhere([['user_id', '=', $user->id], ['server_id', '=', $server->id]]);
-                if ($subuserCount !== 0) {
-                    throw new ServerSubuserExistsException(trans('exceptions.subusers.subuser_exists'));
-                }
+                $user = $this->userRepository->findFirstWhere([['email', '=', $identifier]]);
             } catch (RecordNotFoundException) {
-                // Just cap the username generated at 64 characters at most and then append a random string
-                // to the end to make it "unique"...
-                $username = substr(preg_replace('/([^\w\.-]+)/', '', strtok($email, '@')), 0, 64) . Str::random(3);
+                try {
+                    $user = $this->userRepository->findFirstWhere([['username', '=', $identifier]]);
+                } catch (RecordNotFoundException) {
+                    if (!filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+                        throw new DisplayException('No account uses that username. Enter their email to invite them.');
+                    }
 
-                $user = $this->userCreationService->handle([
-                    'email' => $email,
-                    'username' => $username,
-                    'name_first' => 'Server',
-                    'name_last' => 'Subuser',
-                    'root_admin' => false,
-                ]);
+                    // Just cap the username generated at 64 characters at most and then append a random string
+                    // to the end to make it "unique"...
+                    $username = substr(preg_replace('/([^\w\.-]+)/', '', strtok($identifier, '@')), 0, 64) . Str::random(3);
+
+                    $user = $this->userCreationService->handle([
+                        'email' => $identifier,
+                        'username' => $username,
+                        'name_first' => 'Server',
+                        'name_last' => 'Subuser',
+                        'root_admin' => false,
+                    ]);
+                }
+            }
+
+            if ($server->owner_id === $user->id) {
+                throw new UserIsServerOwnerException(trans('exceptions.subusers.user_is_owner'));
+            }
+
+            $subuserCount = $this->subuserRepository->findCountWhere([['user_id', '=', $user->id], ['server_id', '=', $server->id]]);
+            if ($subuserCount !== 0) {
+                throw new ServerSubuserExistsException(trans('exceptions.subusers.subuser_exists'));
             }
 
             return $this->subuserRepository->create([

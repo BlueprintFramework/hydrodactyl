@@ -34,7 +34,7 @@ const UserRow = ({ subuser }: Props) => {
 
             <div className='flex-1 min-w-0'>
                 <div className='flex items-center gap-2 mb-1.5'>
-                    <h3 className='text-sm font-medium text-zinc-100 truncate'>{subuser.email}</h3>
+                    <h3 className='text-sm font-medium text-zinc-100 truncate'>{subuser.username}</h3>
                     <span
                         className={`text-xs font-medium px-2 py-0.5 rounded ${
                             subuser.twoFactorEnabled
