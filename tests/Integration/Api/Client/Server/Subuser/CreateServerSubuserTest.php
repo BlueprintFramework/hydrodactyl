@@ -126,6 +126,49 @@ class CreateServerSubuserTest extends ClientApiIntegrationTestCase
     }
 
     /**
+     * Test that an existing account can be added by username instead of email.
+     */
+    public function testCreatingSubuserWithExistingUsernameWorks()
+    {
+        [$user, $server] = $this->generateTestAccount();
+
+        /** @var User $existing */
+        $existing = User::factory()->create(['username' => 'existing_user']);
+
+        $response = $this->actingAs($user)->postJson($this->link($server) . '/users', [
+            'email' => $existing->username,
+            'permissions' => [
+                Permission::ACTION_USER_CREATE,
+            ],
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('object', Subuser::RESOURCE_NAME);
+        $response->assertJsonPath('attributes.uuid', $existing->uuid);
+        $this->assertDatabaseMissing('users', ['email' => $existing->username]);
+    }
+
+    /**
+     * A username that does not belong to an account cannot create one, because a new
+     * account still needs an email address.
+     */
+    public function testUnknownUsernameCannotCreateAnAccount()
+    {
+        [$user, $server] = $this->generateTestAccount();
+
+        $response = $this->actingAs($user)->postJson($this->link($server) . '/users', [
+            'email' => 'missinguser',
+            'permissions' => [
+                Permission::ACTION_USER_CREATE,
+            ],
+        ]);
+
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+        $response->assertJsonPath('errors.0.code', 'DisplayException');
+        $response->assertJsonPath('errors.0.detail', 'No account uses that username. Enter their email to invite them.');
+    }
+
+    /**
      * Test that an error is returned if the account associated with an email address is already
      * associated with the server instance.
      */

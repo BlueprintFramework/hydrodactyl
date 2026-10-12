@@ -46,7 +46,7 @@ class SubuserCreationService
                 $user = $this->userRepository->findFirstWhere([['email', '=', $identifier]]);
             } catch (RecordNotFoundException) {
                 try {
-                    $user = $this->userRepository->findFirstWhere([['username', '=', $identifier]]);
+                    $user = $this->userRepository->findFirstWhere([['username', '=', mb_strtolower($identifier)]]);
                 } catch (RecordNotFoundException) {
                     if (!filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
                         throw new DisplayException('No account uses that username. Enter their email to invite them.');
