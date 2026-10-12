@@ -30,7 +30,7 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
                     <img src={actor.image} alt={actor.username || t('server.activity.system')} className='h-full w-full object-cover' />
                 ) : (
                     <div className='flex h-full w-full items-center justify-center text-xs font-medium text-zinc-300'>
-                        {(actor?.username || 'S').charAt(0).toUpperCase()
+                        {(actor?.username || 'S').charAt(0).toUpperCase()}
                     </div>
                 )}
             </div>
