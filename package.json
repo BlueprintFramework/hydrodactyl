@@ -98,7 +98,7 @@
     },
     "scripts": {
         "lint": "biome lint --write",
-        "check": "biome check",
+        "check": "biome check --write",
         "postinstall": "npx @biomejs/biome migrate --write",
         "lint:turbo": "turbo lint",
         "dev": "vite",

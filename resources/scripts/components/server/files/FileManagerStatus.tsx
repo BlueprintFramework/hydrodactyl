@@ -111,9 +111,7 @@ const FileUploadList = () => {
                     );
                 })}
                 <Dialog.Footer>
-                    <Button variant='attention'>
-                        Cancel all
-                    </Button>
+                    <Button variant='attention'>Cancel all</Button>
                     <Button variant='secondary' onClick={close}>
                         Hide
                     </Button>
