@@ -61,7 +61,7 @@ return [
     'server' => [
         'reinstall' => 'Reinstaló el servidor',
         'console' => [
-            'command' => 'Ejecutó ":command" en el servidor',
+            'command' => 'Ejecutó :command en el servidor',
         ],
         'power' => [
             'start' => 'Inició el servidor',
@@ -109,6 +109,9 @@ return [
             'restore-trash' => 'Restauró :count archivos de la papelera',
             'trash' => 'Movió :count archivos a la papelera',
         ],
+        'mod' => [
+            'install' => 'Instaló un mod',
+        ],
         'modrinth' => [
             'install' => 'Instaló el mod :project (:version)',
             'install-modpack' => 'Instaló el modpack :project_title (:version)',
@@ -118,6 +121,11 @@ return [
         ],
         'sftp' => [
             'denied' => 'Bloqueó el acceso SFTP debido a los permisos',
+            'create' => 'Creó :count archivos por SFTP',
+            'create-directory' => 'Creó :count directorios por SFTP',
+            'delete' => 'Eliminó :count archivos por SFTP',
+            'rename' => 'Renombró o movió :count archivos por SFTP',
+            'write' => 'Modificó :count archivos por SFTP',
             'create_one' => 'Creó :files.0',
             'create_other' => 'Creó :count archivos nuevos',
             'write_one' => 'Modificó el contenido de :files.0',
@@ -131,7 +139,7 @@ return [
         ],
         'allocation' => [
             'create' => 'Añadió :allocation al servidor',
-            'notes' => 'Actualizó las notas de :allocation de ":old" a ":new"',
+            'notes' => 'Actualizó las notas de :allocation de :old a :new',
             'primary' => 'Estableció :allocation como la asignación principal del servidor',
             'delete' => 'Eliminó la asignación :allocation',
         ],
@@ -142,8 +150,8 @@ return [
             'delete' => 'Eliminó la tarea programada :name',
         ],
         'task' => [
-            'create' => 'Creó una nueva tarea ":action" para la tarea programada :name',
-            'update' => 'Actualizó la tarea ":action" para la tarea programada :name',
+            'create' => 'Creó una nueva tarea :action para la tarea programada :name',
+            'update' => 'Actualizó la tarea :action para la tarea programada :name',
             'delete' => 'Eliminó una tarea de la tarea programada :name',
         ],
         'settings' => [
@@ -156,9 +164,9 @@ return [
             'change-queued' => 'Puso en cola un cambio de software del huevo :from_egg al :to_egg',
         ],
         'startup' => [
-            'edit' => 'Cambió la variable :variable de ":old" a ":new"',
+            'edit' => 'Cambió la variable :variable de :old a :new',
             'image' => 'Actualizó la imagen de Docker del servidor de :old a :new',
-            'command' => 'Cambió el comando de inicio de ":old" a ":new"',
+            'command' => 'Cambió el comando de inicio de :old a :new',
             'image-reverted' => 'Revirtió la imagen de Docker de :old a :new',
         ],
         'subuser' => [

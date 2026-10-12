@@ -13,6 +13,7 @@ const features: Record<string, ComponentType> = {
     pid_limit: lazy(() => import('@feature/PIDLimitModalFeature')),
     steam_disk_space: lazy(() => import('@feature/SteamDiskSpaceFeature')),
     hytale_oauth: lazy(() => import('@feature/HytaleOauthRequireFeature')),
+    mclogs: lazy(() => import('@feature/MclogsFeature')), // why wasn't this imported?
 };
 
 export default features;

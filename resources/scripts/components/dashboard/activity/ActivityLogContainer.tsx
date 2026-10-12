@@ -11,6 +11,7 @@ import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
+import { activityEventLabel } from '@/lib/activityEvents';
 
 import { useFlashKey } from '@/plugins/useFlash';
 import useLocationHash from '@/plugins/useLocationHash';
@@ -287,7 +288,7 @@ const ActivityLogContainer = () => {
                                                 value={type}
                                                 style={{ backgroundColor: '#27272a', color: '#f4f4f5' }}
                                             >
-                                                {type}
+                                                {activityEventLabel(t, type)}
                                             </option>
                                         ))}
                                     </Select>

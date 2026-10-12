@@ -61,7 +61,7 @@ return [
     'server' => [
         'reinstall' => 'Reinstalled server',
         'console' => [
-            'command' => 'Executed ":command" on the server',
+            'command' => 'Executed :command on the server',
         ],
         'power' => [
             'start' => 'Started the server',
@@ -109,6 +109,9 @@ return [
             'restore-trash' => 'Restored :count files from the trash',
             'trash' => 'Moved :count files to the trash',
         ],
+        'mod' => [
+            'install' => 'Installed a mod',
+        ],
         'modrinth' => [
             'install' => 'Installed mod :project (:version)',
             'install-modpack' => 'Installed modpack :project_title (:version)',
@@ -118,6 +121,11 @@ return [
         ],
         'sftp' => [
             'denied' => 'Blocked SFTP access due to permissions',
+            'create' => 'Created :count files via SFTP',
+            'create-directory' => 'Created :count directories via SFTP',
+            'delete' => 'Deleted :count files via SFTP',
+            'rename' => 'Renamed or moved :count files via SFTP',
+            'write' => 'Modified :count files via SFTP',
             'create_one' => 'Created :files.0',
             'create_other' => 'Created :count new files',
             'write_one' => 'Modified the contents of :files.0',
@@ -131,7 +139,7 @@ return [
         ],
         'allocation' => [
             'create' => 'Added :allocation to the server',
-            'notes' => 'Updated the notes for :allocation from ":old" to ":new"',
+            'notes' => 'Updated the notes for :allocation from :old to :new',
             'primary' => 'Set :allocation as the primary server allocation',
             'delete' => 'Deleted the :allocation allocation',
         ],
@@ -142,8 +150,8 @@ return [
             'delete' => 'Deleted the :name schedule',
         ],
         'task' => [
-            'create' => 'Created a new ":action" task for the :name schedule',
-            'update' => 'Updated the ":action" task for the :name schedule',
+            'create' => 'Created a new :action task for the :name schedule',
+            'update' => 'Updated the :action task for the :name schedule',
             'delete' => 'Deleted a task for the :name schedule',
         ],
         'settings' => [
@@ -156,9 +164,9 @@ return [
             'change-queued' => 'Queued a software change from egg :from_egg to :to_egg',
         ],
         'startup' => [
-            'edit' => 'Changed the :variable variable from ":old" to ":new"',
+            'edit' => 'Changed the :variable variable from :old to :new',
             'image' => 'Updated the Docker Image for the server from :old to :new',
-            'command' => 'Changed the startup command from ":old" to ":new"',
+            'command' => 'Changed the startup command from :old to :new',
             'image-reverted' => 'Reverted the Docker image from :old to :new',
         ],
         'subuser' => [

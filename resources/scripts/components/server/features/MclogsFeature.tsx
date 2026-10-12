@@ -545,3 +545,5 @@ const AnalysisModal = ({
         </Modal>
     );
 };
+
+export default CrashAnalysisCard;

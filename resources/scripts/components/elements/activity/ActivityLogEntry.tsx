@@ -6,6 +6,7 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { Link } from 'react-router-dom';
 
 import ActivityLogMetaButton from '@/components/elements/activity/ActivityLogMetaButton';
+import CopyOnClick from '@/components/elements/CopyOnClick';
 import { useTranslation } from '@/i18n/I18nProvider';
 
 import { formatObjectToIdentString } from '@/lib/objects';
@@ -64,6 +65,30 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
                         {children}
                     </div>
                 </div>
+
+                {/* Translated event description */}
+                {activity.descriptionParts ? (
+                    <div className='text-sm text-zinc-300 mt-1 break-words'>
+                        {activity.descriptionParts.map((part, index) =>
+                            part.type === 'value' ? (
+                                <CopyOnClick key={index} text={part.content}>
+                                    <span
+                                        className='inline-block max-w-full align-middle truncate font-mono text-xs bg-zinc-800/50 text-zinc-300 px-2 py-1 rounded transition-colors duration-150 hover:bg-zinc-700/50 hover:text-brand'
+                                        title={part.content}
+                                    >
+                                        {part.content}
+                                    </span>
+                                </CopyOnClick>
+                            ) : (
+                                <span key={index}>{part.content}</span>
+                            ),
+                        )}
+                    </div>
+                ) : (
+                    activity.description && (
+                        <div className='text-sm text-zinc-300 mt-1 break-words'>{activity.description}</div>
+                    )
+                )}
 
                 {/* Compact metadata and timestamp */}
                 <div className='flex items-center gap-3 mt-1 text-xs text-zinc-400'>

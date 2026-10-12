@@ -61,7 +61,7 @@ return [
     'server' => [
         'reinstall' => 'Ha reinstal·lat el servidor',
         'console' => [
-            'command' => 'Ha executat ":command" al servidor',
+            'command' => 'Ha executat :command al servidor',
         ],
         'power' => [
             'start' => 'Ha iniciat el servidor',
@@ -109,6 +109,9 @@ return [
             'restore-trash' => 'Ha restaurat :count fitxers de la paperera',
             'trash' => 'Ha mogut :count fitxers a la paperera',
         ],
+        'mod' => [
+            'install' => 'Ha instal·lat un mod',
+        ],
         'modrinth' => [
             'install' => 'Ha instal·lat el mod :project (:version)',
             'install-modpack' => 'Ha instal·lat el modpack :project_title (:version)',
@@ -118,6 +121,11 @@ return [
         ],
         'sftp' => [
             'denied' => 'Ha bloquejat l\'accés SFTP a causa dels permisos',
+            'create' => 'Ha creat :count fitxers per SFTP',
+            'create-directory' => 'Ha creat :count directoris per SFTP',
+            'delete' => 'Ha eliminat :count fitxers per SFTP',
+            'rename' => 'Ha canviat el nom o mogut :count fitxers per SFTP',
+            'write' => 'Ha modificat :count fitxers per SFTP',
             'create_one' => 'Ha creat :files.0',
             'create_other' => 'Ha creat :count fitxers nous',
             'write_one' => 'Ha modificat el contingut de :files.0',
@@ -131,7 +139,7 @@ return [
         ],
         'allocation' => [
             'create' => 'Ha afegit :allocation al servidor',
-            'notes' => 'Ha actualitzat les notes de :allocation de ":old" a ":new"',
+            'notes' => 'Ha actualitzat les notes de :allocation de :old a :new',
             'primary' => 'Ha establert :allocation com a assignació principal del servidor',
             'delete' => 'Ha eliminat l\'assignació :allocation',
         ],
@@ -142,8 +150,8 @@ return [
             'delete' => 'Ha eliminat la programació :name',
         ],
         'task' => [
-            'create' => 'Ha creat una tasca nova ":action" per a la programació :name',
-            'update' => 'Ha actualitzat la tasca ":action" de la programació :name',
+            'create' => 'Ha creat una tasca nova :action per a la programació :name',
+            'update' => 'Ha actualitzat la tasca :action de la programació :name',
             'delete' => 'Ha eliminat una tasca de la programació :name',
         ],
         'settings' => [
@@ -156,9 +164,9 @@ return [
             'change-queued' => 'Ha posat en cua un canvi de programari de l\'ou :from_egg a l\'ou :to_egg',
         ],
         'startup' => [
-            'edit' => 'Ha canviat la variable :variable de ":old" a ":new"',
+            'edit' => 'Ha canviat la variable :variable de :old a :new',
             'image' => 'Ha actualitzat la imatge de Docker del servidor de :old a :new',
-            'command' => 'Ha canviat l\'ordre d\'inici de ":old" a ":new"',
+            'command' => 'Ha canviat l\'ordre d\'inici de :old a :new',
             'image-reverted' => 'Ha revertit la imatge de Docker de :old a :new',
         ],
         'subuser' => [
