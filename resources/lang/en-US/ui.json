@@ -361,7 +361,11 @@
         "update": "Update",
         "upload": "Upload",
         "warning": "Warning",
-        "yes": "Yes"
+        "yes": "Yes",
+        "select_placeholder": "Select…",
+        "search_placeholder": "Search…",
+        "clear_search": "Clear search",
+        "no_matches": "No matches"
     },
     "dashboard": {
         "empty": {
@@ -563,7 +567,14 @@
             "time_range": "Time Range",
             "title": "Activity Log",
             "toggle_filters": "Toggle Filters (Ctrl+F)",
-            "view_metadata": "View additional event metadata"
+            "view_metadata": "View additional event metadata",
+            "live": "Live",
+            "go_live": "Go live",
+            "exporting": "Exporting…",
+            "clear": "Clear",
+            "clear_search": "Clear search",
+            "filter_events": "Filter events…",
+            "loading": "Loading activity..."
         },
         "backups": {
             "automatic": "Automatic",

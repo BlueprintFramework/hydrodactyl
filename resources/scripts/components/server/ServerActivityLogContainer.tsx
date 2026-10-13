@@ -12,17 +12,10 @@ import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useFlashKey } from '@/plugins/useFlash';
 import useLocationHash from '@/plugins/useLocationHash';
 import { ServerContext } from '@/state/server';
-
-const DATE_RANGE_OPTIONS = [
-    { value: 'all', label: 'All time' },
-    { value: '1h', label: 'Last hour' },
-    { value: '24h', label: 'Last 24 hours' },
-    { value: '7d', label: 'Last 7 days' },
-    { value: '30d', label: 'Last 30 days' },
-] as const;
 
 const computeAfter = (range: string): string | undefined => {
     if (range === 'all') return undefined;
@@ -47,6 +40,7 @@ const computeAfter = (range: string): string | undefined => {
 };
 
 const ServerActivityLogContainer = () => {
+    const { t } = useTranslation();
     const { hash, pathTo } = useLocationHash();
     const { clearAndAddHttpError } = useFlashKey('server:activity');
 
@@ -59,6 +53,17 @@ const ServerActivityLogContainer = () => {
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const daemonType = getGlobalDaemonType();
+
+    const dateRangeOptions = useMemo(
+        () => [
+            { value: 'all', label: t('server.activity.all_time') },
+            { value: '1h', label: t('server.activity.last_hour') },
+            { value: '24h', label: t('server.activity.last_24_hours') },
+            { value: '7d', label: t('server.activity.last_7_days') },
+            { value: '30d', label: t('server.activity.last_30_days') },
+        ],
+        [t],
+    );
 
     const filters = useMemo<ActivityLogFilters>(() => {
         const filter: NonNullable<ActivityLogFilters['filters']> = {};
@@ -118,12 +123,18 @@ const ServerActivityLogContainer = () => {
             if (items.length === 0) return;
 
             const csvContent = [
-                ['Timestamp', 'Event', 'Actor', 'IP Address', 'Properties'].join(','),
+                [
+                    t('server.activity.csv_timestamp'),
+                    t('server.activity.csv_event'),
+                    t('server.activity.csv_actor'),
+                    t('server.activity.csv_ip_address'),
+                    t('server.activity.csv_properties'),
+                ].join(','),
                 ...items.map((item) =>
                     [
                         new Date(item.timestamp).toISOString(),
                         item.event,
-                        item.relationships.actor?.username || 'System',
+                        item.relationships.actor?.username || t('server.activity.system'),
                         item.ip || '',
                         JSON.stringify(item.properties).replace(/"/g, '""'),
                     ]
@@ -142,19 +153,22 @@ const ServerActivityLogContainer = () => {
         } finally {
             setExporting(false);
         }
-    }, [data, exporting, filters, uuid, daemonType]);
+    }, [data, exporting, filters, uuid, daemonType, t]);
 
     const eventOptions = useMemo(() => {
         const events = eventTypes ?? [];
         const all = selectedEventType && !events.includes(selectedEventType) ? [selectedEventType, ...events] : events;
 
-        return [{ value: '', label: 'All events' }, ...all.map((event) => ({ value: event, label: event }))];
-    }, [eventTypes, selectedEventType]);
+        return [
+            { value: '', label: t('server.activity.all_events') },
+            ...all.map((event) => ({ value: event, label: event })),
+        ];
+    }, [eventTypes, selectedEventType, t]);
 
     const total = data?.pagination.total ?? 0;
 
     return (
-        <ServerContentBlock title={'Activity Log'} showFlashKey={'activity'} className='p-0!'>
+        <ServerContentBlock title={t('server.activity.title')} showFlashKey={'activity'} className='p-0!'>
             <ServerHeader />
 
             <div className='flex flex-col gap-6 px-4 py-8 sm:px-14 sm:py-14'>
@@ -171,7 +185,7 @@ const ServerActivityLogContainer = () => {
                         <Input.Text
                             id='server-activity-search'
                             type='text'
-                            placeholder='Search events, IPs, users...'
+                            placeholder={t('server.activity.search_placeholder')}
                             value={searchTerm}
                             onChange={(e) => {
                                 setSearchTerm(e.target.value);
@@ -184,7 +198,7 @@ const ServerActivityLogContainer = () => {
                                 type='button'
                                 onClick={() => setSearchTerm('')}
                                 className='absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-400 transition-colors hover:text-zinc-100'
-                                aria-label='Clear search'
+                                aria-label={t('server.activity.clear_search')}
                             >
                                 <Xmark width={16} height={16} fill='currentColor' />
                             </button>
@@ -194,9 +208,9 @@ const ServerActivityLogContainer = () => {
                         id='server-activity-event-type'
                         value={selectedEventType}
                         onChange={selectEventType}
-                        placeholder='All events'
+                        placeholder={t('server.activity.all_events')}
                         searchable
-                        searchPlaceholder='Filter events…'
+                        searchPlaceholder={t('server.activity.filter_events')}
                         triggerClassName='w-auto sm:w-52'
                         options={eventOptions}
                     />
@@ -208,12 +222,12 @@ const ServerActivityLogContainer = () => {
                             setPage(1);
                         }}
                         triggerClassName='w-auto sm:w-44'
-                        options={[...DATE_RANGE_OPTIONS]}
+                        options={dateRangeOptions}
                     />
                     <div className='flex items-center gap-2 sm:ml-auto'>
                         {hasActiveFilters && (
                             <Button variant='ghost' onClick={clearAllFilters}>
-                                Clear
+                                {t('server.activity.clear')}
                             </Button>
                         )}
                         <Button
@@ -228,7 +242,7 @@ const ServerActivityLogContainer = () => {
                                 className={isValidating ? 'animate-spin' : ''}
                                 fill='currentColor'
                             />
-                            Refresh
+                            {t('common.refresh')}
                         </Button>
                         <Button
                             variant='secondary'
@@ -241,7 +255,7 @@ const ServerActivityLogContainer = () => {
                             ) : (
                                 <ArrowDownToLine width={18} height={18} fill='currentColor' />
                             )}
-                            {exporting ? 'Exporting…' : 'Export'}
+                            {exporting ? t('server.activity.exporting') : t('server.activity.export')}
                         </Button>
                     </div>
                 </div>
@@ -250,29 +264,34 @@ const ServerActivityLogContainer = () => {
                     <div className='flex items-center justify-center py-24'>
                         <div className='flex flex-col items-center gap-3'>
                             <div className='h-6 w-6 animate-spin rounded-full border-b-2 border-brand' />
-                            <p className='text-sm text-neutral-400'>Loading activity...</p>
+                            <p className='text-sm text-neutral-400'>{t('server.activity.loading')}</p>
                         </div>
                     </div>
                 ) : !data?.items?.length ? (
                     <div className='py-16'>
                         <h3 className='text-sm font-medium text-zinc-100'>
-                            {hasActiveFilters ? 'No matching activity' : 'No activity yet'}
+                            {hasActiveFilters
+                                ? t('server.activity.empty_filtered_title')
+                                : t('server.activity.empty_title')}
                         </h3>
                         <p className='mt-1 max-w-md text-sm text-zinc-400'>
                             {hasActiveFilters
-                                ? 'Nothing matches those search terms or filters.'
-                                : 'Events show up here as the server is used.'}
+                                ? t('server.activity.empty_filtered_description')
+                                : t('server.activity.empty_description')}
                         </p>
                         {hasActiveFilters && (
                             <Button variant='secondary' className='mt-4' onClick={clearAllFilters}>
-                                Clear filters
+                                {t('server.activity.clear_filters')}
                             </Button>
                         )}
                     </div>
                 ) : (
                     <div className='flex flex-col'>
                         <p className='mb-2 text-xs text-zinc-500'>
-                            {total} {total === 1 ? 'event' : 'events'}
+                            {t(
+                                total === 1 ? 'server.activity.events_count_one' : 'server.activity.events_count_other',
+                                { count: total },
+                            )}
                         </p>
                         <div className='divide-y divide-[#ffffff10]'>
                             {data.items.map((activity) => (

@@ -361,7 +361,11 @@
         "update": "Actualizar",
         "upload": "Subir",
         "warning": "Advertencia",
-        "yes": "Sí"
+        "yes": "Sí",
+        "select_placeholder": "Seleccionar…",
+        "search_placeholder": "Buscar…",
+        "clear_search": "Limpiar búsqueda",
+        "no_matches": "Sin resultados"
     },
     "dashboard": {
         "empty": {
@@ -563,7 +567,14 @@
             "time_range": "Intervalo de tiempo",
             "title": "Registro de actividad",
             "toggle_filters": "Mostrar u ocultar filtros (Ctrl+F)",
-            "view_metadata": "Ver metadatos adicionales del evento"
+            "view_metadata": "Ver metadatos adicionales del evento",
+            "live": "En directo",
+            "go_live": "Activar en directo",
+            "exporting": "Exportando…",
+            "clear": "Limpiar",
+            "clear_search": "Limpiar búsqueda",
+            "filter_events": "Filtrar eventos…",
+            "loading": "Cargando actividad..."
         },
         "backups": {
             "automatic": "Automática",

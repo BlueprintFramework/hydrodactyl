@@ -361,7 +361,11 @@
         "update": "Actualitza",
         "upload": "Puja",
         "warning": "Avís",
-        "yes": "Sí"
+        "yes": "Sí",
+        "select_placeholder": "Selecciona…",
+        "search_placeholder": "Cerca…",
+        "clear_search": "Neteja la cerca",
+        "no_matches": "Sense resultats"
     },
     "dashboard": {
         "empty": {
@@ -563,7 +567,14 @@
             "time_range": "Interval de temps",
             "title": "Registre d'activitat",
             "toggle_filters": "Mostra o amaga els filtres (Ctrl+F)",
-            "view_metadata": "Mostra metadades addicionals de l'esdeveniment"
+            "view_metadata": "Mostra metadades addicionals de l'esdeveniment",
+            "live": "En directe",
+            "go_live": "Activa el directe",
+            "exporting": "Exportant…",
+            "clear": "Neteja",
+            "clear_search": "Neteja la cerca",
+            "filter_events": "Filtra esdeveniments…",
+            "loading": "Carregant activitat..."
         },
         "backups": {
             "automatic": "Automàtica",
