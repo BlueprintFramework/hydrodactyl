@@ -48,6 +48,7 @@ return [
         'success' => 'Correcto',
         'test_connection' => 'Probar conexión',
         'title' => 'Nuevo bucket',
+        'test_file_content' => 'Esta es una prueba de subida. Si estás leyendo esto, ha funcionado. ¡Feliz hospedaje de servidores!',
     ],
     'view' => [
         'delete' => [

@@ -17,6 +17,7 @@ import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
+import { activityEventLabel } from '@/lib/activityEvents';
 
 import { useFlashKey } from '@/plugins/useFlash';
 import useLocationHash from '@/plugins/useLocationHash';
@@ -162,7 +163,7 @@ const ActivityLogContainer = () => {
 
         return [
             { value: '', label: t('account.activity.all_events') },
-            ...all.map((event) => ({ value: event, label: event })),
+            ...all.map((event) => ({ value: event, label: activityEventLabel(t, event) })),
         ];
     }, [eventTypes, selectedEventType, t]);
 
@@ -296,9 +297,7 @@ const ActivityLogContainer = () => {
                             <div className='w-5 h-5 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
                                 <Magnifier width={22} height={22} className='text-zinc-400' fill='currentColor' />
                             </div>
-                            <h3 className='text-base font-semibold text-zinc-100'>
-                                {t('account.activity.events_title')}
-                            </h3>
+                            <h3 className='text-base font-semibold text-zinc-100'>{t('account.activity.events_title')}</h3>
                             <span className='text-sm text-zinc-400'>
                                 {t(
                                     total === 1

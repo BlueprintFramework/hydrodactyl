@@ -30,16 +30,6 @@ enum Providers: string
         self::MARQUE->value => MarqueProvider::class,
     ];
 
-    private const DESCRIPTION_MAP = [
-        self::CLOUDFLARE->value => 'Cloudflare DNS service',
-        self::HETZNER->value => 'Hetzner DNS Console',
-        self::ROUTE53->value => 'AWS Route53 DNS Service',
-        self::DNSIMPLE->value => 'DNSimple Service',
-        self::BUNNY->value => 'Bunny.net DNS Service',
-        self::SPACESHIP->value => 'Spaceship DNS Service',
-        self::MARQUE->value => 'Marque DNS Service',
-    ];
-
     public static function all(): array
     {
         $result = [];

@@ -43,11 +43,11 @@ class EmailSettingsCommand extends Command
         $this->variables['MAIL_MAILER'] = $this->option('driver') ?? $this->choice(
             __('command/messages.environment.mail.ask_driver'),
             [
-                'smtp' => 'SMTP Server',
-                'sendmail' => 'sendmail Binary',
-                'mailgun' => 'Mailgun Transactional Email',
-                'mandrill' => 'Mandrill Transactional Email',
-                'postmark' => 'Postmark Transactional Email',
+                'smtp' => __('command/messages.environment.mail.driver_smtp'),
+                'sendmail' => __('command/messages.environment.mail.driver_sendmail'),
+                'mailgun' => __('command/messages.environment.mail.driver_mailgun'),
+                'mandrill' => __('command/messages.environment.mail.driver_mandrill'),
+                'postmark' => __('command/messages.environment.mail.driver_postmark'),
             ],
             $this->config->get('mail.default', 'smtp')
         );
@@ -69,7 +69,7 @@ class EmailSettingsCommand extends Command
 
         $this->writeToEnvironment($this->variables);
 
-        $this->line('Updating stored environment configuration file.');
+        $this->line(__('command/messages.environment.mail.updating_config'));
         $this->line('');
     }
 

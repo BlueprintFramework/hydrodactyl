@@ -295,4 +295,19 @@ return [
             'title' => 'Servidor - :server: Inicio',
         ],
     ],
+
+    'templates' => [
+        'minimal' => [
+            'name' => 'Mínima',
+            'description' => 'Un servidor pequeño para pruebas o bots ligeros.',
+        ],
+        'standard' => [
+            'name' => 'Estándar',
+            'description' => 'Un servidor equilibrado, apto para la mayoría de servidores de juegos.',
+        ],
+        'performance' => [
+            'name' => 'Rendimiento',
+            'description' => 'Un servidor con muchos recursos para cargas de trabajo exigentes.',
+        ],
+    ],
 ];

@@ -226,12 +226,14 @@ class BunnyProvider implements DnsProviderInterface
             'api_key' => [
                 'type' => 'string',
                 'required' => true,
+                'label' => __('admin/domains.schema.bunny.api_key_label'),
                 'description' => __('admin/domains.schema.bunny.api_key'),
                 'sensitive' => true,
             ],
             'zone_id' => [
                 'type' => 'string',
                 'required' => true,
+                'label' => __('admin/domains.schema.bunny.zone_id_label'),
                 'description' => __('admin/domains.schema.bunny.zone_id'),
                 'sensitive' => false,
             ],

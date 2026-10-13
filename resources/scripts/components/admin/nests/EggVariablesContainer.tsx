@@ -16,6 +16,7 @@ import { Dialog } from '@/components/elements/dialog';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const cardClass = 'flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
 
@@ -45,20 +46,24 @@ const PermissionsField = ({
     editable: boolean;
     onViewableChange: (value: boolean) => void;
     onEditableChange: (value: boolean) => void;
-}) => (
-    <Field label='Permissions'>
-        <div className='flex flex-col gap-2'>
-            <div className='flex items-center gap-2'>
-                <Checkbox checked={viewable} onCheckedChange={(checked) => onViewableChange(checked === true)} />
-                <span className='text-sm text-cream-100'>Users Can View</span>
+}) => {
+    const { t } = useTranslation();
+
+    return (
+        <Field label={t('admin.nests.permissions')}>
+            <div className='flex flex-col gap-2'>
+                <div className='flex items-center gap-2'>
+                    <Checkbox checked={viewable} onCheckedChange={(checked) => onViewableChange(checked === true)} />
+                    <span className='text-sm text-cream-100'>{t('admin.nests.users_can_view')}</span>
+                </div>
+                <div className='flex items-center gap-2'>
+                    <Checkbox checked={editable} onCheckedChange={(checked) => onEditableChange(checked === true)} />
+                    <span className='text-sm text-cream-100'>{t('admin.nests.users_can_edit')}</span>
+                </div>
             </div>
-            <div className='flex items-center gap-2'>
-                <Checkbox checked={editable} onCheckedChange={(checked) => onEditableChange(checked === true)} />
-                <span className='text-sm text-cream-100'>Users Can Edit</span>
-            </div>
-        </div>
-    </Field>
-);
+        </Field>
+    );
+};
 
 const CreateVariableDialog = ({
     open,
@@ -71,6 +76,7 @@ const CreateVariableDialog = ({
     onClose: () => void;
     onCreated: () => Promise<unknown>;
 }) => {
+    const { t } = useTranslation();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [envVariable, setEnvVariable] = useState('');
@@ -101,7 +107,7 @@ const CreateVariableDialog = ({
                 rules,
             });
             await onCreated();
-            toast.success('Variable created.');
+            toast.success(t('admin.nests.variable_created'));
             setName('');
             setDescription('');
             setEnvVariable('');
@@ -112,14 +118,14 @@ const CreateVariableDialog = ({
             onClose();
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to create the variable.'));
+            toast.error(errorToMessage(error, t('admin.nests.variable_create_failed')));
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <Dialog open={open} title='Create Variable' onClose={close} preventExternalClose={submitting}>
+        <Dialog open={open} title={t('admin.nests.create_variable')} onClose={close} preventExternalClose={submitting}>
             <div className='mt-4'>
                 <form
                     id='create-variable-form'
@@ -129,23 +135,27 @@ const CreateVariableDialog = ({
                     }}
                     className='flex flex-col gap-4'
                 >
-                    <Field label='Name' error={errors.name} hint='A human readable name for this variable.'>
+                    <Field label={t('admin.common.name')} error={errors.name} hint={t('admin.nests.var_name_hint')}>
                         <Input.Text value={name} onChange={(event) => setName(event.target.value)} />
                     </Field>
-                    <Field label='Description' error={errors.description} hint='Optional. Shown to the user.'>
+                    <Field
+                        label={t('admin.common.description')}
+                        error={errors.description}
+                        hint={t('admin.nests.var_description_hint')}
+                    >
                         <Input.Text value={description} onChange={(event) => setDescription(event.target.value)} />
                     </Field>
                     <Field
-                        label='Environment Variable'
+                        label={t('admin.nests.env_variable')}
                         error={errors.env_variable}
-                        hint='The variable name available to the startup command, e.g. SERVER_JARFILE.'
+                        hint={t('admin.nests.env_variable_hint')}
                     >
                         <Input.Text value={envVariable} onChange={(event) => setEnvVariable(event.target.value)} />
                     </Field>
                     <Field
-                        label='Default Value'
+                        label={t('admin.nests.default_value')}
                         error={errors.default_value}
-                        hint='Used when the user does not set one.'
+                        hint={t('admin.nests.default_value_hint')}
                     >
                         <Input.Text value={defaultValue} onChange={(event) => setDefaultValue(event.target.value)} />
                     </Field>
@@ -156,18 +166,18 @@ const CreateVariableDialog = ({
                         onEditableChange={setEditable}
                     />
                     <Field
-                        label='Input Rules'
+                        label={t('admin.nests.input_rules_field')}
                         error={errors.rules}
-                        hint='Validation rules applied to the value, e.g. required|string|max:20.'
+                        hint={t('admin.nests.input_rules_hint')}
                     >
                         <Input.Text value={rules} onChange={(event) => setRules(event.target.value)} />
                     </Field>
                     <Dialog.Footer>
                         <Button type='button' variant='secondary' onClick={close} disabled={submitting}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button type='submit' form='create-variable-form' disabled={submitting}>
-                            Create
+                            {t('common.create')}
                         </Button>
                     </Dialog.Footer>
                 </form>
@@ -185,6 +195,7 @@ const VariableCard = ({
     variable: EggVariable;
     onChanged: () => Promise<unknown>;
 }) => {
+    const { t } = useTranslation();
     const [values, setValues] = useState<EggVariableValues>({
         name: variable.name,
         description: variable.description ?? '',
@@ -216,10 +227,10 @@ const VariableCard = ({
         try {
             await updateEggVariable(eggId, variable.id, values);
             await onChanged();
-            toast.success('Variable updated.');
+            toast.success(t('admin.nests.variable_updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update the variable.'));
+            toast.error(errorToMessage(error, t('admin.nests.variable_update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -231,9 +242,9 @@ const VariableCard = ({
         try {
             await deleteEggVariable(eggId, variable.id);
             await onChanged();
-            toast.success('Variable deleted.');
+            toast.success(t('admin.nests.variable_deleted'));
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete the variable.'));
+            toast.error(errorToMessage(error, t('admin.nests.variable_delete_failed')));
             setDeleting(false);
             setConfirmDelete(false);
         }
@@ -250,22 +261,22 @@ const VariableCard = ({
             <h2 className='text-sm font-semibold text-cream-50'>
                 {variable.required && (
                     <span className='mr-2 rounded-full bg-brand-400/20 px-2 py-0.5 text-[10px] uppercase text-brand-400'>
-                        Required
+                        {t('admin.nests.required_badge')}
                     </span>
                 )}
                 {values.name || variable.name}
             </h2>
 
-            <Field label='Name' error={errors.name}>
+            <Field label={t('admin.common.name')} error={errors.name}>
                 <Input.Text value={values.name} onChange={(event) => set('name', event.target.value)} />
             </Field>
-            <Field label='Description' error={errors.description}>
+            <Field label={t('admin.common.description')} error={errors.description}>
                 <Input.Text value={values.description} onChange={(event) => set('description', event.target.value)} />
             </Field>
-            <Field label='Environment Variable' error={errors.env_variable}>
+            <Field label={t('admin.nests.env_variable')} error={errors.env_variable}>
                 <Input.Text value={values.env_variable} onChange={(event) => set('env_variable', event.target.value)} />
             </Field>
-            <Field label='Default Value' error={errors.default_value}>
+            <Field label={t('admin.nests.default_value')} error={errors.default_value}>
                 <Input.Text
                     value={values.default_value}
                     onChange={(event) => set('default_value', event.target.value)}
@@ -277,34 +288,35 @@ const VariableCard = ({
                 onViewableChange={(checked) => toggleOption('user_viewable', checked)}
                 onEditableChange={(checked) => toggleOption('user_editable', checked)}
             />
-            <Field label='Input Rules' error={errors.rules}>
+            <Field label={t('admin.nests.input_rules_field')} error={errors.rules}>
                 <Input.Text value={values.rules} onChange={(event) => set('rules', event.target.value)} />
             </Field>
 
             <div className='flex items-center justify-between'>
                 <Button type='button' variant='attention' onClick={() => setConfirmDelete(true)}>
-                    Delete
+                    {t('common.delete')}
                 </Button>
                 <Button type='submit' disabled={submitting}>
-                    Save
+                    {t('common.save')}
                 </Button>
             </div>
 
             <Dialog.Confirm
                 open={confirmDelete}
-                title='Delete Variable'
-                confirm='Delete'
+                title={t('admin.nests.delete_variable')}
+                confirm={t('common.delete')}
                 loading={deleting}
                 onClose={() => setConfirmDelete(false)}
                 onConfirmed={remove}
             >
-                Deleting this variable will remove it from every server using this egg. This cannot be undone.
+                {t('admin.nests.delete_variable_confirm')}
             </Dialog.Confirm>
         </form>
     );
 };
 
 const EggVariablesContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data, mutate } = useEggVariables(id);
     const [createOpen, setCreateOpen] = useState(false);
@@ -322,13 +334,13 @@ const EggVariablesContainer = () => {
     return (
         <div className='flex flex-col gap-4'>
             <div className='flex items-center justify-between'>
-                <h2 className='text-sm font-semibold text-cream-50'>Variables</h2>
-                <Button onClick={() => setCreateOpen(true)}>Create New Variable</Button>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.variables_title')}</h2>
+                <Button onClick={() => setCreateOpen(true)}>{t('admin.nests.create_new_variable')}</Button>
             </div>
 
             {data.data.length === 0 ? (
                 <div className={cardClass}>
-                    <p className='text-sm text-cream-400/50'>This egg has no variables.</p>
+                    <p className='text-sm text-cream-400/50'>{t('admin.nests.no_variables')}</p>
                 </div>
             ) : (
                 <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>

@@ -5,9 +5,11 @@ import { type BucketValues, updateBucket } from '@/api/admin/buckets';
 import { errorToMessage, parseValidationErrors } from '@/api/admin/errors';
 import { useBucket } from '@/api/admin/useBuckets';
 import Spinner from '@/components/elements/Spinner';
+import { useTranslation } from '@/i18n/I18nProvider';
 import BucketForm from './BucketForm';
 
 const BucketDetailsContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data: bucket, mutate } = useBucket(id);
     const [submitting, setSubmitting] = useState(false);
@@ -28,10 +30,10 @@ const BucketDetailsContainer = () => {
         try {
             await updateBucket(bucket.id, values);
             await mutate();
-            toast.success('S3 configuration updated.');
+            toast.success(t('admin.buckets.updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update the S3 configuration.'));
+            toast.error(errorToMessage(error, t('admin.buckets.update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -51,7 +53,7 @@ const BucketDetailsContainer = () => {
                 use_path_style_endpoint: bucket.use_path_style_endpoint,
                 enabled: bucket.enabled,
             }}
-            submitLabel='Update Configuration'
+            submitLabel={t('admin.buckets.update')}
             submitting={submitting}
             errors={errors}
             onSubmit={submit}

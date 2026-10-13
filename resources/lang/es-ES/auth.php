@@ -19,6 +19,7 @@ return [
         'label' => 'Token de autenticación en dos pasos',
         'label_help' => 'Esta cuenta requiere una segunda capa de autenticación para continuar. Introduce el código generado por tu dispositivo para completar este inicio de sesión.',
         'checkpoint_failed' => 'El token de autenticación en dos pasos no era válido.',
+        'recovery_token_invalid' => 'El token de recuperación proporcionado no es válido.',
     ],
 
     'throttle' => 'Demasiados intentos de inicio de sesión. Vuelve a intentarlo en :seconds segundos.',

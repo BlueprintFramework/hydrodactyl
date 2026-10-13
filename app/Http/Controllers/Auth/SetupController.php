@@ -113,7 +113,7 @@ class SetupController extends Controller
         Activity::event('setup:admin-created')
             ->withRequestMetadata()
             ->subject($user)
-            ->log('created the first administrator account via the web setup flow');
+            ->log();
 
         return new JsonResponse([
             'data' => [

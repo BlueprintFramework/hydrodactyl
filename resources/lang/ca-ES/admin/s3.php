@@ -48,6 +48,7 @@ return [
         'success' => 'Correcte',
         'test_connection' => 'Prova la connexió',
         'title' => 'Cub nou',
+        'test_file_content' => 'Aquesta és una prova de pujada. Si estàs llegint això, ha funcionat. Feliç allotjament de servidors!',
     ],
     'view' => [
         'delete' => [

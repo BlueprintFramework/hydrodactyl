@@ -35,4 +35,5 @@ return [
         'servers' => 'Servidors',
         'users' => 'Usuaris',
     ],
+    'auto_deploy_key_memo' => 'Clau de desplegament de nodes generada automàticament.',
 ];

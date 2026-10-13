@@ -58,7 +58,7 @@ class NestSeeder extends Seeder
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Minecraft',
-                'description' => 'Minecraft - the classic game from Mojang. With support for Vanilla MC, Spigot, and many others!',
+                'description' => __('command/messages.seeders.nest_minecraft_description'),
             ], 'support@pterodactyl.io');
         }
     }
@@ -73,7 +73,7 @@ class NestSeeder extends Seeder
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Hytale',
-                'description' => 'Hytale - A new sandbox game from Hypixel Studios.',
+                'description' => __('command/messages.seeders.nest_hytale_description'),
             ], 'support@pterodactyl.io');
         }
     }
@@ -88,7 +88,7 @@ class NestSeeder extends Seeder
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Source Engine',
-                'description' => 'Includes support for most Source Dedicated Server games.',
+                'description' => __('command/messages.seeders.nest_source_engine_description'),
             ], 'support@pterodactyl.io');
         }
     }
@@ -103,7 +103,7 @@ class NestSeeder extends Seeder
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Voice Servers',
-                'description' => 'Voice servers such as Mumble and Teamspeak 3.',
+                'description' => __('command/messages.seeders.nest_voice_servers_description'),
             ], 'support@pterodactyl.io');
         }
     }
@@ -118,7 +118,7 @@ class NestSeeder extends Seeder
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Rust',
-                'description' => 'Rust - A game where you must fight to survive.',
+                'description' => __('command/messages.seeders.nest_rust_description'),
             ], 'support@pterodactyl.io');
         }
     }
@@ -133,7 +133,7 @@ class NestSeeder extends Seeder
         if (is_null($nest)) {
             $this->creationService->handle([
                 'name' => 'Vintage Story',
-                'description' => 'Vintage Story - An uncompromising wilderness survival sandbox game.',
+                'description' => __('command/messages.seeders.nest_vintage_story_description'),
             ], 'support@pterodactyl.io');
         }
     }

@@ -19,6 +19,7 @@ return [
         'label' => 'Testimoni de doble factor',
         'label_help' => 'Aquest compte requereix una segona capa d\'autenticació per continuar. Introdueix el codi generat pel teu dispositiu per completar aquest inici de sessió.',
         'checkpoint_failed' => 'El testimoni d\'autenticació de doble factor no era vàlid.',
+        'recovery_token_invalid' => 'El token de recuperació proporcionat no és vàlid.',
     ],
 
     'throttle' => 'Massa intents d\'inici de sessió. Torna-ho a provar d\'aquí a :seconds segons.',

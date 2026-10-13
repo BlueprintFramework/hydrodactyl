@@ -80,6 +80,9 @@ return [
             'fail' => 'Marked the :name backup as failed',
             'lock' => 'Locked the :name backup',
             'unlock' => 'Unlocked the :name backup',
+            'delete_all' => 'Deleted all :count backups',
+            'bulk_delete' => 'Deleted :count backups',
+            'software-change' => 'Created a software change backup :backup_name',
         ],
         'database' => [
             'create' => 'Created new database :name',
@@ -162,6 +165,9 @@ return [
         ],
         'software' => [
             'change-queued' => 'Queued a software change from egg :from_egg to :to_egg',
+            'change-started' => 'Started a software change from egg :from_egg to :to_egg',
+            'changed' => 'Completed the software change',
+            'change-failed' => 'Software change failed: :error',
         ],
         'startup' => [
             'edit' => 'Changed the :variable variable from :old to :new',
@@ -173,6 +179,12 @@ return [
             'create' => 'Added :email as a subuser',
             'update' => 'Updated the subuser permissions for :email',
             'delete' => 'Removed :email as a subuser',
+        ],
+        'files' => [
+            'software-change-wipe' => 'Deleted :files_deleted files for the software change',
+        ],
+        'subdomain' => [
+            'deleted-egg-change' => 'Deleted the subdomain :subdomain because it is incompatible with the new egg',
         ],
     ],
 ];

@@ -6,9 +6,11 @@ import { addServerMount, removeServerMount, type ServerMount } from '@/api/admin
 import { useServerMounts } from '@/api/admin/useServers';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 const ServerMountsContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data, mutate } = useServerMounts(id);
     const [busy, setBusy] = useState<number>();
@@ -27,15 +29,15 @@ const ServerMountsContainer = () => {
         try {
             if (mount.is_mounted) {
                 await removeServerMount(Number(id), mount.id);
-                toast.success('Mount removed.');
+                toast.success(t('admin.servers.mount_removed'));
             } else {
                 await addServerMount(Number(id), mount.id);
-                toast.success('Mount added.');
+                toast.success(t('admin.servers.mount_added'));
             }
 
             await mutate();
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to update the mount.'));
+            toast.error(errorToMessage(error, t('admin.servers.mount_update_failed')));
         } finally {
             setBusy(undefined);
         }
@@ -46,11 +48,11 @@ const ServerMountsContainer = () => {
             <table className='w-full text-sm'>
                 <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                     <tr className='border-b border-mocha-400'>
-                        <th className='px-4 py-3'>ID</th>
-                        <th className='px-4 py-3'>Name</th>
-                        <th className='px-4 py-3'>Source</th>
-                        <th className='px-4 py-3'>Target</th>
-                        <th className='px-4 py-3'>Status</th>
+                        <th className='px-4 py-3'>{t('admin.common.id')}</th>
+                        <th className='px-4 py-3'>{t('admin.common.name')}</th>
+                        <th className='px-4 py-3'>{t('admin.mounts.source')}</th>
+                        <th className='px-4 py-3'>{t('admin.mounts.target')}</th>
+                        <th className='px-4 py-3'>{t('admin.common.status')}</th>
                         <th className='px-4 py-3' />
                     </tr>
                 </thead>
@@ -80,7 +82,7 @@ const ServerMountsContainer = () => {
                                             : 'bg-mocha-300 text-cream-400',
                                     )}
                                 >
-                                    {mount.is_mounted ? 'Mounted' : 'Unmounted'}
+                                    {mount.is_mounted ? t('admin.servers.mounted') : t('admin.servers.unmounted')}
                                 </span>
                             </td>
                             <td className='px-4 py-3'>
@@ -91,7 +93,9 @@ const ServerMountsContainer = () => {
                                         disabled={busy === mount.id}
                                         onClick={() => void toggle(mount)}
                                     >
-                                        {mount.is_mounted ? 'Unmount' : 'Mount'}
+                                        {mount.is_mounted
+                                            ? t('admin.servers.unmount_button')
+                                            : t('admin.servers.mount_button')}
                                     </Button>
                                 </div>
                             </td>
@@ -100,7 +104,7 @@ const ServerMountsContainer = () => {
                     {data.length === 0 && (
                         <tr>
                             <td colSpan={6} className='px-4 py-6 text-center text-cream-400/50'>
-                                No mounts are available for this server.
+                                {t('admin.servers.no_mounts')}
                             </td>
                         </tr>
                     )}

@@ -37,45 +37,45 @@ class DatabaseSettingsCommand extends Command
      */
     public function handle(): int
     {
-        $this->output->note('It is highly recommended to not use "localhost" as your database host as we have seen frequent socket connection issues. If you want to use a local connection you should be using "127.0.0.1".');
+        $this->output->note(__('command/messages.environment.database.localhost_note'));
         $this->variables['DB_HOST'] = $this->option('host') ?? $this->ask(
-            'Database Host',
+            __('command/messages.environment.database.ask_host'),
             config('database.connections.mysql.host', '127.0.0.1')
         );
 
         $this->variables['DB_PORT'] = $this->option('port') ?? $this->ask(
-            'Database Port',
+            __('command/messages.environment.database.ask_port'),
             config('database.connections.mysql.port', 3306)
         );
 
         $this->variables['DB_DATABASE'] = $this->option('database') ?? $this->ask(
-            'Database Name',
+            __('command/messages.environment.database.ask_name'),
             config('database.connections.mysql.database', 'panel')
         );
 
-        $this->output->note('Using the "root" account for MySQL connections is not only highly frowned upon, it is also not allowed by this application. You\'ll need to have created a MySQL user for this software.');
+        $this->output->note(__('command/messages.environment.database.root_note'));
         $this->variables['DB_USERNAME'] = $this->option('username') ?? $this->ask(
-            'Database Username',
+            __('command/messages.environment.database.ask_username'),
             config('database.connections.mysql.username', 'pterodactyl')
         );
 
         $askForMySQLPassword = true;
         if (!empty(config('database.connections.mysql.password')) && $this->input->isInteractive()) {
             $this->variables['DB_PASSWORD'] = config('database.connections.mysql.password');
-            $askForMySQLPassword = $this->confirm('It appears you already have a MySQL connection password defined, would you like to change it?');
+            $askForMySQLPassword = $this->confirm(__('command/messages.environment.database.ask_change_password'));
         }
 
         if ($askForMySQLPassword) {
-            $this->variables['DB_PASSWORD'] = $this->option('password') ?? $this->secret('Database Password');
+            $this->variables['DB_PASSWORD'] = $this->option('password') ?? $this->secret(__('command/messages.environment.database.ask_password'));
         }
 
         try {
             $this->testMySQLConnection();
         } catch (\PDOException $exception) {
-            $this->output->error(sprintf('Unable to connect to the MySQL server using the provided credentials. The error returned was "%s".', $exception->getMessage()));
-            $this->output->error('Your connection credentials have NOT been saved. You will need to provide valid connection information before proceeding.');
+            $this->output->error(__('command/messages.environment.database.connection_failed', ['error' => $exception->getMessage()]));
+            $this->output->error(__('command/messages.environment.database.not_saved'));
 
-            if ($this->confirm('Go back and try again?')) {
+            if ($this->confirm(__('command/messages.environment.database.ask_retry'))) {
                 $this->database->disconnect('_pterodactyl_command_test');
 
                 return $this->handle();

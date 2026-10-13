@@ -1,4 +1,4 @@
-import type { Translate } from '@/i18n/types';
+import type { Translate, TranslationKey } from '@/i18n/types';
 
 /**
  * Build the dictionary key used for the human readable label of an activity
@@ -14,7 +14,7 @@ export const activityEventKey = (event: string): string => `activity.events.${ev
  */
 export const activityEventLabel = (t: Translate, event: string): string => {
     const key = activityEventKey(event);
-    const translated = t(key);
+    const translated = t(key as TranslationKey);
 
     return translated === key ? event : translated;
 };

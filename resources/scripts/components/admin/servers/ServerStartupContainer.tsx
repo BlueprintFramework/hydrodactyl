@@ -10,6 +10,7 @@ import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const cardClass = 'flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
 
@@ -41,6 +42,7 @@ const ServerStartupForm = ({
     data: ServerStartupData;
     onSaved: () => Promise<unknown>;
 }) => {
+    const { t } = useTranslation();
     const { server, nests, variables } = data;
     const initial = resolveImage(findEgg(nests, server.egg_id), server.image);
 
@@ -105,10 +107,10 @@ const ServerStartupForm = ({
                 environment: env,
             });
             await onSaved();
-            toast.success('Startup configuration updated.');
+            toast.success(t('admin.servers.startup_updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update the startup configuration.'));
+            toast.error(errorToMessage(error, t('admin.servers.startup_update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -123,20 +125,20 @@ const ServerStartupForm = ({
             className='flex flex-col gap-4'
         >
             <div className={cardClass}>
-                <h2 className='text-sm font-semibold text-cream-50'>Startup Command Modification</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.startup_mod_title')}</h2>
                 <Field
-                    label='Startup Command'
+                    label={t('admin.servers.startup_command')}
                     error={errors.startup}
-                    hint={'Available by default: {{SERVER_MEMORY}}, {{SERVER_IP}}, and {{SERVER_PORT}}.'}
+                    hint={t('admin.servers.startup_hint_default')}
                 >
                     <Input.Text value={startup} onChange={(event) => setStartup(event.target.value)} />
                 </Field>
-                <Field label='Default Service Start Command' hint='Provided by the selected egg.'>
+                <Field label={t('admin.servers.default_startup')} hint={t('admin.servers.default_startup_hint')}>
                     <Input.Text readOnly className='opacity-70' value={defaultStartup} />
                 </Field>
                 <div className='flex justify-end'>
                     <Button type='submit' disabled={submitting}>
-                        Save Modifications
+                        {t('admin.servers.save_modifications')}
                     </Button>
                 </div>
             </div>
@@ -144,22 +146,26 @@ const ServerStartupForm = ({
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
                 <div className='flex flex-col gap-4'>
                     <div className={cardClass}>
-                        <h2 className='text-sm font-semibold text-cream-50'>Service Configuration</h2>
-                        <p className='text-xs text-brand-400'>
-                            Changing these values will stop the server and process a re-install command.
-                        </p>
-                        <Field label='Nest' error={errors.nest_id} hint='The nest this server is grouped into.'>
+                        <h2 className='text-sm font-semibold text-cream-50'>
+                            {t('admin.servers.service_configuration')}
+                        </h2>
+                        <p className='text-xs text-brand-400'>{t('admin.servers.service_warning')}</p>
+                        <Field
+                            label={t('admin.servers.nest')}
+                            error={errors.nest_id}
+                            hint={t('admin.servers.nest_hint')}
+                        >
                             <Dropdown
                                 value={nestId}
                                 onChange={changeNest}
                                 options={nests.map((nest) => ({ value: String(nest.id), label: nest.name }))}
                             />
                         </Field>
-                        <Field label='Egg' error={errors.egg_id} hint='Provides the processing data for this server.'>
+                        <Field label={t('admin.servers.egg')} error={errors.egg_id} hint={t('admin.servers.egg_hint')}>
                             <Dropdown
                                 value={eggId}
                                 onChange={changeEgg}
-                                placeholder='Select an egg…'
+                                placeholder={t('admin.servers.select_egg')}
                                 options={(selectedNest?.eggs ?? []).map((egg) => ({
                                     value: String(egg.id),
                                     label: egg.name,
@@ -171,31 +177,35 @@ const ServerStartupForm = ({
                                 checked={skipScripts}
                                 onCheckedChange={(checked) => setSkipScripts(checked === true)}
                             />
-                            <span className='text-sm text-cream-100'>Skip Egg Install Script</span>
+                            <span className='text-sm text-cream-100'>{t('admin.servers.skip_script')}</span>
                         </div>
-                        <p className='text-xs text-cream-400/60'>
-                            If the selected egg has an install script, checking this will skip it during install.
-                        </p>
+                        <p className='text-xs text-cream-400/60'>{t('admin.servers.skip_script_hint')}</p>
                     </div>
 
                     <div className={cardClass}>
-                        <h2 className='text-sm font-semibold text-cream-50'>Docker Image Configuration</h2>
-                        <Field label='Image' error={errors.docker_image} hint='Choose an image provided by the egg.'>
+                        <h2 className='text-sm font-semibold text-cream-50'>
+                            {t('admin.servers.docker_config_title')}
+                        </h2>
+                        <Field
+                            label={t('admin.servers.image')}
+                            error={errors.docker_image}
+                            hint={t('admin.servers.image_hint')}
+                        >
                             <Dropdown
                                 value={dockerImage}
                                 onChange={setDockerImage}
-                                placeholder='Select an image…'
+                                placeholder={t('admin.servers.select_image')}
                                 options={dockerOptions}
                             />
                         </Field>
                         <Field
-                            label='Custom Image'
+                            label={t('admin.servers.custom_image')}
                             error={errors.custom_docker_image}
-                            hint='Overrides the selected image when set.'
+                            hint={t('admin.servers.custom_image_hint_startup')}
                         >
                             <Input.Text
                                 value={customDockerImage}
-                                placeholder='Or enter a custom image…'
+                                placeholder={t('admin.servers.custom_image_placeholder')}
                                 onChange={(event) => setCustomDockerImage(event.target.value)}
                             />
                         </Field>
@@ -208,7 +218,7 @@ const ServerStartupForm = ({
                             <h3 className='text-sm font-semibold text-cream-50'>
                                 {variable.required && (
                                     <span className='mr-2 rounded-full bg-brand-400/20 px-2 py-0.5 text-[10px] uppercase text-brand-400'>
-                                        Required
+                                        {t('admin.servers.required_badge')}
                                     </span>
                                 )}
                                 {variable.name}
@@ -227,11 +237,12 @@ const ServerStartupForm = ({
                             )}
                             <div className='text-xs text-cream-400/60'>
                                 <p>
-                                    Startup Command Variable:{' '}
+                                    {t('admin.servers.startup_var_label')}{' '}
                                     <code className='text-cream-100'>{variable.env_variable}</code>
                                 </p>
                                 <p>
-                                    Input Rules: <code className='text-cream-100'>{variable.rules}</code>
+                                    {t('admin.servers.input_rules')}{' '}
+                                    <code className='text-cream-100'>{variable.rules}</code>
                                 </p>
                             </div>
                         </div>
@@ -239,7 +250,7 @@ const ServerStartupForm = ({
 
                     {(selectedEgg?.variables ?? []).length === 0 && (
                         <div className={cardClass}>
-                            <p className='text-sm text-cream-400/50'>This egg has no configurable variables.</p>
+                            <p className='text-sm text-cream-400/50'>{t('admin.servers.no_variables')}</p>
                         </div>
                     )}
                 </div>

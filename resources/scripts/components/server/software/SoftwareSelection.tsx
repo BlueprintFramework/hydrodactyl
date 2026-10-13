@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import DescriptionText from './DescriptionText';
 import SoftwareCard from './SoftwareCard';
 import SoftwareSearch from './SoftwareSearch';
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const SoftwareSelection = ({ selectedNest, isLoading, selectedEggUuid, onSelectEgg, onBack, onCancel }: Props) => {
+    const { t } = useTranslation();
     const [query, setQuery] = useState('');
     const [debouncedQuery] = useDebounce(query, 150);
     const normalizedQuery = debouncedQuery.trim().toLowerCase();
@@ -34,14 +36,14 @@ const SoftwareSelection = ({ selectedNest, isLoading, selectedEggUuid, onSelectE
     }, [eggs, normalizedQuery]);
 
     return (
-        <SoftwareCard title={`Select Software - ${selectedNest?.attributes.name}`}>
+        <SoftwareCard title={t('server.software.selection.title', { nest: selectedNest?.attributes.name })}>
             <div className='space-y-4'>
                 <div className='flex flex-col sm:flex-row gap-3'>
                     <Button variant='secondary' onClick={onBack} className='w-full sm:w-auto'>
-                        Back to Games
+                        {t('server.software.selection.back_to_games')}
                     </Button>
                     <Button variant='secondary' onClick={onCancel} className='w-full sm:w-auto'>
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                 </div>
 
@@ -49,23 +51,23 @@ const SoftwareSelection = ({ selectedNest, isLoading, selectedEggUuid, onSelectE
                     id='software-search'
                     value={query}
                     onChange={setQuery}
-                    placeholder='Search software...'
+                    placeholder={t('server.software.selection.search_placeholder')}
                 />
 
                 {isLoading ? (
                     <div className='flex items-center justify-center py-16'>
                         <div className='flex flex-col items-center text-center'>
                             <Spinner size='large' />
-                            <p className='text-cream-400/70 mt-4'>Loading software options...</p>
+                            <p className='text-cream-400/70 mt-4'>{t('server.software.selection.loading')}</p>
                         </div>
                     </div>
                 ) : filteredEggs.length === 0 ? (
                     <div className='flex flex-col items-center justify-center py-12 text-center'>
-                        <p className='text-cream-400 font-medium'>No software found</p>
+                        <p className='text-cream-400 font-medium'>{t('server.software.selection.no_results')}</p>
                         <p className='text-sm text-cream-400/50 mt-1'>
                             {normalizedQuery
-                                ? `Nothing in this category matched “${query.trim()}”.`
-                                : 'This category does not have any software available.'}
+                                ? t('server.software.selection.no_results_query', { query: query.trim() })
+                                : t('server.software.selection.no_results_empty')}
                         </p>
                     </div>
                 ) : (

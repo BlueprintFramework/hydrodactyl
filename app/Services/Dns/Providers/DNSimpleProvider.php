@@ -156,12 +156,14 @@ class DNSimpleProvider implements DnsProviderInterface
             'api_token' => [
                 'type' => 'string',
                 'required' => true,
+                'label' => __('admin/domains.schema.dnsimple.api_token_label'),
                 'description' => __('admin/domains.schema.dnsimple.api_token'),
                 'sensitive' => true,
             ],
             'account_id' => [
                 'type' => 'string',
                 'required' => false,
+                'label' => __('admin/domains.schema.dnsimple.account_id_label'),
                 'description' => __('admin/domains.schema.dnsimple.account_id'),
                 'sensitive' => false,
             ],

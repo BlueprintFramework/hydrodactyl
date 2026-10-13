@@ -194,7 +194,7 @@ class Route53Provider implements DnsProviderInterface
         $this->client->changeResourceRecordSets([
             'HostedZoneId' => $zoneId,
             'ChangeBatch'  => [
-                'Comment' => 'Delete subdomain record - Hydrodactyl',
+                'Comment' => __('admin/domains.route53_delete_comment'),
                 'Changes'  => [[
                     'Action'            => 'DELETE',
                     'ResourceRecordSet' => $rrset,
@@ -254,24 +254,28 @@ class Route53Provider implements DnsProviderInterface
             'access_key_id' => [
                 'type' => 'string',
                 'required' => true,
+                'label' => __('admin/domains.schema.route53.access_key_id_label'),
                 'description' => __('admin/domains.schema.route53.access_key_id'),
                 'sensitive' => true,
             ],
             'secret_access_key' => [
                 'type' => 'string',
                 'required' => true,
+                'label' => __('admin/domains.schema.route53.secret_access_key_label'),
                 'description' => __('admin/domains.schema.route53.secret_access_key'),
                 'sensitive' => true,
             ],
             'hosted_zone_id' => [
                 'type' => 'string',
                 'required' => true,
+                'label' => __('admin/domains.schema.route53.hosted_zone_id_label'),
                 'description' => __('admin/domains.schema.route53.hosted_zone_id'),
                 'sensitive' => false,
             ],
             'region' => [
                 'type' => 'string',
                 'required' => false,
+                'label' => __('admin/domains.schema.route53.region_label'),
                 'description' => __('admin/domains.schema.route53.region'),
                 'default' => 'us-east-1',
                 'sensitive' => false,

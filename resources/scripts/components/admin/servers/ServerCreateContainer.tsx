@@ -21,6 +21,7 @@ import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import VirtualizedList from '@/components/elements/VirtualizedList';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import OwnerSelect from './OwnerSelect';
 
 const cardClass = 'flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
@@ -32,6 +33,7 @@ const findEgg = (nests: NestSummary[], eggId: string) => allEggs(nests).find((eg
 const imagesFor = (egg?: EggSummary) => (egg ? Object.values(egg.docker_images ?? {}) : []);
 
 const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const firstNode = options.locations.flatMap((location) => location.nodes)[0];
@@ -199,11 +201,11 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
 
         try {
             const server = await createServer(payload);
-            toast.success('Server created.');
+            toast.success(t('admin.servers.created'));
             navigate(`/servers/${server.id}`);
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to create the server.'));
+            toast.error(errorToMessage(error, t('admin.servers.create_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -218,17 +220,17 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
             className='flex flex-col gap-4'
         >
             <div className={cardClass}>
-                <h2 className='text-sm font-semibold text-cream-50'>Template &amp; Core Details</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.template_title')}</h2>
                 <Field
-                    label='Server Template'
+                    label={t('admin.servers.server_template')}
                     optional
-                    hint='Prefills resources and limits. Node and egg still need to be chosen below.'
+                    hint={t('admin.servers.server_template_hint')}
                 >
                     <Dropdown
                         value={templateId}
                         onChange={applyTemplate}
                         options={[
-                            { value: '', label: 'Custom (no template)' },
+                            { value: '', label: t('admin.servers.custom_no_template') },
                             ...options.templates.map((template) => ({
                                 value: template.id,
                                 label: template.name,
@@ -238,14 +240,22 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
                     />
                 </Field>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-                    <Field label='Server Name' error={errors.name} hint='Allowed: a-z, A-Z, 0-9, _ - . and spaces.'>
+                    <Field
+                        label={t('admin.servers.server_name')}
+                        error={errors.name}
+                        hint={t('admin.servers.server_name_hint')}
+                    >
                         <Input.Text value={name} onChange={(event) => setName(event.target.value)} />
                     </Field>
-                    <Field label='Server Description' error={errors.description}>
+                    <Field label={t('admin.servers.server_description')} error={errors.description}>
                         <Input.Text value={description} onChange={(event) => setDescription(event.target.value)} />
                     </Field>
                 </div>
-                <Field label='Server Owner' error={errors.owner_id} hint='The account that will own this server.'>
+                <Field
+                    label={t('admin.servers.server_owner')}
+                    error={errors.owner_id}
+                    hint={t('admin.servers.server_owner_hint')}
+                >
                     <OwnerSelect onChange={setOwnerId} />
                 </Field>
                 <div className='flex items-center gap-2'>
@@ -253,18 +263,18 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
                         checked={startOnCompletion}
                         onCheckedChange={(checked) => setStartOnCompletion(checked === true)}
                     />
-                    <span className='text-sm text-cream-100'>Start Server when Installed</span>
+                    <span className='text-sm text-cream-100'>{t('admin.servers.start_on_completion')}</span>
                 </div>
             </div>
 
             <div className={cardClass}>
-                <h2 className='text-sm font-semibold text-cream-50'>Allocation Management</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.allocation_title')}</h2>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-                    <Field label='Node' error={errors.node_id} hint='The node this server will be deployed to.'>
+                    <Field label={t('admin.common.node')} error={errors.node_id} hint={t('admin.servers.node_hint')}>
                         <Dropdown
                             value={nodeId}
                             onChange={changeNode}
-                            placeholder='Select a node…'
+                            placeholder={t('admin.servers.select_node')}
                             options={options.locations.flatMap((location) =>
                                 location.nodes.map((node) => ({
                                     value: String(node.id),
@@ -274,11 +284,13 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
                             )}
                         />
                     </Field>
-                    <Field label='Default Allocation' error={errors.allocation_id}>
+                    <Field label={t('admin.servers.default_allocation')} error={errors.allocation_id}>
                         <Dropdown
                             value={allocationId}
                             onChange={setAllocationId}
-                            placeholder={nodeId ? 'Select an allocation…' : 'Select a node first…'}
+                            placeholder={
+                                nodeId ? t('admin.servers.select_allocation') : t('admin.servers.select_node_first')
+                            }
                             disabled={!nodeId}
                             options={(allocations ?? []).map((allocation) => ({
                                 value: String(allocation.id),
@@ -289,13 +301,13 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
                     </Field>
                 </div>
                 <Field
-                    label='Additional Allocations'
+                    label={t('admin.servers.additional_allocations')}
                     error={errors.allocation_additional}
-                    hint='Optionally assign extra allocations to this server.'
+                    hint={t('admin.servers.additional_allocations_hint')}
                 >
                     <div className='flex flex-col gap-2'>
                         <Input.Text
-                            placeholder='Search allocations…'
+                            placeholder={t('admin.servers.search_allocations')}
                             value={allocSearch}
                             onChange={(event) => setAllocSearch(event.target.value)}
                         />
@@ -325,7 +337,7 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
                             )}
                             emptyState={
                                 <div className='px-3 py-2 text-sm text-cream-400/50'>
-                                    No unassigned allocations are available on this node.
+                                    {t('admin.servers.no_unassigned')}
                                 </div>
                             }
                         />
@@ -335,67 +347,105 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
 
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
                 <div className={cardClass}>
-                    <h2 className='text-sm font-semibold text-cream-50'>Resource Management</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.resource_title')}</h2>
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                        <Field label='CPU Limit' error={errors.cpu} hint='Each thread is 100%. 0 is unrestricted.'>
+                        <Field
+                            label={t('admin.servers.cpu_limit')}
+                            error={errors.cpu}
+                            hint={t('admin.servers.cpu_limit_hint')}
+                        >
                             <Input.Text type='number' value={cpu} onChange={(event) => setCpu(event.target.value)} />
                         </Field>
-                        <Field label='CPU Pinning' error={errors.threads} hint='e.g. 0, 0-1,3 or 0,1,3,4.'>
+                        <Field
+                            label={t('admin.servers.cpu_pinning')}
+                            error={errors.threads}
+                            hint={t('admin.servers.cpu_pinning_hint')}
+                        >
                             <Input.Text value={threads} onChange={(event) => setThreads(event.target.value)} />
                         </Field>
-                        <Field label='Memory' error={errors.memory} hint='MiB. 0 is unlimited.'>
+                        <Field
+                            label={t('admin.common.memory')}
+                            error={errors.memory}
+                            hint={t('admin.servers.memory_hint')}
+                        >
                             <Input.Text
                                 type='number'
                                 value={memory}
                                 onChange={(event) => setMemory(event.target.value)}
                             />
                         </Field>
-                        <Field label='Overhead Memory' error={errors.overhead_memory} hint='MiB. 0 disables it.'>
+                        <Field
+                            label={t('admin.servers.overhead_memory')}
+                            error={errors.overhead_memory}
+                            hint={t('admin.servers.overhead_hint')}
+                        >
                             <Input.Text
                                 type='number'
                                 value={overheadMemory}
                                 onChange={(event) => setOverheadMemory(event.target.value)}
                             />
                         </Field>
-                        <Field label='Swap' error={errors.swap} hint='MiB. 0 disables, -1 is unlimited.'>
+                        <Field label={t('admin.servers.swap')} error={errors.swap} hint={t('admin.servers.swap_hint')}>
                             <Input.Text type='number' value={swap} onChange={(event) => setSwap(event.target.value)} />
                         </Field>
-                        <Field label='Disk Space' error={errors.disk} hint='MiB. 0 is unlimited.'>
+                        <Field
+                            label={t('admin.servers.disk_space')}
+                            error={errors.disk}
+                            hint={t('admin.servers.disk_space_hint')}
+                        >
                             <Input.Text type='number' value={disk} onChange={(event) => setDisk(event.target.value)} />
                         </Field>
-                        <Field label='Block IO Weight' error={errors.io} hint='Between 10 and 1000.'>
+                        <Field
+                            label={t('admin.servers.block_io')}
+                            error={errors.io}
+                            hint={t('admin.servers.block_io_hint')}
+                        >
                             <Input.Text type='number' value={io} onChange={(event) => setIo(event.target.value)} />
                         </Field>
                     </div>
                     <div className='flex items-center gap-2'>
                         <Checkbox checked={oomKiller} onCheckedChange={(checked) => setOomKiller(checked === true)} />
-                        <span className='text-sm text-cream-100'>Enable OOM Killer</span>
+                        <span className='text-sm text-cream-100'>{t('admin.servers.oom_killer')}</span>
                     </div>
                     <div className='flex items-center gap-2'>
                         <Checkbox checked={exclude} onCheckedChange={(checked) => setExclude(checked === true)} />
-                        <span className='text-sm text-cream-100'>Exclude from Resource Calculation</span>
+                        <span className='text-sm text-cream-100'>{t('admin.servers.exclude_resource')}</span>
                     </div>
                 </div>
 
                 <div className='flex flex-col gap-4'>
                     <div className={cardClass}>
-                        <h2 className='text-sm font-semibold text-cream-50'>Application Feature Limits</h2>
+                        <h2 className='text-sm font-semibold text-cream-50'>
+                            {t('admin.servers.feature_limits_title')}
+                        </h2>
                         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                            <Field label='Database Limit' error={errors.database_limit} hint='Blank is unlimited.'>
+                            <Field
+                                label={t('admin.servers.database_limit')}
+                                error={errors.database_limit}
+                                hint={t('admin.servers.blank_unlimited')}
+                            >
                                 <Input.Text
                                     type='number'
                                     value={databaseLimit}
                                     onChange={(event) => setDatabaseLimit(event.target.value)}
                                 />
                             </Field>
-                            <Field label='Allocation Limit' error={errors.allocation_limit} hint='Blank is unlimited.'>
+                            <Field
+                                label={t('admin.servers.allocation_limit')}
+                                error={errors.allocation_limit}
+                                hint={t('admin.servers.blank_unlimited')}
+                            >
                                 <Input.Text
                                     type='number'
                                     value={allocationLimit}
                                     onChange={(event) => setAllocationLimit(event.target.value)}
                                 />
                             </Field>
-                            <Field label='Backup Limit' error={errors.backup_limit} hint='Blank is unlimited.'>
+                            <Field
+                                label={t('admin.servers.backup_limit')}
+                                error={errors.backup_limit}
+                                hint={t('admin.servers.blank_unlimited')}
+                            >
                                 <Input.Text
                                     type='number'
                                     value={backupLimit}
@@ -404,9 +454,9 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
                             </Field>
                             {isElytra && (
                                 <Field
-                                    label='Backup Storage Limit'
+                                    label={t('admin.servers.backup_storage_limit')}
                                     error={errors.backup_storage_limit}
-                                    hint='MiB. Blank is unlimited. Elytra only.'
+                                    hint={t('admin.servers.backup_storage_hint')}
                                 >
                                     <Input.Text
                                         type='number'
@@ -419,37 +469,41 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
                     </div>
 
                     <div className={cardClass}>
-                        <h2 className='text-sm font-semibold text-cream-50'>Nest &amp; Docker Configuration</h2>
-                        <Field label='Nest' error={errors.nest_id}>
+                        <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.nest_docker_title')}</h2>
+                        <Field label={t('admin.servers.nest')} error={errors.nest_id}>
                             <Dropdown
                                 value={nestId}
                                 onChange={changeNest}
                                 options={options.nests.map((nest) => ({ value: String(nest.id), label: nest.name }))}
                             />
                         </Field>
-                        <Field label='Egg' error={errors.egg_id}>
+                        <Field label={t('admin.servers.egg')} error={errors.egg_id}>
                             <Dropdown
                                 value={eggId}
                                 onChange={applyEgg}
-                                placeholder='Select an egg…'
+                                placeholder={t('admin.servers.select_egg')}
                                 options={(selectedNest?.eggs ?? []).map((egg) => ({
                                     value: String(egg.id),
                                     label: egg.name,
                                 }))}
                             />
                         </Field>
-                        <Field label='Docker Image' error={errors.image}>
+                        <Field label={t('admin.servers.docker_image')} error={errors.image}>
                             <Dropdown
                                 value={image}
                                 onChange={setImage}
-                                placeholder='Select an image…'
+                                placeholder={t('admin.servers.select_image')}
                                 options={dockerOptions}
                             />
                         </Field>
-                        <Field label='Custom Image' error={errors.custom_image} hint='Overrides the selected image.'>
+                        <Field
+                            label={t('admin.servers.custom_image')}
+                            error={errors.custom_image}
+                            hint={t('admin.servers.custom_image_hint')}
+                        >
                             <Input.Text
                                 value={customImage}
-                                placeholder='Or enter a custom image…'
+                                placeholder={t('admin.servers.custom_image_placeholder')}
                                 onChange={(event) => setCustomImage(event.target.value)}
                             />
                         </Field>
@@ -458,22 +512,22 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
                                 checked={skipScripts}
                                 onCheckedChange={(checked) => setSkipScripts(checked === true)}
                             />
-                            <span className='text-sm text-cream-100'>Skip Egg Install Script</span>
+                            <span className='text-sm text-cream-100'>{t('admin.servers.skip_script')}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div className={cardClass}>
-                <h2 className='text-sm font-semibold text-cream-50'>Startup Configuration</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.startup_title')}</h2>
                 <Field
-                    label='Startup Command'
+                    label={t('admin.servers.startup_command')}
                     error={errors.startup}
-                    hint={'Available: {{SERVER_MEMORY}}, {{SERVER_IP}}, and {{SERVER_PORT}}.'}
+                    hint={t('admin.servers.startup_hint')}
                 >
                     <Input.Text value={startup} onChange={(event) => setStartup(event.target.value)} />
                 </Field>
-                <Field label='Default Service Start Command' hint='Provided by the selected egg.'>
+                <Field label={t('admin.servers.default_startup')} hint={t('admin.servers.default_startup_hint')}>
                     <Input.Text readOnly className='opacity-70' value={defaultStartup} />
                 </Field>
 
@@ -501,7 +555,7 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
 
                 <div className='flex justify-end'>
                     <Button type='submit' disabled={submitting}>
-                        Create Server
+                        {t('admin.servers.create')}
                     </Button>
                 </div>
             </div>
@@ -510,6 +564,7 @@ const ServerCreateForm = ({ options }: { options: ServerCreateOptions }) => {
 };
 
 const ServerCreateContainer = () => {
+    const { t } = useTranslation();
     const { data: options } = useServerCreateOptions();
 
     if (!options) {
@@ -521,9 +576,9 @@ const ServerCreateContainer = () => {
     }
 
     return (
-        <PageContentBlock title='Create Server'>
-            <MainPageHeader direction='column' title='Create Server'>
-                <p className='text-sm text-neutral-400'>Add a new server to the panel.</p>
+        <PageContentBlock title={t('admin.servers.create')}>
+            <MainPageHeader direction='column' title={t('admin.servers.create')}>
+                <p className='text-sm text-neutral-400'>{t('admin.servers.create_description')}</p>
             </MainPageHeader>
 
             <ServerCreateForm options={options} />

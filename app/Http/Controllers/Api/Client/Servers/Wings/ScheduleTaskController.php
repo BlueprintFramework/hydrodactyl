@@ -153,7 +153,7 @@ class ScheduleTaskController extends ClientApiController
         }
 
         if ($task->is_queued || $task->is_processing) {
-            throw new HttpForbiddenException('Cannot delete a task that is currently queued or processing.');
+            throw new HttpForbiddenException(__('exceptions.client.schedules.task_queued'));
         }
 
         $sequenceId = $task->sequence_id;

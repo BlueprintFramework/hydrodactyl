@@ -8,10 +8,13 @@ import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 
 const ICONS = ['link', 'book', 'globe', 'help', 'home', 'store', 'discord', 'document', 'terminal', 'rocket'] as const;
 
 const CustomNavigationForm = ({ settings, onSaved }: { settings: CustomNavValues; onSaved: () => void }) => {
+    const { t } = useTranslation();
     const [items, setItems] = useState(settings.items);
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -26,10 +29,10 @@ const CustomNavigationForm = ({ settings, onSaved }: { settings: CustomNavValues
         try {
             await updateSettings('custom-navigation', { 'app:custom_nav_items': items });
             await onSaved();
-            toast.success('Settings saved.');
+            toast.success(t('admin.settings.saved'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to save settings.'));
+            toast.error(errorToMessage(error, t('admin.settings.save_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -44,37 +47,44 @@ const CustomNavigationForm = ({ settings, onSaved }: { settings: CustomNavValues
             className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'
         >
             <div>
-                <h2 className='text-sm font-semibold text-cream-50'>Custom Navigation Items</h2>
-                <p className='mt-1 text-xs text-cream-400/50'>
-                    Add up to 3 custom links to display at the bottom of the sidebar. Experimental.
-                </p>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.nav_items_title')}</h2>
+                <p className='mt-1 text-xs text-cream-400/50'>{t('admin.settings.nav_items_description')}</p>
             </div>
 
             {items.map((item, index) => (
                 <div key={index} className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <Field label={`Item ${index + 1} Label`} error={errors[`app:custom_nav_items.${index}.label`]}>
+                    <Field
+                        label={t('admin.settings.item_label', { index: index + 1 })}
+                        error={errors[`app:custom_nav_items.${index}.label`]}
+                    >
                         <Input.Text
                             maxLength={32}
-                            placeholder='Documentation'
+                            placeholder={t('admin.settings.item_label_placeholder')}
                             value={item.label}
                             onChange={(e) => update(index, { label: e.target.value })}
                         />
                     </Field>
-                    <Field label={`Item ${index + 1} Link`} error={errors[`app:custom_nav_items.${index}.url`]}>
+                    <Field
+                        label={t('admin.settings.item_link', { index: index + 1 })}
+                        error={errors[`app:custom_nav_items.${index}.url`]}
+                    >
                         <Input.Text
                             maxLength={2048}
-                            placeholder='https://example.com or /account'
+                            placeholder={t('admin.settings.item_link_placeholder')}
                             value={item.url}
                             onChange={(e) => update(index, { url: e.target.value })}
                         />
                     </Field>
-                    <Field label={`Item ${index + 1} Icon`} error={errors[`app:custom_nav_items.${index}.icon`]}>
+                    <Field
+                        label={t('admin.settings.item_icon', { index: index + 1 })}
+                        error={errors[`app:custom_nav_items.${index}.icon`]}
+                    >
                         <Dropdown
                             value={item.icon}
                             onChange={(value) => update(index, { icon: value })}
                             options={ICONS.map((icon) => ({
                                 value: icon,
-                                label: icon.charAt(0).toUpperCase() + icon.slice(1),
+                                label: t(`admin.settings.nav_icons.${icon}` as TranslationKey),
                             }))}
                         />
                     </Field>
@@ -83,7 +93,7 @@ const CustomNavigationForm = ({ settings, onSaved }: { settings: CustomNavValues
 
             <div className='flex justify-end'>
                 <Button type='submit' disabled={submitting}>
-                    Save
+                    {t('common.save')}
                 </Button>
             </div>
         </form>

@@ -7,6 +7,7 @@ interface RequestParameters {
     name?: string;
     ignored?: string;
     isLocked: boolean;
+    pendingName?: string;
 }
 
 interface CreateBackupResponse {
@@ -57,7 +58,7 @@ export default async (
         // note: I really don't like this implementation but I really can't be fucked right now to do this better - ellie
         const tempBackup: ServerBackup = {
             uuid: '', // Will be filled when WebSocket events arrive
-            name: params.name || 'Pending...',
+            name: params.name || params.pendingName || 'Pending...',
             isSuccessful: false,
             isLocked: params.isLocked,
             checksum: '',

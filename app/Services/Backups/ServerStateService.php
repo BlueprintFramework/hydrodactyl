@@ -173,7 +173,7 @@ class ServerStateService
                 ->exists();
             
             if (!$nestExists) {
-                $nestName = $state['nest_info']['name'] ?? 'Unknown';
+                $nestName = $state['nest_info']['name'] ?? __('exceptions.backups.unknown_name');
                 $errors[] = __('exceptions.backups.restore_nest_missing', ['name' => $nestName, 'id' => $state['nest_id']]);
             }
         }
@@ -185,7 +185,7 @@ class ServerStateService
                 ->exists();
             
             if (!$eggExists) {
-                $eggName = $state['egg_info']['name'] ?? 'Unknown';
+                $eggName = $state['egg_info']['name'] ?? __('exceptions.backups.unknown_name');
                 $errors[] = __('exceptions.backups.restore_egg_missing', ['name' => $eggName, 'id' => $state['egg_id']]);
             }
         }
@@ -238,9 +238,9 @@ class ServerStateService
         $state = $backup->server_state;
         
         return [
-            'nest_name' => $state['nest_info']['name'] ?? 'Unknown',
-            'egg_name' => $state['egg_info']['name'] ?? 'Unknown',
-            'image' => $state['image'] ?? 'Unknown',
+            'nest_name' => $state['nest_info']['name'] ?? __('exceptions.backups.unknown_name'),
+            'egg_name' => $state['egg_info']['name'] ?? __('exceptions.backups.unknown_name'),
+            'image' => $state['image'] ?? __('exceptions.backups.unknown_name'),
             'variables_count' => count($state['variables'] ?? []),
             'captured_at' => $state['captured_at'] ?? null,
         ];

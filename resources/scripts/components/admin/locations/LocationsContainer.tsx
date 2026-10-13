@@ -11,6 +11,7 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 const formatMib = (mib: number): string => {
@@ -35,6 +36,7 @@ const CreateLocationDialog = ({
     onClose: () => void;
     onCreated: (location: AdminLocation) => void;
 }) => {
+    const { t } = useTranslation();
     const [short, setShort] = useState('');
     const [long, setLong] = useState('');
     const [submitting, setSubmitting] = useState(false);
@@ -52,21 +54,21 @@ const CreateLocationDialog = ({
 
         try {
             const location = await createLocation({ short, long });
-            toast.success('Location created.');
+            toast.success(t('admin.locations.created'));
             setShort('');
             setLong('');
             onCreated(location);
             onClose();
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to create location.'));
+            toast.error(errorToMessage(error, t('admin.locations.create_failed')));
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <Dialog open={open} title='Create Location' onClose={close} preventExternalClose={submitting}>
+        <Dialog open={open} title={t('admin.locations.create')} onClose={close} preventExternalClose={submitting}>
             <div className='mt-4'>
                 <form
                     id='create-location-form'
@@ -77,21 +79,25 @@ const CreateLocationDialog = ({
                     className='flex flex-col gap-4'
                 >
                     <Field
-                        label='Short Code'
+                        label={t('admin.locations.short_code')}
                         error={errors.short}
-                        hint='A short identifier used to distinguish this location, e.g. us.nyc.lvl3.'
+                        hint={t('admin.locations.short_code_hint')}
                     >
                         <Input.Text value={short} onChange={(event) => setShort(event.target.value)} />
                     </Field>
-                    <Field label='Description' error={errors.long} hint='Optional. Must be less than 191 characters.'>
+                    <Field
+                        label={t('admin.common.description')}
+                        error={errors.long}
+                        hint={t('admin.locations.long_hint')}
+                    >
                         <Input.Text value={long} onChange={(event) => setLong(event.target.value)} />
                     </Field>
                     <Dialog.Footer>
                         <Button type='button' variant='secondary' onClick={close} disabled={submitting}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button type='submit' form='create-location-form' disabled={submitting}>
-                            Create
+                            {t('common.create')}
                         </Button>
                     </Dialog.Footer>
                 </form>
@@ -101,6 +107,7 @@ const CreateLocationDialog = ({
 };
 
 const LocationsContainer = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { data, mutate } = useLocations();
     const [createOpen, setCreateOpen] = useState(false);
@@ -114,28 +121,26 @@ const LocationsContainer = () => {
     }
 
     return (
-        <PageContentBlock title='Locations'>
-            <MainPageHeader direction='column' title='Locations'>
-                <p className='text-sm text-neutral-400'>
-                    All locations that nodes can be assigned to for easier categorization.
-                </p>
+        <PageContentBlock title={t('admin.nav.locations')}>
+            <MainPageHeader direction='column' title={t('admin.nav.locations')}>
+                <p className='text-sm text-neutral-400'>{t('admin.locations.description')}</p>
             </MainPageHeader>
 
             <div className='mb-4 flex justify-end'>
-                <Button onClick={() => setCreateOpen(true)}>Create Location</Button>
+                <Button onClick={() => setCreateOpen(true)}>{t('admin.locations.create')}</Button>
             </div>
 
             <div className='overflow-x-auto rounded-xl border border-mocha-400'>
                 <table className='w-full text-sm'>
                     <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                         <tr className='border-b border-mocha-400'>
-                            <th className='px-4 py-3'>ID</th>
-                            <th className='px-4 py-3'>Short Code</th>
-                            <th className='px-4 py-3'>Description</th>
-                            <th className='px-4 py-3 text-center'>Memory Alloc%</th>
-                            <th className='px-4 py-3 text-center'>Disk Alloc%</th>
-                            <th className='px-4 py-3 text-center'>Nodes</th>
-                            <th className='px-4 py-3 text-center'>Servers</th>
+                            <th className='px-4 py-3'>{t('admin.common.id')}</th>
+                            <th className='px-4 py-3'>{t('admin.locations.short_code')}</th>
+                            <th className='px-4 py-3'>{t('admin.common.description')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.locations.memory_alloc')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.locations.disk_alloc')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.common.nodes')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.common.servers')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -154,7 +159,10 @@ const LocationsContainer = () => {
                                 <td className='px-4 py-3 text-center'>
                                     <span
                                         className={cn(percentColor(location.memory_percent))}
-                                        title={`Allocated: ${formatMib(location.allocated_memory)} / Total: ${formatMib(location.total_memory)}`}
+                                        title={t('admin.locations.allocated_total', {
+                                            allocated: formatMib(location.allocated_memory),
+                                            total: formatMib(location.total_memory),
+                                        })}
                                     >
                                         {location.memory_percent}%
                                     </span>
@@ -162,7 +170,10 @@ const LocationsContainer = () => {
                                 <td className='px-4 py-3 text-center'>
                                     <span
                                         className={cn(percentColor(location.disk_percent))}
-                                        title={`Allocated: ${formatMib(location.allocated_disk)} / Total: ${formatMib(location.total_disk)}`}
+                                        title={t('admin.locations.allocated_total', {
+                                            allocated: formatMib(location.allocated_disk),
+                                            total: formatMib(location.total_disk),
+                                        })}
                                     >
                                         {location.disk_percent}%
                                     </span>
@@ -174,7 +185,7 @@ const LocationsContainer = () => {
                         {data.length === 0 && (
                             <tr>
                                 <td colSpan={7} className='px-4 py-8 text-center text-cream-400/50'>
-                                    No locations have been created.
+                                    {t('admin.locations.empty')}
                                 </td>
                             </tr>
                         )}

@@ -80,6 +80,9 @@ return [
             'fail' => 'Marcó la copia de seguridad :name como fallida',
             'lock' => 'Bloqueó la copia de seguridad :name',
             'unlock' => 'Desbloqueó la copia de seguridad :name',
+            'delete_all' => 'Se eliminaron todas las copias de seguridad (:count)',
+            'bulk_delete' => 'Se eliminaron :count copias de seguridad',
+            'software-change' => 'Se creó una copia de seguridad del cambio de software: :backup_name',
         ],
         'database' => [
             'create' => 'Creó una nueva base de datos :name',
@@ -162,6 +165,9 @@ return [
         ],
         'software' => [
             'change-queued' => 'Puso en cola un cambio de software del huevo :from_egg al :to_egg',
+            'change-started' => 'Se inició un cambio de software del huevo :from_egg al :to_egg',
+            'changed' => 'Se completó el cambio de software',
+            'change-failed' => 'El cambio de software falló: :error',
         ],
         'startup' => [
             'edit' => 'Cambió la variable :variable de :old a :new',
@@ -173,6 +179,12 @@ return [
             'create' => 'Añadió :email como subusuario',
             'update' => 'Actualizó los permisos de subusuario de :email',
             'delete' => 'Eliminó :email como subusuario',
+        ],
+        'files' => [
+            'software-change-wipe' => 'Se eliminaron :files_deleted archivos para el cambio de software',
+        ],
+        'subdomain' => [
+            'deleted-egg-change' => 'Se eliminó el subdominio :subdomain por ser incompatible con el nuevo huevo',
         ],
     ],
 ];

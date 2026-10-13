@@ -17,6 +17,7 @@ import { ModalMask } from '@/components/elements/Modal';
 import FadeTransition from '@/components/elements/transitions/FadeTransition';
 import { Button } from '@/components/ui/button';
 import { cleanDirectoryPath } from '@/helpers';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useEventListener from '@/plugins/useEventListener';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { useFlashKey } from '@/plugins/useFlash';
@@ -74,6 +75,7 @@ const fileUploadShortcut = isMac ? '⌘O' : 'Ctrl+O';
 const folderUploadShortcut = isMac ? '⇧⌘O' : 'Ctrl+Shift+O';
 
 const UploadButton = () => {
+    const { t } = useTranslation();
     const fileUploadInput = useRef<HTMLInputElement>(null);
     const folderUploadInput = useRef<HTMLInputElement>(null);
     const [visible, setVisible] = useState(false);
@@ -262,7 +264,7 @@ const UploadButton = () => {
                                     'flex-1 text-lg font-bold tracking-tight text-center truncate w-full relative px-4'
                                 }
                             >
-                                Upload to {name}
+                                {t('server.files.upload_to', { name: name ?? '' })}
                             </h1>
                         </div>
                     </div>
@@ -275,35 +277,35 @@ const UploadButton = () => {
                     variant='secondary'
                     className='gap-2 rounded-r-none border-r-0'
                     onClick={() => fileUploadInput.current?.click()}
-                    title={`Upload files to ${directory}`}
+                    title={t('server.files.upload_files_to', { directory })}
                 >
                     <ArrowUpFromLine width={16} height={16} fill='currentColor' />
-                    Upload
+                    {t('common.upload')}
                 </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
                             variant='secondary'
                             className='rounded-l-none px-2'
-                            aria-label='More upload options'
-                            title='More upload options'
+                            aria-label={t('server.files.more_upload_options')}
+                            title={t('server.files.more_upload_options')}
                         >
                             <ChevronDown width={16} height={16} fill='currentColor' />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='start' sideOffset={8} className='min-w-[13rem]'>
                         <DropdownMenuLabel className='text-xs font-normal text-neutral-400'>
-                            Upload to <span className='font-mono text-neutral-200'>{directory}</span>
+                            {t('server.files.upload_to', { name: directory })}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className='gap-2' onSelect={() => fileUploadInput.current?.click()}>
                             <ArrowUpFromLine width={16} height={16} fill='currentColor' />
-                            Upload Files
+                            {t('server.files.upload_files')}
                             <DropdownMenuShortcut>{fileUploadShortcut}</DropdownMenuShortcut>
                         </DropdownMenuItem>
                         <DropdownMenuItem className='gap-2' onSelect={() => folderUploadInput.current?.click()}>
                             <FolderOpen width={16} height={16} fill='currentColor' />
-                            Upload Folder
+                            {t('server.files.upload_folder')}
                             <DropdownMenuShortcut>{folderUploadShortcut}</DropdownMenuShortcut>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

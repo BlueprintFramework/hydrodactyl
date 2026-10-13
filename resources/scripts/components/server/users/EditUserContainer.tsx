@@ -8,11 +8,13 @@ import getServerSubusers from '@/api/server/users/getServerSubusers';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import UserFormComponent from '@/components/server/users/UserFormComponent';
+import { useTranslation } from '@/i18n/I18nProvider';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 import type { Subuser } from '@/state/server/subusers';
 
 const EditUserContainer = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,7 +54,7 @@ const EditUserContainer = () => {
     const isLoading = fetching || (!subuser && subusers.length === 0);
 
     return (
-        <ServerContentBlock title={'Edit User'} className='p-0!'>
+        <ServerContentBlock title={t('server.users.edit_title')} className='p-0!'>
             {subuser && <ServerHeader />}
 
             {isLoading ? (
@@ -61,8 +63,8 @@ const EditUserContainer = () => {
                 </div>
             ) : !subuser ? (
                 <div className='px-4 py-16 text-center sm:px-14'>
-                    <h1 className='text-sm font-medium text-zinc-100'>User not found</h1>
-                    <p className='mt-1 text-sm text-zinc-400'>That person is not on this server anymore.</p>
+                    <h1 className='text-sm font-medium text-zinc-100'>{t('server.users.not_found_title')}</h1>
+                    <p className='mt-1 text-sm text-zinc-400'>{t('server.users.not_found_description')}</p>
                 </div>
             ) : (
                 <div className='flex flex-col gap-12 px-4 py-8 sm:px-14 sm:py-14'>
@@ -84,7 +86,9 @@ const EditUserContainer = () => {
                                             : 'border border-zinc-500/30 bg-zinc-500/20 text-zinc-400'
                                     }`}
                                 >
-                                    {subuser.twoFactorEnabled ? 'MFA Enabled' : 'MFA Disabled'}
+                                    {subuser.twoFactorEnabled
+                                        ? t('server.users.mfa_enabled')
+                                        : t('server.users.mfa_disabled')}
                                 </span>
                             </div>
                             <p className='mt-1 truncate text-xs text-zinc-400'>{subuser.email}</p>

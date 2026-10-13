@@ -103,7 +103,7 @@ class NodeCalagopusController extends Controller
     private function connectionError(DaemonConnectionException $exception): JsonResponse
     {
         return new JsonResponse([
-            'error' => 'The panel could not reach the Calagopus node.',
+            'error' => __('exceptions.admin.calagopus_unreachable'),
             'detail' => $exception->getMessage(),
         ], Response::HTTP_BAD_GATEWAY);
     }

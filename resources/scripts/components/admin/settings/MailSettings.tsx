@@ -8,6 +8,7 @@ import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 interface Props {
     host: string;
@@ -20,6 +21,7 @@ interface Props {
 }
 
 const MailForm = ({ host, port, encryption, username, fromAddress, fromName, onSaved }: Props) => {
+    const { t } = useTranslation();
     const [values, setValues] = useState({
         host,
         port: String(port),
@@ -48,10 +50,10 @@ const MailForm = ({ host, port, encryption, username, fromAddress, fromName, onS
             });
             await onSaved();
             setValues({ ...values, password: '' });
-            toast.success('Settings saved.');
+            toast.success(t('admin.settings.saved'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to save settings.'));
+            toast.error(errorToMessage(error, t('admin.settings.save_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -66,42 +68,42 @@ const MailForm = ({ host, port, encryption, username, fromAddress, fromName, onS
             className='space-y-4'
         >
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                <h2 className='text-sm font-semibold text-cream-50'>SMTP Server</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.smtp_server')}</h2>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <Field label='Host' error={errors['mail:mailers:smtp:host']}>
+                    <Field label={t('admin.databases.host')} error={errors['mail:mailers:smtp:host']}>
                         <Input.Text
                             value={values.host}
                             onChange={(e) => setValues({ ...values, host: e.target.value })}
                         />
                     </Field>
-                    <Field label='Port' error={errors['mail:mailers:smtp:port']}>
+                    <Field label={t('admin.common.port')} error={errors['mail:mailers:smtp:port']}>
                         <Input.Text
                             type='number'
                             value={values.port}
                             onChange={(e) => setValues({ ...values, port: e.target.value })}
                         />
                     </Field>
-                    <Field label='Encryption' error={errors['mail:mailers:smtp:encryption']}>
+                    <Field label={t('admin.settings.encryption')} error={errors['mail:mailers:smtp:encryption']}>
                         <Dropdown
                             value={values.encryption}
                             onChange={(value) => setValues({ ...values, encryption: value })}
                             options={[
-                                { value: '', label: 'None' },
+                                { value: '', label: t('common.none') },
                                 { value: 'tls', label: 'TLS' },
                                 { value: 'ssl', label: 'SSL' },
                             ]}
                         />
                     </Field>
-                    <Field label='Username' error={errors['mail:mailers:smtp:username']}>
+                    <Field label={t('admin.common.username')} error={errors['mail:mailers:smtp:username']}>
                         <Input.Text
                             value={values.username}
                             onChange={(e) => setValues({ ...values, username: e.target.value })}
                         />
                     </Field>
                     <Field
-                        label='Password'
+                        label={t('admin.common.password')}
                         error={errors['mail:mailers:smtp:password']}
-                        hint='Leave blank to keep the current password.'
+                        hint={t('admin.databases.password_keep_hint')}
                     >
                         <Input.Text
                             type='password'
@@ -114,16 +116,16 @@ const MailForm = ({ host, port, encryption, username, fromAddress, fromName, onS
             </div>
 
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                <h2 className='text-sm font-semibold text-cream-50'>Sender</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.sender')}</h2>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                    <Field label='From Address' error={errors['mail:from:address']}>
+                    <Field label={t('admin.settings.from_address')} error={errors['mail:from:address']}>
                         <Input.Text
                             type='email'
                             value={values.fromAddress}
                             onChange={(e) => setValues({ ...values, fromAddress: e.target.value })}
                         />
                     </Field>
-                    <Field label='From Name' error={errors['mail:from:name']}>
+                    <Field label={t('admin.settings.from_name')} error={errors['mail:from:name']}>
                         <Input.Text
                             value={values.fromName}
                             onChange={(e) => setValues({ ...values, fromName: e.target.value })}
@@ -134,7 +136,7 @@ const MailForm = ({ host, port, encryption, username, fromAddress, fromName, onS
 
             <div className='flex justify-end'>
                 <Button type='submit' disabled={submitting}>
-                    Save
+                    {t('common.save')}
                 </Button>
             </div>
         </form>
@@ -142,6 +144,7 @@ const MailForm = ({ host, port, encryption, username, fromAddress, fromName, onS
 };
 
 const MailSettings = () => {
+    const { t } = useTranslation();
     const { data, mutate } = useSettings();
 
     if (!data) {
@@ -155,7 +158,7 @@ const MailSettings = () => {
     if (!data.mail.enabled) {
         return (
             <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-4 text-sm text-cream-400/70'>
-                Mail settings can only be edited when SMTP is the configured mail driver.
+                {t('admin.settings.smtp_only')}
             </div>
         );
     }

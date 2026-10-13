@@ -11,6 +11,7 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const cardClass = 'flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
 const textareaClass = 'w-full rounded-lg bg-[#ffffff11] px-4 py-2 text-sm text-cream-100 outline-none';
@@ -22,6 +23,7 @@ const splitFeatures = (value: string) =>
         .filter(Boolean);
 
 const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const [nestId, setNestId] = useState(nests[0] ? String(nests[0].id) : '');
@@ -72,11 +74,11 @@ const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
 
         try {
             const egg = await createEgg(payload);
-            toast.success('Egg created.');
+            toast.success(t('admin.nests.egg_created'));
             navigate(`/eggs/${egg.id}`);
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to create the egg.'));
+            toast.error(errorToMessage(error, t('admin.nests.egg_create_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -91,22 +93,26 @@ const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
             className='flex flex-col gap-4'
         >
             <div className={cardClass}>
-                <h2 className='text-sm font-semibold text-cream-50'>Core Details</h2>
-                <Field label='Associated Nest' error={errors.nest_id} hint='The nest this egg will belong to.'>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.core_details')}</h2>
+                <Field
+                    label={t('admin.nests.associated_nest')}
+                    error={errors.nest_id}
+                    hint={t('admin.nests.associated_nest_hint')}
+                >
                     <Dropdown
                         value={nestId}
                         onChange={setNestId}
-                        placeholder='Select a nest…'
+                        placeholder={t('admin.nests.select_nest')}
                         options={nests.map((item) => ({
                             value: String(item.id),
                             label: `${item.name} <${item.author}>`,
                         }))}
                     />
                 </Field>
-                <Field label='Name' error={errors.name}>
+                <Field label={t('admin.common.name')} error={errors.name}>
                     <Input.Text value={name} onChange={(event) => setName(event.target.value)} />
                 </Field>
-                <Field label='Description' error={errors.description}>
+                <Field label={t('admin.common.description')} error={errors.description}>
                     <textarea
                         className={textareaClass}
                         rows={4}
@@ -114,24 +120,24 @@ const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
                         onChange={(event) => setDescription(event.target.value)}
                     />
                 </Field>
-                <Field label='Force Outgoing IP' error={errors.force_outgoing_ip}>
+                <Field label={t('admin.nests.force_outgoing_ip')} error={errors.force_outgoing_ip}>
                     <Dropdown
                         value={forceOutgoingIp}
                         onChange={setForceOutgoingIp}
                         options={[
-                            { value: 'true', label: 'True' },
-                            { value: 'false', label: 'False' },
+                            { value: 'true', label: t('admin.common.true') },
+                            { value: 'false', label: t('admin.common.false') },
                         ]}
                     />
                 </Field>
             </div>
 
             <div className={cardClass}>
-                <h2 className='text-sm font-semibold text-cream-50'>Startup &amp; Docker</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.startup_docker')}</h2>
                 <Field
-                    label='Docker Images'
+                    label={t('admin.nests.docker_images')}
                     error={errors.docker_images}
-                    hint='One per line. A display name can prefix the image with name|image.'
+                    hint={t('admin.nests.docker_images_hint')}
                 >
                     <textarea
                         className={textareaClass}
@@ -140,7 +146,7 @@ const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
                         onChange={(event) => setDockerImages(event.target.value)}
                     />
                 </Field>
-                <Field label='Startup Command' error={errors.startup}>
+                <Field label={t('admin.nests.startup_command')} error={errors.startup}>
                     <textarea
                         className={textareaClass}
                         rows={4}
@@ -148,20 +154,20 @@ const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
                         onChange={(event) => setStartup(event.target.value)}
                     />
                 </Field>
-                <Field label='Features' error={errors.features} hint='Comma-separated list of features for this egg.'>
+                <Field label={t('admin.nests.features')} error={errors.features} hint={t('admin.nests.features_hint')}>
                     <Input.Text value={features} onChange={(event) => setFeatures(event.target.value)} />
                 </Field>
             </div>
 
             <div className={cardClass}>
-                <h2 className='text-sm font-semibold text-cream-50'>Process Management</h2>
-                <Field label='Copy Settings From' error={errors.config_from}>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.process_management')}</h2>
+                <Field label={t('admin.nests.copy_settings')} error={errors.config_from}>
                     <Dropdown value={configFrom} onChange={setConfigFrom} options={configFromOptions} />
                 </Field>
-                <Field label='Stop Command' error={errors.config_stop}>
+                <Field label={t('admin.nests.stop_command')} error={errors.config_stop}>
                     <Input.Text value={configStop} onChange={(event) => setConfigStop(event.target.value)} />
                 </Field>
-                <Field label='Log Configuration' error={errors.config_logs}>
+                <Field label={t('admin.nests.log_config')} error={errors.config_logs}>
                     <textarea
                         className={textareaClass}
                         rows={6}
@@ -169,7 +175,7 @@ const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
                         onChange={(event) => setConfigLogs(event.target.value)}
                     />
                 </Field>
-                <Field label='Configuration Files' error={errors.config_files}>
+                <Field label={t('admin.nests.config_files')} error={errors.config_files}>
                     <textarea
                         className={textareaClass}
                         rows={6}
@@ -177,7 +183,7 @@ const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
                         onChange={(event) => setConfigFiles(event.target.value)}
                     />
                 </Field>
-                <Field label='Start Configuration' error={errors.config_startup}>
+                <Field label={t('admin.nests.start_config')} error={errors.config_startup}>
                     <textarea
                         className={textareaClass}
                         rows={6}
@@ -189,10 +195,10 @@ const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
 
             <div className='flex flex-wrap items-center justify-end gap-4'>
                 <Button type='button' variant='secondary' onClick={() => navigate('/nests')}>
-                    Cancel
+                    {t('common.cancel')}
                 </Button>
                 <Button type='submit' disabled={submitting}>
-                    Create Egg
+                    {t('admin.nests.create_egg')}
                 </Button>
             </div>
         </form>
@@ -200,12 +206,13 @@ const EggCreateForm = ({ nests }: { nests: AdminNest[] }) => {
 };
 
 const EggCreateContainer = () => {
+    const { t } = useTranslation();
     const { data: nests } = useNests();
 
     return (
-        <PageContentBlock title='New Egg'>
-            <MainPageHeader direction='column' title='New Egg'>
-                <p className='text-sm text-neutral-400'>Create a new Egg to assign to servers.</p>
+        <PageContentBlock title={t('admin.nests.new_egg')}>
+            <MainPageHeader direction='column' title={t('admin.nests.new_egg')}>
+                <p className='text-sm text-neutral-400'>{t('admin.nests.new_egg_description')}</p>
             </MainPageHeader>
 
             {nests ? (

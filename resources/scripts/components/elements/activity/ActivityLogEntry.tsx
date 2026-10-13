@@ -6,7 +6,6 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { Link } from 'react-router-dom';
 
 import ActivityLogMetaButton from '@/components/elements/activity/ActivityLogMetaButton';
-import CopyOnClick from '@/components/elements/CopyOnClick';
 import { useTranslation } from '@/i18n/I18nProvider';
 
 import { formatObjectToIdentString } from '@/lib/objects';
@@ -27,7 +26,11 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
         <div className='flex items-center gap-3 py-3'>
             <div className='h-7 w-7 shrink-0 overflow-hidden rounded-full bg-zinc-700'>
                 {actor?.image ? (
-                    <img src={actor.image} alt={actor.username || t('server.activity.system')} className='h-full w-full object-cover' />
+                    <img
+                        src={actor.image}
+                        alt={actor.username || t('server.activity.system')}
+                        className='h-full w-full object-cover'
+                    />
                 ) : (
                     <div className='flex h-full w-full items-center justify-center text-xs font-medium text-zinc-300'>
                         {(actor?.username || 'S').charAt(0).toUpperCase()}
@@ -54,30 +57,6 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
                         {children}
                     </div>
                 </div>
-
-                {/* Translated event description */}
-                {activity.descriptionParts ? (
-                    <div className='text-sm text-zinc-300 mt-1 break-words'>
-                        {activity.descriptionParts.map((part, index) =>
-                            part.type === 'value' ? (
-                                <CopyOnClick key={index} text={part.content}>
-                                    <span
-                                        className='inline-block max-w-full align-middle truncate font-mono text-xs bg-zinc-800/50 text-zinc-300 px-2 py-1 rounded transition-colors duration-150 hover:bg-zinc-700/50 hover:text-brand'
-                                        title={part.content}
-                                    >
-                                        {part.content}
-                                    </span>
-                                </CopyOnClick>
-                            ) : (
-                                <span key={index}>{part.content}</span>
-                            ),
-                        )}
-                    </div>
-                ) : (
-                    activity.description && (
-                        <div className='text-sm text-zinc-300 mt-1 break-words'>{activity.description}</div>
-                    )
-                )}
 
                 <div className='mt-0.5 flex items-center gap-3 text-xs text-zinc-500'>
                     {activity.ip && <span className='font-mono'>{activity.ip}</span>}

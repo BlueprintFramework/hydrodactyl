@@ -10,21 +10,21 @@ class AtprotoOAuthException extends \Exception
 {
     public static function discoveryFailed(string $reason): self
     {
-        return new self("Could not resolve the AT Protocol identity: {$reason}");
+        return new self(__('exceptions.atproto.discovery_failed', ['reason' => $reason]));
     }
 
     public static function authorizationFailed(string $reason): self
     {
-        return new self("AT Protocol authorization failed: {$reason}");
+        return new self(__('exceptions.atproto.authorization_failed', ['reason' => $reason]));
     }
 
     public static function requestFailed(string $reason): self
     {
-        return new self("AT Protocol request failed: {$reason}");
+        return new self(__('exceptions.atproto.request_failed', ['reason' => $reason]));
     }
 
     public static function misconfigured(string $reason): self
     {
-        return new self("AT Protocol OAuth is not configured correctly: {$reason}");
+        return new self(__('exceptions.atproto.misconfigured', ['reason' => $reason]));
     }
 }

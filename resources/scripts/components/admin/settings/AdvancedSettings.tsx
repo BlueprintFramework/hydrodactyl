@@ -8,6 +8,7 @@ import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 interface Props {
     requestTimeout: number;
@@ -23,16 +24,20 @@ interface Props {
     onSaved: () => void;
 }
 
-const Toggle = ({ value, onChange }: { value: boolean; onChange: (value: boolean) => void }) => (
-    <Dropdown
-        value={value ? 'true' : 'false'}
-        onChange={(next) => onChange(next === 'true')}
-        options={[
-            { value: 'false', label: 'Disabled' },
-            { value: 'true', label: 'Enabled' },
-        ]}
-    />
-);
+const Toggle = ({ value, onChange }: { value: boolean; onChange: (value: boolean) => void }) => {
+    const { t } = useTranslation();
+
+    return (
+        <Dropdown
+            value={value ? 'true' : 'false'}
+            onChange={(next) => onChange(next === 'true')}
+            options={[
+                { value: 'false', label: t('common.disabled') },
+                { value: 'true', label: t('common.enabled') },
+            ]}
+        />
+    );
+};
 
 const AdvancedForm = ({
     requestTimeout,
@@ -47,6 +52,7 @@ const AdvancedForm = ({
     resourceHistorySamples,
     onSaved,
 }: Props) => {
+    const { t } = useTranslation();
     const [values, setValues] = useState({
         requestTimeout: String(requestTimeout),
         connectTimeout: String(connectTimeout),
@@ -80,10 +86,10 @@ const AdvancedForm = ({
                 'pterodactyl:client_features:resource_history:samples': values.resourceHistorySamples,
             });
             await onSaved();
-            toast.success('Settings saved.');
+            toast.success(t('admin.settings.saved'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to save settings.'));
+            toast.error(errorToMessage(error, t('admin.settings.save_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -98,12 +104,12 @@ const AdvancedForm = ({
             className='space-y-4'
         >
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                <h2 className='text-sm font-semibold text-cream-50'>HTTP Connections</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.http_connections')}</h2>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <Field
-                        label='Connection Timeout'
+                        label={t('admin.settings.connection_timeout')}
                         error={errors['pterodactyl:guzzle:connect_timeout']}
-                        hint='Seconds to wait before timing out a connection attempt.'
+                        hint={t('admin.settings.connection_timeout_hint')}
                     >
                         <Input.Text
                             type='number'
@@ -112,9 +118,9 @@ const AdvancedForm = ({
                         />
                     </Field>
                     <Field
-                        label='Request Timeout'
+                        label={t('admin.settings.request_timeout')}
                         error={errors['pterodactyl:guzzle:timeout']}
-                        hint='Seconds to wait before timing out an active request.'
+                        hint={t('admin.settings.request_timeout_hint')}
                     >
                         <Input.Text
                             type='number'
@@ -126,22 +132,31 @@ const AdvancedForm = ({
             </div>
 
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                <h2 className='text-sm font-semibold text-cream-50'>Automatic Allocation Creation</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.auto_allocations')}</h2>
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <Field label='Status' error={errors['pterodactyl:client_features:allocations:enabled']}>
+                    <Field
+                        label={t('admin.common.status')}
+                        error={errors['pterodactyl:client_features:allocations:enabled']}
+                    >
                         <Toggle
                             value={values.allocationsEnabled}
                             onChange={(value) => setValues({ ...values, allocationsEnabled: value })}
                         />
                     </Field>
-                    <Field label='Starting Port' error={errors['pterodactyl:client_features:allocations:range_start']}>
+                    <Field
+                        label={t('admin.settings.starting_port')}
+                        error={errors['pterodactyl:client_features:allocations:range_start']}
+                    >
                         <Input.Text
                             type='number'
                             value={values.rangeStart}
                             onChange={(e) => setValues({ ...values, rangeStart: e.target.value })}
                         />
                     </Field>
-                    <Field label='Ending Port' error={errors['pterodactyl:client_features:allocations:range_end']}>
+                    <Field
+                        label={t('admin.settings.ending_port')}
+                        error={errors['pterodactyl:client_features:allocations:range_end']}
+                    >
                         <Input.Text
                             type='number'
                             value={values.rangeEnd}
@@ -152,11 +167,11 @@ const AdvancedForm = ({
             </div>
 
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                <h2 className='text-sm font-semibold text-cream-50'>Server Groups</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.server_groups')}</h2>
                 <Field
-                    label='Status'
+                    label={t('admin.common.status')}
                     error={errors['pterodactyl:client_features:groups:enabled']}
-                    hint='Allow users to organize their servers on the dashboard.'
+                    hint={t('admin.settings.server_groups_hint')}
                 >
                     <Toggle
                         value={values.groupsEnabled}
@@ -166,12 +181,12 @@ const AdvancedForm = ({
             </div>
 
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                <h2 className='text-sm font-semibold text-cream-50'>Resource History</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.resource_history')}</h2>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <Field
-                        label='Status'
+                        label={t('admin.common.status')}
                         error={errors['pterodactyl:client_features:resource_history:enabled']}
-                        hint='Record resource usage so the console graphs are filled in on page load.'
+                        hint={t('admin.settings.resource_history_hint')}
                     >
                         <Toggle
                             value={values.resourceHistoryEnabled}
@@ -179,9 +194,9 @@ const AdvancedForm = ({
                         />
                     </Field>
                     <Field
-                        label='Samples Per Server'
+                        label={t('admin.settings.samples_per_server')}
                         error={errors['pterodactyl:client_features:resource_history:samples']}
-                        hint='How many readings to keep for each server. At least 20, since that is what the graphs draw.'
+                        hint={t('admin.settings.samples_hint')}
                     >
                         <Input.Text
                             type='number'
@@ -194,12 +209,12 @@ const AdvancedForm = ({
             </div>
 
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                <h2 className='text-sm font-semibold text-cream-50'>Schedules</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.schedules_title')}</h2>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                     <Field
-                        label='Tasks Per Schedule'
+                        label={t('admin.settings.tasks_per_schedule')}
                         error={errors['pterodactyl:client_features:schedules:per_schedule_task_limit']}
-                        hint='The maximum number of tasks a single schedule may have.'
+                        hint={t('admin.settings.tasks_hint')}
                     >
                         <Input.Text
                             type='number'
@@ -210,9 +225,9 @@ const AdvancedForm = ({
                         />
                     </Field>
                     <Field
-                        label='Stuck Schedule Timeout'
+                        label={t('admin.settings.stuck_timeout')}
                         error={errors['pterodactyl:client_features:schedules:stuck_timeout']}
-                        hint='Seconds before a schedule that is still processing is treated as stuck and reset. Must be greater than the maximum task delay (900 seconds).'
+                        hint={t('admin.settings.stuck_hint')}
                     >
                         <Input.Text
                             type='number'
@@ -227,7 +242,7 @@ const AdvancedForm = ({
 
             <div className='flex justify-end'>
                 <Button type='submit' disabled={submitting}>
-                    Save
+                    {t('common.save')}
                 </Button>
             </div>
         </form>

@@ -112,7 +112,7 @@ class BackupJob implements Job
         $jobType = $statusData['job_type'] ?? '';
         $operation = $this->getOperationFromJobType($jobType);
 
-        $errorMessage = $successful ? null : ($statusData['error_message'] ?? 'Unknown error');
+        $errorMessage = $successful ? null : ($statusData['error_message'] ?? __('exceptions.elytra.unknown_error'));
         if ($errorMessage) {
             $errorMessage = $this->sanitizeBackupError($errorMessage);
         }

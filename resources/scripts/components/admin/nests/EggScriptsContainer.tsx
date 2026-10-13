@@ -9,6 +9,7 @@ import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const cardClass = 'flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
 
@@ -21,6 +22,7 @@ const EggScriptsForm = ({
     data: EggScriptResponse;
     onSaved: () => Promise<unknown>;
 }) => {
+    const { t } = useTranslation();
     const [scriptInstall, setScriptInstall] = useState(data.data.script_install ?? '');
     const [copyScriptFrom, setCopyScriptFrom] = useState(
         data.data.copy_script_from === null ? '' : String(data.data.copy_script_from),
@@ -48,10 +50,10 @@ const EggScriptsForm = ({
                 copy_script_from: copyScriptFrom,
             });
             await onSaved();
-            toast.success('Install script updated.');
+            toast.success(t('admin.nests.script_updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update the install script.'));
+            toast.error(errorToMessage(error, t('admin.nests.script_update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -65,13 +67,9 @@ const EggScriptsForm = ({
             }}
             className={cardClass}
         >
-            <h2 className='text-sm font-semibold text-cream-50'>Install Script</h2>
+            <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.install_script')}</h2>
 
-            <Field
-                label='Script'
-                error={errors.script_install}
-                hint='The install script that runs when a server using this egg is installed.'
-            >
+            <Field label={t('admin.nests.script')} error={errors.script_install} hint={t('admin.nests.script_hint')}>
                 <textarea
                     className='w-full rounded-lg bg-[#ffffff11] px-4 py-2 font-mono text-sm text-cream-100 outline-none'
                     rows={14}
@@ -82,32 +80,32 @@ const EggScriptsForm = ({
 
             {data.data.copy_from && (
                 <div className='rounded-lg border border-brand-400/40 bg-brand-400/10 px-4 py-3 text-sm text-brand-400'>
-                    This egg is copying installation scripts from <strong>{data.data.copy_from.name}</strong>. Changes
-                    you make here will not apply unless you select None.
+                    {t('admin.nests.copy_notice_prefix')} <strong>{data.data.copy_from.name}</strong>
+                    {t('admin.nests.copy_notice_suffix')}
                 </div>
             )}
 
             <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
-                <Field label='Copy Script From' error={errors.copy_script_from}>
+                <Field label={t('admin.nests.copy_script')} error={errors.copy_script_from}>
                     <Dropdown value={copyScriptFrom} onChange={setCopyScriptFrom} options={copyOptions} />
                 </Field>
-                <Field label='Script Container' error={errors.script_container}>
+                <Field label={t('admin.nests.script_container')} error={errors.script_container}>
                     <Input.Text value={scriptContainer} onChange={(event) => setScriptContainer(event.target.value)} />
                 </Field>
-                <Field label='Script Entrypoint Command' error={errors.script_entry}>
+                <Field label={t('admin.nests.script_entry')} error={errors.script_entry}>
                     <Input.Text value={scriptEntry} onChange={(event) => setScriptEntry(event.target.value)} />
                 </Field>
             </div>
 
             {data.rely_on_script.length > 0 && (
                 <p className='text-xs text-cream-400/60'>
-                    The following eggs rely on this script: {data.rely_on_script.map((egg) => egg.name).join(', ')}.
+                    {t('admin.nests.rely_notice', { list: data.rely_on_script.map((egg) => egg.name).join(', ') })}
                 </p>
             )}
 
             <div className='flex justify-end'>
                 <Button type='submit' disabled={submitting}>
-                    Save
+                    {t('common.save')}
                 </Button>
             </div>
         </form>

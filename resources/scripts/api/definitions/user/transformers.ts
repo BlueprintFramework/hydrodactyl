@@ -37,7 +37,6 @@ const toActivityLog = ({ attributes }: FractalResponseData): Models.ActivityLog 
         ip: attributes.ip,
         isApi: attributes.is_api,
         description: attributes.description,
-        descriptionParts: attributes.description_parts ?? null,
         properties: attributes.properties,
         hasAdditionalMetadata: attributes.has_additional_metadata ?? false,
         timestamp: new Date(attributes.timestamp),

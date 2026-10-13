@@ -1,0 +1,1 @@
+@include('errors.layout', ['code' => 419])

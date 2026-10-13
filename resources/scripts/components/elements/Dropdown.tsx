@@ -88,7 +88,10 @@ const Dropdown = ({
                         className,
                     )}
                 >
-                    <span className={cn('truncate', !selected && 'text-cream-400/50')}>
+                    <span
+                        className={cn('truncate', !selected && 'text-cream-400/50')}
+                        title={selected?.label ?? resolvedPlaceholder}
+                    >
                         {selected?.label ?? resolvedPlaceholder}
                     </span>
                     <ChevronDown width={16} height={16} className='shrink-0 text-cream-400/50' />
@@ -139,7 +142,9 @@ const Dropdown = ({
                                 value={option.value}
                                 className='flex-col items-start gap-0.5'
                             >
-                                <span className='w-full truncate'>{option.label}</span>
+                                <span className='w-full truncate' title={option.label}>
+                                    {option.label}
+                                </span>
                                 {option.description && (
                                     <span className='text-xs font-normal text-cream-400/50'>{option.description}</span>
                                 )}

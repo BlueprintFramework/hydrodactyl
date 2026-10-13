@@ -13,12 +13,12 @@ class KeyGenerateCommand extends BaseKeyGenerateCommand
     public function handle()
     {
         if (!empty(config('app.key')) && $this->input->isInteractive()) {
-            $this->output->warning('It appears you have already configured an application encryption key. Continuing with this process with overwrite that key and cause data corruption for any existing encrypted data. DO NOT CONTINUE UNLESS YOU KNOW WHAT YOU ARE DOING.');
-            if (!$this->confirm('I understand the consequences of performing this command and accept all responsibility for the loss of encrypted data.')) {
+            $this->output->warning(__('command/messages.overrides.key_exists_warning'));
+            if (!$this->confirm(__('command/messages.overrides.key_exists_confirm'))) {
                 return;
             }
 
-            if (!$this->confirm('Are you sure you wish to continue? Changing the application encryption key WILL CAUSE DATA LOSS.')) {
+            if (!$this->confirm(__('command/messages.overrides.key_generate_confirm'))) {
                 return;
             }
         }

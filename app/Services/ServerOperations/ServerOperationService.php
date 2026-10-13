@@ -143,7 +143,7 @@ class ServerOperationService
     /**
      * Clean up old completed operations.
      */
-    public function cleanupOldOperations(int $daysOld = null): int
+    public function cleanupOldOperations(?int $daysOld = null): int
     {
         $daysOld = $daysOld ?? config('server_operations.cleanup.retain_days', 30);
         $chunkSize = config('server_operations.cleanup.chunk_size', 100);

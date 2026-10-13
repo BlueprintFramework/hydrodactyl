@@ -80,6 +80,9 @@ return [
             'fail' => 'Ha marcat la còpia de seguretat :name com a fallida',
             'lock' => 'Ha bloquejat la còpia de seguretat :name',
             'unlock' => 'Ha desbloquejat la còpia de seguretat :name',
+            'delete_all' => 'S\'han eliminat totes les còpies de seguretat (:count)',
+            'bulk_delete' => 'S\'han eliminat :count còpies de seguretat',
+            'software-change' => 'S\'ha creat una còpia de seguretat del canvi de programari: :backup_name',
         ],
         'database' => [
             'create' => 'Ha creat una base de dades nova :name',
@@ -162,6 +165,9 @@ return [
         ],
         'software' => [
             'change-queued' => 'Ha posat en cua un canvi de programari de l\'ou :from_egg a l\'ou :to_egg',
+            'change-started' => 'S\'ha iniciat un canvi de programari de l\'ou :from_egg al :to_egg',
+            'changed' => 'S\'ha completat el canvi de programari',
+            'change-failed' => 'El canvi de programari ha fallat: :error',
         ],
         'startup' => [
             'edit' => 'Ha canviat la variable :variable de :old a :new',
@@ -173,6 +179,12 @@ return [
             'create' => 'Ha afegit :email com a subusuari',
             'update' => 'Ha actualitzat els permisos de subusuari de :email',
             'delete' => 'Ha eliminat :email com a subusuari',
+        ],
+        'files' => [
+            'software-change-wipe' => 'S\'han eliminat :files_deleted fitxers per al canvi de programari',
+        ],
+        'subdomain' => [
+            'deleted-egg-change' => 'S\'ha eliminat el subdomini :subdomain perquè és incompatible amb el nou ou',
         ],
     ],
 ];

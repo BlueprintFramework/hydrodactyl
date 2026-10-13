@@ -10,9 +10,11 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import UserForm from './UserForm';
 
 const UserViewContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const navigate = useNavigate();
     const { data: user, mutate } = useUser(id);
@@ -37,10 +39,10 @@ const UserViewContainer = () => {
         try {
             await updateUser(user.id, values);
             await mutate();
-            toast.success('User updated.');
+            toast.success(t('admin.users.updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update user.'));
+            toast.error(errorToMessage(error, t('admin.users.update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -51,10 +53,10 @@ const UserViewContainer = () => {
 
         try {
             await deleteUser(user.id);
-            toast.success('User deleted.');
+            toast.success(t('admin.users.deleted'));
             navigate('/users');
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete user.'));
+            toast.error(errorToMessage(error, t('admin.users.delete_failed')));
             setDeleting(false);
             setConfirmDelete(false);
         }
@@ -78,7 +80,7 @@ const UserViewContainer = () => {
                     language: user.language,
                     root_admin: user.root_admin,
                 }}
-                submitLabel='Update User'
+                submitLabel={t('admin.users.update')}
                 submitting={submitting}
                 errors={errors}
                 onSubmit={handleSubmit}
@@ -86,29 +88,27 @@ const UserViewContainer = () => {
             />
 
             <div className='mt-6 rounded-xl border border-brand-400/40 bg-brand-400/5 p-4'>
-                <h2 className='text-sm font-semibold text-brand-400'>Delete User</h2>
-                <p className='mt-1 text-sm text-cream-400/70'>
-                    There must be no servers associated with this account in order for it to be deleted.
-                </p>
+                <h2 className='text-sm font-semibold text-brand-400'>{t('admin.users.delete')}</h2>
+                <p className='mt-1 text-sm text-cream-400/70'>{t('admin.users.delete_description')}</p>
                 <Button
                     variant='attention'
                     className='mt-3'
                     disabled={user.servers_count > 0}
                     onClick={() => setConfirmDelete(true)}
                 >
-                    Delete User
+                    {t('admin.users.delete')}
                 </Button>
             </div>
 
             <Dialog.Confirm
                 open={confirmDelete}
-                title='Delete User'
-                confirm='Delete'
+                title={t('admin.users.delete')}
+                confirm={t('common.delete')}
                 onClose={() => setConfirmDelete(false)}
                 onConfirmed={handleDelete}
                 loading={deleting}
             >
-                Deleting this user is permanent and cannot be undone.
+                {t('admin.users.delete_confirm')}
             </Dialog.Confirm>
         </PageContentBlock>
     );

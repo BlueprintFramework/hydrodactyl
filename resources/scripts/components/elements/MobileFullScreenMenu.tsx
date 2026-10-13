@@ -5,6 +5,7 @@ import { NavLink } from 'react-router-dom';
 import { getSubdomainInfo } from '@/api/server/network/subdomain';
 import Can from '@/components/elements/Can';
 import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 import { isFeatureLimitEnabled, isNetworkFeatureEnabled } from '@/lib/featureLimits';
 import type { ServerRouteDefinition } from '@/routers/routes';
 import { getServerNavRoutes } from '@/routers/routes';
@@ -165,7 +166,7 @@ const ServerMobileNavItem = ({ route, serverId, onClose }: ServerMobileNavItemPr
 
     const NavContent = (
         <NavigationItem to={to} icon={Icon} end={end} onClick={onClose}>
-            {t(name)}
+            {t(name as TranslationKey)}
         </NavigationItem>
     );
 

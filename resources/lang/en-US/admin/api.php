@@ -35,4 +35,5 @@ return [
         'servers' => 'Servers',
         'users' => 'Users',
     ],
+    'auto_deploy_key_memo' => 'Automatically generated node deployment key.',
 ];

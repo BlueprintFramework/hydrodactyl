@@ -232,12 +232,12 @@ const Console = () => {
         const content = getTerminalBufferText(terminal.buffer.active);
 
         if (!content) {
-            toast.error('There is nothing in the console to copy yet.');
+            toast.error(t('server.console.nothing_to_copy'));
             return;
         }
 
         if (!navigator.clipboard) {
-            toast.error('Clipboard is not available in this context.');
+            toast.error(t('server.console.clipboard_unavailable'));
             return;
         }
 
@@ -245,14 +245,14 @@ const Console = () => {
             .writeText(content)
             .then(() => {
                 setCopiedConsole(true);
-                toast.success('Copied console output to clipboard.');
+                toast.success(t('server.console.copied_to_clipboard'));
 
                 if (copyResetTimerRef.current) {
                     clearTimeout(copyResetTimerRef.current);
                 }
                 copyResetTimerRef.current = setTimeout(() => setCopiedConsole(false), 2000);
             })
-            .catch(() => toast.error('Failed to copy console output to the clipboard.'));
+            .catch(() => toast.error(t('server.console.copy_failed')));
     }, [terminal]);
 
     useEffect(
@@ -412,8 +412,8 @@ const Console = () => {
                         shape='round'
                         className='absolute top-4 right-4 z-20 gap-1.5 bg-mocha-400/90 backdrop-blur'
                         onClick={handleCopyConsole}
-                        aria-label={'Copy full console output'}
-                        title={'Copy full console output'}
+                        aria-label={t('server.console.copy_full_output')}
+                        title={t('server.console.copy_full_output')}
                     >
                         <HugeiconsIcon
                             size={16}
@@ -421,7 +421,7 @@ const Console = () => {
                             icon={copiedConsole ? Tick02Icon : Copy01Icon}
                             className='size-4'
                         />
-                        {copiedConsole ? 'Copied' : 'Copy'}
+                        {copiedConsole ? t('server.console.copied') : t('server.console.copy')}
                     </Button>
                 </div>
 

@@ -295,4 +295,19 @@ return [
             'title' => 'Server — :server: Startup',
         ],
     ],
+
+    'templates' => [
+        'minimal' => [
+            'name' => 'Minimal',
+            'description' => 'A small server for testing or lightweight bots.',
+        ],
+        'standard' => [
+            'name' => 'Standard',
+            'description' => 'A balanced server suitable for most game servers.',
+        ],
+        'performance' => [
+            'name' => 'Performance',
+            'description' => 'A high-resource server for demanding workloads.',
+        ],
+    ],
 ];

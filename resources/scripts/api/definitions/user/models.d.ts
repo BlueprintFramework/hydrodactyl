@@ -20,11 +20,6 @@ export interface SSHKey extends Model {
     createdAt: Date;
 }
 
-export interface ActivityLogDescriptionPart {
-    type: 'text' | 'value';
-    content: string;
-}
-
 export interface ActivityLog extends Model<'actor'> {
     id: string;
     batch: UUID | null;
@@ -32,7 +27,6 @@ export interface ActivityLog extends Model<'actor'> {
     ip: string | null;
     isApi: boolean;
     description: string | null;
-    descriptionParts: ActivityLogDescriptionPart[] | null;
     properties: Record<string, string | unknown>;
     hasAdditionalMetadata: boolean;
     timestamp: Date;

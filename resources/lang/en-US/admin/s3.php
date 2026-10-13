@@ -48,6 +48,7 @@ return [
         'success' => 'Success',
         'test_connection' => 'Test Connection',
         'title' => 'New Bucket',
+        'test_file_content' => 'This is an upload test, If your reading this, it succeeded, happy Servering',
     ],
     'view' => [
         'delete' => [
