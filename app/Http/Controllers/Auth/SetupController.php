@@ -19,6 +19,7 @@ use Pterodactyl\Rules\Username;
 use Pterodactyl\Events\Auth\DirectLogin;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Services\Users\UserCreationService;
+use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 
 class SetupController extends Controller
 {
@@ -30,6 +31,7 @@ class SetupController extends Controller
     public function __construct(
         private ViewFactory $view,
         private UserCreationService $creationService,
+        private SettingsRepositoryInterface $settings,
     ) {
         $this->auth = Container::getInstance()->make(AuthManager::class);
     }
@@ -104,6 +106,13 @@ class SetupController extends Controller
             ], fn ($value) => !is_null($value)));
         } finally {
             $lock->release();
+        }
+
+        // Persist the language chosen in the setup wizard as the panel-wide
+        // default so guests, error pages and notification fallbacks start out
+        // in the same locale as the administrator that just completed setup.
+        if (!empty($data['language'])) {
+            $this->settings->set('settings::app:locale', $data['language']);
         }
 
         $request->session()->regenerate();
