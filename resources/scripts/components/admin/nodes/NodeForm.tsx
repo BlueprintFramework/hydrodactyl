@@ -12,6 +12,7 @@ export const emptyNodeValues: NodeValues = {
     daemonType: '',
     public: true,
     trust_alias: false,
+    custom_domains_enabled: true,
     fqdn: '',
     internal_fqdn: '',
     scheme: 'https',
@@ -142,6 +143,17 @@ const NodeForm = ({
                             <Dropdown
                                 value={String(values.trust_alias)}
                                 onChange={(value) => set('trust_alias', value === 'true')}
+                                options={boolOptions('Yes', 'No')}
+                            />
+                        </Field>
+                        <Field
+                            label='Custom Domains'
+                            error={errors.custom_domains_enabled}
+                            hint='Allow users to point their own domains at servers on this node.'
+                        >
+                            <Dropdown
+                                value={String(values.custom_domains_enabled)}
+                                onChange={(value) => set('custom_domains_enabled', value === 'true')}
                                 options={boolOptions('Yes', 'No')}
                             />
                         </Field>

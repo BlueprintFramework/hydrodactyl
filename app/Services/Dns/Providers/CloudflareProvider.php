@@ -14,6 +14,8 @@ use Pterodactyl\Services\Dns;
 
 class CloudflareProvider implements DnsProviderInterface
 {
+    public const TOKEN_REJECTED = 'The API token was rejected by Cloudflare.';
+
     private Client $client;
     private array $config;
 
@@ -74,6 +76,10 @@ class CloudflareProvider implements DnsProviderInterface
                 'ttl' => $ttl,
             ];
 
+            if (!empty($this->config['comment'])) {
+                $payload['comment'] = $this->config['comment'];
+            }
+
             // Handle different content types
             if (is_array($content)) {
                 // For SRV records and other structured data
@@ -112,7 +118,7 @@ class CloudflareProvider implements DnsProviderInterface
                 $this->getRequestExceptionMessage($e)
             );
         } catch (GuzzleException $e) {
-            throw DnsProviderException::recordCreationFailed($domain, $displayName, 'DNS service temporarily unavailable.');
+            throw DnsProviderException::recordCreationFailed($domain, $displayName, $this->failureReason($e));
         }
     }
 
@@ -125,6 +131,10 @@ class CloudflareProvider implements DnsProviderInterface
 
         try {
             $payload = [];
+
+            if (!empty($this->config['comment'])) {
+                $payload['comment'] = $this->config['comment'];
+            }
 
             // Handle different content types
             if (is_array($content)) {
@@ -154,7 +164,7 @@ class CloudflareProvider implements DnsProviderInterface
 
             return true;
         } catch (GuzzleException $e) {
-            throw DnsProviderException::recordUpdateFailed($domain, [$recordId], 'DNS service temporarily unavailable.');
+            throw DnsProviderException::recordUpdateFailed($domain, [$recordId], $this->failureReason($e));
         }
     }
 
@@ -173,7 +183,7 @@ class CloudflareProvider implements DnsProviderInterface
                 throw new \Exception('DNS provider rejected the record deletion request.');
             }
         } catch (GuzzleException $e) {
-            throw DnsProviderException::recordDeletionFailed($domain, [$recordId], 'DNS service temporarily unavailable.');
+            throw DnsProviderException::recordDeletionFailed($domain, [$recordId], $this->failureReason($e));
         }
     }
 
@@ -194,7 +204,7 @@ class CloudflareProvider implements DnsProviderInterface
 
             return $data['result'];
         } catch (GuzzleException $e) {
-            throw DnsProviderException::connectionFailed('cloudflare', 'DNS service temporarily unavailable.');
+            throw DnsProviderException::connectionFailed('cloudflare', $this->failureReason($e));
         }
     }
 
@@ -226,8 +236,43 @@ class CloudflareProvider implements DnsProviderInterface
 
             return $data['result'];
         } catch (GuzzleException $e) {
-            throw DnsProviderException::connectionFailed('cloudflare', 'DNS service temporarily unavailable.');
+            throw DnsProviderException::connectionFailed('cloudflare', $this->failureReason($e));
         }
+    }
+
+    /**
+     * Find the zone a hostname belongs to by walking up its labels, so
+     * 'play.example.com' and 'example.com' both resolve to the 'example.com' zone.
+     *
+     * @return array{id: string, name: string}|null
+     */
+    public function findZone(string $hostname): ?array
+    {
+        if (!isset($this->client)) {
+            throw DnsProviderException::invalidConfiguration('cloudflare', 'api_token');
+        }
+
+        $labels = explode('.', rtrim($hostname, '.'));
+
+        try {
+            while (count($labels) >= 2) {
+                $response = $this->client->get('zones', [
+                    'query' => ['name' => implode('.', $labels)]
+                ]);
+
+                $data = json_decode($response->getBody()->getContents(), true);
+
+                if (!empty($data['result'])) {
+                    return ['id' => $data['result'][0]['id'], 'name' => $data['result'][0]['name']];
+                }
+
+                array_shift($labels);
+            }
+        } catch (GuzzleException $e) {
+            throw DnsProviderException::connectionFailed('cloudflare', $this->failureReason($e));
+        }
+
+        return null;
     }
 
     private function normalizeRecordName(string $domain, string $name): string
@@ -246,11 +291,22 @@ class CloudflareProvider implements DnsProviderInterface
         return $name . '.' . $domain;
     }
 
+    /**
+     * Describe why a request to Cloudflare failed, telling a rejected API
+     * token apart from Cloudflare being unreachable.
+     */
+    private function failureReason(GuzzleException $e): string
+    {
+        $status = $e instanceof RequestException ? $e->getResponse()?->getStatusCode() : null;
+
+        return in_array($status, [401, 403], true) ? self::TOKEN_REJECTED : 'DNS service temporarily unavailable.';
+    }
+
     private function getRequestExceptionMessage(RequestException $e): string
     {
         $response = $e->getResponse();
-        if (!$response) {
-            return 'DNS service temporarily unavailable.';
+        if (!$response || in_array($response->getStatusCode(), [401, 403], true)) {
+            return $this->failureReason($e);
         }
 
         $data = json_decode((string) $response->getBody(), true);
@@ -333,7 +389,7 @@ class CloudflareProvider implements DnsProviderInterface
 
             return $data['result'][0]['id'];
         } catch (GuzzleException $e) {
-            throw DnsProviderException::connectionFailed('cloudflare', 'DNS service temporarily unavailable.');
+            throw DnsProviderException::connectionFailed('cloudflare', $this->failureReason($e));
         }
     }
 }

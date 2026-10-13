@@ -170,6 +170,7 @@ class Server extends Model
         'oom_disabled' => 'sometimes|boolean',
         'exclude_from_resource_calculation' => 'sometimes|boolean',
         'software_enabled' => 'sometimes|boolean',
+        'custom_domains_enabled' => 'sometimes|boolean',
         'disk' => 'required|numeric|min:0',
         'allocation_id' => 'required|bail|unique:servers|exists:allocations,id',
         'nest_id' => 'required|exists:nests,id',
@@ -199,6 +200,7 @@ class Server extends Model
         'oom_disabled' => 'boolean',
         'exclude_from_resource_calculation' => 'boolean',
         'software_enabled' => 'boolean',
+        'custom_domains_enabled' => 'boolean',
         'allocation_id' => 'integer',
         'nest_id' => 'integer',
         'egg_id' => 'integer',
@@ -466,6 +468,30 @@ class Server extends Model
     public function activeSubdomain(): HasOne
     {
         return $this->hasOne(ServerSubdomain::class)->where('is_active', true);
+    }
+
+    /**
+     * Gets the custom domains that point at this server.
+     */
+    public function customDomains(): HasMany
+    {
+        return $this->hasMany(ServerCustomDomain::class);
+    }
+
+    /**
+     * Whether custom domains can be added to this server. The egg needs the
+     * user_domains feature, the server and the node it runs on both have to
+     * allow it, and the server's owner must be allowed to use custom domains.
+     */
+    public function allowsCustomDomains(): bool
+    {
+        $features = $this->egg->inherit_features ?? [];
+
+        return in_array(Egg::FEATURE_USER_DOMAINS, $features, true)
+            && in_array(Egg::FEATURE_SUBDOMAIN_MINECRAFT, $features, true)
+            && $this->custom_domains_enabled !== false
+            && $this->node->custom_domains_enabled !== false
+            && (bool) $this->user->custom_domains;
     }
 
     /**

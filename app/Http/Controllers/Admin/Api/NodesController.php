@@ -212,6 +212,7 @@ class NodesController extends Controller
             'behind_proxy' => (bool) $node->behind_proxy,
             'public' => (bool) $node->public,
             'trust_alias' => (bool) $node->trust_alias,
+            'custom_domains_enabled' => (bool) $node->custom_domains_enabled,
             'maintenance_mode' => (bool) $node->maintenance_mode,
             'memory' => (int) $node->memory,
             'memory_overallocate' => (int) $node->memory_overallocate,
