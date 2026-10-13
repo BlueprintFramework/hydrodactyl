@@ -3,13 +3,11 @@
 
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Controllers\Api\Client\Servers;
-use Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra;
 use Pterodactyl\Http\Middleware\Activity\ServerSubject;
+use Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra;
+use Pterodactyl\Http\Middleware\Api\Client\Server\CheckDaemonType;
 use Pterodactyl\Http\Middleware\Api\Client\Server\ResourceBelongsToServer;
 use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
-use Pterodactyl\Http\Middleware\Api\Client\Server\CheckDaemonType;
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +31,7 @@ Route::group([
     Route::get('/websocket', Elytra\WebsocketController::class)->name('api:client:server.elytra.ws');
     Route::get('/resources', Elytra\ResourceUtilizationController::class)->name('api:client:server.elytra.resources');
     Route::get('/activity', Elytra\ActivityLogController::class)->name('api:client:server.elytra.activity');
+    Route::get('/activity/events', [Elytra\ActivityLogController::class, 'events'])->name('api:client:server.elytra.activity-events');
 
     Route::post('/command', [Elytra\CommandController::class, 'index']);
     Route::post('/power', [Elytra\PowerController::class, 'index']);

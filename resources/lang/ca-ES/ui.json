@@ -128,7 +128,12 @@
             "system": "Sistema",
             "time_range": "Interval de temps",
             "title": "Registre d'activitat del compte",
-            "toggle_filters": "Mostra o amaga els filtres (Ctrl+F)"
+            "toggle_filters": "Mostra o amaga els filtres (Ctrl+F)",
+            "go_live": "Activa el directe",
+            "exporting": "Exportant…",
+            "clear": "Neteja",
+            "clear_search": "Neteja la cerca",
+            "filter_events": "Filtra esdeveniments…"
         },
         "api_keys": {
             "allowed_ips_description": "Deixa-ho en blanc per permetre qualsevol adreça IP; si no, indica cada adreça IP en una línia nova.",

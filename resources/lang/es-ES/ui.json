@@ -128,7 +128,12 @@
             "system": "Sistema",
             "time_range": "Intervalo de tiempo",
             "title": "Registro de actividad de la cuenta",
-            "toggle_filters": "Mostrar u ocultar filtros (Ctrl+F)"
+            "toggle_filters": "Mostrar u ocultar filtros (Ctrl+F)",
+            "go_live": "Activar en directo",
+            "exporting": "Exportando…",
+            "clear": "Limpiar",
+            "clear_search": "Limpiar búsqueda",
+            "filter_events": "Filtrar eventos…"
         },
         "api_keys": {
             "allowed_ips_description": "Déjalo en blanco para permitir que cualquier dirección IP use esta clave de API; de lo contrario, indica cada dirección IP en una línea nueva.",

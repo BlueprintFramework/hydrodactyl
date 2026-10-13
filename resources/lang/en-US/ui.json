@@ -128,7 +128,12 @@
             "system": "System",
             "time_range": "Time Range",
             "title": "Account Activity Log",
-            "toggle_filters": "Toggle Filters (Ctrl+F)"
+            "toggle_filters": "Toggle Filters (Ctrl+F)",
+            "go_live": "Go live",
+            "exporting": "Exporting…",
+            "clear": "Clear",
+            "clear_search": "Clear search",
+            "filter_events": "Filter events…"
         },
         "api_keys": {
             "allowed_ips_description": "Leave blank to allow any IP address to use this API key, otherwise provide each IP address on a new line.",

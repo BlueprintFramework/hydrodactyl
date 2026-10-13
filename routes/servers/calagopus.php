@@ -32,6 +32,7 @@ Route::group([
     Route::get('/websocket', Calagopus\WebsocketController::class)->name('api:client:server.calagopus.ws');
     Route::get('/resources', Calagopus\ResourceUtilizationController::class)->name('api:client:server.calagopus.resources');
     Route::get('/activity', Calagopus\ActivityLogController::class)->name('api:client:server.calagopus.activity');
+    Route::get('/activity/events', [Calagopus\ActivityLogController::class, 'events'])->name('api:client:server.calagopus.activity-events');
 
     Route::post('/command', [Calagopus\CommandController::class, 'index']);
     Route::post('/power', [Calagopus\PowerController::class, 'index']);
