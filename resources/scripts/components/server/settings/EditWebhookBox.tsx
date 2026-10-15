@@ -1,12 +1,12 @@
 import { type Actions, useStoreActions } from 'easy-peasy';
-import { Form, Formik, Field as FormikField } from 'formik';
+import { Form, Formik } from 'formik';
 import { toast } from 'sonner';
 import { object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
 import editWebhookInfo from '@/api/server/editWebhookInfo';
+import Dropdown from '@/components/elements/Dropdown';
 import Field from '@/components/elements/Field';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
-import Select from '@/components/elements/Select';
 import { Button } from '@/components/ui/button';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
@@ -46,31 +46,30 @@ const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<s
                 webhook_url: string().url().required(),
             })}
         >
-            <Form className='flex flex-col gap-4'>
-                <div className='flex max-w-lg flex-col gap-4'>
-                    <FormikFieldWrapper id={'webhook_type'} name={'webhook_type'} label={'Webhook Type'}>
-                        <FormikField
-                            as={Select}
-                            className='w-full rounded-lg bg-[#ffffff17] px-4 py-2 text-base outline-hidden sm:text-sm'
-                            id={'webhook_type'}
-                            name={'webhook_type'}
-                        >
-                            <option value=''>Select a webhook type</option>
-                            {Object.entries(allowedWebhookTypes).map(([value, label]) => (
-                                <option key={value} value={value}>
-                                    {label}
-                                </option>
-                            ))}
-                        </FormikField>
-                    </FormikFieldWrapper>
-                    <Field id={'webhook_url'} name={'webhook_url'} label={'Webhook URL'} type={'url'} />
-                </div>
-                <div>
-                    <Button variant='secondary' type={'submit'}>
-                        Save
-                    </Button>
-                </div>
-            </Form>
+            {({ values, setFieldValue }) => (
+                <Form className='flex flex-col gap-4'>
+                    <div className='flex max-w-lg flex-col gap-4'>
+                        <FormikFieldWrapper id={'webhook_type'} name={'webhook_type'} label={'Webhook Type'}>
+                            <Dropdown
+                                id={'webhook_type'}
+                                value={values.webhook_type}
+                                onChange={(value) => setFieldValue('webhook_type', value)}
+                                placeholder='Select a webhook type'
+                                options={Object.entries(allowedWebhookTypes).map(([value, label]) => ({
+                                    value,
+                                    label,
+                                }))}
+                            />
+                        </FormikFieldWrapper>
+                        <Field id={'webhook_url'} name={'webhook_url'} label={'Webhook URL'} type={'url'} />
+                    </div>
+                    <div>
+                        <Button variant='secondary' type={'submit'}>
+                            Save
+                        </Button>
+                    </div>
+                </Form>
+            )}
         </Formik>
     );
 };
