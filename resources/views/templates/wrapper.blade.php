@@ -48,7 +48,7 @@
                     window.SiteConfiguration = {!! json_encode($siteConfiguration) !!};
                 </script>
             @endif
-            @if(Auth::guest() && !Cache::get('pterodactyl.setup_complete', false))
+            @if(Auth::guest() && !Cache::get('pterodactyl.setup_complete', false) && !\Pterodactyl\Models\User::query()->exists())
                 <script>window.SetupRequired = true;</script>
             @endif
         @show

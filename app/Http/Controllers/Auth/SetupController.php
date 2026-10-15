@@ -103,6 +103,10 @@ class SetupController extends Controller
             $lock->release();
         }
 
+        // Setup is complete: prime the flag so guests skip the user existence
+        // check on future page renders and the setup surface 404s immediately.
+        Cache::forever('pterodactyl.setup_complete', true);
+
         $request->session()->regenerate();
         $this->auth->guard()->login($user, true);
         Event::dispatch(new DirectLogin($user, true));
