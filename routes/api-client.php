@@ -96,6 +96,8 @@ Route::group([
             ->middleware('throttle:25,1');
     });
 
+    Route::post('/webhook', [Client\ServerController::class, 'webhook']);
+
     // Native plugin/mod installer (Minecraft). Browse/search are cached and
     // throttled; the actual file transfer happens via the per-daemon pull.
     Route::group(['prefix' => '/marketplace', 'middleware' => ['throttle:30,1']], function () {

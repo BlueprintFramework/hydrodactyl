@@ -1,4 +1,4 @@
-import { Bug, FolderArrowUpIn, Gear, ArrowsRotateRight } from '@gravity-ui/icons';
+import { ArrowsRotateRight, Bell, Bug, FolderArrowUpIn, Gear } from '@gravity-ui/icons';
 import { type Actions, useStoreActions, useStoreState } from 'easy-peasy';
 import { Form, Formik } from 'formik';
 import { useEffect, useState } from 'react';
@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { ip } from '@/lib/formatters';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
+import EditWebhookBox from './EditWebhookBox';
 
 interface Values {
     name: string;
@@ -33,6 +34,7 @@ const SettingsContainer = () => {
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const node = ServerContext.useStoreState((state) => state.server.data?.node);
+    const allowedWebhookTypes = ServerContext.useStoreState((state) => state.server.data?.allowedWebhookTypes);
     const sftp = ServerContext.useStoreState((state) => state.server.data?.sftpDetails, isEqual);
     const server = ServerContext.useStoreState((state) => state.server.data);
     const setServer = ServerContext.useStoreActions((actions) => actions.server.setServer);
@@ -144,6 +146,21 @@ const SettingsContainer = () => {
                             </div>
                         </Form>
                     </Formik>
+                </Can>
+
+                <Can action={'settings.webhook'}>
+                    <section className={sectionClass}>
+                        <div>
+                            <h2 className='flex items-center gap-2 text-sm font-medium text-cream-200'>
+                                <Bell width={16} height={16} className='text-cream-400/70' />
+                                Webhook
+                            </h2>
+                            <p className='mt-1 text-sm text-cream-400/70'>
+                                Send server activity to an external webhook.
+                            </p>
+                        </div>
+                        <EditWebhookBox allowedWebhookTypes={allowedWebhookTypes || {}} />
+                    </section>
                 </Can>
 
                 <section className={sectionClass}>
