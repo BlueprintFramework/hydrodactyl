@@ -1,6 +1,6 @@
-import debounce from 'debounce';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useDebouncedCallback } from 'use-debounce';
 import { httpErrorToHuman } from '@/api/http';
 import type { FileObject } from '@/api/server/files/loadDirectory';
 import Can from '@/components/elements/Can';
@@ -24,7 +24,7 @@ import { ServerContext } from '@/state/server';
 import NewFileButton from './NewFileButton';
 
 const sortFiles = (files: FileObject[]): FileObject[] => {
-    const sortedFiles: FileObject[] = files
+    const sortedFiles: FileObject[] = [...files]
         .sort((a, b) => a.name.localeCompare(b.name))
         .sort((a, b) => (a.isFile === b.isFile ? 0 : a.isFile ? 1 : -1));
     return sortedFiles.filter((file, index) => index === 0 || file.name !== sortedFiles[index - 1]?.name);
@@ -56,7 +56,6 @@ const FileManagerContainer = () => {
     }, [mutate]);
 
     const onSelectAllClick = () => {
-        console.log('files', files);
         setSelectedFiles(
             selectedFilesLength === (files?.length === 0 ? -1 : files?.length)
                 ? []
@@ -65,10 +64,12 @@ const FileManagerContainer = () => {
     };
 
     const [searchTerm, setSearchTerm] = useState('');
-    const debouncedSearchTerm = debounce(setSearchTerm, 50);
+    const debouncedSearchTerm = useDebouncedCallback((value: string) => setSearchTerm(value), 50);
 
-    const filesArray = sortFiles(files ?? []).filter((file) =>
-        file.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    const normalizedSearchTerm = searchTerm.toLowerCase();
+    const filesArray = useMemo(
+        () => sortFiles(files ?? []).filter((file) => file.name.toLowerCase().includes(normalizedSearchTerm)),
+        [files, normalizedSearchTerm],
     );
 
     useEffect(() => {

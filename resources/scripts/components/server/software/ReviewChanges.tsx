@@ -1,8 +1,8 @@
 import { TriangleExclamation } from '@gravity-ui/icons';
 import type { EggPreview } from '@/api/server/previewEggChange';
 import Spinner from '@/components/elements/Spinner';
-import TitledGreyBox from '@/components/elements/TitledGreyBox';
 import { Button } from '@/components/ui/button';
+import SoftwareCard from './SoftwareCard';
 import type { Egg, Nest } from './types';
 
 interface Props {
@@ -35,43 +35,43 @@ const ReviewChanges = ({
     onApply,
 }: Props) => (
     <div className='space-y-6'>
-        <TitledGreyBox title='Review Changes'>
+        <SoftwareCard title='Review Changes'>
             {selectedEgg && eggPreview && (
                 <div className='space-y-6'>
-                    <div className='p-4 bg-[#ffffff08] border border-[#ffffff12] rounded-lg'>
-                        <h3 className='text-lg font-semibold text-neutral-200 mb-4'>Change Summary</h3>
+                    <div className='p-4 bg-mocha-400/60 border border-mocha-300/60 rounded-lg'>
+                        <h3 className='text-lg font-semibold text-cream-100 mb-4'>Change Summary</h3>
                         <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm'>
                             <div>
-                                <span className='text-neutral-400'>From:</span>
-                                <div className='text-neutral-200 font-medium'>{currentEggName || 'No software'}</div>
+                                <span className='text-cream-400/70'>From:</span>
+                                <div className='text-cream-100 font-medium'>{currentEggName || 'No software'}</div>
                             </div>
                             <div>
-                                <span className='text-neutral-400'>To:</span>
+                                <span className='text-cream-400/70'>To:</span>
                                 <div className='text-brand font-medium'>{selectedEgg.attributes.name}</div>
                             </div>
                             <div>
-                                <span className='text-neutral-400'>Category:</span>
-                                <div className='text-neutral-200 font-medium'>{selectedNest?.attributes.name}</div>
+                                <span className='text-cream-400/70'>Category:</span>
+                                <div className='text-cream-100 font-medium'>{selectedNest?.attributes.name}</div>
                             </div>
                             <div>
-                                <span className='text-neutral-400'>Docker Image:</span>
-                                <div className='text-neutral-200 font-medium'>{selectedDockerImage || 'Default'}</div>
+                                <span className='text-cream-400/70'>Docker Image:</span>
+                                <div className='text-cream-100 font-medium'>{selectedDockerImage || 'Default'}</div>
                             </div>
                         </div>
                     </div>
 
-                    <div className='p-4 bg-[#ffffff08] border border-[#ffffff12] rounded-lg'>
-                        <h3 className='text-lg font-semibold text-neutral-200 mb-4'>Startup Configuration</h3>
+                    <div className='p-4 bg-mocha-400/60 border border-mocha-300/60 rounded-lg'>
+                        <h3 className='text-lg font-semibold text-cream-100 mb-4'>Startup Configuration</h3>
                         <div className='space-y-3'>
                             <div>
-                                <span className='text-neutral-400 text-sm'>Startup Command:</span>
-                                <div className='mt-1 p-3 bg-[#ffffff08] border border-[#ffffff12] rounded-lg font-mono text-sm text-neutral-200 whitespace-pre-wrap'>
+                                <span className='text-cream-400/70 text-sm'>Startup Command:</span>
+                                <div className='mt-1 p-3 bg-mocha-600 border border-mocha-400 rounded-lg font-mono text-sm text-cream-100 whitespace-pre-wrap'>
                                     {customStartup || eggPreview.egg.startup}
                                 </div>
                             </div>
                             <div>
-                                <span className='text-neutral-400 text-sm'>Docker Image:</span>
-                                <div className='mt-1 p-3 bg-[#ffffff08] border border-[#ffffff12] rounded-lg text-sm text-neutral-200'>
+                                <span className='text-cream-400/70 text-sm'>Docker Image:</span>
+                                <div className='mt-1 p-3 bg-mocha-600 border border-mocha-400 rounded-lg text-sm text-cream-100'>
                                     {selectedDockerImage || 'Default Image'}
                                 </div>
                             </div>
@@ -79,17 +79,17 @@ const ReviewChanges = ({
                     </div>
 
                     {eggPreview.variables.length > 0 && (
-                        <div className='p-4 bg-[#ffffff08] border border-[#ffffff12] rounded-lg'>
-                            <h3 className='text-lg font-semibold text-neutral-200 mb-4'>Variable Configuration</h3>
+                        <div className='p-4 bg-mocha-400/60 border border-mocha-300/60 rounded-lg'>
+                            <h3 className='text-lg font-semibold text-cream-100 mb-4'>Variable Configuration</h3>
                             <div className='space-y-2'>
                                 {eggPreview.variables.map((variable) => (
                                     <div
                                         key={variable.env_variable}
-                                        className='flex justify-between items-center py-2 px-3 bg-[#ffffff08] rounded-lg'
+                                        className='flex justify-between items-center py-2 px-3 bg-mocha-600/70 rounded-lg'
                                     >
                                         <div>
-                                            <span className='text-neutral-200 font-medium'>{variable.name}</span>
-                                            <span className='text-neutral-500 text-sm ml-2 font-mono'>
+                                            <span className='text-cream-100 font-medium'>{variable.name}</span>
+                                            <span className='text-cream-400/50 text-sm ml-2 font-mono'>
                                                 ({variable.env_variable})
                                             </span>
                                         </div>
@@ -104,18 +104,18 @@ const ReviewChanges = ({
                         </div>
                     )}
 
-                    <div className='p-4 bg-[#ffffff08] border border-[#ffffff12] rounded-lg'>
-                        <h3 className='text-lg font-semibold text-neutral-200 mb-4'>Safety Options</h3>
+                    <div className='p-4 bg-mocha-400/60 border border-mocha-300/60 rounded-lg'>
+                        <h3 className='text-lg font-semibold text-cream-100 mb-4'>Safety Options</h3>
                         <div className='space-y-2'>
-                            <div className='flex justify-between items-center py-2 px-3 bg-[#ffffff08] rounded-lg'>
-                                <span className='text-neutral-200'>Create Backup</span>
-                                <span className={shouldBackup ? 'text-green-400' : 'text-neutral-400'}>
+                            <div className='flex justify-between items-center py-2 px-3 bg-mocha-600/70 rounded-lg'>
+                                <span className='text-cream-100'>Create Backup</span>
+                                <span className={shouldBackup ? 'text-green-400' : 'text-cream-400/70'}>
                                     {shouldBackup ? 'Yes' : 'No'}
                                 </span>
                             </div>
-                            <div className='flex justify-between items-center py-2 px-3 bg-[#ffffff08] rounded-lg'>
-                                <span className='text-neutral-200'>Wipe Files</span>
-                                <span className={shouldWipe ? 'text-amber-400' : 'text-neutral-400'}>
+                            <div className='flex justify-between items-center py-2 px-3 bg-mocha-600/70 rounded-lg'>
+                                <span className='text-cream-100'>Wipe Files</span>
+                                <span className={shouldWipe ? 'text-amber-400' : 'text-cream-400/70'}>
                                     {shouldWipe ? 'Yes' : 'No'}
                                 </span>
                             </div>
@@ -152,7 +152,7 @@ const ReviewChanges = ({
                                                     ? 'Subdomain Will Be Deleted'
                                                     : 'Warning'}
                                             </h4>
-                                            <p className='text-sm text-neutral-300'>{warning.message}</p>
+                                            <p className='text-sm text-cream-400'>{warning.message}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -170,7 +170,7 @@ const ReviewChanges = ({
                             />
                             <div>
                                 <h4 className='text-amber-400 font-semibold mb-2'>This will:</h4>
-                                <ul className='text-sm text-neutral-300'>
+                                <ul className='text-sm text-cream-400'>
                                     <li>• Stop and reinstall your server</li>
                                     <li>• Take several minutes to complete</li>
                                     <li>• Modify and remove some files</li>
@@ -193,7 +193,7 @@ const ReviewChanges = ({
                     Apply Changes
                 </Button>
             </div>
-        </TitledGreyBox>
+        </SoftwareCard>
     </div>
 );
 

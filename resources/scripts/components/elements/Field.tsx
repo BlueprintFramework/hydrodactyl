@@ -11,7 +11,7 @@ interface OwnProps {
 type Props = OwnProps & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'name'>;
 
 const Field = forwardRef<HTMLInputElement, Props>(
-    ({ id, name = false, label, description, validate, ...props }, ref) => (
+    ({ id, name = false, label, description, validate, onChange, ...props }, ref) => (
         <FormikField innerRef={ref} name={name} validate={validate}>
             {({ field, form: { errors, touched } }: FieldProps) => (
                 <div className='flex flex-col gap-2'>
@@ -25,6 +25,10 @@ const Field = forwardRef<HTMLInputElement, Props>(
                         id={id}
                         {...field}
                         {...props}
+                        onChange={(event) => {
+                            field.onChange(event);
+                            onChange?.(event);
+                        }}
                     />
                     {touched[field.name] && errors[field.name] ? (
                         <p className={'text-sm font-bold text-[#d36666]'}>

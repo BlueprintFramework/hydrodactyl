@@ -17,6 +17,7 @@ interface NavItem {
     ref: RefObject<HTMLAnchorElement | null>;
     end: boolean;
     permission?: string | string[];
+    hardNav?: boolean;
 }
 
 interface SidebarProps {
@@ -124,6 +125,7 @@ export default memo(function Sidebar({ navItems, bottomNavItems = [], className,
                                 lastItem={index === navItems.length - 1}
                                 permission={item.permission}
                                 onNavClick={handleNavClick}
+                                hardNav={item.hardNav}
                             />
                         </li>
                     );
@@ -144,6 +146,7 @@ export default memo(function Sidebar({ navItems, bottomNavItems = [], className,
                                     lastItem={index === bottomNavItems.length - 1}
                                     permission={item.permission}
                                     onNavClick={handleNavClick}
+                                    hardNav={item.hardNav}
                                 />
                             </li>
                         );

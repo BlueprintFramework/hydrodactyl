@@ -37,7 +37,8 @@ class VerifyCaptcha
         if (empty($captchaResponse)) {
             Log::warning('Captcha verification failed - no response provided', [
                 'field_name' => $fieldName,
-                'request_data' => $request->all(),
+                'uri' => $request->getRequestUri(),
+                'ip' => $request->ip(),
             ]);
             throw new DisplayException('Please complete the captcha verification.');
         }

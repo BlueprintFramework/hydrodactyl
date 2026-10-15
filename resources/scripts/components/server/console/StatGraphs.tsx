@@ -1,17 +1,19 @@
 import { CloudDownload, CloudUpload } from '@carbon/icons-react';
 import { useEffect, useRef, useState } from 'react';
-import { Line } from 'react-chartjs-2';
 import CopyOnClick from '@/components/elements/CopyOnClick';
+import { EChartsLineChart, type ChartConfig } from '@/components/evilcharts/charts/echarts-line-chart';
 import ChartBlock from '@/components/server/console/ChartBlock';
-import { useChart, useChartTickLabel } from '@/components/server/console/chart';
+import getServerResourceHistory from '@/api/server/getServerResourceHistory';
 import { SocketEvent } from '@/components/server/events';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { bytesToString, ip } from '@/lib/formatters';
-import { hexToRgba } from '@/lib/helpers';
+import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { ServerContext } from '@/state/server';
 
 import formatUptime from '../UptimeDuration';
+
+const POINTS = 20;
+
+const GRAPH_STROKE_WIDTH = 1.6;
 
 interface StatsData {
     cpu_absolute: number;
@@ -23,68 +25,135 @@ interface StatsData {
     };
 }
 
+interface LiveStats {
+    cpu: number;
+    memory: number;
+    tx: number;
+    rx: number;
+    uptime: number;
+}
+
+interface Sample {
+    [key: string]: number;
+    index: number;
+    cpu: number;
+    memory: number;
+    inbound: number;
+    outbound: number;
+}
+
+const EMPTY_STATS: LiveStats = { cpu: 0, memory: 0, tx: 0, rx: 0, uptime: 0 };
+
+const cacheKey = (uuid: string) => `hydrodactyl:stats:${uuid}`;
+
+const readCachedSamples = (uuid: string | undefined): Sample[] => {
+    if (!uuid) return [];
+
+    try {
+        const cached = JSON.parse(localStorage.getItem(cacheKey(uuid)) ?? '[]') as Sample[];
+
+        return Array.isArray(cached) ? cached.filter((sample) => typeof sample?.cpu === 'number').slice(-POINTS) : [];
+    } catch {
+        return [];
+    }
+};
+
+const cpuConfig = {
+    cpu: { label: 'CPU', colors: { light: ['#f1995a'], dark: ['#f1995a'] } },
+} satisfies ChartConfig;
+
+const memoryConfig = {
+    memory: { label: 'Memory', colors: { light: ['#52a9ff'], dark: ['#52a9ff'] } },
+} satisfies ChartConfig;
+
+const networkConfig = {
+    inbound: { label: 'Inbound', colors: { light: ['#5eead4'], dark: ['#5eead4'] } },
+    outbound: { label: 'Outbound', colors: { light: ['#c084fc'], dark: ['#c084fc'] } },
+} satisfies ChartConfig;
+
 const StatGraphs = () => {
     const status = ServerContext.useStoreState((state) => state.status.value);
     const limits = ServerContext.useStoreState((state) => state.server.data?.limits);
+    const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const previous = useRef<Record<'tx' | 'rx', number>>({ tx: -1, rx: -1 });
+    const [live, setLive] = useState<LiveStats>(EMPTY_STATS);
+    const [samples, setSamples] = useState<Sample[]>(() => readCachedSamples(uuid));
 
-    const cpu = useChartTickLabel('CPU', limits.cpu, '%', 2);
-    const [uptime, setUptime] = useState(0);
-    const memory = useChartTickLabel('Memory', limits.memory, 'MiB');
-    const network = useChart('Network', {
-        sets: 2,
-        options: {
-            scales: {
-                y: {
-                    ticks: {
-                        callback(value) {
-                            return bytesToString(typeof value === 'string' ? parseInt(value, 10) : value);
-                        },
-                    },
-                },
-            },
-        },
-        callback(opts, index) {
-            return {
-                ...opts,
-                label: !index ? 'Network In' : 'Network Out',
-                borderColor: !index ? '#facc15' : '#60a5fa',
-                backgroundColor: hexToRgba(!index ? '#facc15' : '#60a5fa', 0.09),
-            };
-        },
-    });
+    useEffect(() => {
+        if (!uuid || samples.length === 0) return;
 
-    // When the server goes offline, clear the charts once. Do NOT list the
-    // per-chart `clear` functions in the deps — useChart() recreates them every
-    // render, so doing so makes this effect re-fire every render -> clear()
-    // calls setData -> re-render -> re-fire, i.e. a "Maximum update depth
-    // exceeded" infinite loop. They only close over stable setData/merge, so a
-    // status-only dependency is both correct and safe.
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — clear fns are unstable, see above.
+        localStorage.setItem(cacheKey(uuid), JSON.stringify(samples));
+    }, [uuid, samples]);
+
+    useEffect(() => {
+        if (!uuid) return;
+
+        getServerResourceHistory(uuid)
+            .then((history) => {
+                if (history.length === 0) return;
+
+                const restored = history.slice(-POINTS).map((sample, index) => {
+                    const earlier = history[index - 1];
+
+                    return {
+                        index,
+                        cpu: Number(sample.cpu.toFixed(2)),
+                        memory: sample.memory,
+                        inbound: earlier ? Math.max(0, sample.tx - earlier.tx) : 0,
+                        outbound: earlier ? Math.max(0, sample.rx - earlier.rx) : 0,
+                    };
+                });
+
+                setSamples((current) => (current.length > restored.length ? current : restored));
+
+                const latest = history.at(-1);
+                if (latest) {
+                    setLive((current) => (current.uptime > 0 ? current : { ...current, uptime: latest.uptime }));
+                    previous.current = { tx: latest.tx, rx: latest.rx };
+                }
+            })
+            .catch((error) => console.error(error));
+    }, [uuid]);
+
     useEffect(() => {
         if (status !== 'offline') return;
 
-        cpu.clear();
-        memory.clear();
-        network.clear();
-        setUptime(0);
-    }, [status]);
+        setSamples([]);
+        setLive(EMPTY_STATS);
+        if (uuid) localStorage.removeItem(cacheKey(uuid));
+    }, [status, uuid]);
 
-    useWebsocketEvent(SocketEvent.STATS, (data: string) => {
+    useWebsocketEvent(SocketEvent.STATS, (data) => {
         let values: StatsData;
         try {
-            values = JSON.parse(data) as StatsData;
+            values = JSON.parse(String(data)) as StatsData;
         } catch {
             return;
         }
-        setUptime(values.uptime);
-        cpu.push(values.cpu_absolute);
-        memory.push(Math.floor(values.memory_bytes / 1024 / 1024));
 
-        network.push([
-            previous.current.tx < 0 ? 0 : Math.max(0, values.network.tx_bytes - previous.current.tx),
-            previous.current.rx < 0 ? 0 : Math.max(0, values.network.rx_bytes - previous.current.rx),
-        ]);
+        const tx = previous.current.tx < 0 ? 0 : Math.max(0, values.network.tx_bytes - previous.current.tx);
+        const rx = previous.current.rx < 0 ? 0 : Math.max(0, values.network.rx_bytes - previous.current.rx);
+
+        setSamples((current) =>
+            [
+                ...current,
+                {
+                    index: (current.at(-1)?.index ?? -1) + 1,
+                    cpu: Number(values.cpu_absolute.toFixed(2)),
+                    memory: Math.floor(values.memory_bytes / 1024 / 1024),
+                    inbound: tx,
+                    outbound: rx,
+                },
+            ].slice(-POINTS),
+        );
+
+        setLive({
+            cpu: values.cpu_absolute,
+            memory: values.memory_bytes,
+            tx,
+            rx,
+            uptime: values.uptime,
+        });
 
         previous.current = {
             tx: values.network.tx_bytes,
@@ -99,80 +168,96 @@ const StatGraphs = () => {
     });
 
     const description = ServerContext.useStoreState((state) => state.server.data?.description);
+    const loading = samples.length === 0;
 
     return (
-        <TooltipProvider>
-            <div className='flex h-full flex-col gap-4 overflow-y-auto flex-none'>
-                <div>
-                    <div className='group p-4 justify-between relative rounded-xl border border-[#ffffff11] bg-[#110f0d] flex gap-4 text-sm'>
-                        <h3 className='font-extrabold'>IP Address</h3>
-                        <CopyOnClick text={allocation}>
-                            <div className='font-medium'>{allocation}</div>
-                        </CopyOnClick>
-                    </div>
-                </div>
-                <div>
-                    <div className='group p-4 justify-between relative rounded-xl border border-[#ffffff11] bg-[#110f0d] flex gap-4 text-sm'>
-                        <h3 className='font-extrabold'>Uptime</h3>
-                        <div className='font-medium'>{formatUptime(uptime)}</div>
-                    </div>
-                </div>
-                {description && (
-                    <div>
-                        <div className='group p-4 justify-between relative rounded-xl border border-[#ffffff11] flex-col bg-[#110f0d] flex gap-4 text-sm'>
-                            <h3 className='font-extrabold'>Description</h3>
-                            <div className='font-medium'>{description}</div>
-                        </div>
-                    </div>
-                )}
-                <div>
-                    <ChartBlock title={'CPU'}>
-                        <Line aria-label='CPU Usage' role='img' {...cpu.props} />
-                    </ChartBlock>
-                </div>
-                <div>
-                    <ChartBlock title={'RAM'}>
-                        <Line aria-label='Memory Usage' role='img' {...memory.props} />
-                    </ChartBlock>
-                </div>
-                <div>
-                    <ChartBlock
-                        title={'Network Activity'}
-                        legend={
-                            <div className='flex gap-2'>
-                                <Tooltip delayDuration={200}>
-                                    <TooltipTrigger asChild>
-                                        <div className='flex items-center cursor-default'>
-                                            <CloudDownload className='mr-2 w-4 h-4 text-yellow-400' />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent side='top' sideOffset={5}>
-                                        Inbound
-                                    </TooltipContent>
-                                </Tooltip>
-
-                                <Tooltip delayDuration={200}>
-                                    <TooltipTrigger asChild>
-                                        <div className='flex items-center cursor-default'>
-                                            <CloudUpload className='w-4 h-4 text-blue-400' />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent side='top' sideOffset={5}>
-                                        Outbound
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
-                        }
-                    >
-                        <Line
-                            aria-label='Network Activity. Download and upload activity'
-                            role='img'
-                            {...network.props}
-                        />
-                    </ChartBlock>
-                </div>
+        <div className='flex h-full flex-none flex-col gap-3 overflow-y-auto'>
+            <div className='rounded-2xl border border-mocha-400 bg-mocha-500 p-4'>
+                <p className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>IP Address</p>
+                <CopyOnClick text={allocation}>
+                    <div className='mt-1 truncate text-sm font-medium text-cream-50 tabular-nums'>{allocation}</div>
+                </CopyOnClick>
             </div>
-        </TooltipProvider>
+
+            <div className='rounded-2xl border border-mocha-400 bg-mocha-500 p-4'>
+                <p className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>Uptime</p>
+                <div className='mt-1 text-sm font-medium text-cream-50 tabular-nums'>{formatUptime(live.uptime)}</div>
+            </div>
+
+            {description && (
+                <div className='rounded-2xl border border-mocha-400 bg-mocha-500 p-4'>
+                    <p className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>Description</p>
+                    <div className='mt-1 text-sm font-medium text-cream-50'>{description}</div>
+                </div>
+            )}
+
+            <ChartBlock
+                title='CPU'
+                hint={limits?.cpu ? `of ${limits.cpu}%` : undefined}
+                value={<span className='tabular-nums'>{live.cpu.toFixed(1)}%</span>}
+            >
+                <EChartsLineChart
+                    data={loading ? [] : samples}
+                    config={cpuConfig}
+                    xDataKey='index'
+                    isLoading={loading}
+                    curveType='bump'
+                    className='h-full w-full'
+                >
+                    <EChartsLineChart.Tooltip />
+                    <EChartsLineChart.Line dataKey='cpu' strokeVariant='solid' strokeWidth={GRAPH_STROKE_WIDTH} />
+                </EChartsLineChart>
+            </ChartBlock>
+
+            <ChartBlock
+                title='Memory'
+                hint={limits?.memory ? `of ${bytesToString(mbToBytes(limits.memory))}` : undefined}
+                value={<span className='tabular-nums'>{bytesToString(live.memory)}</span>}
+            >
+                <EChartsLineChart
+                    data={loading ? [] : samples}
+                    config={memoryConfig}
+                    xDataKey='index'
+                    isLoading={loading}
+                    curveType='bump'
+                    className='h-full w-full'
+                >
+                    <EChartsLineChart.Tooltip
+                        valueFormatter={(value) => bytesToString(mbToBytes(value))}
+                    />
+                    <EChartsLineChart.Line dataKey='memory' strokeVariant='solid' strokeWidth={GRAPH_STROKE_WIDTH} />
+                </EChartsLineChart>
+            </ChartBlock>
+
+            <ChartBlock
+                title='Network'
+                value={
+                    <div className='flex flex-col items-end gap-1 text-xs font-semibold tabular-nums'>
+                        <span className='flex items-center gap-1.5'>
+                            <CloudDownload className='size-3.5' style={{ color: '#5eead4' }} />
+                            {bytesToString(live.tx)}
+                        </span>
+                        <span className='flex items-center gap-1.5'>
+                            <CloudUpload className='size-3.5' style={{ color: '#c084fc' }} />
+                            {bytesToString(live.rx)}
+                        </span>
+                    </div>
+                }
+            >
+                <EChartsLineChart
+                    data={loading ? [] : samples}
+                    config={networkConfig}
+                    xDataKey='index'
+                    isLoading={loading}
+                    curveType='bump'
+                    className='h-full w-full'
+                >
+                    <EChartsLineChart.Tooltip valueFormatter={(value) => bytesToString(value)} />
+                    <EChartsLineChart.Line dataKey='inbound' strokeVariant='solid' strokeWidth={GRAPH_STROKE_WIDTH} />
+                    <EChartsLineChart.Line dataKey='outbound' strokeVariant='solid' strokeWidth={GRAPH_STROKE_WIDTH} />
+                </EChartsLineChart>
+            </ChartBlock>
+        </div>
     );
 };
 

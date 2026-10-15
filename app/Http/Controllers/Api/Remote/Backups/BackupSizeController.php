@@ -47,12 +47,16 @@ class BackupSizeController extends Controller
         $backupsToUpdate = [];
 
         // First pass: validate all backups and prepare updates
+        $requestedUuids = collect($validatedData['backups'])->pluck('backup_uuid')->all();
+        $existingBackups = Backup::query()
+            ->where('server_id', $server->id)
+            ->whereIn('uuid', $requestedUuids)
+            ->get()
+            ->keyBy('uuid');
+
         foreach ($validatedData['backups'] as $backupData) {
-            /** @var Backup $backup */
-            $backup = Backup::query()
-                ->where('uuid', $backupData['backup_uuid'])
-                ->where('server_id', $server->id)
-                ->first();
+            /** @var Backup|null $backup */
+            $backup = $existingBackups->get($backupData['backup_uuid']);
 
             if (!$backup) {
                 $errors[] = [

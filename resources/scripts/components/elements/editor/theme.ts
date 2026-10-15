@@ -3,7 +3,7 @@ import type { Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { tags as t } from '@lezer/highlight';
 
-const highlightBackground = 'transparent';
+const highlightBackground = 'rgba(255, 255, 255, 0.04)';
 const background = 'transparent';
 const selection = '#34455A';
 const cursor = '#ffffff';
@@ -13,10 +13,20 @@ export const ayuMirageTheme: Extension = EditorView.theme(
         '&': {
             color: '#CBCCC6',
             backgroundColor: background,
+            height: '100%',
+            fontSize: '13px',
+        },
+
+        '.cm-scroller': {
+            overflow: 'auto',
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+            lineHeight: '1.5',
         },
 
         '.cm-content': {
             caretColor: cursor,
+            paddingTop: '0.75rem',
+            paddingBottom: '1rem',
         },
 
         '&.cm-focused .cm-cursor': { borderLeftColor: cursor },
@@ -24,11 +34,25 @@ export const ayuMirageTheme: Extension = EditorView.theme(
             backgroundColor: selection,
         },
 
-        '.cm-button': { background: '#222222' },
-
         '.cm-panels': { backgroundColor: '#111111', color: '#CBCCC6' },
-        // '.cm-panels.cm-panels-top': { borderBottom: '2px solid black' },
-        // '.cm-panels.cm-panels-bottom': { borderTop: '2px solid black' },
+        '.cm-panels.cm-panels-top': { borderBottom: '1px solid rgba(255, 255, 255, 0.06)' },
+        '.cm-panels.cm-panels-bottom': { borderTop: '1px solid rgba(255, 255, 255, 0.06)' },
+        '.cm-textfield': {
+            backgroundColor: 'rgba(255, 255, 255, 0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: '6px',
+            color: '#CBCCC6',
+            outline: 'none',
+        },
+        '.cm-textfield:focus': { borderColor: 'rgba(255, 255, 255, 0.3)' },
+        '.cm-button': {
+            backgroundImage: 'none',
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '6px',
+            color: '#CBCCC6',
+        },
+        '.cm-panel.cm-search label': { color: 'rgba(203, 204, 198, 0.7)', fontSize: '12px' },
 
         '.cm-searchMatch': {
             backgroundColor: '#72a1ff59',
@@ -48,7 +72,7 @@ export const ayuMirageTheme: Extension = EditorView.theme(
 
         '.cm-gutters': {
             backgroundColor: 'transparent',
-            color: '#FF3333',
+            color: 'rgba(255, 255, 255, 0.35)',
             border: 'none',
         },
 

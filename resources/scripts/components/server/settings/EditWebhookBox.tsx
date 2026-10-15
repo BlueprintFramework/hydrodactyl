@@ -7,7 +7,6 @@ import editWebhookInfo from '@/api/server/editWebhookInfo';
 import Field from '@/components/elements/Field';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import Select from '@/components/elements/Select';
-import TitledGreyBox from '@/components/elements/TitledGreyBox';
 import { Button } from '@/components/ui/button';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
@@ -16,36 +15,6 @@ interface Values {
     webhook_type: string;
     webhook_url: string;
 }
-
-const EditWebhookForm = (allowedWebhookTypes: Record<string, string>) => {
-    return (
-        <TitledGreyBox title={'Webhook'}>
-            <Form className='flex flex-col gap-4'>
-                <FormikFieldWrapper id={'webhook_type'} name={'webhook_type'} label={'Webhook Type'}>
-                    <FormikField
-                        as={Select}
-                        className='w-full px-4 py-2 rounded-lg outline-hidden bg-[#ffffff17] text-base sm:text-sm'
-                        id={'webhook_type'}
-                        name={'webhook_type'}
-                    >
-                        <option value=''>Select a webhook type</option>
-                        {Object.entries(allowedWebhookTypes).map(([value, label]) => (
-                            <option key={value} value={value}>
-                                {label}
-                            </option>
-                        ))}
-                    </FormikField>
-                </FormikFieldWrapper>
-                <Field id={'webhook_url'} name={'webhook_url'} label={'Webhook URL'} type={'url'} />
-                <div className={`mt-6 text-right`}>
-                    <Button variant='secondary' type={'submit'}>
-                        Save
-                    </Button>
-                </div>
-            </Form>
-        </TitledGreyBox>
-    );
-};
 
 const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<string, string> }) => {
     const server = ServerContext.useStoreState((state) => state.server.data);
@@ -77,7 +46,31 @@ const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<s
                 webhook_url: string().url().required(),
             })}
         >
-            <EditWebhookForm {...allowedWebhookTypes} />
+            <Form className='flex flex-col gap-4'>
+                <div className='flex max-w-lg flex-col gap-4'>
+                    <FormikFieldWrapper id={'webhook_type'} name={'webhook_type'} label={'Webhook Type'}>
+                        <FormikField
+                            as={Select}
+                            className='w-full rounded-lg bg-[#ffffff17] px-4 py-2 text-base outline-hidden sm:text-sm'
+                            id={'webhook_type'}
+                            name={'webhook_type'}
+                        >
+                            <option value=''>Select a webhook type</option>
+                            {Object.entries(allowedWebhookTypes).map(([value, label]) => (
+                                <option key={value} value={value}>
+                                    {label}
+                                </option>
+                            ))}
+                        </FormikField>
+                    </FormikFieldWrapper>
+                    <Field id={'webhook_url'} name={'webhook_url'} label={'Webhook URL'} type={'url'} />
+                </div>
+                <div>
+                    <Button variant='secondary' type={'submit'}>
+                        Save
+                    </Button>
+                </div>
+            </Form>
         </Formik>
     );
 };

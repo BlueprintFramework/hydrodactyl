@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a24882c220f13553585a9b5fb83e301",
+    "content-hash": "b15ddbdef60f6d0166b094af9941ec6a",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -1502,67 +1502,6 @@
                 }
             ],
             "time": "2026-06-08T15:39:10+00:00"
-        },
-        {
-            "name": "laracasts/utilities",
-            "version": "3.2.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laracasts/PHP-Vars-To-Js-Transformer.git",
-                "reference": "e4d5bb22a3e8d6d92d8454b773bd9c8df2473c17"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/laracasts/PHP-Vars-To-Js-Transformer/zipball/e4d5bb22a3e8d6d92d8454b773bd9c8df2473c17",
-                "reference": "e4d5bb22a3e8d6d92d8454b773bd9c8df2473c17",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/support": "^5.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
-                "php": ">=5.5.0|>=7.2.5|>=8.0.0"
-            },
-            "require-dev": {
-                "phpspec/phpspec": ">=2.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "JavaScript": "Laracasts\\Utilities\\JavaScript\\JavaScriptFacade"
-                    },
-                    "providers": [
-                        "Laracasts\\Utilities\\JavaScript\\JavaScriptServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/helpers.php"
-                ],
-                "psr-4": {
-                    "Laracasts\\Utilities\\JavaScript\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jeffrey Way",
-                    "email": "jeffrey@laracasts.com"
-                }
-            ],
-            "description": "Transform your PHP to JavaScript",
-            "keywords": [
-                "javascript",
-                "laravel"
-            ],
-            "support": {
-                "issues": "https://github.com/laracasts/PHP-Vars-To-Js-Transformer/issues",
-                "source": "https://github.com/laracasts/PHP-Vars-To-Js-Transformer/tree/3.2.5"
-            },
-            "time": "2026-02-24T22:12:50+00:00"
         },
         {
             "name": "laravel/framework",

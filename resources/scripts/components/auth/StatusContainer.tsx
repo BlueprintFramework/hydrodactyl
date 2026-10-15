@@ -56,9 +56,8 @@ const StatusContainer = ({ text, type }: { text: string; type?: FlashMessageType
 StatusContainer.displayName = 'StatusContainer';
 
 const FlashStatusContainer = ({ byKey }: Props) => {
-    const flashes = useStoreState((state) =>
-        state.flashes.items.filter((flash) => (byKey ? flash.key === byKey : true)),
-    );
+    const items = useStoreState((state) => state.flashes.items);
+    const flashes = byKey ? items.filter((flash) => flash.key === byKey) : items;
 
     return flashes.length
         ? flashes.map((flash, index) => (

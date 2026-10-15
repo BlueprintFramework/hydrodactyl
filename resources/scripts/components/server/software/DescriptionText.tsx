@@ -13,7 +13,7 @@ const DescriptionText = ({ description, id: _id }: Props) => {
     const toggle = () => setShowFull((prev) => !prev);
 
     return (
-        <p className='text-sm text-neutral-400 leading-relaxed'>
+        <p className='text-sm text-cream-400/70 leading-relaxed'>
             {isLong && !showFull ? (
                 <>
                     {description.slice(0, MAX_DESCRIPTION_LENGTH)}...{' '}

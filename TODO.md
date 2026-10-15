@@ -102,8 +102,8 @@ A living roadmap of the features and improvements planned for Hydrodactyl. Check
 ### Activity
 
 - [x] Filter system
-- [ ] Fix search restricted to current page (enable global search)
-- [ ] Improve search/filter UX & overall feel
+- [x] Fix search restricted to current page (enable global search)
+- [x] Improve search/filter UX & overall feel
 
 ### Software
 
@@ -128,6 +128,6 @@ A living roadmap of the features and improvements planned for Hydrodactyl. Check
 
 ## In Progress
 
-- [ ] Admin Panel Redesign
-  - [ ] Convert Admin Panel pages to React (dashboard overview is done)
-  - [ ] Redesign UI to match Client-side styling
+- [x] Admin Panel Redesign
+  - [x] Convert Admin Panel pages to React (dashboard overview is done)
+  - [x] Redesign UI to match Client-side styling

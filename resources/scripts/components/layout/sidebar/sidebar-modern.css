@@ -41,7 +41,7 @@ body[data-sidebar-minimized] {
 body[data-sidebar-minimized="true"] .sidebar-logo-container {
     width: var(--sidebar-width);
 }
-.sidebar-logo-container,
+
 .sidebar-container {
     transition: width var(--sidebar-transition-sidebar);
 }

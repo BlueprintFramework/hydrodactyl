@@ -55,10 +55,14 @@ class ResourceBelongsToServer
                         throw $exception;
                     }
                     break;
-                    // Regular users are a special case here as we need to make sure they're
-                    // currently assigned as a subuser on the server.
+                // Regular users are a special case here as we need to make sure they're
+                // currently assigned as a subuser on the server.
                 case User::class:
-                    $subuser = $server->subusers()->where('user_id', $model->id)->first();
+                    // Prefer an already-loaded subuser collection to avoid a redundant
+                    // query, falling back to a targeted lookup if it hasn't been loaded.
+                    $subuser = $server->relationLoaded('subusers')
+                        ? $server->subusers->firstWhere('user_id', $model->id)
+                        : $server->subusers()->where('user_id', $model->id)->first();
                     if (is_null($subuser)) {
                         throw $exception;
                     }
@@ -66,8 +70,8 @@ class ResourceBelongsToServer
                     // in the underlying logic.
                     $request->attributes->set('subuser', $subuser);
                     break;
-                    // Tasks are special since they're (currently) the only item in the API
-                    // that requires something in addition to the server in order to be accessed.
+                // Tasks are special since they're (currently) the only item in the API
+                // that requires something in addition to the server in order to be accessed.
                 case Task::class:
                     $schedule = $request->route()->parameter('schedule');
                     if ($model->schedule_id !== $schedule->id || $schedule->server_id !== $server->id) {

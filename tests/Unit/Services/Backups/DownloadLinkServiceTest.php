@@ -124,7 +124,7 @@ class DownloadLinkServiceTest extends TestCase
         $user = User::factory()->make(['id' => 1]);
 
         $node = \Mockery::mock(Node::class)->makePartial();
-        $node->shouldReceive('getConnectionAddress')->andReturn('https://node1.example.com:8080');
+        $node->shouldReceive('getBrowserConnectionAddress')->andReturn('https://node1.example.com:8080');
 
         $backup = Backup::factory()->make([
             'is_successful' => true,
@@ -175,7 +175,7 @@ class DownloadLinkServiceTest extends TestCase
         $user = User::factory()->make(['id' => 2]);
 
         $node = \Mockery::mock(Node::class)->makePartial();
-        $node->shouldReceive('getConnectionAddress')->andReturn('https://node2.example.com');
+        $node->shouldReceive('getBrowserConnectionAddress')->andReturn('https://node2.example.com');
 
         $backup = Backup::factory()->make([
             'is_successful' => true,

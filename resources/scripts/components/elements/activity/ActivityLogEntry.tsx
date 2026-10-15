@@ -21,35 +21,30 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
     const actor = activity.relationships.actor;
 
     return (
-        <div className='flex items-center py-2 px-3 border-b border-zinc-800/30 last:border-0 group hover:bg-zinc-800/20 transition-colors duration-150'>
-            {/* Compact Avatar */}
-            <div className='flex-shrink-0 w-8 h-8 rounded-full bg-zinc-600 overflow-hidden mr-3'>
+        <div className='flex items-center gap-3 py-3'>
+            <div className='h-7 w-7 shrink-0 overflow-hidden rounded-full bg-zinc-700'>
                 {actor?.image ? (
-                    <img src={actor.image} alt={actor.username || 'System'} className='w-full h-full object-cover' />
+                    <img src={actor.image} alt={actor.username || 'System'} className='h-full w-full object-cover' />
                 ) : (
-                    <div className='w-full h-full flex items-center justify-center text-zinc-300 text-xs font-semibold'>
+                    <div className='flex h-full w-full items-center justify-center text-xs font-medium text-zinc-300'>
                         {(actor?.username || 'S').charAt(0).toUpperCase()}
                     </div>
                 )}
             </div>
 
-            {/* Main Content - Compact Layout */}
-            <div className='flex-1 min-w-0'>
+            <div className='min-w-0 flex-1'>
                 <div className='flex items-center gap-2 text-sm'>
-                    <span className='font-medium text-zinc-100 truncate'>{actor?.username || 'System'}</span>
-                    <span className='text-zinc-500'>•</span>
+                    <span className='truncate text-zinc-100'>{actor?.username || 'System'}</span>
                     <Link
                         to={`#${pathTo({ event: activity.event })}`}
-                        className='font-mono text-xs bg-zinc-800/50 text-zinc-300 px-2 py-1 rounded hover:bg-zinc-700/50 hover:text-brand transition-colors duration-150 truncate'
+                        className='truncate font-mono text-xs text-zinc-400 hover:text-zinc-100'
                     >
                         {activity.event}
                     </Link>
-
-                    {/* Compact badges */}
-                    <div className='flex items-center gap-1 ml-auto'>
+                    <div className='ml-auto flex shrink-0 items-center gap-2'>
                         {activity.isApi && (
-                            <span className='text-xs bg-blue-900/30 text-blue-300 px-1.5 py-0.5 rounded flex items-center gap-1'>
-                                <TerminalLine width={22} height={22} fill='currentColor' />
+                            <span className='flex items-center gap-1 text-xs text-zinc-500'>
+                                <TerminalLine width={14} height={14} fill='currentColor' />
                                 API
                             </span>
                         )}
@@ -57,20 +52,13 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
                     </div>
                 </div>
 
-                {/* Compact metadata and timestamp */}
-                <div className='flex items-center gap-3 mt-1 text-xs text-zinc-400'>
-                    {activity.ip && (
-                        <span className='font-mono bg-zinc-800/30 px-1.5 py-0.5 rounded'>{activity.ip}</span>
-                    )}
+                <div className='mt-0.5 flex items-center gap-3 text-xs text-zinc-500'>
+                    {activity.ip && <span className='font-mono'>{activity.ip}</span>}
                     <span>{formatDistanceToNowStrict(activity.timestamp, { addSuffix: true })}</span>
-
-                    {/* Inline properties for compact view */}
                     {!activity.hasAdditionalMetadata &&
                         activity.properties &&
                         Object.keys(activity.properties).length > 0 && (
-                            <span className='text-zinc-500 truncate max-w-xs'>
-                                {formatObjectToIdentString(activity.properties)}
-                            </span>
+                            <span className='max-w-xs truncate'>{formatObjectToIdentString(activity.properties)}</span>
                         )}
                 </div>
             </div>

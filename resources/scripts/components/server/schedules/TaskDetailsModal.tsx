@@ -5,20 +5,16 @@ import { boolean, number, object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
 import createOrUpdateScheduleTask from '@/api/server/schedules/createOrUpdateScheduleTask';
 import type { Schedule, Task } from '@/api/server/schedules/getServerSchedules';
+import Dropdown from '@/components/elements/Dropdown';
 import Field from '@/components/elements/Field';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import FormikSwitchV2 from '@/components/elements/FormikSwitchV2';
 import { Textarea } from '@/components/elements/Input';
 import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
-import Select from '@/components/elements/Select';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
-
-// TODO: Port modern dropdowns to Formik and integrate them
-// import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem } from '@/components/elements/DropdownMenu';
-// import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 
 const Label = styled.label`
   display: inline-block;
@@ -134,7 +130,7 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
                 continueOnFailure: task?.continueOnFailure || false,
             }}
         >
-            {({ isSubmitting, values }) => (
+            {({ isSubmitting, values, setFieldValue }) => (
                 <Modal
                     visible={visible}
                     onDismissed={onDismissed}
@@ -149,21 +145,15 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
                                 <Label>Action</Label>
                                 <ActionListener />
                                 <FormikFieldWrapper name={'action'}>
-                                    <FormikField
-                                        className='px-4 py-2 bg-[#ffffff11] rounded-lg min-w-full'
-                                        as={Select}
-                                        name={'action'}
-                                    >
-                                        <option className='bg-black' value={'command'}>
-                                            Send command
-                                        </option>
-                                        <option className='bg-black' value={'power'}>
-                                            Power
-                                        </option>
-                                        <option className='bg-black' value={'backup'}>
-                                            Create backup
-                                        </option>
-                                    </FormikField>
+                                    <Dropdown
+                                        value={values.action}
+                                        onChange={(value) => setFieldValue('action', value)}
+                                        options={[
+                                            { value: 'command', label: 'Send command' },
+                                            { value: 'power', label: 'Power' },
+                                            { value: 'backup', label: 'Create backup' },
+                                        ]}
+                                    />
                                 </FormikFieldWrapper>
                             </div>
                             <div>
@@ -193,24 +183,16 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
                                 <div>
                                     <Label>Payload</Label>
                                     <FormikFieldWrapper name={'payload'}>
-                                        <FormikField
-                                            className='px-4 py-2 bg-[#ffffff11] rounded-lg min-w-full'
-                                            as={Select}
-                                            name={'payload'}
-                                        >
-                                            <option className='bg-black' value={'start'}>
-                                                Start the server
-                                            </option>
-                                            <option className='bg-black' value={'restart'}>
-                                                Restart the server
-                                            </option>
-                                            <option className='bg-black' value={'stop'}>
-                                                Stop the server
-                                            </option>
-                                            <option className='bg-black' value={'kill'}>
-                                                Terminate the server
-                                            </option>
-                                        </FormikField>
+                                        <Dropdown
+                                            value={values.payload}
+                                            onChange={(value) => setFieldValue('payload', value)}
+                                            options={[
+                                                { value: 'start', label: 'Start the server' },
+                                                { value: 'restart', label: 'Restart the server' },
+                                                { value: 'stop', label: 'Stop the server' },
+                                                { value: 'kill', label: 'Terminate the server' },
+                                            ]}
+                                        />
                                     </FormikFieldWrapper>
                                 </div>
                             ) : (

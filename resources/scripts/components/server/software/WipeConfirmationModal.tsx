@@ -30,13 +30,13 @@ const WipeConfirmationModal = ({ visible, wipeCountdown, shiftPressed, wipeLoadi
                 />
                 <div>
                     <h4 className='text-red-400 font-semibold mb-2'>DANGER: No Backup Selected</h4>
-                    <p className='text-sm text-neutral-300'>
+                    <p className='text-sm text-cream-400'>
                         You have chosen to wipe all files <strong>without creating a backup</strong>. This action will{' '}
                         <strong>permanently delete ALL files</strong> on your server and cannot be undone.
                     </p>
                 </div>
             </div>
-            <div className='text-sm text-neutral-300 space-y-2'>
+            <div className='text-sm text-cream-400 space-y-2'>
                 <p>
                     <strong>What will happen:</strong>
                 </p>
@@ -47,7 +47,7 @@ const WipeConfirmationModal = ({ visible, wipeCountdown, shiftPressed, wipeLoadi
                     <li>This action cannot be reversed</li>
                 </ul>
             </div>
-            <p className='text-sm text-neutral-300'>Are you absolutely sure you want to proceed without a backup?</p>
+            <p className='text-sm text-cream-400'>Are you absolutely sure you want to proceed without a backup?</p>
         </div>
     </ConfirmationModal>
 );

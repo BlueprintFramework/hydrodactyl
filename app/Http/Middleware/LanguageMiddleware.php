@@ -19,7 +19,8 @@ class LanguageMiddleware
      */
     public function handle(Request $request, \Closure $next): mixed
     {
-        $this->app->setLocale($request->user()->language ?? config('app.locale', 'en'));
+        $user = $request->user();
+        $this->app->setLocale($user?->language ?? config('app.locale', 'en'));
 
         return $next($request);
     }

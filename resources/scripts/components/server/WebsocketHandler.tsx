@@ -45,7 +45,13 @@ function WebsocketHandler() {
             setError('connecting');
             setConnectionState(false);
         });
-        socket.on('SOCKET_RECONNECT', () => setConnectionState(false));
+        socket.on('SOCKET_RECONNECT', () => {
+            setConnectionState(false);
+            // The token that got us here may have just expired (it is only valid
+            // for 10 minutes), so fetch a fresh one during the backoff window.
+            // It is applied on the next open rather than sent to the dead socket.
+            updateToken(uuid, socket);
+        });
         socket.on('status', (status) => setServerStatus(status));
 
         socket.on('daemon error', (message) => {
@@ -127,7 +133,7 @@ function WebsocketHandler() {
         let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
         const attemptReconnect = () => {
             if (reconnectTimer) clearTimeout(reconnectTimer);
-            reconnectTimer = window.setTimeout(() => {
+            reconnectTimer = setTimeout(() => {
                 const socket = instanceRef.current;
                 // Reconnect if the store thinks we're disconnected, OR if the
                 // socket is actually dead but `connected` went stale (mobile
@@ -142,12 +148,19 @@ function WebsocketHandler() {
         const onVisibility = () => {
             if (document.visibilityState === 'visible') attemptReconnect();
         };
+        // Restoring a page from the back/forward cache keeps the DOM but the
+        // websocket is long gone, so reconnect as well.
+        const onPageShow = (event: PageTransitionEvent) => {
+            if (event.persisted) attemptReconnect();
+        };
 
         document.addEventListener('visibilitychange', onVisibility);
         window.addEventListener('online', attemptReconnect);
+        window.addEventListener('pageshow', onPageShow);
         return () => {
             document.removeEventListener('visibilitychange', onVisibility);
             window.removeEventListener('online', attemptReconnect);
+            window.removeEventListener('pageshow', onPageShow);
             if (reconnectTimer) clearTimeout(reconnectTimer);
         };
     }, [setConnectionState]);

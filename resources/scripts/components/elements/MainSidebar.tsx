@@ -34,10 +34,6 @@ const MainSidebar = styled.nav`
             -webkit-user-drag: none;
             transition: 200ms all ease-in-out;
 
-            &.active {
-                color: var(--color-brand);
-                fill: var(--color-brand);
-            }
         }
     }
 `;

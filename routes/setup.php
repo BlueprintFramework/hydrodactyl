@@ -22,3 +22,4 @@ Route::middleware(SetupRequired::class)->group(function () {
     Route::get('/setup', [SetupController::class, 'index'])->name('setup.index');
     Route::post('/setup', [SetupController::class, 'store'])->name('setup.store');
 });
+

@@ -74,7 +74,7 @@ See the [Installation Guide](https://hydrodactyl.dev/docs/hydrodactyl/installati
 
 Hydrodactyl is open-source software licensed under the **Apache License 2.0**.
 
-You are free to use, modify, and redistribute Hydrodactyl under the terms of the license. A copy of the full license text is available in the [LICENSE](./LICENSE) file included in this repository.
+You are free to use, modify, and redistribute Hydrodactyl under the terms of the license. A copy of the full license text is available in the [LICENSE](./LICENSE.md) file included in this repository.
 
 ### Copyright & Attribution
 

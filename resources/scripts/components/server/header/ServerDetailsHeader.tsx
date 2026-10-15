@@ -13,6 +13,22 @@ type Stats = Record<'memory' | 'cpu' | 'disk' | 'uptime' | 'rx' | 'tx', number>;
 // @ts-expect-error - Unused parameter in component definition
 const _Limit = ({ children }: { limit: string | null; children: React.ReactNode }) => <>{children}</>;
 
+interface DetailProps {
+    label: string;
+    loading?: boolean;
+    children?: React.ReactNode;
+    className?: string;
+}
+
+const Detail = ({ label, loading, children, className }: DetailProps) => {
+    return (
+        <div className={cn('flex flex-col', className)}>
+            <span className='font-bold uppercase text-cream-400/50 text-xs'>{label}</span>
+            <span className={`text-sm`}>{loading ? <Skeleton className='w-full h-[1lh]' /> : children}</span>
+        </div>
+    );
+};
+
 const ServerDetailsHeader = ({ className }: { className?: string }) => {
     const [stats, setStats] = useState<Stats>({
         memory: 0,
@@ -70,22 +86,6 @@ const ServerDetailsHeader = ({ className }: { className?: string }) => {
         });
         setLoading(false);
     });
-
-    interface DetailProps {
-        label: string;
-        loading?: boolean;
-        children?: React.ReactNode;
-        className?: string;
-    }
-
-    const Detail = ({ label, loading, children, className }: DetailProps) => {
-        return (
-            <div className={cn('flex flex-col', className)}>
-                <span className='font-bold uppercase text-cream-400/50 text-xs'>{label}</span>
-                <span className={`text-sm`}>{loading ? <Skeleton className='w-full h-[1lh]' /> : children}</span>
-            </div>
-        );
-    };
 
     return (
         <div className={cn('flex md:flex-row gap-4 flex-col text-nowrap', className)}>

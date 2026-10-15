@@ -20,7 +20,9 @@ export default async (uuid: string, data: ApplyEggChangeData): Promise<void> => 
         return http.post(`/api/client/servers/${daemonType}/${uuid}/settings/egg/apply`, data);
     }
 
-    if (daemonType?.toLowerCase() === 'wings') {
+    // Calagopus Wings is API-compatible with Wings, so it uses the same
+    // synchronous egg-change flow.
+    if (daemonType?.toLowerCase() === 'wings' || daemonType?.toLowerCase() === 'calagopus') {
         const {
             egg_id,
             nest_id,
