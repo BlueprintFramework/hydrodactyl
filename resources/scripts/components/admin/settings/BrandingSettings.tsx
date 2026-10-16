@@ -116,7 +116,7 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
     };
 
     return (
-        <div className='space-y-4'>
+        <div className='flex flex-col gap-4'>
             <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
                 <h2 className='text-sm font-semibold text-cream-50'>Current Logo</h2>
                 <div className='mt-4 flex min-h-[120px] items-center justify-center'>
