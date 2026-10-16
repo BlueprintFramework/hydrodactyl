@@ -8,6 +8,7 @@ export interface AdminUser {
     name_first: string | null;
     name_last: string | null;
     root_admin: boolean;
+    custom_domains: boolean;
     use_totp: boolean;
     language: string;
     servers_count: number;
@@ -23,6 +24,7 @@ export interface UserValues {
     password: string;
     language: string;
     root_admin: boolean;
+    custom_domains: boolean;
 }
 
 export interface UserQuery {

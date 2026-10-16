@@ -23,6 +23,7 @@ const emptyValues: UserValues = {
     password: '',
     language: 'en',
     root_admin: false,
+    custom_domains: false,
 };
 
 const UserForm = ({ languages, initialValues, errors = {}, submitting, submitLabel, onSubmit, onCancel }: Props) => {
@@ -106,6 +107,20 @@ const UserForm = ({ languages, initialValues, errors = {}, submitting, submitLab
                         <Dropdown
                             value={values.root_admin ? '1' : '0'}
                             onChange={(value) => set('root_admin', value === '1')}
+                            options={[
+                                { value: '0', label: 'No' },
+                                { value: '1', label: 'Yes' },
+                            ]}
+                        />
+                    </Field>
+                    <Field
+                        label='Custom Domains'
+                        error={errors.custom_domains}
+                        hint="Setting this to 'Yes' lets servers this user owns use custom domains, where the node, server and egg allow it."
+                    >
+                        <Dropdown
+                            value={values.custom_domains ? '1' : '0'}
+                            onChange={(value) => set('custom_domains', value === '1')}
                             options={[
                                 { value: '0', label: 'No' },
                                 { value: '1', label: 'Yes' },

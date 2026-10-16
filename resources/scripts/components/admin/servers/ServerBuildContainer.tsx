@@ -32,6 +32,7 @@ interface FormState {
     oom_disabled: boolean;
     exclude_from_resource_calculation: boolean;
     software_enabled: boolean;
+    custom_domains_enabled: boolean;
 }
 
 const AllocationChecklist = ({
@@ -123,6 +124,7 @@ const ServerBuildForm = ({
         oom_disabled: data.oom_disabled,
         exclude_from_resource_calculation: data.exclude_from_resource_calculation,
         software_enabled: data.software_enabled,
+        custom_domains_enabled: data.custom_domains_enabled,
     });
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -250,6 +252,21 @@ const ServerBuildForm = ({
                     <Dropdown
                         value={String(values.software_enabled)}
                         onChange={(value) => set('software_enabled', value === 'true')}
+                        options={[
+                            { value: 'true', label: 'Enabled' },
+                            { value: 'false', label: 'Disabled' },
+                        ]}
+                    />
+                </Field>
+
+                <Field
+                    label='Custom Domains'
+                    error={errors.custom_domains_enabled}
+                    hint='When disabled, custom domains cannot be added to this server. The node and the server owner must allow them too, and the egg needs to be a Minecraft egg with the user_domains feature.'
+                >
+                    <Dropdown
+                        value={String(values.custom_domains_enabled)}
+                        onChange={(value) => set('custom_domains_enabled', value === 'true')}
                         options={[
                             { value: 'true', label: 'Enabled' },
                             { value: 'false', label: 'Disabled' },

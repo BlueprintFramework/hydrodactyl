@@ -70,6 +70,7 @@ const NodeSettingsContainer = () => {
                     daemonType: node.daemonType,
                     public: node.public,
                     trust_alias: node.trust_alias,
+                    custom_domains_enabled: node.custom_domains_enabled,
                     fqdn: node.fqdn,
                     internal_fqdn: node.internal_fqdn ?? '',
                     scheme: node.scheme,

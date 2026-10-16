@@ -98,6 +98,16 @@ Route::group([
 
     Route::post('/webhook', [Client\ServerController::class, 'webhook']);
 
+    Route::group(['prefix' => '/custom-domains'], function () {
+        Route::get('/', [Elytra\CustomDomainController::class, 'index']);
+        Route::post('/', [Elytra\CustomDomainController::class, 'store'])
+            ->middleware('throttle:10,1');
+        Route::patch('/{customDomain}', [Elytra\CustomDomainController::class, 'update'])
+            ->middleware('throttle:10,1');
+        Route::delete('/{customDomain}', [Elytra\CustomDomainController::class, 'destroy'])
+            ->middleware('throttle:10,1');
+    });
+
     // Native plugin/mod installer (Minecraft). Browse/search are cached and
     // throttled; the actual file transfer happens via the per-daemon pull.
     Route::group(['prefix' => '/marketplace', 'middleware' => ['throttle:30,1']], function () {

@@ -47,6 +47,8 @@ class Permission extends Model
     public const ACTION_ALLOCATION_CREATE = 'allocation.create';
     public const ACTION_ALLOCATION_UPDATE = 'allocation.update';
     public const ACTION_ALLOCATION_DELETE = 'allocation.delete';
+    public const ACTION_ALLOCATION_CUSTOM_DOMAIN_READ = 'allocation.custom_domain_read';
+    public const ACTION_ALLOCATION_CUSTOM_DOMAIN_UPDATE = 'allocation.custom_domain_update';
 
     public const ACTION_FILE_READ = 'file.read';
     public const ACTION_FILE_READ_CONTENT = 'file.read-content';
@@ -164,6 +166,8 @@ class Permission extends Model
                 'create' => 'Allows a user to assign additional allocations to the server.',
                 'update' => 'Allows a user to change the primary server allocation and attach notes to each allocation.',
                 'delete' => 'Allows a user to delete an allocation from the server.',
+                'custom_domain_read' => 'Allows a user to view the custom domains pointed at this server.',
+                'custom_domain_update' => 'Allows a user to add and remove custom domains for this server.',
             ],
         ],
 

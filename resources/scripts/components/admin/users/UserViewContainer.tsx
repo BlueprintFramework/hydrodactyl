@@ -77,6 +77,7 @@ const UserViewContainer = () => {
                     name_last: user.name_last ?? '',
                     language: user.language,
                     root_admin: user.root_admin,
+                    custom_domains: user.custom_domains,
                 }}
                 submitLabel='Update User'
                 submitting={submitting}
