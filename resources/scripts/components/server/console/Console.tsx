@@ -16,6 +16,7 @@ import { getTerminalBufferText } from '@/components/server/console/consoleBuffer
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import { Button } from '@/components/ui/button';
 import KeyboardShortcut from '@/components/ui/keyboard-shortcut';
+import { useAppearance } from '@/contexts/AppearanceContext';
 
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/plugins/usePermissions';
@@ -57,6 +58,7 @@ const terminalProps: ITerminalOptions = {
 };
 
 const Console = () => {
+    const { theme: appearanceTheme } = useAppearance();
     const TERMINAL_PRELUDE = '\u001b[1m\u001b[33mcontainer@hydrodactyl~ \u001b[0m';
     const ref = useRef<HTMLDivElement>(null);
     const resizeObserverRef = useRef<ResizeObserver | null>(null);
@@ -75,6 +77,34 @@ const Console = () => {
     const copyResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const { isMinimized: _isMinimized } = useSidebar();
     const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        terminal.options.theme =
+            appearanceTheme === 'dark'
+                ? theme
+                : {
+                      ...theme,
+                      background: '#ffffff',
+                      foreground: '#29221c',
+                      black: '#29221c',
+                      white: '#52525b',
+                      brightBlack: '#62626b',
+                      brightWhite: '#29221c',
+                      red: '#a41331',
+                      brightRed: '#a41331',
+                      green: '#25633b',
+                      brightGreen: '#25633b',
+                      yellow: '#795000',
+                      brightYellow: '#795000',
+                      blue: '#1d4ed8',
+                      brightBlue: '#1d4ed8',
+                      magenta: '#7e22a0',
+                      brightMagenta: '#7e22a0',
+                      cyan: '#006577',
+                      brightCyan: '#006577',
+                      selectionBackground: '#d9edff',
+                  };
+    }, [appearanceTheme, terminal]);
 
     const debouncedFit = useDebouncedCallback(() => {
         // FIXME: The proposeDimensions & fit functions seemingly only go one column at a time (until it stabilizes)
