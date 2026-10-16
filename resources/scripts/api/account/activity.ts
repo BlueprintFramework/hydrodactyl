@@ -9,7 +9,7 @@ import http, { type PaginatedResult, type QueryBuilderParams, withQueryBuilderPa
 import useFilteredObject from '@/plugins/useFilteredObject';
 import { useUserSWRKey } from '@/plugins/useSWRKey';
 
-export type ActivityLogFilters = QueryBuilderParams<'ip' | 'event', 'timestamp'>;
+export type ActivityLogFilters = QueryBuilderParams<'event' | 'ip' | 'search' | 'after', 'timestamp'>;
 
 const useActivityLogs = (
     filters?: ActivityLogFilters,
@@ -33,4 +33,44 @@ const useActivityLogs = (
     );
 };
 
-export { useActivityLogs };
+const useActivityEvents = (config?: SWRConfiguration<string[], AxiosError>) => {
+    const key = useUserSWRKey(['account', 'activity', 'events']);
+
+    return useSWR<string[]>(
+        key,
+        async () => {
+            const { data } = await http.get('/api/client/account/activity/events');
+            return data;
+        },
+        config,
+    );
+};
+
+const fetchAllActivityLogs = async (filters?: ActivityLogFilters): Promise<ActivityLog[]> => {
+    const perPage = 100;
+    const items: ActivityLog[] = [];
+
+    let page = 1;
+    while (true) {
+        const { data } = await http.get('/api/client/account/activity', {
+            params: {
+                ...withQueryBuilderParams({ ...filters, page }),
+                per_page: perPage,
+                include: ['actor'],
+            },
+        });
+
+        const set = toPaginatedSet(data, Transformers.toActivityLog);
+        items.push(...set.items);
+
+        if (set.items.length === 0 || items.length >= set.pagination.total) {
+            break;
+        }
+
+        page++;
+    }
+
+    return items;
+};
+
+export { fetchAllActivityLogs, useActivityEvents, useActivityLogs };

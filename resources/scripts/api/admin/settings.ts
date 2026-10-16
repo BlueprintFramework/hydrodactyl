@@ -15,6 +15,8 @@ export interface AdvancedSettings {
     'pterodactyl:client_features:groups:enabled': boolean;
     'pterodactyl:client_features:schedules:per_schedule_task_limit': number;
     'pterodactyl:client_features:schedules:stuck_timeout': number;
+    'pterodactyl:client_features:resource_history:enabled': boolean;
+    'pterodactyl:client_features:resource_history:samples': number;
 }
 
 export interface MailSettings {

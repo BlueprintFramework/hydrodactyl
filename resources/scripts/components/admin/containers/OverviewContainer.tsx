@@ -1,16 +1,9 @@
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { useSystemStatus } from '@/api/admin/useSystemStatus';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
-
-function formatBytes(bytes: number): string {
-    if (!bytes) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`;
-}
+import { type ChartConfig, EChartsBarChart } from '@/components/evilcharts/charts/echarts-bar-chart';
+import { bytesToString } from '@/lib/formatters';
 
 function formatUptime(seconds: number): string {
     const days = Math.floor(seconds / 86400);
@@ -19,19 +12,14 @@ function formatUptime(seconds: number): string {
     return `${days}d ${hours}h ${minutes}m`;
 }
 
-const CHART = {
-    usage: 'var(--color-hydro-500)',
-    track: 'var(--color-mocha-400)',
-    axis: 'var(--color-mocha-50)',
-};
+const usedConfig = {
+    used: { label: 'Used', colors: { light: ['#52a9ff'], dark: ['#52a9ff'] } },
+    free: { label: 'Free', colors: { light: ['#3a332c'], dark: ['#3a332c'] } },
+} satisfies ChartConfig;
 
-const tooltipStyle = {
-    background: 'var(--color-mocha-500)',
-    border: '1px solid var(--color-mocha-400)',
-    borderRadius: 6,
-    fontSize: 12,
-    color: 'var(--color-cream-400)',
-};
+const loadConfig = {
+    load: { label: 'Load', colors: { light: ['#f1995a'], dark: ['#f1995a'] } },
+} satisfies ChartConfig;
 
 function Card({ label, children }: { label: string; children: React.ReactNode }) {
     return (
@@ -47,39 +35,50 @@ function UsageBar({ used, total, percent }: { used: number; total: number; perce
 
     return (
         <div>
-            <ResponsiveContainer width='100%' height={18}>
-                <BarChart data={data} layout='vertical' margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                    <XAxis type='number' hide domain={[0, total]} />
-                    <Tooltip
-                        cursor={false}
-                        contentStyle={tooltipStyle}
-                        formatter={(value) => formatBytes(Number(value))}
-                    />
-                    <Bar dataKey='used' fill={CHART.usage} stackId='a' radius={[4, 0, 0, 4]} maxBarSize={18} />
-                    <Bar dataKey='free' fill={CHART.track} stackId='a' radius={[0, 4, 4, 0]} maxBarSize={18} />
-                </BarChart>
-            </ResponsiveContainer>
+            <EChartsBarChart
+                data={data}
+                config={usedConfig}
+                xDataKey='name'
+                layout='horizontal'
+                stackType='stacked'
+                barRadius={4}
+                className='h-[18px] w-full'
+            >
+                <EChartsBarChart.Tooltip valueFormatter={(value) => bytesToString(value)} />
+                <EChartsBarChart.Bar dataKey='used' />
+                <EChartsBarChart.Bar dataKey='free' />
+            </EChartsBarChart>
             <div className='mt-2 flex items-baseline justify-between'>
                 <span className='text-lg font-semibold text-cream-50'>{percent.toFixed(1)}%</span>
                 <span className='text-xs text-cream-400/60'>
-                    {formatBytes(used)} / {formatBytes(total)}
+                    {bytesToString(used)} / {bytesToString(total)}
                 </span>
             </div>
         </div>
     );
 }
 
+const LOAD_LABELS = ['1m', '5m', '15m'];
+
 function LoadGraph({ loads }: { loads: number[] }) {
-    const data = loads.map((v, i) => ({ name: `${i + 1}m`, value: parseFloat(v.toFixed(2)) }));
+    const data = loads.map((value, index) => ({
+        name: LOAD_LABELS[index] ?? `${index + 1}m`,
+        load: Number(value.toFixed(2)),
+    }));
 
     return (
-        <ResponsiveContainer width='100%' height={120}>
-            <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
-                <XAxis dataKey='name' tick={{ fontSize: 10, fill: CHART.axis }} axisLine={false} tickLine={false} />
-                <Tooltip cursor={false} contentStyle={tooltipStyle} />
-                <Bar dataKey='value' fill={CHART.usage} radius={[3, 3, 0, 0]} maxBarSize={48} />
-            </BarChart>
-        </ResponsiveContainer>
+        <EChartsBarChart
+            data={data}
+            config={loadConfig}
+            xDataKey='name'
+            barRadius={3}
+            barCategoryGap={24}
+            className='h-[120px] w-full'
+        >
+            <EChartsBarChart.XAxis dataKey='name' />
+            <EChartsBarChart.Tooltip />
+            <EChartsBarChart.Bar dataKey='load' />
+        </EChartsBarChart>
     );
 }
 

@@ -1,13 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\CheckDaemonType;
 use Pterodactyl\Http\Controllers\Api\Client;
-use Pterodactyl\Http\Controllers\Api\Client\Servers\MarketplaceController;
 use Pterodactyl\Http\Middleware\Activity\ServerSubject;
 use Pterodactyl\Http\Middleware\Activity\AccountSubject;
 use Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra;
 use Pterodactyl\Http\Middleware\RequireTwoFactorAuthentication;
+use Pterodactyl\Http\Controllers\Api\Client\Servers\MarketplaceController;
 use Pterodactyl\Http\Middleware\Api\Client\Server\ResourceBelongsToServer;
 use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
 
@@ -52,6 +51,7 @@ Route::prefix('/account')->middleware(AccountSubject::class)->group(function () 
     Route::put('/password', [Client\AccountController::class, 'updatePassword'])->name('api:client.account.update-password');
 
     Route::get('/activity', Client\ActivityLogController::class)->name('api:client.account.activity');
+    Route::get('/activity/events', [Client\ActivityLogController::class, 'events'])->name('api:client.account.activity-events');
 
     Route::get('/api-keys', [Client\ApiKeyController::class, 'index']);
     Route::post('/api-keys', [Client\ApiKeyController::class, 'store']);
@@ -83,6 +83,8 @@ Route::group([
 ], function () {
     Route::get('/', [Client\ServerController::class, 'index'])->name('api.client.servers.daemonType');
     Route::get('/resources', [Client\ServerController::class, 'resources'])->name('api.client.servers.resources');
+    Route::get('/resources/history', Client\Servers\ResourceHistoryController::class)
+        ->name('api.client.servers.resources.history');
 
     Route::group(['prefix' => '/subdomain'], function () {
         Route::get('/', [Elytra\SubdomainController::class, 'index']);
@@ -93,6 +95,8 @@ Route::group([
         Route::post('/check-availability', [Elytra\SubdomainController::class, 'checkAvailability'])
             ->middleware('throttle:25,1');
     });
+
+    Route::post('/webhook', [Client\ServerController::class, 'webhook']);
 
     Route::group(['prefix' => '/custom-domains'], function () {
         Route::get('/', [Elytra\CustomDomainController::class, 'index']);

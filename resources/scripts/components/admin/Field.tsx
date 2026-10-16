@@ -19,12 +19,9 @@ export const Field = ({
                     Optional
                 </span>
             )}
+            {error && <span className='text-[11px] font-normal text-brand-600'>{error}</span>}
         </span>
         {children}
-        {error ? (
-            <span className='mt-1 block text-xs text-brand-600'>{error}</span>
-        ) : hint ? (
-            <span className='mt-1 block text-xs text-cream-400/50'>{hint}</span>
-        ) : null}
+        {!error && hint ? <span className='mt-1 block text-xs text-cream-400/50'>{hint}</span> : null}
     </div>
 );

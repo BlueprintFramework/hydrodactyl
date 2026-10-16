@@ -4,14 +4,11 @@
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Controllers\Api\Client;
 use Pterodactyl\Http\Controllers\Api\Client\Servers;
-use Pterodactyl\Http\Controllers\Api\Client\Servers\Wings;
 use Pterodactyl\Http\Middleware\Activity\ServerSubject;
-use Pterodactyl\Http\Middleware\Activity\AccountSubject;
-use Pterodactyl\Http\Middleware\RequireTwoFactorAuthentication;
+use Pterodactyl\Http\Controllers\Api\Client\Servers\Wings;
+use Pterodactyl\Http\Middleware\Api\Client\Server\CheckDaemonType;
 use Pterodactyl\Http\Middleware\Api\Client\Server\ResourceBelongsToServer;
 use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
-use Pterodactyl\Http\Middleware\Api\Client\Server\CheckDaemonType;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +32,7 @@ Route::group([
     Route::get('/websocket', Wings\WebsocketController::class)->name('api:client:server.wings.ws');
     Route::get('/resources', Wings\ResourceUtilizationController::class)->name('api:client:server.wings.resources');
     Route::get('/activity', Wings\ActivityLogController::class)->name('api:client:server.wings.activity');
+    Route::get('/activity/events', [Wings\ActivityLogController::class, 'events'])->name('api:client:server.wings.activity-events');
 
     Route::post('/command', [Wings\CommandController::class, 'index']);
     Route::post('/power', [Wings\PowerController::class, 'index']);

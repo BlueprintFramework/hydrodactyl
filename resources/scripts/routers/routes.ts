@@ -191,15 +191,6 @@ const routes: Routes = {
             end: true,
         },
         {
-            route: 'users/*',
-            path: 'users',
-            permission: 'user.*',
-            name: 'Users',
-            component: UsersContainer,
-            icon: Persons,
-            end: true,
-        },
-        {
             route: 'users/new',
             permission: 'user.*',
             name: undefined,
@@ -212,6 +203,15 @@ const routes: Routes = {
             name: undefined,
             component: EditUserContainer,
             isSubRoute: true,
+        },
+        {
+            route: 'users/*',
+            path: 'users',
+            permission: 'user.*',
+            name: 'Users',
+            component: UsersContainer,
+            icon: Persons,
+            end: true,
         },
         {
             route: 'startup/*',

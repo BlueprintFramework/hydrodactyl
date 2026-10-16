@@ -52,7 +52,7 @@ const ProgressRing = ({ percent, size = 30, stroke = 3 }: { percent: number; siz
 const FileUploadList = () => {
     const { close } = useContext(DialogWrapperContext);
     const cancelFileUpload = ServerContext.useStoreActions((actions) => actions.files.cancelFileUpload);
-    const clearFileUploads = ServerContext.useStoreActions((actions) => actions.files.clearFileUploads);
+    // const clearFileUploads = ServerContext.useStoreActions((actions) => actions.files.clearFileUploads);
     const uploads = ServerContext.useStoreState((state) =>
         Object.entries(state.files.uploads).sort(([a], [b]) => a.localeCompare(b)),
     );
@@ -111,9 +111,7 @@ const FileUploadList = () => {
                     );
                 })}
                 <Dialog.Footer>
-                    <Button variant='attention'>
-                        Cancel all
-                    </Button>
+                    <Button variant='attention'>Cancel all</Button>
                     <Button variant='secondary' onClick={close}>
                         Hide
                     </Button>

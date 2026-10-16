@@ -162,6 +162,12 @@ return [
         'groups' => [
             'enabled' => env('PTERODACTYL_CLIENT_GROUPS_ENABLED', true),
         ],
+
+        'resource_history' => [
+            'enabled' => env('PTERODACTYL_RESOURCE_HISTORY_ENABLED', true),
+
+            'samples' => env('PTERODACTYL_RESOURCE_HISTORY_SAMPLES', 20),
+        ],
     ],
 
     /*

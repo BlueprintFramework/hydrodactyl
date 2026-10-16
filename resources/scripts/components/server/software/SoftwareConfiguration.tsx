@@ -1,11 +1,5 @@
 import type { EggPreview } from '@/api/server/previewEggChange';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuTrigger,
-} from '@/components/elements/DropdownMenu';
+import Dropdown from '@/components/elements/Dropdown';
 import { Switch } from '@/components/elements/SwitchV2';
 import { Button } from '@/components/ui/button';
 import SoftwareCard from './SoftwareCard';
@@ -89,49 +83,17 @@ const SoftwareConfiguration = ({
                                     Docker Image
                                 </label>
                                 {eggPreview.docker_images && Object.keys(eggPreview.docker_images).length > 1 ? (
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <button
-                                                id='docker_image_trigger'
-                                                type='button'
-                                                className='w-full px-3 py-2 bg-mocha-400/60 border border-mocha-300/60 rounded-lg text-sm text-cream-100 focus:outline-none focus:border-brand-400/60 transition-colors text-left flex items-center justify-between hover:border-brand-400/60'
-                                            >
-                                                <span className='truncate'>
-                                                    {selectedDockerImage || 'Select image...'}
-                                                </span>
-                                                <svg
-                                                    className='w-4 h-4 text-cream-400/70 flex-shrink-0'
-                                                    fill='none'
-                                                    stroke='currentColor'
-                                                    viewBox='0 0 24 24'
-                                                    aria-hidden='true'
-                                                >
-                                                    <path
-                                                        strokeLinecap='round'
-                                                        strokeLinejoin='round'
-                                                        strokeWidth={2}
-                                                        d='M19 9l-7 7-7-7'
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent className='w-full min-w-[300px]'>
-                                            <DropdownMenuRadioGroup
-                                                value={selectedDockerImage}
-                                                onValueChange={onDockerImageChange}
-                                            >
-                                                {Object.entries(eggPreview.docker_images).map(([displayName, _]) => (
-                                                    <DropdownMenuRadioItem
-                                                        key={displayName}
-                                                        value={displayName}
-                                                        className='text-sm font-mono'
-                                                    >
-                                                        <span>{displayName}</span>
-                                                    </DropdownMenuRadioItem>
-                                                ))}
-                                            </DropdownMenuRadioGroup>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                    <Dropdown
+                                        id='docker_image_trigger'
+                                        value={selectedDockerImage}
+                                        onChange={onDockerImageChange}
+                                        placeholder='Select image...'
+                                        triggerClassName='font-mono'
+                                        options={Object.keys(eggPreview.docker_images).map((displayName) => ({
+                                            value: displayName,
+                                            label: displayName,
+                                        }))}
+                                    />
                                 ) : (
                                     <div className='w-full px-3 py-2 bg-mocha-400/60 border border-mocha-300/60 rounded-lg text-sm text-cream-100'>
                                         {(eggPreview.docker_images && Object.keys(eggPreview.docker_images)[0]) ||

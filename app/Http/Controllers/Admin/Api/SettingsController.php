@@ -66,6 +66,8 @@ class SettingsController extends Controller
                 'pterodactyl:client_features:groups:enabled' => (bool) $this->config->get('pterodactyl.client_features.groups.enabled'),
                 'pterodactyl:client_features:schedules:per_schedule_task_limit' => (int) $this->config->get('pterodactyl.client_features.schedules.per_schedule_task_limit', 10),
                 'pterodactyl:client_features:schedules:stuck_timeout' => (int) $this->config->get('pterodactyl.client_features.schedules.stuck_timeout', 1800),
+                'pterodactyl:client_features:resource_history:enabled' => (bool) $this->config->get('pterodactyl.client_features.resource_history.enabled', true),
+                'pterodactyl:client_features:resource_history:samples' => (int) $this->config->get('pterodactyl.client_features.resource_history.samples', 20),
             ],
             'mail' => [
                 'enabled' => $this->config->get('mail.default') === 'smtp',

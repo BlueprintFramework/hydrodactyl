@@ -13,7 +13,7 @@ import {
 } from '@codemirror/language';
 import { languages } from '@codemirror/language-data';
 import { lintKeymap } from '@codemirror/lint';
-import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
+import { highlightSelectionMatches, search, searchKeymap } from '@codemirror/search';
 import type { Extension } from '@codemirror/state';
 import { Compartment, EditorState } from '@codemirror/state';
 import {
@@ -24,9 +24,11 @@ import {
     highlightActiveLine,
     highlightActiveLineGutter,
     highlightSpecialChars,
+    highlightWhitespace,
     keymap,
     lineNumbers,
     rectangularSelection,
+    scrollPastEnd,
 } from '@codemirror/view';
 import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -64,6 +66,11 @@ const defaultExtensions: Extension = [
     crosshairCursor(),
     highlightActiveLine(),
     highlightSelectionMatches(),
+    highlightWhitespace(),
+    // Keymap alone does nothing visible until search state exists. Ctrl-F opens this panel.
+    search({ top: true }),
+    EditorView.lineWrapping,
+    scrollPastEnd(),
     keymap.of([
         ...closeBracketsKeymap,
         ...defaultKeymap,
@@ -75,7 +82,9 @@ const defaultExtensions: Extension = [
         indentWithTab,
     ]),
     EditorState.tabSize.of(4),
-    indentUnit.of('\t'),
+    // Spaces, not a literal tab. Game configs (yaml, json, properties) almost all want this,
+    // and existing tab characters in a file are left alone.
+    indentUnit.of('    '),
 ];
 
 export interface EditorProps {

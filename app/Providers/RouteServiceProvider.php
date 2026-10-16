@@ -4,14 +4,14 @@ namespace Pterodactyl\Providers;
 
 use Illuminate\Http\Request;
 use Pterodactyl\Models\Database;
-use Pterodactyl\Enums\Limits\ResourceLimit;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
+use Pterodactyl\Enums\Limits\ResourceLimit;
 use Pterodactyl\Http\Middleware\TrimStrings;
+use Pterodactyl\Http\Middleware\SetupRequired;
 use Pterodactyl\Http\Middleware\AdminAuthenticate;
 use Pterodactyl\Http\Middleware\RequireTwoFactorAuthentication;
-use Pterodactyl\Http\Middleware\SetupRequired;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
@@ -38,6 +38,11 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->routes(function () {
             Route::middleware('web')->group(function () {
+                // AT Protocol OAuth metadata + callback are intentionally public,
+                // so they must be registered before the authenticated routes
+                // (and before the SPA catch-all in routes/base.php).
+                Route::group([], base_path('routes/oauth.php'));
+
                 Route::middleware(['auth.session', RequireTwoFactorAuthentication::class])
                     ->group(base_path('routes/base.php'));
 

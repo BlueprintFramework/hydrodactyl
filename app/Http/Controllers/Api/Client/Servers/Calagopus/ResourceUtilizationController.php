@@ -9,14 +9,18 @@ use Pterodactyl\Transformers\Api\Client\StatsTransformer;
 use Pterodactyl\Repositories\Calagopus\DaemonServerRepository;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Pterodactyl\Http\Requests\Api\Client\Servers\GetServerRequest;
+use Pterodactyl\Services\Servers\RecordServerResourceSampleService;
 
 class ResourceUtilizationController extends ClientApiController
 {
     /**
      * ResourceUtilizationController constructor.
      */
-    public function __construct(private Repository $cache, private DaemonServerRepository $repository)
-    {
+    public function __construct(
+        private Repository $cache,
+        private DaemonServerRepository $repository,
+        private RecordServerResourceSampleService $samples,
+    ) {
         parent::__construct();
     }
 
@@ -29,7 +33,10 @@ class ResourceUtilizationController extends ClientApiController
     {
         $key = "resources:$server->uuid";
         $stats = $this->cache->remember($key, Carbon::now()->addSeconds(20), function () use ($server) {
-            return $this->repository->setServer($server)->getDetails();
+            $details = $this->repository->setServer($server)->getDetails();
+            $this->samples->handle($server, $details);
+
+            return $details;
         });
 
         return $this->fractal->item($stats)

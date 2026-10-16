@@ -18,16 +18,8 @@ const Container = styled.div<{ visible?: boolean }>`
 
 const InputSpinner = ({ visible, children }: { visible: boolean; children: React.ReactNode }) => (
     <Container visible={visible}>
-        <FadeTransition
-            css={`
-                position: relative;
-            `}
-            show={visible}
-            duration='duration-150'
-            appear
-            unmount
-        >
-            <div className={`absolute right-0 h-full flex items-center justify-end pr-3`}>
+        <FadeTransition show={visible} duration='duration-150' appear unmount>
+            <div className='pointer-events-none absolute inset-y-0 right-0 z-10 flex items-center pr-3'>
                 <Spinner size='small' />
             </div>
         </FadeTransition>
