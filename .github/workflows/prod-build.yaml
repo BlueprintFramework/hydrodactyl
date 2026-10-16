@@ -1,8 +1,10 @@
-name: Build & Push Version (reusable)
+name: Build & Push Tagged Image
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
 permissions:
+  contents: read
   packages: write
 jobs:
   build-release:
@@ -39,5 +41,7 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/${{ steps.repo.outputs.repo }}:${{ github.event.release.tag_name }}
-            ghcr.io/${{ steps.repo.outputs.repo }}:latest
+            ghcr.io/${{ steps.repo.outputs.repo }}:${{ github.ref_name }}
+            ghcr.io/${{ steps.repo.outputs.repo }}:canary
+            ghcr.io/${{ steps.repo.outputs.repo }}:canary-${{ github.sha }}
+            ${{ !contains(github.ref_name, '-') && format('ghcr.io/{0}:latest', steps.repo.outputs.repo) || '' }}
