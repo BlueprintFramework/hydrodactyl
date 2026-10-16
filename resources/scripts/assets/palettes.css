@@ -1,0 +1,97 @@
+:root {
+    --palette-hue: 0;
+    --palette-chroma: 0;
+    --color-brand: var(--color-hydro);
+    --color-brand-50: var(--color-hydro-50);
+    --color-brand-100: var(--color-hydro-100);
+    --color-brand-200: var(--color-hydro-200);
+    --color-brand-300: var(--color-hydro-300);
+    --color-brand-400: var(--color-hydro-400);
+    --color-brand-500: var(--color-hydro-500);
+    --color-brand-600: var(--color-hydro-600);
+    --color-brand-700: var(--color-hydro-700);
+    --color-brand-800: var(--color-hydro-800);
+    --color-brand-900: var(--color-hydro-900);
+}
+
+:root[data-palette="red"] {
+    --palette-hue: 25;
+    --palette-chroma: 0.04;
+}
+
+:root[data-palette="blue"] {
+    --palette-hue: 255;
+    --palette-chroma: 0.04;
+}
+
+:root[data-palette="yellow"] {
+    --palette-hue: 95;
+    --palette-chroma: 0.035;
+}
+
+:root[data-palette="green"] {
+    --palette-hue: 145;
+    --palette-chroma: 0.035;
+}
+
+:root[data-palette="violet"] {
+    --palette-hue: 295;
+    --palette-chroma: 0.04;
+}
+
+/* Keep existing mocha/cream utility names so every panel screen uses the palette. */
+:root:not([data-palette="mocha"]) {
+    --color-primary: var(--color-cream-400);
+    --color-accent: var(--color-cream-400);
+    --color-accent-foreground: var(--color-mocha-500);
+}
+
+:root:not([data-theme="light"]):not([data-palette="mocha"]) {
+    --color-canvas: oklch(0.11 var(--palette-chroma) var(--palette-hue));
+    --color-bg: oklch(0.14 var(--palette-chroma) var(--palette-hue));
+    --color-bg-raised: oklch(0.18 var(--palette-chroma) var(--palette-hue));
+    --color-bg-lowered: oklch(0.12 var(--palette-chroma) var(--palette-hue));
+    --color-secondary: oklch(0.78 var(--palette-chroma) var(--palette-hue));
+
+    --color-cream-50: oklch(0.99 calc(var(--palette-chroma) * 0.2) var(--palette-hue));
+    --color-cream-100: oklch(0.98 calc(var(--palette-chroma) * 0.3) var(--palette-hue));
+    --color-cream-200: oklch(0.97 calc(var(--palette-chroma) * 0.4) var(--palette-hue));
+    --color-cream-300: oklch(0.95 calc(var(--palette-chroma) * 0.5) var(--palette-hue));
+    --color-cream-400: oklch(0.93 calc(var(--palette-chroma) * 0.6) var(--palette-hue));
+    --color-cream-500: oklch(0.9 calc(var(--palette-chroma) * 0.7) var(--palette-hue));
+
+    --color-mocha-50: oklch(0.65 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-100: oklch(0.58 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-200: oklch(0.46 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-300: oklch(0.33 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-400: oklch(0.26 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-500: oklch(0.21 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-600: oklch(0.17 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-700: oklch(0.14 var(--palette-chroma) var(--palette-hue));
+}
+
+:root[data-theme="light"]:not([data-palette="mocha"]) {
+    --panel-ink-rgb: 24, 24, 27;
+    --color-overlay: var(--color-cream-100);
+    --color-canvas: oklch(0.98 calc(var(--palette-chroma) * 0.25) var(--palette-hue));
+    --color-bg: var(--color-canvas);
+    --color-bg-raised: oklch(0.995 calc(var(--palette-chroma) * 0.1) var(--palette-hue));
+    --color-bg-lowered: oklch(0.94 calc(var(--palette-chroma) * 0.5) var(--palette-hue));
+    --color-secondary: oklch(0.44 var(--palette-chroma) var(--palette-hue));
+
+    --color-cream-50: oklch(0.18 var(--palette-chroma) var(--palette-hue));
+    --color-cream-100: oklch(0.22 var(--palette-chroma) var(--palette-hue));
+    --color-cream-200: oklch(0.26 var(--palette-chroma) var(--palette-hue));
+    --color-cream-300: oklch(0.28 var(--palette-chroma) var(--palette-hue));
+    --color-cream-400: oklch(0.3 var(--palette-chroma) var(--palette-hue));
+    --color-cream-500: oklch(0.34 var(--palette-chroma) var(--palette-hue));
+
+    --color-mocha-50: oklch(0.5 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-100: oklch(0.64 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-200: oklch(0.76 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-300: oklch(0.86 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-400: oklch(0.92 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-500: var(--color-bg-raised);
+    --color-mocha-600: oklch(0.965 calc(var(--palette-chroma) * 0.4) var(--palette-hue));
+    --color-mocha-700: var(--color-canvas);
+}

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./tailwindcss-animate.css";
+@import "./palettes.css";
 /* @import 'tw-animate-css'; */
 @plugin "tailwind-scrollbar";
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -200,8 +201,8 @@
     outline-offset: 2px;
 }
 
-/* Legacy muted text used alpha against dark surfaces; opacity loses contrast on white. */
-:root[data-theme="light"]
+/* Legacy alpha text can lose contrast when the surface palette changes. */
+:root:is([data-theme="light"], :not([data-palette="mocha"]))
 :is(
     [class~="text-cream-200/40"],
     [class~="text-cream-200/50"],

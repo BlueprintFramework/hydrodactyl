@@ -6,13 +6,14 @@
         const root = document.documentElement;
         root.dataset.theme = mode === 'system' ? (window.matchMedia?.('(prefers-color-scheme: dark)').matches === false ? 'light' : 'dark') : mode;
         root.dataset.accent = ['panel', 'blue', 'green', 'violet', 'orange', 'rose'].includes(saved?.accent) ? saved.accent : 'panel';
+        root.dataset.palette = ['neutral', 'red', 'blue', 'yellow', 'green', 'violet', 'mocha'].includes(saved?.palette) ? saved.palette : 'neutral';
         root.style.colorScheme = root.dataset.theme;
     })();
 </script>
 <style>
     html[data-theme="light"] {
-        --color-bg: #f8f6f3;
-        --color-canvas: #f8f6f3;
-        --color-primary: #40352b;
+        --color-bg: #fafafa;
+        --color-canvas: #fafafa;
+        --color-primary: #27272a;
     }
 </style>

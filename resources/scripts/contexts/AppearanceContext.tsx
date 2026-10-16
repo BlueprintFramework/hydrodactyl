@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useLayoutEffect, useState } from 'react';
 import {
     type Appearance,
     appearanceStorageKey,
@@ -32,12 +32,12 @@ export function AppearanceProvider({ children }: { children: ReactNode }) {
         return () => media?.removeEventListener('change', sync);
     }, []);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         applyAppearance(preferences, systemDark);
         document
             .querySelector('meta[name="theme-color"]')
-            ?.setAttribute('content', theme === 'light' ? '#f8f6f3' : '#0c0a09');
-    }, [preferences, systemDark, theme]);
+            ?.setAttribute('content', getComputedStyle(document.documentElement).backgroundColor);
+    }, [preferences, systemDark]);
 
     useEffect(() => {
         const sync = (event: StorageEvent) => {

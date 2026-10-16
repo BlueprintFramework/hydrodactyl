@@ -25,8 +25,7 @@ import { ScrollDownHelperAddon } from '@/plugins/XtermScrollDownHelperAddon';
 import { ServerContext } from '@/state/server';
 
 const theme = {
-    // background: 'rgba(0, 0, 0, 0)',
-    background: '#110f0d',
+    background: '#00000000',
     cursor: 'transparent',
     black: '#000000',
     red: '#E54B4B',
@@ -84,12 +83,12 @@ const Console = () => {
                 ? theme
                 : {
                       ...theme,
-                      background: '#ffffff',
-                      foreground: '#29221c',
-                      black: '#29221c',
+                      background: '#00000000',
+                      foreground: '#27272a',
+                      black: '#27272a',
                       white: '#52525b',
                       brightBlack: '#62626b',
-                      brightWhite: '#29221c',
+                      brightWhite: '#27272a',
                       red: '#a41331',
                       brightRed: '#a41331',
                       green: '#25633b',

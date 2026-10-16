@@ -9,10 +9,21 @@ export const appearanceAccents = {
     rose: 'Rose',
 } as const;
 
+export const appearancePalettes = {
+    neutral: 'Neutral',
+    red: 'Red',
+    blue: 'Blue',
+    yellow: 'Yellow',
+    green: 'Green',
+    violet: 'Violet',
+    mocha: 'Original mocha',
+} as const;
+
 export type AppearanceMode = 'dark' | 'light' | 'system';
 export interface Appearance {
     mode: AppearanceMode;
     accent: keyof typeof appearanceAccents;
+    palette: keyof typeof appearancePalettes;
 }
 
 export function parseAppearance(value: string | null): Appearance {
@@ -28,6 +39,10 @@ export function parseAppearance(value: string | null): Appearance {
             typeof saved?.accent === 'string' && Object.hasOwn(appearanceAccents, saved.accent)
                 ? saved.accent
                 : 'panel',
+        palette:
+            typeof saved?.palette === 'string' && Object.hasOwn(appearancePalettes, saved.palette)
+                ? saved.palette
+                : 'neutral',
     };
 }
 
@@ -60,6 +75,7 @@ export function applyAppearance(
     const theme = resolveTheme(preferences.mode, systemDark);
     root.dataset.theme = theme;
     root.dataset.accent = preferences.accent;
+    root.dataset.palette = preferences.palette;
     root.style.colorScheme = theme;
     return theme;
 }

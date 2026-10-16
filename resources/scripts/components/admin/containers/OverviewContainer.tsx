@@ -14,8 +14,8 @@ function formatUptime(seconds: number): string {
 }
 
 const usedConfig = {
-    used: { label: 'Used', colors: { light: ['#52a9ff'], dark: ['#52a9ff'] } },
-    free: { label: 'Free', colors: { light: ['#3a332c'], dark: ['#3a332c'] } },
+    used: { label: 'Used', colors: { light: ['var(--color-hydro-500)'], dark: ['var(--color-hydro-500)'] } },
+    free: { label: 'Free', colors: { light: ['var(--color-mocha-300)'], dark: ['var(--color-mocha-300)'] } },
 } satisfies ChartConfig;
 
 const loadConfig = {
