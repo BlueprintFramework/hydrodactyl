@@ -107,7 +107,8 @@
         "ship": "turbo build",
         "test": "php vendor/bin/phpunit",
         "test:unit": "php vendor/bin/phpunit --testsuite=Unit",
-        "test:integration": "php vendor/bin/phpunit --testsuite=Integration"
+        "test:integration": "php vendor/bin/phpunit --testsuite=Integration",
+        "test:appearance": "node --experimental-strip-types --test tests/Frontend/appearance.test.mjs"
     },
     "browserslist": ["> 0.5%", "last 2 versions", "firefox esr", "not dead"],
     "packageManager": "pnpm@11.3.0"
