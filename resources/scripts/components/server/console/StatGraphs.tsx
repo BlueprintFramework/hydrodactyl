@@ -1,9 +1,9 @@
 import { CloudDownload, CloudUpload } from '@carbon/icons-react';
 import { useEffect, useRef, useState } from 'react';
-import CopyOnClick from '@/components/elements/CopyOnClick';
-import { EChartsLineChart, type ChartConfig } from '@/components/evilcharts/charts/echarts-line-chart';
-import ChartBlock from '@/components/server/console/ChartBlock';
 import getServerResourceHistory from '@/api/server/getServerResourceHistory';
+import CopyOnClick from '@/components/elements/CopyOnClick';
+import { type ChartConfig, EChartsLineChart } from '@/components/evilcharts/charts/echarts-line-chart';
+import ChartBlock from '@/components/server/console/ChartBlock';
 import { SocketEvent } from '@/components/server/events';
 import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
@@ -222,9 +222,7 @@ const StatGraphs = () => {
                     curveType='bump'
                     className='h-full w-full'
                 >
-                    <EChartsLineChart.Tooltip
-                        valueFormatter={(value) => bytesToString(mbToBytes(value))}
-                    />
+                    <EChartsLineChart.Tooltip valueFormatter={(value) => bytesToString(mbToBytes(value))} />
                     <EChartsLineChart.Line dataKey='memory' strokeVariant='solid' strokeWidth={GRAPH_STROKE_WIDTH} />
                 </EChartsLineChart>
             </ChartBlock>
