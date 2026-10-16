@@ -2,7 +2,7 @@
 
 # Stage 0:
 # Build the frontend (only if not in dev mode)
-FROM --platform=$TARGETOS/$TARGETARCH node:lts-alpine AS frontend
+FROM --platform=$BUILDPLATFORM node:lts-alpine AS frontend
 ARG DEV=false
 WORKDIR /app
 RUN if [ "$DEV" = "false" ]; then \

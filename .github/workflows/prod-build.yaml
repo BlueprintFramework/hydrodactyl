@@ -1,5 +1,11 @@
 name: Build & Push Tagged Image
 on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Docker image tag (e.g. v6.5.0)'
+        required: true
+        type: string
   push:
     tags:
       - 'v*'
@@ -10,6 +16,8 @@ jobs:
   build-release:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    env:
+      IMAGE_TAG: ${{ inputs.image_tag || github.ref_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,7 +49,7 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/${{ steps.repo.outputs.repo }}:${{ github.ref_name }}
+            ghcr.io/${{ steps.repo.outputs.repo }}:${{ env.IMAGE_TAG }}
             ghcr.io/${{ steps.repo.outputs.repo }}:canary
             ghcr.io/${{ steps.repo.outputs.repo }}:canary-${{ github.sha }}
-            ${{ !contains(github.ref_name, '-') && format('ghcr.io/{0}:latest', steps.repo.outputs.repo) || '' }}
+            ${{ !contains(env.IMAGE_TAG, '-') && format('ghcr.io/{0}:latest', steps.repo.outputs.repo) || '' }}
