@@ -6,7 +6,7 @@ import {
     getCalagopusLogs,
     getCalagopusStats,
     getCalagopusSystem,
-    upgradeCalagopus,
+    upgradeNode,
 } from '@/api/admin/nodes';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
@@ -79,7 +79,7 @@ const CalagopusNodePanel = ({ nodeId }: { nodeId: number | string }) => {
         setUpgrading(true);
 
         try {
-            const result = await upgradeCalagopus(nodeId, { url: upgradeUrl, sha256: upgradeSha });
+            const result = await upgradeNode(nodeId, { url: upgradeUrl, sha256: upgradeSha });
             toast.success(
                 result.applied ? 'Upgrade applied. The node is restarting.' : 'Upgrade was ignored by the node.',
             );

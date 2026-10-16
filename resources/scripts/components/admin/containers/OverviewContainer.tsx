@@ -1,4 +1,5 @@
 import { useSystemStatus } from '@/api/admin/useSystemStatus';
+import { useVersionCheck } from '@/api/admin/useVersion';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
@@ -82,6 +83,38 @@ function LoadGraph({ loads }: { loads: number[] }) {
     );
 }
 
+function VersionCard() {
+    const { data } = useVersionCheck();
+
+    const state = !data
+        ? 'Checking…'
+        : data.up_to_date === true
+          ? 'Up to date'
+          : data.up_to_date === false
+            ? `Update to ${data.latest}`
+            : 'Unknown';
+
+    const stateClass =
+        data?.up_to_date === true ? 'text-hydro-400' : data?.up_to_date === false ? 'text-brand-400' : 'text-cream-50';
+
+    return (
+        <Card label='Version'>
+            <dl className='space-y-2 text-sm'>
+                {[
+                    ['Panel', data?.current ?? '—'],
+                    ['Latest', data?.latest ?? '—'],
+                    ['Status', state],
+                ].map(([key, value]) => (
+                    <div key={key} className='flex justify-between gap-4'>
+                        <dt className='text-cream-400/60'>{key}</dt>
+                        <dd className={key === 'Status' ? stateClass : 'truncate text-cream-50'}>{value}</dd>
+                    </div>
+                ))}
+            </dl>
+        </Card>
+    );
+}
+
 const OverviewContainer = () => {
     const { data } = useSystemStatus();
 
@@ -119,7 +152,7 @@ const OverviewContainer = () => {
                 </Card>
             </div>
 
-            <div className='mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4'>
+            <div className='mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4'>
                 <Card label='System'>
                     <dl className='space-y-2 text-sm'>
                         {[
@@ -134,6 +167,7 @@ const OverviewContainer = () => {
                         ))}
                     </dl>
                 </Card>
+                <VersionCard />
                 <Card label='Load Average'>
                     <LoadGraph loads={system.load_average} />
                 </Card>

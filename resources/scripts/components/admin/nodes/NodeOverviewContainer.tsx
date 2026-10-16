@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useNode } from '@/api/admin/useNodes';
+import { useNode, useNodeStatus } from '@/api/admin/useNodes';
 import Spinner from '@/components/elements/Spinner';
 import { cn } from '@/lib/utils';
 import CalagopusNodePanel from './CalagopusNodePanel';
@@ -53,6 +53,7 @@ const Stat = ({ label, value }: { label: string; value: string }) => (
 const NodeOverviewContainer = () => {
     const { id } = useParams<'id'>();
     const { data: node } = useNode(id);
+    const { data: status } = useNodeStatus(id);
 
     if (!node) {
         return (
@@ -61,6 +62,20 @@ const NodeOverviewContainer = () => {
             </div>
         );
     }
+
+    const daemonVersion = !status
+        ? 'Checking…'
+        : !status.up
+          ? 'Unreachable'
+          : !status.version
+            ? 'Unknown'
+            : `v${status.version} (${
+                  status.up_to_date === true
+                      ? 'up to date'
+                      : status.up_to_date === false
+                        ? `update to ${status.latest}`
+                        : 'status unknown'
+              })`;
 
     return (
         <div className='space-y-4'>
@@ -80,6 +95,7 @@ const NodeOverviewContainer = () => {
             </div>
 
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                <Stat label='Daemon Version' value={daemonVersion} />
                 <Stat label='FQDN' value={node.fqdn} />
                 <Stat label='Internal FQDN' value={node.internal_fqdn || '—'} />
                 <Stat label='Scheme' value={node.scheme.toUpperCase()} />
