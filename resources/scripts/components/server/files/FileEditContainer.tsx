@@ -144,11 +144,11 @@ const FileEditContainer = () => {
                 <div className={`mb-4 p-4 border-l-4 bg-neutral-900 rounded-sm border-cyan-400`}>
                     <p className={`text-neutral-300 text-sm`}>
                         You&apos;re editing a{' '}
-                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>{filename}</code> file. Any files
-                        or directories listed in here will be excluded from backups. Wildcards are supported by using an
-                        asterisk (<code className={`font-mono bg-black rounded-sm py-px px-1`}>*</code>
+                        <code className='font-mono bg-bg-lowered rounded-sm py-px px-1'>{filename}</code> file. Any
+                        files or directories listed in here will be excluded from backups. Wildcards are supported by
+                        using an asterisk (<code className='font-mono bg-bg-lowered rounded-sm py-px px-1'>*</code>
                         ). You can negate a prior rule by prepending an exclamation point (
-                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>!</code>
+                        <code className='font-mono bg-bg-lowered rounded-sm py-px px-1'>!</code>
                         ).
                     </p>
                 </div>

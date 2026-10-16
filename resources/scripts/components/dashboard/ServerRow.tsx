@@ -139,7 +139,7 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                         <div className={'status-bar'} />
                     </div>
                     <div className='flex items-center gap-2 min-w-0'>
-                        <p className={`text-sm text-[#ffffff66] truncate`}>
+                        <p className='text-sm text-secondary truncate'>
                             {server.allocations
                                 .filter((alloc) => alloc.isDefault)
                                 .map((allocation) => (
@@ -185,13 +185,13 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                     <Fragment>
                         <div className={`sm:flex hidden`}>
                             <div className={`flex justify-center gap-2 w-fit`}>
-                                <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>CPU:</p>
+                                <p className='text-sm text-secondary font-bold w-fit whitespace-nowrap'>CPU:</p>
                                 <p className='font-bold w-fit whitespace-nowrap'>{stats.cpuUsagePercent.toFixed(2)}%</p>
                             </div>
                         </div>
                         <div className={`sm:flex hidden`}>
                             <div className={`flex justify-center gap-2 w-fit`}>
-                                <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>RAM:</p>
+                                <p className='text-sm text-secondary font-bold w-fit whitespace-nowrap'>RAM:</p>
                                 <p className='font-bold w-fit whitespace-nowrap'>
                                     {bytesToString(stats.memoryUsageInBytes, 0)}
                                 </p>
@@ -199,7 +199,7 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                         </div>
                         <div className={`sm:flex hidden`}>
                             <div className={`flex justify-center gap-2 w-fit`}>
-                                <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>Storage:</p>
+                                <p className='text-sm text-secondary font-bold w-fit whitespace-nowrap'>Storage:</p>
                                 <p className='font-bold w-fit whitespace-nowrap'>
                                     {bytesToString(stats.diskUsageInBytes, 0)}
                                 </p>

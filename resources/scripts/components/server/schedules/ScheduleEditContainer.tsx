@@ -23,7 +23,7 @@ const CronBox = ({ title, value }: { title: string; value: string }) => (
 );
 
 const ActivePill = ({ active }: { active: boolean }) => (
-    <span className='flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-white'>
+    <span className='flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-primary'>
         {active ? 'Active' : 'Inactive'}
     </span>
 );
@@ -97,9 +97,7 @@ const ScheduleEditContainer = () => {
                             <h3 className={`flex items-center text-neutral-100 text-2xl`}>
                                 {schedule.name}
                                 {schedule.isProcessing ? (
-                                    <span
-                                        className={`flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-white`}
-                                    >
+                                    <span className='flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-primary'>
                                         Processing
                                     </span>
                                 ) : (

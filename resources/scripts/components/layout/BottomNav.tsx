@@ -49,7 +49,7 @@ const BottomNav = memo(({ items }: BottomNavProps) => {
                             <HugeiconsIcon
                                 className={cn(
                                     'size-5 transition-colors',
-                                    active ? 'text-brand' : 'text-white/55 group-hover:text-white',
+                                    active ? 'text-hydro-400' : 'text-secondary group-hover:text-primary',
                                 )}
                                 strokeWidth={2}
                                 icon={item.icon}
@@ -57,7 +57,7 @@ const BottomNav = memo(({ items }: BottomNavProps) => {
                             <span
                                 className={cn(
                                     'max-w-full truncate text-[10px] leading-none transition-colors',
-                                    active ? 'font-semibold text-brand' : 'text-white/55 group-hover:text-white',
+                                    active ? 'font-semibold text-hydro-400' : 'text-secondary group-hover:text-primary',
                                 )}
                             >
                                 {label}

@@ -18,7 +18,7 @@ const FormikFieldWrapper = ({ id, name, label, className, description, validate,
         {({ field, form: { errors, touched } }: FieldProps) => (
             <div className={`${className} ${touched[field.name] && errors[field.name] ? 'has-error' : undefined}`}>
                 {label && (
-                    <Label className='text-sm text-[#ffffff77]' htmlFor={id}>
+                    <Label className='text-sm text-secondary' htmlFor={id}>
                         {label}
                     </Label>
                 )}

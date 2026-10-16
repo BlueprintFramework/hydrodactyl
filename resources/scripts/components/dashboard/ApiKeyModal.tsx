@@ -26,7 +26,7 @@ const ApiKeyModal = ({ apiKey }: Props) => {
 
             {/* API Key Display Section */}
             <div className='relative mt-6'>
-                <pre className='bg-gray-900 text-white p-4 rounded-lg font-mono overflow-x-auto'>
+                <pre className='bg-gray-900 text-primary p-4 rounded-lg font-mono overflow-x-auto'>
                     <CopyOnClick text={apiKey}>
                         <code className='text-sm break-words'>{apiKey}</code>
                     </CopyOnClick>

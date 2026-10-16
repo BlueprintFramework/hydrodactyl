@@ -58,7 +58,7 @@ const ScheduleRow = ({ schedule, onDeleted }: Props) => {
                             </p>
                         </div>
                         <div className='flex-none w-20 sm:ml-2 flex items-center align-middle justify-center ml-auto'>
-                            <p className='rounded-full px-2 py-px text-xs uppercase bg-neutral-600 text-white'>
+                            <p className='rounded-full px-2 py-px text-xs uppercase bg-neutral-600 text-primary'>
                                 {schedule.isProcessing ? 'Processing' : schedule.isActive ? 'Active' : 'Inactive'}
                             </p>
                         </div>

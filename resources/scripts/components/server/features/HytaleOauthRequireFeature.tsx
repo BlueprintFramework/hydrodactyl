@@ -90,13 +90,13 @@ const HytaleOauthRequireFeature = () => {
                     {userCode ? (
                         <button
                             type='button'
-                            className='text-3xl font-mono text-white tracking-wider mb-2 cursor-pointer hover:text-zinc-300 transition-colors w-full text-center bg-transparent border-none'
+                            className='text-3xl font-mono text-primary tracking-wider mb-2 cursor-pointer hover:text-zinc-300 transition-colors w-full text-center bg-transparent border-none'
                             onClick={() => navigator.clipboard.writeText(userCode)}
                         >
                             {userCode}
                         </button>
                     ) : (
-                        <div className='text-3xl font-mono text-white tracking-wider mb-2'>•••• ••••</div>
+                        <div className='text-3xl font-mono text-primary tracking-wider mb-2'>•••• ••••</div>
                     )}
                 </div>
 

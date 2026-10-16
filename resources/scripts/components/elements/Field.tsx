@@ -16,7 +16,7 @@ const Field = forwardRef<HTMLInputElement, Props>(
             {({ field, form: { errors, touched } }: FieldProps) => (
                 <div className='flex flex-col gap-2'>
                     {label && (
-                        <label className='text-sm text-[#ffffff77]' htmlFor={id}>
+                        <label className='text-sm text-secondary' htmlFor={id}>
                             {label}
                         </label>
                     )}
