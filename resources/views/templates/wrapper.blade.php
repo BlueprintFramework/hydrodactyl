@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <!-- Copyright (c) 2025-Present BlueprintFramework, parent collaborators, and contributors -->
-<html data-hydrodactyl-html lang="en" style="background-color: #11100E; height: 100%; width: 100%; margin: 0; padding: 0;">
+<html data-hydrodactyl-html lang="en" style="background-color: var(--color-bg, #11100E); height: 100%; width: 100%; margin: 0; padding: 0;">
     <head>
+        @include('templates.appearance')
         <title>{{ config('app.name', 'Panel') }}</title>
 
         @section('meta')
@@ -74,7 +75,7 @@
             }
         </style>
     </head>
-    <body data-hydrodactyl-body class="{{ $css['body'] }}" style="background-color: #11100E; height: 100%; width: 100%; margin: 0; padding: 0;">
+    <body data-hydrodactyl-body class="{{ $css['body'] }}" style="background-color: var(--color-bg, #11100E); height: 100%; width: 100%; margin: 0; padding: 0;">
         @section('content')
             @yield('above-container')
             @yield('container')

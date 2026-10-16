@@ -2,9 +2,12 @@
 @import "./tailwindcss-animate.css";
 /* @import 'tw-animate-css'; */
 @plugin "tailwind-scrollbar";
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme {
     --color-ring: deepskyblue;
+    --color-overlay: #ffffff;
+    --color-canvas: #000000;
 
     --color-brand-50: oklch(0.97 0.0143 57.59);
     --color-brand-100: oklch(0.9354 0.0323 58.39);
@@ -71,16 +74,149 @@
     --font-manrope: "Manrope", serif;
 }
 
-/* The configured brand color (server-rendered into --brand-color by
-   templates/wrapper.blade.php) drives the hydro accent ramp, so the admin
-   panel and user dashboard re-tint when branding changes. Must come after
-   @theme so it wins the cascade. */
+/* Keep the user's accent separate from the server-rendered logo/brand color. */
 :root {
-    --color-hydro: var(--brand-color);
-    --color-hydro-300: color-mix(in srgb, var(--brand-color) 62%, white);
-    --color-hydro-400: color-mix(in srgb, var(--brand-color) 85%, white);
-    --color-hydro-500: var(--brand-color);
-    --color-hydro-600: color-mix(in srgb, var(--brand-color) 80%, black);
+    color-scheme: dark;
+    --panel-accent: var(--brand-color);
+    --panel-ink-rgb: 255, 255, 255;
+    --color-hydro: var(--panel-accent);
+    --color-hydro-50: color-mix(in srgb, var(--panel-accent) 8%, white);
+    --color-hydro-100: color-mix(in srgb, var(--panel-accent) 16%, white);
+    --color-hydro-200: color-mix(in srgb, var(--panel-accent) 32%, white);
+    --color-hydro-300: color-mix(in srgb, var(--panel-accent) 62%, white);
+    --color-hydro-400: color-mix(in srgb, var(--panel-accent) 85%, white);
+    --color-hydro-500: var(--panel-accent);
+    --color-hydro-600: color-mix(in srgb, var(--panel-accent) 80%, black);
+    --color-hydro-700: color-mix(in srgb, var(--panel-accent) 65%, black);
+    --color-hydro-800: color-mix(in srgb, var(--panel-accent) 50%, black);
+    --color-hydro-900: color-mix(in srgb, var(--panel-accent) 40%, black);
+    --color-ring: var(--color-hydro-400);
+}
+
+:root[data-accent="blue"] {
+    --panel-accent: #52a9ff;
+}
+:root[data-accent="green"] {
+    --panel-accent: #5ee4a0;
+}
+:root[data-accent="violet"] {
+    --panel-accent: #c4a0ff;
+}
+:root[data-accent="orange"] {
+    --panel-accent: #ffb36b;
+}
+:root[data-accent="rose"] {
+    --panel-accent: #ff99b0;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+    --panel-ink-rgb: 29, 24, 22;
+    --color-overlay: #1d1816;
+    --color-canvas: #f8f6f3;
+    --color-bg: #f8f6f3;
+    --color-bg-raised: #ffffff;
+    --color-bg-lowered: #f0ede8;
+    --color-secondary: #62564b;
+
+    --color-cream-50: #171310;
+    --color-cream-100: #211b16;
+    --color-cream-200: #29221c;
+    --color-cream-300: #352c24;
+    --color-cream-400: #40352b;
+    --color-cream-500: #4d4034;
+    --color-mocha-50: #766555;
+    --color-mocha-100: #9b8876;
+    --color-mocha-200: #b8a99b;
+    --color-mocha-300: #d5ccc2;
+    --color-mocha-400: #e7e0d8;
+    --color-mocha-500: #ffffff;
+    --color-mocha-600: #f3f0eb;
+    --color-mocha-700: #f8f6f3;
+
+    --color-zinc-50: #18181b;
+    --color-zinc-100: #27272a;
+    --color-zinc-200: #3f3f46;
+    --color-zinc-300: #52525b;
+    --color-zinc-400: #62626b;
+    --color-zinc-500: #71717a;
+    --color-zinc-600: #a1a1aa;
+    --color-zinc-700: #d4d4d8;
+    --color-zinc-800: #e4e4e7;
+    --color-zinc-900: #f4f4f5;
+    --color-zinc-950: #fafafa;
+    --color-neutral-100: #262626;
+    --color-neutral-200: #404040;
+    --color-neutral-300: #525252;
+    --color-neutral-400: #626262;
+    --color-neutral-500: #737373;
+    --color-neutral-600: #a3a3a3;
+    --color-neutral-700: #d4d4d4;
+    --color-neutral-800: #e5e5e5;
+    --color-neutral-900: #f5f5f5;
+    --color-gray-300: #4b5563;
+    --color-gray-400: #5e6878;
+    --color-gray-500: #6b7280;
+    --color-gray-700: #d1d5db;
+    --color-gray-800: #e5e7eb;
+    --color-gray-900: #f3f4f6;
+
+    --color-red-300: #991b1b;
+    --color-red-400: #b91c1c;
+    --color-red-500: #b91c1c;
+    --color-green-300: #166534;
+    --color-green-400: #15803d;
+    --color-green-500: #15803d;
+    --color-emerald-300: #065f46;
+    --color-emerald-400: #047857;
+    --color-emerald-500: #047857;
+    --color-yellow-300: #854d0e;
+    --color-yellow-400: #854d0e;
+    --color-yellow-500: #854d0e;
+    --color-yellow-600: #854d0e;
+    --color-orange-300: #9a3412;
+    --color-orange-400: #c2410c;
+    --color-orange-500: #c2410c;
+    --color-blue-300: #1e40af;
+    --color-blue-400: #1d4ed8;
+    --color-blue-500: #1d4ed8;
+    --color-cyan-300: #155e75;
+    --color-cyan-400: #0e7490;
+    --color-teal-300: #115e59;
+    --color-teal-400: #0f766e;
+    --color-purple-300: #6b21a8;
+    --color-purple-400: #7e22ce;
+
+    /* Darker accent text/buttons stay readable on the light surfaces. */
+    --color-hydro: color-mix(in srgb, var(--panel-accent) 40%, black);
+    --color-hydro-300: color-mix(in srgb, var(--panel-accent) 40%, black);
+    --color-hydro-400: color-mix(in srgb, var(--panel-accent) 40%, black);
+    --color-hydro-500: color-mix(in srgb, var(--panel-accent) 40%, black);
+    --color-hydro-600: color-mix(in srgb, var(--panel-accent) 30%, black);
+}
+
+:root[data-theme="light"] :focus-visible {
+    outline: 2px solid var(--color-hydro-400);
+    outline-offset: 2px;
+}
+
+/* Legacy muted text used alpha against dark surfaces; opacity loses contrast on white. */
+:root[data-theme="light"]
+:is(
+    [class~="text-cream-200/40"],
+    [class~="text-cream-200/50"],
+    [class~="text-cream-200/60"],
+    [class~="text-cream-200/70"],
+    [class~="text-cream-400/30"],
+    [class~="text-cream-400/40"],
+    [class~="text-cream-400/50"],
+    [class~="text-cream-400/60"],
+    [class~="text-cream-400/70"],
+    [class~="text-cream-400/80"],
+    [class~="text-cream-500/30"],
+    [class~="text-primary/40"]
+) {
+    color: var(--color-secondary);
 }
 
 @keyframes groupFlyIn {

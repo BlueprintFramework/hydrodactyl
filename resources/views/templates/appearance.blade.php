@@ -1,0 +1,18 @@
+<script>
+    (() => {
+        let saved;
+        try { saved = JSON.parse(localStorage.getItem('hydrodactyl:appearance') || 'null'); } catch {}
+        const mode = saved?.mode === 'light' || saved?.mode === 'system' ? saved.mode : 'dark';
+        const root = document.documentElement;
+        root.dataset.theme = mode === 'system' ? (window.matchMedia?.('(prefers-color-scheme: dark)').matches === false ? 'light' : 'dark') : mode;
+        root.dataset.accent = ['panel', 'blue', 'green', 'violet', 'orange', 'rose'].includes(saved?.accent) ? saved.accent : 'panel';
+        root.style.colorScheme = root.dataset.theme;
+    })();
+</script>
+<style>
+    html[data-theme="light"] {
+        --color-bg: #f8f6f3;
+        --color-canvas: #f8f6f3;
+        --color-primary: #40352b;
+    }
+</style>
