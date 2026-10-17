@@ -1,6 +1,6 @@
 {
     "name": "hydrodactyl",
-    "version": "6.5.0",
+    "version": "6.5.1",
     "buildNumber": "31",
     "engines": {
         "node": ">=22.13"
