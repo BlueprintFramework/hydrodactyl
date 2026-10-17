@@ -44,8 +44,22 @@ const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<s
                 webhook_url: server?.webhookUrl || '',
             }}
             validationSchema={object().shape({
-                webhook_type: string().required(),
-                webhook_url: string().url().required(),
+                webhook_type: string().test(
+                    'webhook-type-required',
+                    t('server.settings.webhook.type_required'),
+                    (value, context) => !context.parent.webhook_url || !!value,
+                ),
+                webhook_url: string()
+                    .test(
+                        'webhook-url-required',
+                        t('server.settings.webhook.url_required'),
+                        (value, context) => !context.parent.webhook_type || !!value,
+                    )
+                    .test(
+                        'webhook-url-valid',
+                        t('server.settings.webhook.url_invalid'),
+                        (value) => !value || /^https?:\/\/\S+$/.test(value),
+                    ),
             })}
         >
             {({ values, setFieldValue }) => (

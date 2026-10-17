@@ -2103,7 +2103,10 @@
                 "updated": "¡Detalles del servidor actualizados!",
                 "type_label": "Tipo de webhook",
                 "type_placeholder": "Selecciona un tipo de webhook",
-                "url_label": "URL del webhook"
+                "url_label": "URL del webhook",
+                "type_required": "Se requiere un tipo de webhook.",
+                "url_required": "Se requiere una URL de webhook.",
+                "url_invalid": "La URL del webhook debe ser una URL válida."
             }
         },
         "software": {
