@@ -1,9 +1,11 @@
 import { useCallback } from 'react';
 import { getGlobalDaemonType } from '@/api/server/getServer';
 import getServerBackups from '@/api/swr/getServerBackups';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { ServerContext } from '@/state/server';
 
 export const useBackupMutations = () => {
+    const { t } = useTranslation();
     const { mutate } = getServerBackups();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const daemonType = getGlobalDaemonType();
@@ -15,11 +17,12 @@ export const useBackupMutations = () => {
                 name,
                 ignored,
                 isLocked,
+                pendingName: t('server.backups.pending_name'),
             });
             mutate();
             return result;
         },
-        [uuid, mutate],
+        [uuid, mutate, t],
     );
 
     const deleteBackup = useCallback(

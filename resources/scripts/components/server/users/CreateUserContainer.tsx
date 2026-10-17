@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import UserFormComponent from '@/components/server/users/UserFormComponent';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { ServerContext } from '@/state/server';
 
 const CreateUserContainer = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [identifier, setIdentifier] = useState('');
@@ -19,7 +21,7 @@ const CreateUserContainer = () => {
     const back = () => navigate(`/server/${serverId}/users`);
 
     return (
-        <ServerContentBlock title={'Invite User'} className='p-0!' showFlashKey={'users'}>
+        <ServerContentBlock title={t('server.users.invite_user')} className='p-0!' showFlashKey={'users'}>
             <ServerHeader />
             <div className='flex flex-col gap-8 px-4 py-8 sm:px-14 sm:py-14'>
                 <div className='flex items-center gap-4 rounded-xl border border-[#ffffff10] bg-[#ffffff08] px-4 py-4'>
@@ -27,13 +29,15 @@ const CreateUserContainer = () => {
                         <Person width={22} height={22} fill='currentColor' className='text-zinc-400' />
                     </div>
                     <div className='min-w-0'>
-                        <h1 className='truncate text-sm font-medium text-zinc-100'>{trimmed || 'New user'}</h1>
+                        <h1 className='truncate text-sm font-medium text-zinc-100'>
+                            {trimmed || t('server.users.new_user')}
+                        </h1>
                         <p className='mt-1 truncate text-xs text-zinc-400'>
                             {trimmed
                                 ? isEmail
-                                    ? 'Inviting by email'
-                                    : 'Adding an existing username'
-                                : 'Enter a username or email below.'}
+                                    ? t('server.users.inviting_by_email')
+                                    : t('server.users.adding_existing')
+                                : t('server.users.identifier_hint')}
                         </p>
                     </div>
                 </div>

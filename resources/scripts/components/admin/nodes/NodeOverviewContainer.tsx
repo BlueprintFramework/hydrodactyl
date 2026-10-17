@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useNode, useNodeStatus } from '@/api/admin/useNodes';
 import Spinner from '@/components/elements/Spinner';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 import CalagopusNodePanel from './CalagopusNodePanel';
 
@@ -25,23 +26,27 @@ const Resource = ({
     percent: number;
     allocated: number;
     total: number;
-}) => (
-    <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-        <div className='flex items-center justify-between'>
-            <h3 className='text-sm font-semibold text-cream-50'>{title}</h3>
-            <span className='text-sm text-cream-400/70'>{percent}%</span>
+}) => {
+    const { t } = useTranslation();
+
+    return (
+        <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
+            <div className='flex items-center justify-between'>
+                <h3 className='text-sm font-semibold text-cream-50'>{title}</h3>
+                <span className='text-sm text-cream-400/70'>{percent}%</span>
+            </div>
+            <div className='mt-3 h-2 w-full overflow-hidden rounded-full bg-mocha-400'>
+                <div
+                    className={cn('h-full rounded-full', barColor(percent))}
+                    style={{ width: `${Math.min(100, percent)}%` }}
+                />
+            </div>
+            <p className='mt-2 text-xs text-cream-400/60'>
+                {t('admin.nodes.of_allocated', { used: formatBytes(allocated), total: formatBytes(total) })}
+            </p>
         </div>
-        <div className='mt-3 h-2 w-full overflow-hidden rounded-full bg-mocha-400'>
-            <div
-                className={cn('h-full rounded-full', barColor(percent))}
-                style={{ width: `${Math.min(100, percent)}%` }}
-            />
-        </div>
-        <p className='mt-2 text-xs text-cream-400/60'>
-            {formatBytes(allocated)} of {formatBytes(total)} allocated
-        </p>
-    </div>
-);
+    );
+};
 
 const Stat = ({ label, value }: { label: string; value: string }) => (
     <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
@@ -51,6 +56,7 @@ const Stat = ({ label, value }: { label: string; value: string }) => (
 );
 
 const NodeOverviewContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data: node } = useNode(id);
     const { data: status } = useNodeStatus(id);
@@ -64,30 +70,30 @@ const NodeOverviewContainer = () => {
     }
 
     const daemonVersion = !status
-        ? 'Checking…'
+        ? t('admin.nodes.daemon_checking')
         : !status.up
-          ? 'Unreachable'
+          ? t('admin.nodes.daemon_unreachable')
           : !status.version
-            ? 'Unknown'
+            ? t('admin.nodes.daemon_unknown')
             : `v${status.version} (${
                   status.up_to_date === true
-                      ? 'up to date'
+                      ? t('admin.nodes.daemon_up_to_date')
                       : status.up_to_date === false
-                        ? `update to ${status.latest}`
-                        : 'status unknown'
+                        ? t('admin.nodes.daemon_update_to', { version: status.latest ?? '' })
+                        : t('admin.nodes.daemon_status_unknown')
               })`;
 
     return (
         <div className='space-y-4'>
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                 <Resource
-                    title='Memory'
+                    title={t('admin.common.memory')}
                     percent={node.memory_percent}
                     allocated={node.allocated_memory}
                     total={node.total_memory}
                 />
                 <Resource
-                    title='Disk'
+                    title={t('admin.common.disk')}
                     percent={node.disk_percent}
                     allocated={node.allocated_disk}
                     total={node.total_disk}
@@ -95,15 +101,18 @@ const NodeOverviewContainer = () => {
             </div>
 
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-                <Stat label='Daemon Version' value={daemonVersion} />
-                <Stat label='FQDN' value={node.fqdn} />
-                <Stat label='Internal FQDN' value={node.internal_fqdn || '—'} />
-                <Stat label='Scheme' value={node.scheme.toUpperCase()} />
-                <Stat label='Location' value={node.location?.short ?? '—'} />
-                <Stat label='Daemon' value={node.daemonType} />
-                <Stat label='Backup Storage' value={node.backupDisk.replace(/_/g, ' ')} />
-                <Stat label='Servers' value={String(node.servers_count)} />
-                <Stat label='Maintenance Mode' value={node.maintenance_mode ? 'Enabled' : 'Disabled'} />
+                <Stat label={t('admin.nodes.daemon_version')} value={daemonVersion} />
+                <Stat label={t('admin.common.fqdn')} value={node.fqdn} />
+                <Stat label={t('admin.nodes.internal_fqdn')} value={node.internal_fqdn || '—'} />
+                <Stat label={t('admin.nodes.scheme')} value={node.scheme.toUpperCase()} />
+                <Stat label={t('admin.nodes.location')} value={node.location?.short ?? '—'} />
+                <Stat label={t('admin.nodes.daemon')} value={node.daemonType} />
+                <Stat label={t('admin.nodes.backup_storage')} value={node.backupDisk.replace(/_/g, ' ')} />
+                <Stat label={t('common.server')} value={String(node.servers_count)} />
+                <Stat
+                    label={t('admin.nodes.maintenance_mode')}
+                    value={node.maintenance_mode ? t('common.enabled') : t('common.disabled')}
+                />
             </div>
 
             {node.daemonType === 'calagopus' && <CalagopusNodePanel nodeId={node.id} />}

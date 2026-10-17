@@ -42,7 +42,7 @@ class NodeUpgradeController extends Controller
 
         if (!$type || !$endpoint) {
             return new JsonResponse([
-                'error' => 'This daemon does not support remote upgrades.',
+                'error' => __('exceptions.admin.daemon_upgrade_unsupported'),
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
@@ -57,7 +57,7 @@ class NodeUpgradeController extends Controller
             );
         } catch (DaemonConnectionException $exception) {
             return new JsonResponse([
-                'error' => 'The panel could not reach the node.',
+                'error' => __('exceptions.admin.daemon_unreachable'),
                 'detail' => $exception->getMessage(),
             ], Response::HTTP_BAD_GATEWAY);
         }

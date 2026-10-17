@@ -12,6 +12,8 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { Translate } from '@/i18n/types';
 
 const emptyValues: MountValues = {
     name: '',
@@ -22,9 +24,9 @@ const emptyValues: MountValues = {
     user_mountable: false,
 };
 
-const boolOptions = [
-    { value: 'false', label: 'False' },
-    { value: 'true', label: 'True' },
+const boolOptions = (t: Translate) => [
+    { value: 'false', label: t('admin.common.false') },
+    { value: 'true', label: t('admin.common.true') },
 ];
 
 const CreateMountDialog = ({
@@ -36,6 +38,7 @@ const CreateMountDialog = ({
     onClose: () => void;
     onCreated: () => void;
 }) => {
+    const { t } = useTranslation();
     const [values, setValues] = useState<MountValues>(emptyValues);
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -55,20 +58,20 @@ const CreateMountDialog = ({
 
         try {
             await createMount(values);
-            toast.success('Mount created.');
+            toast.success(t('admin.mounts.created'));
             setValues(emptyValues);
             onCreated();
             onClose();
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to create the mount.'));
+            toast.error(errorToMessage(error, t('admin.mounts.create_failed')));
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <Dialog open={open} title='Create Mount' onClose={close} preventExternalClose={submitting}>
+        <Dialog open={open} title={t('admin.mounts.create')} onClose={close} preventExternalClose={submitting}>
             <div className='mt-4'>
                 <form
                     id='create-mount-form'
@@ -78,57 +81,65 @@ const CreateMountDialog = ({
                     }}
                     className='flex flex-col gap-4'
                 >
-                    <Field
-                        label='Name'
-                        error={errors.name}
-                        hint='Unique name used to separate this mount from another.'
-                    >
+                    <Field label={t('admin.common.name')} error={errors.name} hint={t('admin.mounts.name_hint')}>
                         <Input.Text value={values.name} onChange={(event) => set('name', event.target.value)} />
                     </Field>
-                    <Field label='Description' error={errors.description} hint='Optional, less than 191 characters.'>
+                    <Field
+                        label={t('admin.common.description')}
+                        error={errors.description}
+                        hint={t('admin.mounts.description_hint')}
+                    >
                         <Input.Text
                             value={values.description}
                             onChange={(event) => set('description', event.target.value)}
                         />
                     </Field>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-                        <Field label='Source' error={errors.source} hint='Path on the host to mount.'>
+                        <Field
+                            label={t('admin.mounts.source')}
+                            error={errors.source}
+                            hint={t('admin.mounts.source_hint')}
+                        >
                             <Input.Text value={values.source} onChange={(event) => set('source', event.target.value)} />
                         </Field>
-                        <Field label='Target' error={errors.target} hint='Path inside the container.'>
+                        <Field
+                            label={t('admin.mounts.target')}
+                            error={errors.target}
+                            hint={t('admin.mounts.target_hint')}
+                        >
                             <Input.Text value={values.target} onChange={(event) => set('target', event.target.value)} />
                         </Field>
                     </div>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <Field
-                            label='Read Only'
+                            label={t('admin.mounts.read_only')}
                             error={errors.read_only}
-                            hint='Mount as read only inside the container.'
+                            hint={t('admin.mounts.read_only_hint')}
                         >
                             <Dropdown
                                 value={String(values.read_only)}
                                 onChange={(value) => set('read_only', value === 'true')}
-                                options={boolOptions}
+                                options={boolOptions(t)}
                             />
                         </Field>
                         <Field
-                            label='User Mountable'
+                            label={t('admin.mounts.user_mountable')}
                             error={errors.user_mountable}
-                            hint='Allow users to mount this themselves.'
+                            hint={t('admin.mounts.user_mountable_hint')}
                         >
                             <Dropdown
                                 value={String(values.user_mountable)}
                                 onChange={(value) => set('user_mountable', value === 'true')}
-                                options={boolOptions}
+                                options={boolOptions(t)}
                             />
                         </Field>
                     </div>
                     <Dialog.Footer>
                         <Button type='button' variant='secondary' onClick={close} disabled={submitting}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button type='submit' form='create-mount-form' disabled={submitting}>
-                            Create
+                            {t('common.create')}
                         </Button>
                     </Dialog.Footer>
                 </form>
@@ -138,6 +149,7 @@ const CreateMountDialog = ({
 };
 
 const MountsContainer = () => {
+    const { t } = useTranslation();
     const { data, mutate } = useMounts();
     const [createOpen, setCreateOpen] = useState(false);
 
@@ -150,26 +162,26 @@ const MountsContainer = () => {
     }
 
     return (
-        <PageContentBlock title='Mounts'>
-            <MainPageHeader direction='column' title='Mounts'>
-                <p className='text-sm text-neutral-400'>Configure and manage additional mount points for servers.</p>
+        <PageContentBlock title={t('admin.nav.mounts')}>
+            <MainPageHeader direction='column' title={t('admin.nav.mounts')}>
+                <p className='text-sm text-neutral-400'>{t('admin.mounts.description')}</p>
             </MainPageHeader>
 
             <div className='mb-4 flex justify-end'>
-                <Button onClick={() => setCreateOpen(true)}>Create Mount</Button>
+                <Button onClick={() => setCreateOpen(true)}>{t('admin.mounts.create')}</Button>
             </div>
 
             <div className='overflow-x-auto rounded-xl border border-mocha-400'>
                 <table className='w-full text-sm'>
                     <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                         <tr className='border-b border-mocha-400'>
-                            <th className='px-4 py-3'>ID</th>
-                            <th className='px-4 py-3'>Name</th>
-                            <th className='px-4 py-3'>Source</th>
-                            <th className='px-4 py-3'>Target</th>
-                            <th className='px-4 py-3 text-center'>Eggs</th>
-                            <th className='px-4 py-3 text-center'>Nodes</th>
-                            <th className='px-4 py-3 text-center'>Servers</th>
+                            <th className='px-4 py-3'>{t('admin.common.id')}</th>
+                            <th className='px-4 py-3'>{t('admin.common.name')}</th>
+                            <th className='px-4 py-3'>{t('admin.mounts.source')}</th>
+                            <th className='px-4 py-3'>{t('admin.mounts.target')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.mounts.eggs')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.common.nodes')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.common.servers')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -195,7 +207,7 @@ const MountsContainer = () => {
                         {data.length === 0 && (
                             <tr>
                                 <td colSpan={7} className='px-4 py-8 text-center text-cream-400/50'>
-                                    No mounts have been created.
+                                    {t('admin.mounts.empty')}
                                 </td>
                             </tr>
                         )}

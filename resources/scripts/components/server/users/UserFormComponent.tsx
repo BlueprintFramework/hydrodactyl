@@ -9,6 +9,8 @@ import Field from '@/components/elements/Field';
 import { Switch } from '@/components/elements/SwitchV2';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 import { useDeepCompareMemo } from '@/plugins/useDeepCompareMemo';
 import { usePermissions } from '@/plugins/usePermissions';
 import type { ApplicationStore } from '@/state';
@@ -46,7 +48,17 @@ const PermissionGroup = ({
     editable: string[];
     canEdit: boolean;
 }) => {
+    const { t } = useTranslation();
     const [{ value }, , { setValue }] = useField<string[]>('permissions');
+
+    const translateWithFallback = (path: string, fallback: string) => {
+        const translated = t(path as TranslationKey);
+
+        return translated === path ? fallback : translated;
+    };
+
+    const groupTitle = translateWithFallback(`server.users.permissions.${name}.title`, name);
+    const groupDescription = translateWithFallback(`server.users.permissions.${name}.description`, description);
     const permissions = keys.map((item) => `${name}.${item.key}`);
     const granted = permissions.filter((permission) => value.includes(permission));
     const editableHere = permissions.filter((permission) => editable.includes(permission));
@@ -79,17 +91,17 @@ const PermissionGroup = ({
                             fill='currentColor'
                             className={`shrink-0 text-zinc-400 transition-transform ${open ? 'rotate-90' : ''}`}
                         />
-                        <span className='text-sm capitalize text-zinc-100'>{name}</span>
+                        <span className='text-sm first-letter:uppercase text-zinc-100'>{groupTitle}</span>
                         <span className='text-xs text-zinc-500'>
                             {granted.length}/{permissions.length}
                         </span>
                     </button>
-                    <p className='mt-1 pl-6 text-sm text-zinc-400'>{description}</p>
+                    <p className='mt-1 pl-6 text-sm text-zinc-400'>{groupDescription}</p>
                 </div>
                 <Switch
                     checked={allGranted || someGranted}
                     disabled={!canEdit || editableHere.length === 0}
-                    aria-label={`Grant every ${name} permission`}
+                    aria-label={t('server.users.grant_group_aria', { name: groupTitle })}
                     className={someGranted ? 'opacity-60' : undefined}
                     onCheckedChange={(checked) => setGroup(someGranted ? true : checked)}
                 />
@@ -130,7 +142,10 @@ const PermissionGroup = ({
                                         <span className='block font-mono text-xs text-zinc-200'>{item.key}</span>
                                         {item.description && (
                                             <span className='mt-0.5 block text-xs leading-relaxed text-zinc-500'>
-                                                {item.description}
+                                                {translateWithFallback(
+                                                    `server.users.permissions.${name}_${item.key}.description`,
+                                                    item.description,
+                                                )}
                                             </span>
                                         )}
                                     </span>
@@ -154,6 +169,7 @@ const UserFormComponent = ({
     identifier,
     onIdentifierChange,
 }: Props) => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const appendSubuser = ServerContext.useStoreActions((actions) => actions.subusers.appendSubuser);
     const { clearFlashes, clearAndAddHttpError } = useStoreActions(
@@ -231,7 +247,9 @@ const UserFormComponent = ({
                     } as Values
                 }
                 validationSchema={object().shape({
-                    email: string().max(191, 'That is too long.').required('Enter a username or email address.'),
+                    email: string()
+                        .max(191, t('server.users.identifier_max'))
+                        .required(t('server.users.identifier_required')),
                     permissions: array().of(string()),
                 })}
             >
@@ -248,9 +266,9 @@ const UserFormComponent = ({
                                         <Field
                                             id='email'
                                             name='email'
-                                            label='Username or email'
-                                            placeholder='username or email'
-                                            description='An existing username, or an email to invite someone new.'
+                                            label={t('server.users.identifier_label')}
+                                            placeholder={t('server.users.identifier_placeholder')}
+                                            description={t('server.users.identifier_description')}
                                             onChange={(event) => onIdentifierChange?.(event.currentTarget.value)}
                                         />
                                     </div>
@@ -260,11 +278,13 @@ const UserFormComponent = ({
                             <section className='flex flex-col'>
                                 <div className='mb-2 flex items-start justify-between gap-4'>
                                     <div>
-                                        <h2 className='text-sm font-medium text-zinc-100'>Permissions</h2>
+                                        <h2 className='text-sm font-medium text-zinc-100'>
+                                            {t('server.users.detailed_permissions')}
+                                        </h2>
                                         <p className='mt-1 max-w-xl text-sm text-zinc-400'>
-                                            Flip a group to grant everything in it. Open it if you only want some.
+                                            {t('server.users.permissions_flip')}
                                             {!isRootAdmin && loggedInPermissions[0] !== '*' && (
-                                                <> You can only hand out permissions you have yourself.</>
+                                                <> {t('server.users.permission_restriction_description')}</>
                                             )}
                                         </p>
                                     </div>
@@ -281,7 +301,7 @@ const UserFormComponent = ({
                                                 )
                                             }
                                         >
-                                            {allSelected ? 'Clear all' : 'Grant all'}
+                                            {allSelected ? t('server.users.clear_all') : t('server.users.grant_all')}
                                         </Button>
                                     )}
                                 </div>
@@ -309,14 +329,14 @@ const UserFormComponent = ({
                             {canEditUser && (
                                 <div className='flex justify-end gap-3'>
                                     <Button variant='ghost' type='button' onClick={onCancel}>
-                                        Cancel
+                                        {t('common.cancel')}
                                     </Button>
                                     <Button
                                         variant='secondary'
                                         type='submit'
                                         disabled={isSubmitting || !permissionsReady}
                                     >
-                                        {subuser ? 'Save' : 'Invite'}
+                                        {subuser ? t('common.save') : t('server.users.invite')}
                                     </Button>
                                 </div>
                             )}

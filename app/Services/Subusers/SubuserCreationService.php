@@ -50,7 +50,7 @@ class SubuserCreationService
                 } catch (RecordNotFoundException) {
                     // FUCK YOU LARAVEL
                     if (!preg_match('/^.+@.+\..+$/', $identifier)) {
-                        throw new DisplayException('No account uses that username. Enter their email to invite them.');
+                        throw new DisplayException(__('exceptions.subusers.no_account_found'));
                     }
 
                     // Just cap the username generated at 64 characters at most and then append a random string

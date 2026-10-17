@@ -9,13 +9,15 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const CopyButton = ({ value }: { value: string }) => {
+    const { t } = useTranslation();
     const [copied, setCopied] = useState(false);
 
     const copy = async () => {
         if (!navigator.clipboard) {
-            toast.error('Clipboard is not available in this context.');
+            toast.error(t('admin.common.clipboard_unavailable'));
             return;
         }
 
@@ -26,7 +28,7 @@ const CopyButton = ({ value }: { value: string }) => {
 
     return (
         <Button type='button' variant='secondary' size='sm' onClick={() => void copy()}>
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? t('admin.common.copied') : t('admin.common.copy')}
         </Button>
     );
 };
@@ -34,6 +36,7 @@ const CopyButton = ({ value }: { value: string }) => {
 const formatDate = (value: string | null) => (value ? new Date(value).toLocaleString() : '—');
 
 const ApplicationApiContainer = () => {
+    const { t } = useTranslation();
     const { data, mutate } = useApplicationApiKeys();
     const [confirm, setConfirm] = useState<string>();
     const [revoking, setRevoking] = useState(false);
@@ -55,27 +58,25 @@ const ApplicationApiContainer = () => {
 
         try {
             await revokeApplicationApiKey(confirm);
-            toast.success('API key revoked.');
+            toast.success(t('admin.api.revoked'));
             await mutate();
             setConfirm(undefined);
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to revoke the key.'));
+            toast.error(errorToMessage(error, t('admin.api.revoke_failed')));
         } finally {
             setRevoking(false);
         }
     };
 
     return (
-        <PageContentBlock title='Application API'>
-            <MainPageHeader direction='column' title='Application API'>
-                <p className='text-sm text-neutral-400'>
-                    Control access credentials for managing this panel via the API.
-                </p>
+        <PageContentBlock title={t('admin.nav.api')}>
+            <MainPageHeader direction='column' title={t('admin.nav.api')}>
+                <p className='text-sm text-neutral-400'>{t('admin.api.description')}</p>
             </MainPageHeader>
 
             <div className='mb-4 flex justify-end'>
                 <Button asChild>
-                    <Link to='/api/new'>Create Credentials</Link>
+                    <Link to='/api/new'>{t('admin.api.create_credentials')}</Link>
                 </Button>
             </div>
 
@@ -83,10 +84,10 @@ const ApplicationApiContainer = () => {
                 <table className='w-full text-sm'>
                     <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                         <tr className='border-b border-mocha-400'>
-                            <th className='px-4 py-3'>Key</th>
-                            <th className='px-4 py-3'>Description</th>
-                            <th className='px-4 py-3'>Last Used</th>
-                            <th className='px-4 py-3'>Created</th>
+                            <th className='px-4 py-3'>{t('admin.api.key')}</th>
+                            <th className='px-4 py-3'>{t('admin.common.description')}</th>
+                            <th className='px-4 py-3'>{t('admin.api.last_used')}</th>
+                            <th className='px-4 py-3'>{t('admin.api.created_at')}</th>
                             <th className='px-4 py-3' />
                         </tr>
                     </thead>
@@ -104,7 +105,7 @@ const ApplicationApiContainer = () => {
                                 <td className='px-4 py-3 text-cream-400/70'>{formatDate(key.created_at)}</td>
                                 <td className='px-4 py-3 text-right'>
                                     <Button variant='attention' size='sm' onClick={() => setConfirm(key.identifier)}>
-                                        Revoke
+                                        {t('admin.api.revoke')}
                                     </Button>
                                 </td>
                             </tr>
@@ -112,7 +113,7 @@ const ApplicationApiContainer = () => {
                         {data.data.length === 0 && (
                             <tr>
                                 <td colSpan={5} className='px-4 py-8 text-center text-cream-400/50'>
-                                    You have not created any application API keys.
+                                    {t('admin.api.empty')}
                                 </td>
                             </tr>
                         )}
@@ -122,13 +123,13 @@ const ApplicationApiContainer = () => {
 
             <Dialog.Confirm
                 open={!!confirm}
-                title='Revoke API Key'
-                confirm='Revoke'
+                title={t('admin.api.revoke_title')}
+                confirm={t('admin.api.revoke')}
                 loading={revoking}
                 onClose={() => setConfirm(undefined)}
                 onConfirmed={revoke}
             >
-                Once this API key is revoked any applications currently using it will stop working.
+                {t('admin.api.revoke_confirm')}
             </Dialog.Confirm>
         </PageContentBlock>
     );

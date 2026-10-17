@@ -1,0 +1,68 @@
+<?php
+
+return [
+    'notices' => [
+        'created' => 'Se ha creado correctamente un nuevo nido, :name.',
+        'deleted' => 'Se eliminó correctamente el nido solicitado del Panel.',
+        'updated' => 'Se actualizaron correctamente los ajustes de configuración del nido.',
+    ],
+    'eggs' => [
+        'notices' => [
+            'imported' => 'Se importó correctamente este huevo y sus variables asociadas.',
+            'import_url_host' => 'La URL de importación del huevo no pertenece a un host permitido.',
+            'import_url_scheme' => 'El esquema de la URL de importación del huevo no es válido.',
+            'import_fetch_failed' => 'No se pudo descargar el huevo desde la URL.',
+            'updated_via_import' => 'Este huevo se ha actualizado usando el archivo proporcionado.',
+            'deleted' => 'Se eliminó correctamente el huevo solicitado del Panel.',
+            'updated' => 'La configuración del huevo se ha actualizado correctamente.',
+            'script_updated' => 'El script de instalación del huevo se ha actualizado y se ejecutará siempre que se instalen servidores.',
+            'egg_created' => 'Se ha creado correctamente un nuevo huevo. Tendrás que reiniciar cualquier daemon en ejecución para aplicar este nuevo huevo.',
+        ],
+    ],
+    'variables' => [
+        'notices' => [
+            'variable_deleted' => 'La variable ":variable" se ha eliminado y ya no estará disponible para los servidores una vez reconstruidos.',
+            'variable_updated' => 'La variable ":variable" se ha actualizado. Tendrás que reconstruir cualquier servidor que use esta variable para aplicar los cambios.',
+            'variable_created' => 'Se ha creado correctamente una nueva variable y se ha asignado a este huevo.',
+        ],
+    ],
+    'index' => [
+        'title' => 'Nidos',
+        'subtitle' => 'Todos los nidos disponibles actualmente en este sistema.',
+        'warning' => '<strong>Los huevos son poderosos</strong>: modificarlos incorrectamente puede romper tus servidores. Evita editar los huevos predeterminados a menos que sepas lo que haces.',
+        'configured_nests' => 'Nidos configurados',
+        'import_egg' => 'Importar huevo',
+        'import_egg_from_url' => 'Importar huevo desde URL',
+        'create_new' => 'Crear nuevo',
+        'table_description' => 'Descripción',
+        'table_eggs' => 'Huevos',
+        'import_modal_title' => 'Importar un huevo',
+        'egg_file' => 'Archivo de huevo',
+        'egg_file_help' => 'Selecciona el archivo <code>.json</code> del nuevo huevo que deseas importar.',
+        'associated_nest' => 'Nido asociado',
+        'associated_nest_help' => 'Selecciona en el desplegable el nido con el que se asociará este huevo. Si deseas asociarlo con un nuevo nido, tendrás que crear ese nido antes de continuar.',
+        'import_button' => 'Importar',
+        'egg_url' => 'URL del huevo',
+        'egg_url_help' => 'Escribe la URL del archivo del nuevo huevo que deseas importar.',
+    ],
+    'new' => [
+        'title' => 'Nuevo nido',
+        'subtitle' => 'Configura un nuevo nido para desplegarlo en todos los nodos.',
+        'name_help' => 'Este debería ser un nombre de categoría descriptivo que englobe todos los huevos del nido.',
+        'description' => 'Descripción',
+    ],
+    'view' => [
+        'title' => 'Nidos &rarr; :name',
+        'name_help' => 'Este debería ser un nombre de categoría descriptivo que englobe todas las opciones del servicio.',
+        'description' => 'Descripción',
+        'nest_id' => 'ID del nido',
+        'nest_id_help' => 'Un ID único usado para identificar este nido internamente y a través de la API.',
+        'author' => 'Autor',
+        'author_help' => 'El autor de esta opción de servicio. Dirige tus preguntas y problemas a él, a menos que sea una opción oficial creada por <code>support@pterodactyl.io</code>.',
+        'uuid' => 'UUID',
+        'uuid_help' => 'Un UUID que se asigna a todos los servidores que usan esta opción con fines de identificación.',
+        'nest_eggs' => 'Huevos del nido',
+        'new_egg' => 'Nuevo huevo',
+        'delete_js' => ' Eliminar nido',
+    ],
+];

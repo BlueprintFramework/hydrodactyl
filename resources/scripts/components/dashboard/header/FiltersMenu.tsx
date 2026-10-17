@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { FilterOption, FilterOptions } from '@/api/getFilterOptions';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import FilterDropdown from './FilterDropdown';
 import GroupDropdown from './GroupDropdown';
 import SortDropdown, { type SortPreset } from './SortDropdown';
@@ -38,6 +39,7 @@ const FiltersMenu = ({
     onGroupChange,
     onSortChange,
 }: FiltersMenuProps) => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [position, setPosition] = useState<{ top: number; right: number }>({ top: 0, right: 0 });
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -61,14 +63,14 @@ const FiltersMenu = ({
                 ref={buttonRef}
                 size='sm'
                 variant='secondary'
-                aria-label='Open filters'
+                aria-label={t('dashboard.filters.open')}
                 aria-expanded={open}
                 onClick={toggle}
                 className='h-11 sm:h-8 px-2 sm:px-3 gap-1 rounded-full hover:cursor-pointer'
             >
                 <div className='flex flex-row items-center gap-1.5'>
                     <HugeiconsIcon size={16} strokeWidth={2} icon={FilterIcon} className='size-4' />
-                    <span className='hidden sm:inline'>Filters</span>
+                    <span className='hidden sm:inline'>{t('dashboard.filters.title')}</span>
                 </div>
             </Button>
             {open &&

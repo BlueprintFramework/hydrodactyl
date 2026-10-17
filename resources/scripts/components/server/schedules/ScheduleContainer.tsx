@@ -8,10 +8,12 @@ import ServerHeader from '@/components/server/header/ServerHeader';
 import EditScheduleModal from '@/components/server/schedules/EditScheduleModal';
 import ScheduleRow from '@/components/server/schedules/ScheduleRow';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useFlashKey } from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
 function ScheduleContainer() {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const { clearFlashes, clearAndAddHttpError } = useFlashKey('server:schedules');
     const [loading, setLoading] = useState(true);
@@ -30,7 +32,7 @@ function ScheduleContainer() {
     }, [uuid, setSchedules, clearFlashes, clearAndAddHttpError]);
 
     return (
-        <ServerContentBlock title={'Schedules'} className='p-0!' showFlashKey={'server:schedules'}>
+        <ServerContentBlock title={t('navigation.schedules')} className='p-0!' showFlashKey={'server:schedules'}>
             <ServerHeader />
             <div className='rounded-xl shadow-sm px-4 py-8 sm:px-14 sm:py-14 w-full'>
                 <div className='flex items-center justify-between mb-2'>
@@ -39,9 +41,11 @@ function ScheduleContainer() {
                             <div className='flex items-center gap-4'>
                                 <Button variant='secondary' className='gap-2' onClick={() => setVisible(true)}>
                                     <Plus width={22} height={22} className='w-4 h-4' fill='currentColor' />
-                                    New Schedule
+                                    {t('server.schedules.new')}
                                 </Button>
-                                <span className='text-sm text-zinc-300'>{schedules.length} schedule(s)</span>
+                                <span className='text-sm text-zinc-300'>
+                                    {t('server.schedules.count', { count: schedules.length })}
+                                </span>
                             </div>
                         </Can>
                     )}
@@ -50,7 +54,7 @@ function ScheduleContainer() {
                     <div className='flex items-center justify-center py-12'>
                         <div className='flex flex-col items-center gap-3'>
                             <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-brand' />
-                            <p className='text-sm text-neutral-400'>Loading schedules...</p>
+                            <p className='text-sm text-neutral-400'>{t('server.schedules.loading')}</p>
                         </div>
                     </div>
                 ) : schedules.length === 0 ? (
@@ -70,9 +74,11 @@ function ScheduleContainer() {
                                     />
                                 </svg>
                             </div>
-                            <h4 className='text-lg font-medium text-zinc-200 mb-2'>No schedules found</h4>
+                            <h4 className='text-lg font-medium text-zinc-200 mb-2'>
+                                {t('server.schedules.empty_title')}
+                            </h4>
                             <p className='text-sm text-zinc-400 max-w-sm text-center'>
-                                Your server does not have any scheduled tasks. Create one to automate server management.
+                                {t('server.schedules.empty_description')}
                             </p>
                         </div>
                     </div>

@@ -1,0 +1,68 @@
+<?php
+
+return [
+    'notices' => [
+        'created' => 'S\'ha creat correctament un niu nou, :name.',
+        'deleted' => 'S\'ha eliminat correctament el niu sol·licitat del panell.',
+        'updated' => 'S\'han actualitzat correctament les opcions de configuració del niu.',
+    ],
+    'eggs' => [
+        'notices' => [
+            'imported' => 'S\'ha importat correctament aquest ou i les seves variables associades.',
+            'import_url_host' => 'L\'URL d\'importació de l\'ou no pertany a un amfitrió permès.',
+            'import_url_scheme' => 'L\'esquema de l\'URL d\'importació de l\'ou no és vàlid.',
+            'import_fetch_failed' => 'No s\'ha pogut descarregar l\'ou des de l\'URL.',
+            'updated_via_import' => 'Aquest ou s\'ha actualitzat utilitzant el fitxer proporcionat.',
+            'deleted' => 'S\'ha eliminat correctament l\'ou sol·licitat del panell.',
+            'updated' => 'La configuració de l\'ou s\'ha actualitzat correctament.',
+            'script_updated' => 'L\'script d\'instal·lació de l\'ou s\'ha actualitzat i s\'executarà sempre que s\'instal·lin servidors.',
+            'egg_created' => 'S\'ha creat correctament un ou nou. Hauràs de reiniciar qualsevol dimoni en execució per aplicar aquest ou nou.',
+        ],
+    ],
+    'variables' => [
+        'notices' => [
+            'variable_deleted' => 'La variable ":variable" s\'ha eliminat i ja no estarà disponible per als servidors un cop reconstruïts.',
+            'variable_updated' => 'La variable ":variable" s\'ha actualitzat. Hauràs de reconstruir qualsevol servidor que utilitzi aquesta variable per aplicar els canvis.',
+            'variable_created' => 'S\'ha creat correctament una variable nova i s\'ha assignat a aquest ou.',
+        ],
+    ],
+    'index' => [
+        'title' => 'Nius',
+        'subtitle' => 'Tots els nius disponibles actualment en aquest sistema.',
+        'warning' => '<strong>Els ous són potents</strong>: modificar-los incorrectament pot trencar els teus servidors. Evita editar els ous predeterminats tret que sàpigues què fas.',
+        'configured_nests' => 'Nius configurats',
+        'import_egg' => 'Importa un ou',
+        'import_egg_from_url' => 'Importa un ou des d\'un URL',
+        'create_new' => 'Crea\'n un de nou',
+        'table_description' => 'Descripció',
+        'table_eggs' => 'Ous',
+        'import_modal_title' => 'Importa un ou',
+        'egg_file' => 'Fitxer de l\'ou',
+        'egg_file_help' => 'Selecciona el fitxer <code>.json</code> de l\'ou nou que vols importar.',
+        'associated_nest' => 'Niu associat',
+        'associated_nest_help' => 'Selecciona al desplegable el niu amb el qual s\'associarà aquest ou. Si vols associar-lo amb un niu nou, hauràs de crear aquest niu abans de continuar.',
+        'import_button' => 'Importa',
+        'egg_url' => 'URL de l\'ou',
+        'egg_url_help' => 'Escriu l\'URL del fitxer de l\'ou nou que vols importar.',
+    ],
+    'new' => [
+        'title' => 'Niu nou',
+        'subtitle' => 'Configura un niu nou per desplegar-lo a tots els nodes.',
+        'name_help' => 'Hauria de ser un nom de categoria descriptiu que englobi tots els ous del niu.',
+        'description' => 'Descripció',
+    ],
+    'view' => [
+        'title' => 'Nius &rarr; :name',
+        'name_help' => 'Hauria de ser un nom de categoria descriptiu que englobi totes les opcions del servei.',
+        'description' => 'Descripció',
+        'nest_id' => 'ID del niu',
+        'nest_id_help' => 'Un ID únic utilitzat per identificar aquest niu internament i a través de l\'API.',
+        'author' => 'Autor',
+        'author_help' => 'L\'autor d\'aquesta opció de servei. Adreça les teves preguntes i problemes a ell, tret que sigui una opció oficial creada per <code>support@pterodactyl.io</code>.',
+        'uuid' => 'UUID',
+        'uuid_help' => 'Un UUID que s\'assigna a tots els servidors que utilitzen aquesta opció amb finalitats d\'identificació.',
+        'nest_eggs' => 'Ous del niu',
+        'new_egg' => 'Ou nou',
+        'delete_js' => ' Elimina el niu',
+    ],
+];

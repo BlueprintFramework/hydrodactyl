@@ -59,7 +59,7 @@ class BulkPowerActionCommand extends Command
         }
 
         $count = $this->getQueryBuilder($servers, $nodes)->count();
-        if (!$this->confirm(trans('command/messages.server.power.confirm', ['action' => $action, 'count' => $count])) && $this->input->isInteractive()) {
+        if (!$this->confirm(__('command/messages.server.power.confirm', ['action' => $action, 'count' => $count])) && $this->input->isInteractive()) {
             return;
         }
 
@@ -71,7 +71,7 @@ class BulkPowerActionCommand extends Command
             try {
                 $powerRepository->setServer($server)->send($action);
             } catch (DaemonConnectionException $exception) {
-                $this->output->error(trans('command/messages.server.power.action_failed', [
+                $this->output->error(__('command/messages.server.power.action_failed', [
                     'name' => $server->name,
                     'id' => $server->id,
                     'node' => $server->node->name,

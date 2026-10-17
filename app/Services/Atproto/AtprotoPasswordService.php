@@ -44,7 +44,7 @@ class AtprotoPasswordService
     public function describe(): array
     {
         $result = $this->request('GET', 'com.atproto.server.getSession');
-        $this->assertOk($result, 'get the AT Protocol session');
+        $this->assertOk($result, __('exceptions.atproto.action_get_session'));
 
         return $result['data'];
     }
@@ -66,7 +66,7 @@ class AtprotoPasswordService
             return null;
         }
 
-        $this->assertOk($result, "fetch {$collection}/{$rkey}");
+        $this->assertOk($result, __('exceptions.atproto.action_fetch_record', ['target' => "{$collection}/{$rkey}"]));
 
         return $result['data'];
     }
@@ -88,7 +88,7 @@ class AtprotoPasswordService
         }
 
         $result = $this->request('POST', 'com.atproto.repo.putRecord', ['json' => $body]);
-        $this->assertOk($result, "write {$collection}/{$rkey}");
+        $this->assertOk($result, __('exceptions.atproto.action_write_record', ['target' => "{$collection}/{$rkey}"]));
 
         return $result['data'];
     }
@@ -99,11 +99,11 @@ class AtprotoPasswordService
     public function validateConfiguration(): void
     {
         if (empty($this->config['identifier'])) {
-            throw AtprotoOAuthException::misconfigured('missing the AT Protocol handle or DID.');
+            throw AtprotoOAuthException::misconfigured(__('exceptions.atproto.reason_missing_handle'));
         }
 
         if (empty($this->config['app_password'])) {
-            throw AtprotoOAuthException::misconfigured('missing the AT Protocol app password.');
+            throw AtprotoOAuthException::misconfigured(__('exceptions.atproto.reason_missing_app_password'));
         }
     }
 
@@ -128,11 +128,11 @@ class AtprotoPasswordService
         ]);
 
         if ($result['status'] === 401 || ($result['data']['error'] ?? null) === 'Unauthorized') {
-            throw AtprotoOAuthException::authorizationFailed('the PDS rejected the handle or app password.');
+            throw AtprotoOAuthException::authorizationFailed(__('exceptions.atproto.reason_password_rejected'));
         }
 
         if ($result['status'] < 200 || $result['status'] >= 300 || empty($result['data']['accessJwt']) || empty($result['data']['did'])) {
-            throw AtprotoOAuthException::authorizationFailed($this->errorDetail($result, 'could not create an AT Protocol session'));
+            throw AtprotoOAuthException::authorizationFailed($this->errorDetail($result, __('exceptions.atproto.reason_session_create_failed')));
         }
 
         $this->accessJwt = (string) $result['data']['accessJwt'];
@@ -235,7 +235,10 @@ class AtprotoPasswordService
     private function assertOk(array $result, string $what): void
     {
         if ($result['status'] < 200 || $result['status'] >= 300) {
-            throw AtprotoOAuthException::requestFailed("could not {$what}: " . $this->errorDetail($result, 'the PDS rejected the request'));
+            throw AtprotoOAuthException::requestFailed(__('exceptions.atproto.reason_action_failed', [
+                'action' => $what,
+                'detail' => $this->errorDetail($result, __('exceptions.atproto.reason_pds_rejected')),
+            ]));
         }
     }
 
@@ -295,7 +298,7 @@ class AtprotoPasswordService
         $result = $this->sendPublic(self::RESOLVE_HANDLE_URL . '?handle=' . rawurlencode($handle));
 
         if ($result['status'] !== 200 || empty($result['data']['did'])) {
-            throw AtprotoOAuthException::discoveryFailed("could not resolve the handle \"{$handle}\".");
+            throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_handle_unresolved', ['handle' => $handle]));
         }
 
         return (string) $result['data']['did'];
@@ -314,7 +317,7 @@ class AtprotoPasswordService
             }
         }
 
-        throw AtprotoOAuthException::discoveryFailed('the DID document does not advertise a PDS endpoint.');
+        throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_no_pds'));
     }
 
     private function didDocumentUrl(string $did): string
@@ -331,7 +334,7 @@ class AtprotoPasswordService
             return 'https://' . $host . $path;
         }
 
-        throw AtprotoOAuthException::discoveryFailed("unsupported DID method in \"{$did}\".");
+        throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_unsupported_did', ['did' => $did]));
     }
 
     /**

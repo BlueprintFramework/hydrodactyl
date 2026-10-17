@@ -12,6 +12,9 @@ import {
 import { Dialog } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
+import { formatNumber } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 import { destinationFolder } from './eggFeatures';
@@ -33,21 +36,27 @@ interface VersionPickerProps {
     onInstalled?: (filename: string, directory: string) => void;
 }
 
-const formatBytes = (bytes: number | null | undefined): string => {
+const formatBytes = (bytes: number | null | undefined, locale: string): string => {
     if (!bytes) return '—';
-    if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
-    if (bytes >= 1_000) return `${(bytes / 1_000).toFixed(0)} KB`;
+    if (bytes >= 1_000_000) {
+        return `${formatNumber(bytes / 1_000_000, locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} MB`;
+    }
+
+    if (bytes >= 1_000) {
+        return `${formatNumber(bytes / 1_000, locale, { maximumFractionDigits: 0 })} KB`;
+    }
+
     return `${bytes} B`;
 };
 
-const TYPE_BADGE: Record<string, { label: string; className: string }> = {
-    release: { label: 'Release', className: 'bg-brand-400/20 text-brand-400' },
-    beta: { label: 'Beta', className: 'bg-amber-500/20 text-amber-400' },
-    alpha: { label: 'Alpha', className: 'bg-red-500/20 text-red-400' },
+const TYPE_BADGE: Record<string, { label: TranslationKey; className: string }> = {
+    release: { label: 'server.installer.version_type_release', className: 'bg-brand-400/20 text-brand-400' },
+    beta: { label: 'server.installer.version_type_beta', className: 'bg-amber-500/20 text-amber-400' },
+    alpha: { label: 'server.installer.version_type_alpha', className: 'bg-red-500/20 text-red-400' },
 };
 
-const BADGE_FALLBACK: { label: string; className: string } = {
-    label: 'Other',
+const BADGE_FALLBACK: { label: TranslationKey; className: string } = {
+    label: 'server.installer.version_type_other',
     className: 'bg-mocha-300/40 text-cream-400/60',
 };
 
@@ -63,6 +72,7 @@ const VersionPicker = ({
     installedEntry,
     onInstalled,
 }: VersionPickerProps) => {
+    const { t, locale } = useTranslation();
     const [versions, setVersions] = useState<MarketplaceVersion[]>([]);
     const [loading, setLoading] = useState(false);
     const [installingId, setInstallingId] = useState<string | null>(null);
@@ -131,11 +141,13 @@ const VersionPicker = ({
                 // Non-fatal: the file is already on disk, manifest is best-effort.
             }
 
-            toast.success(`Installed ${resolved.filename} into ${targetDirectory}/`);
+            toast.success(
+                t('server.installer.install_success', { filename: resolved.filename, directory: targetDirectory }),
+            );
             onInstalled?.(resolved.filename, targetDirectory);
             onClose();
         } catch (err) {
-            toast.error(httpErrorToHuman(err) || 'Failed to install the file.');
+            toast.error(httpErrorToHuman(err) || t('server.installer.error_install'));
         } finally {
             setInstallingId(null);
         }
@@ -147,15 +159,15 @@ const VersionPicker = ({
         <Dialog
             open={open}
             onClose={onClose}
-            title={`${installedEntry ? 'Manage' : 'Install'} ${project.title}`}
-            description={`${SOURCE_LABELS[source] ?? source} · ${project.author || 'Unknown author'}`}
+            title={`${installedEntry ? t('server.installer.manage') : t('server.installer.install')} ${project.title}`}
+            description={`${SOURCE_LABELS[source] ?? source} · ${project.author || t('server.installer.unknown_author')}`}
         >
             <div className='space-y-3'>
                 {installedEntry && (
                     <div className='flex items-center gap-2 rounded-lg border border-brand-400/30 bg-brand-400/10 p-2 text-xs text-brand-400'>
                         <Check width={14} height={14} fill='currentColor' />
                         <span>
-                            Currently installed: <strong>{installedEntry.version_name}</strong> (
+                            {t('server.installer.currently_installed')} <strong>{installedEntry.version_name}</strong> (
                             {installedEntry.filename})
                         </span>
                     </div>
@@ -164,7 +176,7 @@ const VersionPicker = ({
                 {loading && (
                     <div className='flex items-center justify-center gap-2 py-10 text-cream-400/70'>
                         <Spinner size='small' />
-                        <span className='text-sm'>Loading versions…</span>
+                        <span className='text-sm'>{t('server.installer.loading_versions')}</span>
                     </div>
                 )}
 
@@ -172,7 +184,9 @@ const VersionPicker = ({
 
                 {!loading && !error && versions.length === 0 && (
                     <p className='py-10 text-center text-sm text-cream-400/60'>
-                        No versions available{loader ? ` for ${loader}` : ''}. Try a different loader.
+                        {loader
+                            ? t('server.installer.no_versions_loader', { loader })
+                            : t('server.installer.no_versions')}
                     </p>
                 )}
 
@@ -196,12 +210,12 @@ const VersionPicker = ({
                                                 {version.name}
                                             </span>
                                             <span className={cn('rounded px-1.5 py-0.5 text-[10px]', badge.className)}>
-                                                {badge.label}
+                                                {t(badge.label)}
                                             </span>
                                             {isInstalledVersion && (
                                                 <span className='flex items-center gap-1 rounded bg-brand-400/20 px-1.5 py-0.5 text-[10px] font-medium text-brand-400'>
                                                     <Check width={10} height={10} fill='currentColor' />
-                                                    Installed
+                                                    {t('server.installer.installed')}
                                                 </span>
                                             )}
                                         </div>
@@ -213,7 +227,7 @@ const VersionPicker = ({
                                                 </span>
                                             )}
                                             {version.loaders.length > 0 && <span>{version.loaders.join(', ')}</span>}
-                                            <span>{formatBytes(version.size)}</span>
+                                            <span>{formatBytes(version.size, locale)}</span>
                                         </div>
                                     </div>
                                     <Button
@@ -230,7 +244,11 @@ const VersionPicker = ({
                                         ) : (
                                             <ArrowDownToLine width={16} height={16} fill='currentColor' />
                                         )}
-                                        {installing ? 'Installing' : isInstalledVersion ? 'Reinstall' : 'Install'}
+                                        {installing
+                                            ? t('server.installer.installing')
+                                            : isInstalledVersion
+                                              ? t('server.installer.reinstall')
+                                              : t('server.installer.install')}
                                     </Button>
                                 </div>
                             );

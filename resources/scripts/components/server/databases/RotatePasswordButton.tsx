@@ -7,6 +7,7 @@ import type { ServerDatabase } from '@/api/server/databases/getServerDatabases';
 import rotateDatabasePassword from '@/api/server/databases/rotateDatabasePassword';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
@@ -18,6 +19,7 @@ const RotatePasswordButton = ({
     databaseId: string;
     onUpdate: (database: ServerDatabase) => void;
 }) => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const { addFlash, clearFlashes } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
     const server = ServerContext.useStoreState((state) => state.server.data);
@@ -34,13 +36,13 @@ const RotatePasswordButton = ({
         rotateDatabasePassword(server.uuid, databaseId)
             .then((database) => {
                 onUpdate(database);
-                toast.success('A new password was generated');
+                toast.success(t('server.databases.password_rotated'));
             })
             .catch((error) => {
                 console.error(error);
                 addFlash({
                     type: 'error',
-                    title: 'Error',
+                    title: t('common.error'),
                     message: httpErrorToHuman(error),
                     key: 'database-connection-modal',
                 });

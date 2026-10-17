@@ -7,6 +7,7 @@ import Input from '@/components/elements/Input';
 import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import RotatePasswordButton from '@/components/server/databases/RotatePasswordButton';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const Label = styled.label`
   display: inline-block;
@@ -21,6 +22,7 @@ interface Props extends RequiredModalProps {
 }
 
 const DatabaseConnectionModal = ({ database, onRotate, visible, onDismissed, ...props }: Props) => {
+    const { t } = useTranslation();
     const jdbcConnectionString = `jdbc:mysql://${database.username}${database.password ? `:${encodeURIComponent(database.password)}` : ''}@${database.connectionString}/${database.name}`;
 
     const preventFocus = (e: MouseEvent<HTMLInputElement>) => e.preventDefault();
@@ -30,14 +32,14 @@ const DatabaseConnectionModal = ({ database, onRotate, visible, onDismissed, ...
             visible={visible}
             onDismissed={onDismissed}
             {...props}
-            title='Database connection details'
+            title={t('server.databases.connection_details')}
             closeButton={true}
         >
             <FlashMessageRender byKey={'database-connection-modal'} />
             <div className='flex flex-col min-w-full gap-4'>
                 <div className='grid gap-4 sm:grid-cols-2 min-w-full'>
                     <div className='flex flex-col'>
-                        <Label>Endpoint</Label>
+                        <Label>{t('server.databases.endpoint')}</Label>
                         <CopyOnClick text={database.connectionString}>
                             <Input
                                 type={'text'}
@@ -49,7 +51,7 @@ const DatabaseConnectionModal = ({ database, onRotate, visible, onDismissed, ...
                         </CopyOnClick>
                     </div>
                     <div className='flex flex-col'>
-                        <Label>Connections from</Label>
+                        <Label>{t('server.databases.connections_from')}</Label>
                         <CopyOnClick text={database.allowConnectionsFrom}>
                             <Input
                                 type={'text'}
@@ -61,7 +63,7 @@ const DatabaseConnectionModal = ({ database, onRotate, visible, onDismissed, ...
                         </CopyOnClick>
                     </div>
                     <div className='flex flex-col'>
-                        <Label>Username</Label>
+                        <Label>{t('server.databases.username')}</Label>
                         <CopyOnClick text={database.username}>
                             <Input
                                 type={'text'}
@@ -74,7 +76,7 @@ const DatabaseConnectionModal = ({ database, onRotate, visible, onDismissed, ...
                     </div>
                     <Can action={'database.view_password'}>
                         <div className='flex flex-col'>
-                            <Label>Password</Label>
+                            <Label>{t('server.databases.password')}</Label>
                             <div className='relative min-w-full'>
                                 <CopyOnClick text={database.password} showInNotification={false}>
                                     <Input
@@ -96,7 +98,7 @@ const DatabaseConnectionModal = ({ database, onRotate, visible, onDismissed, ...
                 </div>
                 <div className='flex flex-col'>
                     <div className='flex flex-row gap-2 align-middle items-center'>
-                        <Label>JDBC Connection String</Label>
+                        <Label>{t('server.databases.jdbc_connection_string')}</Label>
                     </div>
                     <CopyOnClick text={jdbcConnectionString} showInNotification={false}>
                         <Input

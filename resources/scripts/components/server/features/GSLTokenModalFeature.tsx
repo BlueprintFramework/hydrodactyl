@@ -6,6 +6,7 @@ import Modal from '@/components/elements/Modal';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -14,6 +15,7 @@ interface Values {
 }
 
 const GSLTokenModalFeature = () => {
+    const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -71,26 +73,23 @@ const GSLTokenModalFeature = () => {
                 onDismissed={() => setVisible(false)}
                 closeOnBackground={false}
                 showSpinnerOverlay={loading}
-                title='Invalid GSL token!'
+                title={t('server.features.gsl_token.title')}
             >
                 <FlashMessageRender key={'feature:gslToken'} />
                 <Form>
-                    <p>It seems like your Gameserver Login Token (GSL token) is invalid or has expired.</p>
-                    <p className={`mt-3`}>
-                        You can either generate a new one and enter it below or leave the field blank to remove it
-                        completely.
-                    </p>
+                    <p>{t('server.features.gsl_token.description')}</p>
+                    <p className={`mt-3`}>{t('server.features.gsl_token.instructions')}</p>
                     <div className={`sm:flex items-center mt-6`}>
                         <Field
                             name={'gslToken'}
-                            label={'GSL Token'}
-                            description={'Visit https://steamcommunity.com/dev/managegameservers to generate a token.'}
+                            label={t('server.features.gsl_token.token_label')}
+                            description={t('server.features.gsl_token.token_description')}
                             autoFocus
                         />
                     </div>
                     <div className={`my-6 sm:flex items-center justify-end`}>
                         <Button variant='attention' type={'submit'}>
-                            Update GSL Token
+                            {t('server.features.gsl_token.update')}
                         </Button>
                     </div>
                 </Form>

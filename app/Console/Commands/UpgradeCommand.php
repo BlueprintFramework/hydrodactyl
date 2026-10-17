@@ -16,7 +16,7 @@ class UpgradeCommand extends Command
 
     public function handle()
     {
-        $this->error('This command is currently disabled.');
+        $this->error(__('command/messages.upgrade.disabled'));
         return;
     }
 }

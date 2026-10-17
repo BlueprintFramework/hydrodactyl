@@ -24,7 +24,7 @@ class AllocationDeletionService
     public function handle(Allocation $allocation): int
     {
         if (!is_null($allocation->server_id)) {
-            throw new ServerUsingAllocationException(trans('exceptions.allocations.server_using'));
+            throw new ServerUsingAllocationException(__('exceptions.allocations.server_using'));
         }
 
         return $this->repository->delete($allocation->id);

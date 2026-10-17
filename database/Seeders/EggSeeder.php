@@ -58,7 +58,7 @@ class EggSeeder extends Seeder
     {
         $files = new \DirectoryIterator(database_path('Seeders/eggs/' . kebab_case($nest->name)));
 
-        $this->command->alert('Updating Eggs for Nest: ' . $nest->name);
+        $this->command->alert(__('command/messages.seeders.updating_eggs_for_nest', ['nest' => $nest->name]));
         /** @var \DirectoryIterator $file */
         foreach ($files as $file) {
             if (!$file->isFile() || !$file->isReadable()) {
@@ -75,10 +75,10 @@ class EggSeeder extends Seeder
 
             if ($egg instanceof Egg) {
                 $this->updateImporterService->handle($egg, $file);
-                $this->command->info('Updated ' . $decoded['name']);
+                $this->command->info(__('command/messages.seeders.egg_updated', ['egg' => $decoded['name']]));
             } else {
                 $this->importerService->handle($file, $nest->id);
-                $this->command->comment('Created ' . $decoded['name']);
+                $this->command->comment(__('command/messages.seeders.egg_created', ['egg' => $decoded['name']]));
             }
         }
 

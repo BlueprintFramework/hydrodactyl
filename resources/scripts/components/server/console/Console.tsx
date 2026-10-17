@@ -16,6 +16,7 @@ import { getTerminalBufferText } from '@/components/server/console/consoleBuffer
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import { Button } from '@/components/ui/button';
 import KeyboardShortcut from '@/components/ui/keyboard-shortcut';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { cn } from '@/lib/utils';
 import { usePermissions } from '@/plugins/usePermissions';
@@ -57,6 +58,7 @@ const terminalProps: ITerminalOptions = {
 };
 
 const Console = () => {
+    const { t } = useTranslation();
     const TERMINAL_PRELUDE = '\u001b[1m\u001b[33mcontainer@hydrodactyl~ \u001b[0m';
     const ref = useRef<HTMLDivElement>(null);
     const resizeObserverRef = useRef<ResizeObserver | null>(null);
@@ -64,7 +66,18 @@ const Console = () => {
     const fitAddon = useMemo(() => new FitAddon(), []);
     const searchAddon = useMemo(() => new SearchAddon(), []);
     const webLinksAddon = useMemo(() => new WebLinksAddon(), []);
-    const scrollDownHelperAddon = useMemo(() => new ScrollDownHelperAddon(), []);
+    const latestT = useRef(t);
+    useEffect(() => {
+        latestT.current = t;
+    }, [t]);
+    const scrollDownHelperAddon = useMemo(
+        () =>
+            new ScrollDownHelperAddon(() => ({
+                ariaLabel: latestT.current('server.console.scroll_aria'),
+                title: latestT.current('server.console.scroll_title'),
+            })),
+        [],
+    );
     const { connected, instance } = ServerContext.useStoreState((state) => state.socket);
     const [canSendCommands] = usePermissions(['control.console']);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.id);
@@ -120,11 +133,11 @@ const Console = () => {
             switch (status) {
                 // Sent by either the source or target node if a failure occurs.
                 case 'failure':
-                    terminal.writeln(`${TERMINAL_PRELUDE}Transfer has failed.\u001b[0m`);
+                    terminal.writeln(`${TERMINAL_PRELUDE}${t('server.console.transfer_failed')}\u001b[0m`);
                     return;
             }
         },
-        [terminal],
+        [terminal, t],
     );
 
     const handleDaemonErrorOutput = useCallback(
@@ -134,8 +147,9 @@ const Console = () => {
     );
 
     const handlePowerChangeEvent = useCallback(
-        (state: string) => terminal.writeln(`${TERMINAL_PRELUDE}Server marked as ${state}...\u001b[0m`),
-        [terminal],
+        (state: string) =>
+            terminal.writeln(`${TERMINAL_PRELUDE}${t('server.console.server_marked_as', { state })}\u001b[0m`),
+        [terminal, t],
     );
 
     const handleCommandKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -218,12 +232,12 @@ const Console = () => {
         const content = getTerminalBufferText(terminal.buffer.active);
 
         if (!content) {
-            toast.error('There is nothing in the console to copy yet.');
+            toast.error(t('server.console.nothing_to_copy'));
             return;
         }
 
         if (!navigator.clipboard) {
-            toast.error('Clipboard is not available in this context.');
+            toast.error(t('server.console.clipboard_unavailable'));
             return;
         }
 
@@ -231,14 +245,14 @@ const Console = () => {
             .writeText(content)
             .then(() => {
                 setCopiedConsole(true);
-                toast.success('Copied console output to clipboard.');
+                toast.success(t('server.console.copied_to_clipboard'));
 
                 if (copyResetTimerRef.current) {
                     clearTimeout(copyResetTimerRef.current);
                 }
                 copyResetTimerRef.current = setTimeout(() => setCopiedConsole(false), 2000);
             })
-            .catch(() => toast.error('Failed to copy console output to the clipboard.'));
+            .catch(() => toast.error(t('server.console.copy_failed')));
     }, [terminal]);
 
     useEffect(
@@ -398,8 +412,8 @@ const Console = () => {
                         shape='round'
                         className='absolute top-4 right-4 z-20 gap-1.5 bg-mocha-400/90 backdrop-blur'
                         onClick={handleCopyConsole}
-                        aria-label={'Copy full console output'}
-                        title={'Copy full console output'}
+                        aria-label={t('server.console.copy_full_output')}
+                        title={t('server.console.copy_full_output')}
                     >
                         <HugeiconsIcon
                             size={16}
@@ -407,7 +421,7 @@ const Console = () => {
                             icon={copiedConsole ? Tick02Icon : Copy01Icon}
                             className='size-4'
                         />
-                        {copiedConsole ? 'Copied' : 'Copy'}
+                        {copiedConsole ? t('server.console.copied') : t('server.console.copy')}
                     </Button>
                 </div>
 
@@ -417,8 +431,8 @@ const Console = () => {
                             ref={inputRef}
                             className='w-full'
                             type={'text'}
-                            placeholder={'Enter a command'}
-                            aria-label={'Console command input.'}
+                            placeholder={t('server.console.enter_command')}
+                            aria-label={t('server.console.command_input_aria')}
                             disabled={!instance || !connected}
                             onKeyDown={handleCommandKeyDown}
                             autoCorrect={'off'}

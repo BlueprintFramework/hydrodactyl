@@ -3,11 +3,13 @@ import { useNode } from '@/api/admin/useNodes';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 const tabClass = 'rounded-lg px-3 py-1.5 text-sm transition-colors';
 
 const NodeLayout = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data: node, error, isLoading } = useNode(id);
 
@@ -21,9 +23,9 @@ const NodeLayout = () => {
 
     if (error || !node) {
         return (
-            <PageContentBlock title='Node'>
+            <PageContentBlock title={t('admin.nodes.title_singular')}>
                 <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-8 text-center text-sm text-cream-400/60'>
-                    That node could not be found.
+                    {t('admin.nodes.not_found')}
                 </div>
             </PageContentBlock>
         );
@@ -31,11 +33,11 @@ const NodeLayout = () => {
 
     const base = `/nodes/${node.id}`;
     const tabs = [
-        { label: 'About', to: base, end: true },
-        { label: 'Settings', to: `${base}/settings`, end: false },
-        { label: 'Configuration', to: `${base}/configuration`, end: false },
-        { label: 'Allocation', to: `${base}/allocation`, end: false },
-        { label: 'Servers', to: `${base}/servers`, end: false },
+        { label: t('admin.nodes.tab_about'), to: base, end: true },
+        { label: t('admin.nodes.tab_settings'), to: `${base}/settings`, end: false },
+        { label: t('admin.nodes.tab_configuration'), to: `${base}/configuration`, end: false },
+        { label: t('admin.nodes.tab_allocation'), to: `${base}/allocation`, end: false },
+        { label: t('admin.nodes.tab_servers'), to: `${base}/servers`, end: false },
     ];
 
     return (

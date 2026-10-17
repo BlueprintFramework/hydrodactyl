@@ -17,6 +17,7 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const emptyValues: DatabaseHostValues = {
     name: '',
@@ -36,6 +37,7 @@ const CreateHostDialog = ({
     onClose: () => void;
     onCreated: (host: AdminDatabaseHost) => void;
 }) => {
+    const { t } = useTranslation();
     const [values, setValues] = useState<DatabaseHostValues>(emptyValues);
     const [submitting, setSubmitting] = useState(false);
     const [testing, setTesting] = useState(false);
@@ -67,7 +69,7 @@ const CreateHostDialog = ({
         } catch (error) {
             setTestResult({
                 success: false,
-                message: errorToMessage(error, 'Failed to connect to the database host.'),
+                message: errorToMessage(error, t('admin.databases.test_failed')),
             });
         } finally {
             setTesting(false);
@@ -80,21 +82,21 @@ const CreateHostDialog = ({
 
         try {
             const host = await createDatabaseHost(values);
-            toast.success('Database host created.');
+            toast.success(t('admin.databases.created'));
             setValues(emptyValues);
             setTestResult(null);
             onCreated(host);
             onClose();
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to create the database host.'));
+            toast.error(errorToMessage(error, t('admin.databases.create_failed')));
         } finally {
             setSubmitting(false);
         }
     };
 
     const nodeOptions = [
-        { value: '', label: 'None' },
+        { value: '', label: t('common.none') },
         ...(options?.nodes ?? []).map((node) => ({
             value: String(node.id),
             label: node.name,
@@ -103,7 +105,7 @@ const CreateHostDialog = ({
     ];
 
     return (
-        <Dialog open={open} title='Create Database Host' onClose={close} preventExternalClose={submitting}>
+        <Dialog open={open} title={t('admin.databases.create')} onClose={close} preventExternalClose={submitting}>
             <div className='mt-4'>
                 <form
                     id='create-database-host-form'
@@ -113,25 +115,25 @@ const CreateHostDialog = ({
                     }}
                     className='flex flex-col gap-4'
                 >
-                    <Field
-                        label='Name'
-                        error={errors.name}
-                        hint='A short identifier used to distinguish this database host from others.'
-                    >
+                    <Field label={t('admin.common.name')} error={errors.name} hint={t('admin.databases.name_hint')}>
                         <Input.Text value={values.name} onChange={(event) => set('name', event.target.value)} />
                     </Field>
 
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
                         <div className='sm:col-span-2'>
                             <Field
-                                label='Host'
+                                label={t('admin.databases.host')}
                                 error={errors.host}
-                                hint='The IP address or FQDN used to connect to this MySQL host from the panel.'
+                                hint={t('admin.databases.host_hint')}
                             >
                                 <Input.Text value={values.host} onChange={(event) => set('host', event.target.value)} />
                             </Field>
                         </div>
-                        <Field label='Port' error={errors.port} hint='The MySQL port.'>
+                        <Field
+                            label={t('admin.databases.port')}
+                            error={errors.port}
+                            hint={t('admin.databases.port_hint')}
+                        >
                             <Input.Text
                                 type='number'
                                 value={values.port}
@@ -142,16 +144,20 @@ const CreateHostDialog = ({
 
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                         <Field
-                            label='Username'
+                            label={t('admin.common.username')}
                             error={errors.username}
-                            hint='An account with permission to create users and databases.'
+                            hint={t('admin.databases.username_hint')}
                         >
                             <Input.Text
                                 value={values.username}
                                 onChange={(event) => set('username', event.target.value)}
                             />
                         </Field>
-                        <Field label='Password' error={errors.password} hint='The password for the account above.'>
+                        <Field
+                            label={t('admin.common.password')}
+                            error={errors.password}
+                            hint={t('admin.databases.password_hint')}
+                        >
                             <Input.Text
                                 type='password'
                                 value={values.password}
@@ -161,21 +167,21 @@ const CreateHostDialog = ({
                     </div>
 
                     <Field
-                        label='Linked Node'
+                        label={t('admin.databases.linked_node')}
                         error={errors.node_id}
-                        hint='Only used to default to this host when adding a database to a server on the selected node.'
+                        hint={t('admin.databases.linked_node_hint')}
                     >
                         <Dropdown
                             value={values.node_id}
                             onChange={(value) => set('node_id', value)}
                             options={nodeOptions}
-                            placeholder='None'
+                            placeholder={t('common.none')}
                         />
                     </Field>
 
                     <p className='text-xs text-brand-400'>
-                        The account must have the <code className='font-mono'>WITH GRANT OPTION</code> permission, and
-                        must not be the account the panel itself uses.
+                        {t('admin.databases.grant_notice_prefix')} <code className='font-mono'>WITH GRANT OPTION</code>{' '}
+                        {t('admin.databases.grant_notice_suffix')}
                     </p>
 
                     {testResult && (
@@ -198,13 +204,13 @@ const CreateHostDialog = ({
                             onClick={() => void test()}
                             disabled={testing || submitting}
                         >
-                            {testing ? 'Testing…' : 'Test Connection'}
+                            {testing ? t('admin.databases.testing') : t('admin.databases.test_connection')}
                         </Button>
                         <Button type='button' variant='secondary' onClick={close} disabled={submitting}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button type='submit' form='create-database-host-form' disabled={submitting || testing}>
-                            Create
+                            {t('common.create')}
                         </Button>
                     </Dialog.Footer>
                 </form>
@@ -214,6 +220,7 @@ const CreateHostDialog = ({
 };
 
 const DatabaseHostsContainer = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { data, mutate } = useDatabaseHosts();
     const [createOpen, setCreateOpen] = useState(false);
@@ -227,26 +234,26 @@ const DatabaseHostsContainer = () => {
     }
 
     return (
-        <PageContentBlock title='Database Hosts'>
-            <MainPageHeader direction='column' title='Database Hosts'>
-                <p className='text-sm text-neutral-400'>Database hosts that servers can have databases created on.</p>
+        <PageContentBlock title={t('admin.databases.title')}>
+            <MainPageHeader direction='column' title={t('admin.databases.title')}>
+                <p className='text-sm text-neutral-400'>{t('admin.databases.description')}</p>
             </MainPageHeader>
 
             <div className='mb-4 flex justify-end'>
-                <Button onClick={() => setCreateOpen(true)}>Create Database Host</Button>
+                <Button onClick={() => setCreateOpen(true)}>{t('admin.databases.create')}</Button>
             </div>
 
             <div className='overflow-x-auto rounded-xl border border-mocha-400'>
                 <table className='w-full text-sm'>
                     <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                         <tr className='border-b border-mocha-400'>
-                            <th className='px-4 py-3'>ID</th>
-                            <th className='px-4 py-3'>Name</th>
-                            <th className='px-4 py-3'>Host</th>
-                            <th className='px-4 py-3'>Port</th>
-                            <th className='px-4 py-3'>Username</th>
-                            <th className='px-4 py-3 text-center'>Databases</th>
-                            <th className='px-4 py-3 text-center'>Node</th>
+                            <th className='px-4 py-3'>{t('admin.common.id')}</th>
+                            <th className='px-4 py-3'>{t('admin.common.name')}</th>
+                            <th className='px-4 py-3'>{t('admin.databases.host')}</th>
+                            <th className='px-4 py-3'>{t('admin.databases.port')}</th>
+                            <th className='px-4 py-3'>{t('admin.common.username')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.databases.databases')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.common.node')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -272,7 +279,7 @@ const DatabaseHostsContainer = () => {
                                         </Link>
                                     ) : (
                                         <span className='rounded-full bg-mocha-300/60 px-2 py-0.5 text-[10px] uppercase text-cream-400/70'>
-                                            None
+                                            {t('common.none')}
                                         </span>
                                     )}
                                 </td>
@@ -281,7 +288,7 @@ const DatabaseHostsContainer = () => {
                         {data.length === 0 && (
                             <tr>
                                 <td colSpan={7} className='px-4 py-8 text-center text-cream-400/50'>
-                                    No database hosts have been created.
+                                    {t('admin.databases.empty')}
                                 </td>
                             </tr>
                         )}

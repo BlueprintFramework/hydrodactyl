@@ -1,3 +1,5 @@
+import type { Translate } from '@/i18n/types';
+
 interface EggVariable {
     id: number;
     name: string;
@@ -44,7 +46,11 @@ const blank_egg_prefix = '@';
 
 type FlowStep = 'overview' | 'select-game' | 'select-software' | 'configure' | 'review';
 
-const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables: Record<string, string>): string[] => {
+const validateEnvironmentVariables = (
+    variables: EggVariable[],
+    pendingVariables: Record<string, string>,
+    t: Translate,
+): string[] => {
     const errors: string[] = [];
 
     variables.forEach((variable) => {
@@ -61,7 +67,7 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
         const isNullable = ruleArray.includes('nullable') || !isRequired;
 
         if (isRequired && (!value || value.trim() === '')) {
-            errors.push(`${variable.name} is required.`);
+            errors.push(t('server.software.validation.required', { name: variable.name }));
             return;
         }
 
@@ -75,21 +81,21 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
             switch (ruleName) {
                 case 'string':
                     if (typeof value !== 'string') {
-                        errors.push(`${variable.name} must be a string.`);
+                        errors.push(t('server.software.validation.string', { name: variable.name }));
                     }
                     break;
 
                 case 'integer':
                 case 'numeric':
                     if (value && Number.isNaN(Number(value))) {
-                        errors.push(`${variable.name} must be a number.`);
+                        errors.push(t('server.software.validation.number', { name: variable.name }));
                     }
                     break;
 
                 case 'boolean': {
                     const boolValues = ['true', 'false', '1', '0', 'yes', 'no', 'on', 'off'];
                     if (value && !boolValues.includes(value.toLowerCase())) {
-                        errors.push(`${variable.name} must be true or false.`);
+                        errors.push(t('server.software.validation.boolean', { name: variable.name }));
                     }
                     break;
                 }
@@ -98,7 +104,7 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
                     if (ruleValue && value) {
                         const minValue = parseInt(ruleValue, 10);
                         if (value.length < minValue) {
-                            errors.push(`${variable.name} must be at least ${minValue} characters.`);
+                            errors.push(t('server.software.validation.min', { name: variable.name, min: minValue }));
                         }
                     }
                     break;
@@ -108,7 +114,7 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
                     if (ruleValue && value) {
                         const maxValue = parseInt(ruleValue, 10);
                         if (value.length > maxValue) {
-                            errors.push(`${variable.name} may not be greater than ${maxValue} characters.`);
+                            errors.push(t('server.software.validation.max', { name: variable.name, max: maxValue }));
                         }
                     }
                     break;
@@ -118,7 +124,13 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
                     if (ruleValue && value) {
                         const [min, max] = ruleValue.split(',').map((v) => parseInt(v.trim(), 10));
                         if (value.length < min || value.length > max) {
-                            errors.push(`${variable.name} must be between ${min} and ${max} characters.`);
+                            errors.push(
+                                t('server.software.validation.between', {
+                                    name: variable.name,
+                                    min: min ?? 0,
+                                    max: max ?? 0,
+                                }),
+                            );
                         }
                     }
                     break;
@@ -128,7 +140,12 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
                     if (ruleValue && value) {
                         const allowedValues = ruleValue.split(',').map((v) => v.trim());
                         if (!allowedValues.includes(value)) {
-                            errors.push(`${variable.name} must be one of: ${allowedValues.join(', ')}.`);
+                            errors.push(
+                                t('server.software.validation.one_of', {
+                                    name: variable.name,
+                                    values: allowedValues.join(', '),
+                                }),
+                            );
                         }
                     }
                     break;
@@ -141,7 +158,9 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
                             if (regexMatch) {
                                 const regex = new RegExp(regexMatch[1], regexMatch[2]);
                                 if (!regex.test(value)) {
-                                    errors.push(`${variable.name} format is invalid.`);
+                                    errors.push(
+                                        t('server.software.validation.format_invalid', { name: variable.name }),
+                                    );
                                 }
                             }
                         } catch {
@@ -153,19 +172,19 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
 
                 case 'alpha':
                     if (value && !/^[a-zA-Z]+$/.test(value)) {
-                        errors.push(`${variable.name} may only contain letters.`);
+                        errors.push(t('server.software.validation.only_alpha', { name: variable.name }));
                     }
                     break;
 
                 case 'alpha_num':
                     if (value && !/^[a-zA-Z0-9]+$/.test(value)) {
-                        errors.push(`${variable.name} may only contain letters and numbers.`);
+                        errors.push(t('server.software.validation.only_alpha_num', { name: variable.name }));
                     }
                     break;
 
                 case 'alpha_dash':
                     if (value && !/^[a-zA-Z0-9_-]+$/.test(value)) {
-                        errors.push(`${variable.name} may only contain letters, numbers, dashes and underscores.`);
+                        errors.push(t('server.software.validation.only_alpha_dash', { name: variable.name }));
                     }
                     break;
 
@@ -174,14 +193,14 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
                         try {
                             new URL(value);
                         } catch {
-                            errors.push(`${variable.name} must be a valid URL.`);
+                            errors.push(t('server.software.validation.url', { name: variable.name }));
                         }
                     }
                     break;
 
                 case 'email':
                     if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                        errors.push(`${variable.name} must be a valid email address.`);
+                        errors.push(t('server.software.validation.email', { name: variable.name }));
                     }
                     break;
 
@@ -190,7 +209,7 @@ const validateEnvironmentVariables = (variables: EggVariable[], pendingVariables
                         const ipRegex =
                             /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
                         if (!ipRegex.test(value)) {
-                            errors.push(`${variable.name} must be a valid IP address.`);
+                            errors.push(t('server.software.validation.ip', { name: variable.name }));
                         }
                     }
                     break;

@@ -18,6 +18,7 @@ import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const cardClass = 'flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
 
@@ -30,6 +31,7 @@ const DatabaseHostDetails = ({
     onSaved: () => Promise<unknown>;
     onPageSelect: (page: number) => void;
 }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { data: options } = useDatabaseHostOptions();
     const [values, setValues] = useState<DatabaseHostValues>({
@@ -49,7 +51,7 @@ const DatabaseHostDetails = ({
         setValues((current) => ({ ...current, [key]: value }));
 
     const nodeOptions = [
-        { value: '', label: 'None' },
+        { value: '', label: t('common.none') },
         ...(options?.nodes ?? []).map((node) => ({
             value: String(node.id),
             label: node.name,
@@ -65,10 +67,10 @@ const DatabaseHostDetails = ({
             await updateDatabaseHost(host.id, values);
             await onSaved();
             set('password', '');
-            toast.success('Database host updated.');
+            toast.success(t('admin.databases.updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update the database host.'));
+            toast.error(errorToMessage(error, t('admin.databases.update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -79,10 +81,10 @@ const DatabaseHostDetails = ({
 
         try {
             await deleteDatabaseHost(host.id);
-            toast.success('Database host deleted.');
+            toast.success(t('admin.databases.deleted'));
             navigate('/databases');
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete the database host.'));
+            toast.error(errorToMessage(error, t('admin.databases.delete_failed')));
             setDeleting(false);
             setConfirmDelete(false);
         }
@@ -98,23 +100,27 @@ const DatabaseHostDetails = ({
                     }}
                     className={cardClass}
                 >
-                    <h2 className='text-sm font-semibold text-cream-50'>Host Details</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.databases.details')}</h2>
 
-                    <Field label='Name' error={errors.name}>
+                    <Field label={t('admin.common.name')} error={errors.name}>
                         <Input.Text value={values.name} onChange={(event) => set('name', event.target.value)} />
                     </Field>
 
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
                         <div className='sm:col-span-2'>
                             <Field
-                                label='Host'
+                                label={t('admin.databases.host')}
                                 error={errors.host}
-                                hint='The IP address or FQDN used to connect from the panel.'
+                                hint={t('admin.databases.host_hint_short')}
                             >
                                 <Input.Text value={values.host} onChange={(event) => set('host', event.target.value)} />
                             </Field>
                         </div>
-                        <Field label='Port' error={errors.port} hint='The MySQL port.'>
+                        <Field
+                            label={t('admin.databases.port')}
+                            error={errors.port}
+                            hint={t('admin.databases.port_hint')}
+                        >
                             <Input.Text
                                 type='number'
                                 value={values.port}
@@ -124,16 +130,16 @@ const DatabaseHostDetails = ({
                     </div>
 
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                        <Field label='Username' error={errors.username}>
+                        <Field label={t('admin.common.username')} error={errors.username}>
                             <Input.Text
                                 value={values.username}
                                 onChange={(event) => set('username', event.target.value)}
                             />
                         </Field>
                         <Field
-                            label='Password'
+                            label={t('admin.common.password')}
                             error={errors.password}
-                            hint='Leave blank to keep the current password.'
+                            hint={t('admin.databases.password_keep_hint')}
                         >
                             <Input.Text
                                 type='password'
@@ -144,59 +150,59 @@ const DatabaseHostDetails = ({
                     </div>
 
                     <Field
-                        label='Linked Node'
+                        label={t('admin.databases.linked_node')}
                         error={errors.node_id}
-                        hint='Only used to default to this host when adding a database to a server on the selected node.'
+                        hint={t('admin.databases.linked_node_hint')}
                     >
                         <Dropdown
                             value={values.node_id}
                             onChange={(value) => set('node_id', value)}
                             options={nodeOptions}
-                            placeholder='None'
+                            placeholder={t('common.none')}
                         />
                     </Field>
 
                     <div className='flex justify-end'>
                         <Button type='submit' disabled={submitting}>
-                            Save
+                            {t('common.save')}
                         </Button>
                     </div>
                 </form>
 
                 <div className={cardClass}>
-                    <h2 className='text-sm font-semibold text-cream-50'>Connection</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.databases.connection')}</h2>
 
                     <dl className='grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-2'>
-                        <dt className='text-cream-400/60'>Address</dt>
+                        <dt className='text-cream-400/60'>{t('admin.common.address')}</dt>
                         <dd className='font-mono text-cream-100'>
                             {host.host}:{host.port}
                         </dd>
-                        <dt className='text-cream-400/60'>Username</dt>
+                        <dt className='text-cream-400/60'>{t('admin.common.username')}</dt>
                         <dd className='text-cream-100'>{host.username}</dd>
-                        <dt className='text-cream-400/60'>Databases</dt>
+                        <dt className='text-cream-400/60'>{t('admin.databases.databases')}</dt>
                         <dd className='text-cream-100'>{host.databases.pagination.total}</dd>
                     </dl>
 
                     <p className='text-xs text-brand-400'>
-                        The account must have the <code className='font-mono'>WITH GRANT OPTION</code> permission, and
-                        must not be the account the panel itself uses.
+                        {t('admin.databases.grant_notice_prefix')} <code className='font-mono'>WITH GRANT OPTION</code>{' '}
+                        {t('admin.databases.grant_notice_suffix')}
                     </p>
                 </div>
             </div>
 
             <div className='overflow-hidden rounded-xl border border-mocha-400'>
                 <div className='border-b border-mocha-400 px-4 py-3'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Databases</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.databases.databases')}</h2>
                 </div>
                 <div className='overflow-x-auto'>
                     <table className='w-full text-sm'>
                         <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                             <tr className='border-b border-mocha-400'>
-                                <th className='px-4 py-3'>Server</th>
-                                <th className='px-4 py-3'>Database Name</th>
-                                <th className='px-4 py-3'>Username</th>
-                                <th className='px-4 py-3'>Connections From</th>
-                                <th className='px-4 py-3'>Max Connections</th>
+                                <th className='px-4 py-3'>{t('common.server')}</th>
+                                <th className='px-4 py-3'>{t('admin.databases.database_name')}</th>
+                                <th className='px-4 py-3'>{t('admin.common.username')}</th>
+                                <th className='px-4 py-3'>{t('admin.databases.connections_from')}</th>
+                                <th className='px-4 py-3'>{t('admin.databases.max_connections')}</th>
                                 <th className='px-4 py-3' />
                             </tr>
                         </thead>
@@ -219,12 +225,14 @@ const DatabaseHostDetails = ({
                                     <td className='px-4 py-3 text-cream-400/70'>{database.username}</td>
                                     <td className='px-4 py-3 font-mono text-cream-400/70'>{database.remote}</td>
                                     <td className='px-4 py-3 text-cream-100'>
-                                        {database.max_connections ?? 'Unlimited'}
+                                        {database.max_connections ?? t('admin.databases.unlimited')}
                                     </td>
                                     <td className='px-4 py-3 text-right'>
                                         {database.server && (
                                             <Button asChild size='sm' variant='secondary'>
-                                                <Link to={`/servers/${database.server.id}/database`}>Manage</Link>
+                                                <Link to={`/servers/${database.server.id}/database`}>
+                                                    {t('admin.common.manage')}
+                                                </Link>
                                             </Button>
                                         )}
                                     </td>
@@ -233,7 +241,7 @@ const DatabaseHostDetails = ({
                             {host.databases.items.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className='px-4 py-6 text-center text-cream-400/50'>
-                                        No databases are hosted here.
+                                        {t('admin.databases.no_databases')}
                                     </td>
                                 </tr>
                             )}
@@ -248,35 +256,34 @@ const DatabaseHostDetails = ({
             </div>
 
             <div className='rounded-xl border border-brand-400/40 bg-brand-400/5 p-4'>
-                <h2 className='text-sm font-semibold text-brand-400'>Delete Database Host</h2>
-                <p className='mt-1 text-sm text-cream-400/70'>
-                    A database host must have no databases before it can be deleted.
-                </p>
+                <h2 className='text-sm font-semibold text-brand-400'>{t('admin.databases.delete')}</h2>
+                <p className='mt-1 text-sm text-cream-400/70'>{t('admin.databases.delete_description')}</p>
                 <Button
                     variant='attention'
                     className='mt-3'
                     disabled={host.databases.pagination.total > 0}
                     onClick={() => setConfirmDelete(true)}
                 >
-                    Delete Database Host
+                    {t('admin.databases.delete')}
                 </Button>
             </div>
 
             <Dialog.Confirm
                 open={confirmDelete}
-                title='Delete Database Host'
-                confirm='Delete'
+                title={t('admin.databases.delete')}
+                confirm={t('common.delete')}
                 loading={deleting}
                 onClose={() => setConfirmDelete(false)}
                 onConfirmed={remove}
             >
-                Deleting this database host is permanent and cannot be undone.
+                {t('admin.databases.delete_confirm')}
             </Dialog.Confirm>
         </div>
     );
 };
 
 const DatabaseHostViewContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const [page, setPage] = useState(1);
     const { data: host, error, isLoading, mutate } = useDatabaseHost(id, page);
@@ -291,9 +298,9 @@ const DatabaseHostViewContainer = () => {
 
     if (error || !host) {
         return (
-            <PageContentBlock title='Database Host'>
+            <PageContentBlock title={t('admin.databases.title_singular')}>
                 <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-8 text-center text-sm text-cream-400/60'>
-                    That database host could not be found.
+                    {t('admin.databases.not_found')}
                 </div>
             </PageContentBlock>
         );
@@ -302,7 +309,7 @@ const DatabaseHostViewContainer = () => {
     return (
         <PageContentBlock title={host.name}>
             <MainPageHeader direction='column' title={host.name}>
-                <p className='text-sm text-neutral-400'>Viewing associated databases and details for this host.</p>
+                <p className='text-sm text-neutral-400'>{t('admin.databases.view_description')}</p>
             </MainPageHeader>
 
             <DatabaseHostDetails key={host.id} host={host} onSaved={mutate} onPageSelect={setPage} />

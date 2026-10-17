@@ -19,14 +19,14 @@ class NodeConfigurationCommand extends Command
 
         /** @var Node $node */
         $node = Node::query()->where($column, $this->argument('node'))->firstOr(function () {
-            $this->error('The selected node does not exist.');
+            $this->error(__('command/messages.node.not_found'));
 
             exit(1);
         });
 
         $format = $this->option('format');
         if (!in_array($format, ['yaml', 'yml', 'json'])) {
-            $this->error('Invalid format specified. Valid options are "yaml" and "json".');
+            $this->error(__('command/messages.node.invalid_format'));
 
             return 1;
         }

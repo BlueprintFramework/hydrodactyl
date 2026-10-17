@@ -33,7 +33,7 @@ class StoreSubuserRequest extends SubuserRequest
     public function messages(): array
     {
         return [
-            'email.p_username' => 'Enter an existing username, or an email address to invite someone new.',
+            'email.p_username' => __('exceptions.subusers.invalid_username_hint'),
         ];
     }
 }

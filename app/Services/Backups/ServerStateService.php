@@ -173,8 +173,8 @@ class ServerStateService
                 ->exists();
             
             if (!$nestExists) {
-                $nestName = $state['nest_info']['name'] ?? 'Unknown';
-                $errors[] = "Nest '{$nestName}' (ID: {$state['nest_id']}) no longer exists.";
+                $nestName = $state['nest_info']['name'] ?? __('exceptions.backups.unknown_name');
+                $errors[] = __('exceptions.backups.restore_nest_missing', ['name' => $nestName, 'id' => $state['nest_id']]);
             }
         }
 
@@ -185,8 +185,8 @@ class ServerStateService
                 ->exists();
             
             if (!$eggExists) {
-                $eggName = $state['egg_info']['name'] ?? 'Unknown';
-                $errors[] = "Egg '{$eggName}' (ID: {$state['egg_id']}) no longer exists.";
+                $eggName = $state['egg_info']['name'] ?? __('exceptions.backups.unknown_name');
+                $errors[] = __('exceptions.backups.restore_egg_missing', ['name' => $eggName, 'id' => $state['egg_id']]);
             }
         }
 
@@ -208,7 +208,7 @@ class ServerStateService
             }
             
             if (!empty($missingVariables)) {
-                $warnings[] = 'Some variables from the backup no longer exist in the current egg: ' . implode(', ', $missingVariables);
+                $warnings[] = __('exceptions.backups.restore_variables_missing', ['variables' => implode(', ', $missingVariables)]);
             }
         }
 
@@ -238,9 +238,9 @@ class ServerStateService
         $state = $backup->server_state;
         
         return [
-            'nest_name' => $state['nest_info']['name'] ?? 'Unknown',
-            'egg_name' => $state['egg_info']['name'] ?? 'Unknown',
-            'image' => $state['image'] ?? 'Unknown',
+            'nest_name' => $state['nest_info']['name'] ?? __('exceptions.backups.unknown_name'),
+            'egg_name' => $state['egg_info']['name'] ?? __('exceptions.backups.unknown_name'),
+            'image' => $state['image'] ?? __('exceptions.backups.unknown_name'),
             'variables_count' => count($state['variables'] ?? []),
             'captured_at' => $state['captured_at'] ?? null,
         ];

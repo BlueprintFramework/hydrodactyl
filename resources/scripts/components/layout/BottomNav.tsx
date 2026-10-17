@@ -3,6 +3,7 @@ import { Fragment, memo } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import Can from '@/components/elements/Can';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 export interface BottomNavItem {
@@ -25,6 +26,7 @@ interface BottomNavProps {
 // Hides its scrollbar for a clean native "sliding tab" feel.
 const BottomNav = memo(({ items }: BottomNavProps) => {
     const location = useLocation();
+    const { t } = useTranslation();
 
     if (items.length === 0) return null;
 
@@ -33,7 +35,7 @@ const BottomNav = memo(({ items }: BottomNavProps) => {
 
     return (
         <nav
-            aria-label='Primary navigation'
+            aria-label={t('panel.primary_navigation')}
             className='lg:hidden fixed inset-x-0 bottom-0 z-[9996] border-t border-mocha-400 bg-bg-lowered pb-[env(safe-area-inset-bottom)]'
         >
             <ul className='flex h-14 items-stretch gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>

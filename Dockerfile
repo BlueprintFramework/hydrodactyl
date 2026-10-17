@@ -32,12 +32,12 @@ WORKDIR /app
 
 # Build-time deps & PHP extensions
 RUN apk add --no-cache --virtual .build-deps \
-    libpng-dev libxml2-dev libzip-dev postgresql18-dev \
+    libpng-dev libxml2-dev libzip-dev icu-dev postgresql18-dev \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install bcmath gd pdo pdo_mysql pdo_pgsql zip \
+    && docker-php-ext-install bcmath gd intl pdo pdo_mysql pdo_pgsql zip \
     && apk del .build-deps \
     && apk add --no-cache \
-    libpng libxml2 libzip libpq
+    libpng libxml2 libzip libpq icu-libs
 
 # Runtime packages
 RUN apk add --no-cache \

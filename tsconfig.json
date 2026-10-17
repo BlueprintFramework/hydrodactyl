@@ -8,6 +8,7 @@
         "target": "ES2015",
         "paths": {
             "@/*": ["./resources/scripts/*"],
+            "@lang/*": ["./resources/lang/*"],
             "@definitions/*": ["./resources/scripts/api/definitions/*"],
             "@feature/*": ["./resources/scripts/components/server/features/*"]
         },
@@ -20,8 +21,6 @@
         "allowJs": false,
         "allowSyntheticDefaultImports": true,
         "composite": false,
-        "declaration": true,
-        "declarationMap": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "inlineSources": false,

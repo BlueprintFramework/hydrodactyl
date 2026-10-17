@@ -145,7 +145,7 @@ class BucketController extends Controller
     public function destroy(S3 $s3): JsonResponse
     {
         if ($s3->servers()->exists()) {
-            throw new DisplayException('Cannot delete: bucket is used by servers.');
+            throw new DisplayException(__('exceptions.admin.bucket_in_use'));
         }
 
         $this->deletionService->handle($s3->id);
@@ -186,7 +186,7 @@ class BucketController extends Controller
 
             $bucket = $request->input('bucket_name');
             $key = '_hydrodactyl_test_' . time();
-            $message = 'This is an upload test, If your reading this, it succeeded, happy Servering';
+            $message = __('admin/s3.new.test_file_content');
             $content = str_repeat($message . "\n", (int) (10 * 1024 * 1024 / (strlen($message) + 1)));
 
             $client->putObject([
@@ -198,17 +198,17 @@ class BucketController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Connection successful! A 10MB test file was uploaded as "' . $key . '".',
+                'message' => __('admin/s3.view.details.test_connection_success', ['key' => $key]),
             ]);
         } catch (AwsException $exception) {
             return response()->json([
                 'success' => false,
-                'message' => 'S3 error: ' . ($exception->getAwsErrorMessage() ?: $exception->getMessage()),
+                'message' => __('admin/s3.view.details.test_connection_s3_error', ['error' => $exception->getAwsErrorMessage() ?: $exception->getMessage()]),
             ], 400);
         } catch (\Exception $exception) {
             return response()->json([
                 'success' => false,
-                'message' => 'Connection failed: ' . $exception->getMessage(),
+                'message' => __('admin/s3.view.details.test_connection_failed_error', ['error' => $exception->getMessage()]),
             ], 400);
         }
     }

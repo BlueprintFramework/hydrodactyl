@@ -156,7 +156,7 @@ class AtprotoOAuthService
     public function complete(?string $state, ?string $code, ?string $issuer, ?string $error): AtprotoOauthSession
     {
         if (empty($state)) {
-            throw AtprotoOAuthException::authorizationFailed('the callback did not include a state parameter.');
+            throw AtprotoOAuthException::authorizationFailed(__('exceptions.atproto.reason_state_missing'));
         }
 
         $session = AtprotoOauthSession::query()
@@ -165,7 +165,7 @@ class AtprotoOAuthService
             ->first();
 
         if (!$session) {
-            throw AtprotoOAuthException::authorizationFailed('the authorization request could not be matched or has expired.');
+            throw AtprotoOAuthException::authorizationFailed(__('exceptions.atproto.reason_request_not_matched'));
         }
 
         if ($error !== null && $error !== '') {
@@ -175,11 +175,11 @@ class AtprotoOAuthService
         }
 
         if (empty($code)) {
-            throw AtprotoOAuthException::authorizationFailed('the callback did not include an authorization code.');
+            throw AtprotoOAuthException::authorizationFailed(__('exceptions.atproto.reason_code_missing'));
         }
 
         if ($issuer !== null && $issuer !== '' && $issuer !== $session->authorization_server) {
-            throw AtprotoOAuthException::authorizationFailed('the authorization server issuer did not match the one bound to this request.');
+            throw AtprotoOAuthException::authorizationFailed(__('exceptions.atproto.reason_issuer_mismatch'));
         }
 
         $serverMetadata = $this->authorizationServerMetadata($session->authorization_server);
@@ -203,16 +203,16 @@ class AtprotoOAuthService
             $session->dpop_nonce_as = $result['nonce'];
         }
 
-        $this->assertTokenResponse($result, 'token exchange');
+        $this->assertTokenResponse($result, __('exceptions.atproto.context_token_exchange'));
 
         $data = $result['data'];
 
         if (empty($data['sub']) || $data['sub'] !== $session->account_did) {
-            throw AtprotoOAuthException::authorizationFailed('the authorized account did not match the account that started the request.');
+            throw AtprotoOAuthException::authorizationFailed(__('exceptions.atproto.reason_account_mismatch'));
         }
 
         if (empty($data['refresh_token'])) {
-            throw AtprotoOAuthException::authorizationFailed('the authorization server did not return a refresh token.');
+            throw AtprotoOAuthException::authorizationFailed(__('exceptions.atproto.reason_no_refresh_token'));
         }
 
         $session->fill([
@@ -239,7 +239,7 @@ class AtprotoOAuthService
     public function describeSession(AtprotoOauthSession $session): array
     {
         $result = $this->pdsRequest($session, 'GET', 'com.atproto.server.getSession');
-        $this->assertOk($result, 'get the AT Protocol session');
+        $this->assertOk($result, __('exceptions.atproto.action_get_session'));
 
         return $result['data'];
     }
@@ -261,7 +261,7 @@ class AtprotoOAuthService
             return null;
         }
 
-        $this->assertOk($result, "fetch {$collection}/{$rkey}");
+        $this->assertOk($result, __('exceptions.atproto.action_fetch_record', ['target' => "{$collection}/{$rkey}"]));
 
         return $result['data'];
     }
@@ -283,7 +283,7 @@ class AtprotoOAuthService
         }
 
         $result = $this->pdsRequest($session, 'POST', 'com.atproto.repo.putRecord', ['json' => $body]);
-        $this->assertOk($result, "write {$collection}/{$rkey}");
+        $this->assertOk($result, __('exceptions.atproto.action_write_record', ['target' => "{$collection}/{$rkey}"]));
 
         return $result['data'];
     }
@@ -310,7 +310,7 @@ class AtprotoOAuthService
         $document = $this->fetchDidDocument($did);
 
         if ($handle !== null && !$this->didClaimsHandle($document, $handle)) {
-            throw AtprotoOAuthException::discoveryFailed("the DID document for {$did} does not claim the handle {$handle}.");
+            throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_handle_not_claimed', ['did' => $did, 'handle' => $handle]));
         }
 
         return [
@@ -325,7 +325,7 @@ class AtprotoOAuthService
         $result = $this->send('GET', self::RESOLVE_HANDLE_URL, ['query' => ['handle' => $handle]]);
 
         if ($result['status'] !== 200 || empty($result['data']['did'])) {
-            throw AtprotoOAuthException::discoveryFailed("could not resolve the handle \"{$handle}\".");
+            throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_handle_unresolved', ['handle' => $handle]));
         }
 
         return (string) $result['data']['did'];
@@ -336,7 +336,7 @@ class AtprotoOAuthService
         $result = $this->send('GET', $this->didDocumentUrl($did));
 
         if ($result['status'] !== 200 || empty($result['data'])) {
-            throw AtprotoOAuthException::discoveryFailed("could not fetch the DID document for {$did}.");
+            throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_did_document_unavailable', ['did' => $did]));
         }
 
         return $result['data'];
@@ -377,7 +377,7 @@ class AtprotoOAuthService
             }
         }
 
-        throw AtprotoOAuthException::discoveryFailed('the DID document does not advertise a PDS endpoint.');
+        throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_no_pds'));
     }
 
     private function didDocumentUrl(string $did): string
@@ -394,7 +394,7 @@ class AtprotoOAuthService
             return 'https://' . $host . $path;
         }
 
-        throw AtprotoOAuthException::discoveryFailed("unsupported DID method in \"{$did}\".");
+        throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_unsupported_did', ['did' => $did]));
     }
 
     private function discoverAuthorizationServer(string $pdsUrl): string
@@ -415,31 +415,31 @@ class AtprotoOAuthService
         $result = $this->send('GET', rtrim($issuer, '/') . '/.well-known/oauth-authorization-server');
 
         if ($result['status'] !== 200 || empty($result['data'])) {
-            throw AtprotoOAuthException::discoveryFailed("could not load authorization server metadata from {$issuer}.");
+            throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_metadata_unavailable', ['issuer' => $issuer]));
         }
 
         $data = $result['data'];
 
         foreach (['issuer', 'authorization_endpoint', 'token_endpoint', 'pushed_authorization_request_endpoint'] as $field) {
             if (empty($data[$field])) {
-                throw AtprotoOAuthException::discoveryFailed("authorization server metadata is missing \"{$field}\".");
+                throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_metadata_field_missing', ['field' => $field]));
             }
         }
 
         if (($data['issuer'] ?? null) !== rtrim($issuer, '/')) {
-            throw AtprotoOAuthException::discoveryFailed('the authorization server issuer did not match the expected origin.');
+            throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_issuer_origin_mismatch'));
         }
 
         if (empty($data['require_pushed_authorization_requests'])) {
-            throw AtprotoOAuthException::discoveryFailed('the authorization server does not require (and may not support) pushed authorization requests.');
+            throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_par_unsupported'));
         }
 
         if (empty($data['code_challenge_methods_supported']) || !in_array('S256', $data['code_challenge_methods_supported'], true)) {
-            throw AtprotoOAuthException::discoveryFailed('the authorization server does not support PKCE S256.');
+            throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_pkce_unsupported'));
         }
 
         if (empty($data['dpop_signing_alg_values_supported']) || !in_array('ES256', $data['dpop_signing_alg_values_supported'], true)) {
-            throw AtprotoOAuthException::discoveryFailed('the authorization server does not support ES256 DPoP.');
+            throw AtprotoOAuthException::discoveryFailed(__('exceptions.atproto.reason_dpop_unsupported'));
         }
 
         return $data;
@@ -474,7 +474,7 @@ class AtprotoOAuthService
         );
 
         if ($result['status'] < 200 || $result['status'] >= 300 || empty($result['data']['request_uri'])) {
-            throw AtprotoOAuthException::authorizationFailed($this->errorDetail($result, 'the authorization server rejected the pushed authorization request'));
+            throw AtprotoOAuthException::authorizationFailed($this->errorDetail($result, __('exceptions.atproto.reason_par_rejected')));
         }
 
         return (string) $result['data']['request_uri'];
@@ -486,7 +486,7 @@ class AtprotoOAuthService
     public function refresh(AtprotoOauthSession $session): void
     {
         if (empty($session->refresh_token)) {
-            throw AtprotoOAuthException::authorizationFailed('the session has no refresh token; reconnect the account.');
+            throw AtprotoOAuthException::authorizationFailed(__('exceptions.atproto.reason_no_refresh_token_session'));
         }
 
         $serverMetadata = $this->authorizationServerMetadata($session->authorization_server);
@@ -506,7 +506,7 @@ class AtprotoOAuthService
             $session->dpop_nonce_as = $result['nonce'];
         }
 
-        $this->assertTokenResponse($result, 'token refresh');
+        $this->assertTokenResponse($result, __('exceptions.atproto.context_token_refresh'));
 
         $session->fill([
             'access_token' => $result['data']['access_token'],
@@ -648,18 +648,21 @@ class AtprotoOAuthService
     private function assertTokenResponse(array $result, string $context): void
     {
         if ($result['status'] < 200 || $result['status'] >= 300 || empty($result['data']['access_token'])) {
-            throw AtprotoOAuthException::authorizationFailed($this->errorDetail($result, "the {$context} failed"));
+            throw AtprotoOAuthException::authorizationFailed($this->errorDetail($result, __('exceptions.atproto.reason_context_failed', ['context' => $context])));
         }
 
         if (isset($result['data']['token_type']) && strtolower((string) $result['data']['token_type']) !== 'dpop') {
-            throw AtprotoOAuthException::authorizationFailed('the authorization server returned a token that is not DPoP bound.');
+            throw AtprotoOAuthException::authorizationFailed(__('exceptions.atproto.reason_not_dpop'));
         }
     }
 
     private function assertOk(array $result, string $what): void
     {
         if ($result['status'] < 200 || $result['status'] >= 300) {
-            throw AtprotoOAuthException::requestFailed("could not {$what}: " . $this->errorDetail($result, 'the PDS rejected the request'));
+            throw AtprotoOAuthException::requestFailed(__('exceptions.atproto.reason_action_failed', [
+                'action' => $what,
+                'detail' => $this->errorDetail($result, __('exceptions.atproto.reason_pds_rejected')),
+            ]));
         }
     }
 
@@ -693,15 +696,15 @@ class AtprotoOAuthService
         $host = $parts['host'] ?? '';
 
         if ($scheme !== 'https') {
-            throw AtprotoOAuthException::misconfigured('APP_URL must be an https:// address so PDS instances can fetch the client metadata document.');
+            throw AtprotoOAuthException::misconfigured(__('exceptions.atproto.reason_https_required'));
         }
 
         if (isset($parts['port']) && (int) $parts['port'] !== 443) {
-            throw AtprotoOAuthException::misconfigured('the client_id URL must not include a port number.');
+            throw AtprotoOAuthException::misconfigured(__('exceptions.atproto.reason_no_port'));
         }
 
         if ($host === '') {
-            throw AtprotoOAuthException::misconfigured('APP_URL is not a valid URL.');
+            throw AtprotoOAuthException::misconfigured(__('exceptions.atproto.reason_invalid_app_url'));
         }
     }
 }

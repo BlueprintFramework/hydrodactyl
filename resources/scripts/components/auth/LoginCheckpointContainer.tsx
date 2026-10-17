@@ -7,6 +7,7 @@ import loginCheckpoint from '@/api/auth/loginCheckpoint';
 import LoginFormContainer from '@/components/auth/LoginFormContainer';
 import Button from '@/components/elements/Button';
 import Field from '@/components/elements/Field';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import type { FlashStore } from '@/state/flashes';
 
@@ -26,20 +27,23 @@ type Props = OwnProps & {
 function LoginCheckpointForm() {
     const { isSubmitting, setFieldValue } = useFormikContext<Values>();
     const [isMissingDevice, setIsMissingDevice] = useState(false);
+    const { t } = useTranslation();
+
+    const fieldTitle = isMissingDevice ? t('auth.two_factor.recovery_code') : t('auth.two_factor.authentication_code');
 
     return (
         <LoginFormContainer className={`w-full flex flex-col`}>
-            <h2 className='text-xl font-extrabold mb-2'>Two Factor Authentication</h2>
+            <h2 className='text-xl font-extrabold mb-2'>{t('auth.two_factor.title')}</h2>
 
             <div className={`mt-6`}>
                 <Field
                     name={isMissingDevice ? 'recoveryCode' : 'code'}
-                    title={isMissingDevice ? 'Recovery Code' : 'Authentication Code'}
+                    title={fieldTitle}
                     placeholder='000000'
                     description={
                         isMissingDevice
-                            ? 'Enter one of the recovery codes generated when you setup 2-Factor authentication on this account in order to continue.'
-                            : 'Enter the two-factor token displayed by your device.'
+                            ? t('auth.two_factor.recovery_code_description')
+                            : t('auth.two_factor.authentication_code_description')
                     }
                     type={'text'}
                     autoComplete={'one-time-code'}
@@ -55,7 +59,7 @@ function LoginCheckpointForm() {
                     disabled={isSubmitting}
                     isLoading={isSubmitting}
                 >
-                    Sign in
+                    {t('auth.login.sign_in')}
                 </Button>
                 <button
                     type='button'
@@ -68,13 +72,13 @@ function LoginCheckpointForm() {
                         'block text-center w-full sm:w-auto py-2.5 px-4 text-xs font-medium tracking-wide uppercase text-white hover:text-white/80 transition-colors duration-200 border border-white/20 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30'
                     }
                 >
-                    {!isMissingDevice ? "I've Lost My Device" : 'I Have My Device'}
+                    {!isMissingDevice ? t('auth.two_factor.lost_device') : t('auth.two_factor.have_device')}
                 </button>
             </div>
             <div
-                className={`text-right w-full rounded-b-lg border-0 ring-0 outline-hidden capitalize font-bold text-sm py-2 hover:cursor-pointer `}
+                className={`text-right w-full rounded-b-lg border-0 ring-0 outline-hidden font-bold text-sm py-2 hover:cursor-pointer `}
             >
-                <SecondaryLink to='/auth/login'>Return to Login</SecondaryLink>
+                <SecondaryLink to='/auth/login'>{t('auth.two_factor.return_to_login')}</SecondaryLink>
             </div>
         </LoginFormContainer>
     );

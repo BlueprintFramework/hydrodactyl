@@ -7,9 +7,11 @@ import { useNodeOptions } from '@/api/admin/useNodes';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
+import { useTranslation } from '@/i18n/I18nProvider';
 import NodeForm, { emptyNodeValues } from './NodeForm';
 
 const NodeCreateContainer = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { data: options } = useNodeOptions();
     const [submitting, setSubmitting] = useState(false);
@@ -29,26 +31,26 @@ const NodeCreateContainer = () => {
 
         try {
             const node = await createNode(values);
-            toast.success('Node created.');
+            toast.success(t('admin.nodes.created'));
             navigate(`/nodes/${node.id}`);
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to create node.'));
+            toast.error(errorToMessage(error, t('admin.nodes.create_failed')));
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <PageContentBlock title='Create Node'>
-            <MainPageHeader direction='column' title='Create Node'>
-                <p className='text-sm text-neutral-400'>Provision a new node to run servers on.</p>
+        <PageContentBlock title={t('admin.nodes.create')}>
+            <MainPageHeader direction='column' title={t('admin.nodes.create')}>
+                <p className='text-sm text-neutral-400'>{t('admin.nodes.create_description')}</p>
             </MainPageHeader>
 
             <NodeForm
                 options={options}
                 initialValues={emptyNodeValues}
-                submitLabel='Create Node'
+                submitLabel={t('admin.nodes.create')}
                 submitting={submitting}
                 errors={errors}
                 onSubmit={submit}

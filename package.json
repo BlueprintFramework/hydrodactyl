@@ -98,6 +98,7 @@
     "scripts": {
         "lint": "biome lint --write",
         "check": "biome check --write",
+        "typecheck": "tsc -p tsconfig.json",
         "postinstall": "npx @biomejs/biome migrate --write",
         "lint:turbo": "turbo lint",
         "dev": "vite",

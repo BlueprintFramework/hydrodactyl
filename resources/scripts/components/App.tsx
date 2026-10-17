@@ -13,10 +13,11 @@ import { Toaster } from 'sonner';
 import AuthenticatedRoute from '@/components/elements/AuthenticatedRoute';
 import { NotFound } from '@/components/elements/ScreenBlock';
 import Spinner from '@/components/elements/Spinner';
+import I18nProvider from '@/i18n/I18nProvider';
 
 import { store } from '@/state';
+import { hydrateStore } from '@/state/bootstrap';
 import { ServerContext } from '@/state/server';
-import type { SiteSettings } from '@/state/settings';
 
 import HydrodactylProvider from './HydrodactylProvider';
 
@@ -26,109 +27,77 @@ const UnifiedRouter = lazy(() => import('@/routers/UnifiedRouter'));
 const AuthenticationRouter = lazy(() => import('@/routers/AuthenticationRouter'));
 const SetupRouter = lazy(() => import('@/routers/SetupRouter'));
 
-interface ExtendedWindow extends Window {
-    SiteConfiguration?: SiteSettings;
-    SetupRequired?: boolean;
-    HydrodactylUser?: {
-        uuid: string;
-        username: string;
-        email: string;
-
-        root_admin: boolean;
-        use_totp: boolean;
-        language: string;
-        updated_at: string;
-        created_at: string;
-    };
-}
-
 const App = () => {
-    const { HydrodactylUser, SiteConfiguration } = window as ExtendedWindow;
-    if (HydrodactylUser && !store.getState().user.data) {
-        store.getActions().user.setUserData({
-            uuid: HydrodactylUser.uuid,
-            username: HydrodactylUser.username,
-            email: HydrodactylUser.email,
-            language: HydrodactylUser.language,
-            rootAdmin: HydrodactylUser.root_admin,
-            useTotp: HydrodactylUser.use_totp,
-            createdAt: new Date(HydrodactylUser.created_at),
-            updatedAt: new Date(HydrodactylUser.updated_at),
-        });
-    }
-
-    if (!store.getState().settings.data) {
-        if (SiteConfiguration) {
-            store.getActions().settings.setSettings(SiteConfiguration);
-        }
-    }
+    hydrateStore();
 
     return (
         <>
             <GlobalStylesheet />
             <StoreProvider store={store}>
-                <HydrodactylProvider>
-                    <div
-                        data-hydrodactyl-routerwrap=''
-                        className='relative w-full h-full flex flex-row p-2 overflow-hidden rounded-lg'
-                    >
-                        <Toaster
-                            theme='dark'
-                            toastOptions={{
-                                unstyled: true,
-                                classNames: {
-                                    toast: 'p-4 bg-[#ffffff09] border border-[#ffffff12] rounded-2xl shadow-lg backdrop-blur-2xl flex items-center w-full gap-2',
-                                },
-                            }}
-                        />
-                        <BrowserRouter>
-                            <Routes>
-                                <Route
-                                    path='/setup/*'
-                                    element={
-                                        <Spinner.Suspense>
-                                            <SetupRouter />
-                                        </Spinner.Suspense>
-                                    }
-                                />
-                                <Route
-                                    path='/auth/*'
-                                    element={
-                                        <Spinner.Suspense>
-                                            <AuthenticationRouter />
-                                        </Spinner.Suspense>
-                                    }
-                                />
-
-                                <Route
-                                    path='/*'
-                                    element={
-                                        <AuthenticatedRoute>
+                <I18nProvider>
+                    <HydrodactylProvider>
+                        <div
+                            data-hydrodactyl-routerwrap=''
+                            className='relative w-full h-full flex flex-row p-2 overflow-hidden rounded-lg'
+                        >
+                            <Toaster
+                                theme='dark'
+                                toastOptions={{
+                                    unstyled: true,
+                                    classNames: {
+                                        toast: 'p-4 bg-[#ffffff09] border border-[#ffffff12] rounded-2xl shadow-lg backdrop-blur-2xl flex items-center w-full gap-2',
+                                    },
+                                }}
+                            />
+                            <BrowserRouter>
+                                <Routes>
+                                    <Route
+                                        path='/setup/*'
+                                        element={
                                             <Spinner.Suspense>
-                                                <ServerContext.Provider>
-                                                    <UnifiedRouter />
-                                                </ServerContext.Provider>
+                                                <SetupRouter />
                                             </Spinner.Suspense>
-                                        </AuthenticatedRoute>
-                                    }
-                                />
+                                        }
+                                    />
+                                    <Route
+                                        path='/auth/*'
+                                        element={
+                                            <Spinner.Suspense>
+                                                <AuthenticationRouter />
+                                            </Spinner.Suspense>
+                                        }
+                                    />
 
-                                {/* <Route */}
-                                {/*     path='/*' */}
-                                {/*     element={ */}
-                                {/*         <AuthenticatedRoute> */}
-                                {/*             <Spinner.Suspense> */}
-                                {/*                 <DashboardRouter /> */}
-                                {/*             </Spinner.Suspense> */}
-                                {/*         </AuthenticatedRoute> */}
-                                {/*     } */}
-                                {/* /> */}
+                                    <Route
+                                        path='/*'
+                                        element={
+                                            <AuthenticatedRoute>
+                                                <Spinner.Suspense>
+                                                    <ServerContext.Provider>
+                                                        <UnifiedRouter />
+                                                    </ServerContext.Provider>
+                                                </Spinner.Suspense>
+                                            </AuthenticatedRoute>
+                                        }
+                                    />
 
-                                <Route path='*' element={<NotFound />} />
-                            </Routes>
-                        </BrowserRouter>
-                    </div>
-                </HydrodactylProvider>
+                                    {/* <Route */}
+                                    {/*     path='/*' */}
+                                    {/*     element={ */}
+                                    {/*         <AuthenticatedRoute> */}
+                                    {/*             <Spinner.Suspense> */}
+                                    {/*                 <DashboardRouter /> */}
+                                    {/*             </Spinner.Suspense> */}
+                                    {/*         </AuthenticatedRoute> */}
+                                    {/*     } */}
+                                    {/* /> */}
+
+                                    <Route path='*' element={<NotFound />} />
+                                </Routes>
+                            </BrowserRouter>
+                        </div>
+                    </HydrodactylProvider>
+                </I18nProvider>
             </StoreProvider>
         </>
     );

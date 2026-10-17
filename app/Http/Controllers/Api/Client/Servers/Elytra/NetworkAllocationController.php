@@ -92,11 +92,11 @@ class NetworkAllocationController extends ClientApiController
     public function store(NewAllocationRequest $request, Server $server): array
     {
         if (!$server->allowsAllocations()) {
-            throw new DisplayException('Cannot assign allocations to this server: allocations are disabled.');
+            throw new DisplayException(__('exceptions.client.network.allocations_disabled'));
         }
 
         if ($server->hasAllocationLimit() && $server->allocations()->count() >= $server->allocation_limit) {
-            throw new DisplayException('Cannot assign additional allocations to this server: limit has been reached.');
+            throw new DisplayException(__('exceptions.client.network.allocation_limit'));
         }
 
         $allocation = $this->assignableAllocationService->handle($server);
@@ -119,11 +119,11 @@ class NetworkAllocationController extends ClientApiController
     public function delete(DeleteAllocationRequest $request, Server $server, Allocation $allocation): JsonResponse
     {
         if (!$server->allowsAllocations()) {
-            throw new DisplayException('You cannot delete allocations for this server: no allocation limit is set.');
+            throw new DisplayException(__('exceptions.client.network.no_allocation_limit'));
         }
 
         if ($allocation->id === $server->allocation_id) {
-            throw new DisplayException('You cannot delete the primary allocation for this server.');
+            throw new DisplayException(__('exceptions.client.network.primary_allocation'));
         }
 
         Allocation::query()->where('id', $allocation->id)->update([

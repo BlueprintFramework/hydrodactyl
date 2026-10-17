@@ -20,20 +20,22 @@ import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const AliasInput = ({ nodeId, allocation }: { nodeId: string; allocation: NodeAllocation }) => {
+    const { t } = useTranslation();
     const [value, setValue] = useState(allocation.ip_alias ?? '');
 
     const save = useDebouncedCallback((alias: string) => {
         void setAllocationAlias(nodeId, allocation.id, alias).catch((error) =>
-            toast.error(errorToMessage(error, 'Failed to save alias.')),
+            toast.error(errorToMessage(error, t('admin.nodes.alias_save_failed'))),
         );
     }, 500);
 
     return (
         <Input.Text
             value={value}
-            placeholder='none'
+            placeholder={t('common.none')}
             onChange={(event) => {
                 setValue(event.target.value);
                 save(event.target.value);
@@ -43,6 +45,7 @@ const AliasInput = ({ nodeId, allocation }: { nodeId: string; allocation: NodeAl
 };
 
 const NodeAllocationContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const nodeId = id as string;
 
@@ -96,14 +99,14 @@ const NodeAllocationContainer = () => {
                     .map((port) => port.trim())
                     .filter(Boolean),
             });
-            toast.success('Allocations added.');
+            toast.success(t('admin.nodes.allocations_added'));
             setIp('');
             setAlias('');
             setPorts('');
             await mutate();
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to add allocations.'));
+            toast.error(errorToMessage(error, t('admin.nodes.allocations_add_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -118,11 +121,11 @@ const NodeAllocationContainer = () => {
 
         try {
             await deleteAllocation(nodeId, confirmSingle.id);
-            toast.success('Allocation deleted.');
+            toast.success(t('admin.nodes.allocation_deleted'));
             await mutate();
             setConfirmSingle(undefined);
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete allocation.'));
+            toast.error(errorToMessage(error, t('admin.nodes.allocation_delete_failed')));
         } finally {
             setBusy(false);
         }
@@ -133,12 +136,12 @@ const NodeAllocationContainer = () => {
 
         try {
             await deleteAllocations(nodeId, selected);
-            toast.success('Allocations deleted.');
+            toast.success(t('admin.nodes.allocations_deleted'));
             setSelected([]);
             await mutate();
             setConfirmMultiple(false);
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete allocations.'));
+            toast.error(errorToMessage(error, t('admin.nodes.allocations_delete_failed')));
         } finally {
             setBusy(false);
         }
@@ -149,12 +152,12 @@ const NodeAllocationContainer = () => {
 
         try {
             await deleteAllocationBlock(nodeId, blockIp);
-            toast.success(`Deleted allocations for ${blockIp}.`);
+            toast.success(t('admin.nodes.block_deleted', { ip: blockIp }));
             setBlockIp('');
             await mutate();
             setConfirmBlock(false);
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete allocations.'));
+            toast.error(errorToMessage(error, t('admin.nodes.allocations_delete_failed')));
         } finally {
             setBusy(false);
         }
@@ -165,12 +168,12 @@ const NodeAllocationContainer = () => {
 
         try {
             const updated = await updateAllocationAliases(nodeId, bulkIp || null, bulkAlias);
-            toast.success(`Updated ${updated} allocation(s).`);
+            toast.success(t('admin.nodes.aliases_updated', { count: updated }));
             setBulkAlias('');
             await mutate();
             setConfirmBulkAlias(false);
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to update aliases.'));
+            toast.error(errorToMessage(error, t('admin.nodes.aliases_update_failed')));
         } finally {
             setBusy(false);
         }
@@ -181,9 +184,9 @@ const NodeAllocationContainer = () => {
             <div className='flex flex-col gap-4 lg:col-span-2'>
                 {selected.length > 0 && (
                     <div className='flex items-center justify-between rounded-lg bg-brand-400/10 px-3 py-2 text-sm text-brand-400'>
-                        <span>{selected.length} allocation(s) selected</span>
+                        <span>{t('admin.nodes.selected_count', { count: selected.length })}</span>
                         <Button variant='attention' size='sm' onClick={() => setConfirmMultiple(true)}>
-                            Delete Selected
+                            {t('admin.nodes.delete_selected')}
                         </Button>
                     </div>
                 )}
@@ -201,10 +204,10 @@ const NodeAllocationContainer = () => {
                                         }
                                     />
                                 </th>
-                                <th className='px-3 py-3'>IP Address</th>
-                                <th className='px-3 py-3'>IP Alias</th>
-                                <th className='px-3 py-3'>Port</th>
-                                <th className='px-3 py-3'>Assigned To</th>
+                                <th className='px-3 py-3'>{t('admin.nodes.ip_address')}</th>
+                                <th className='px-3 py-3'>{t('admin.nodes.ip_alias')}</th>
+                                <th className='px-3 py-3'>{t('admin.common.port')}</th>
+                                <th className='px-3 py-3'>{t('admin.nodes.assigned_to')}</th>
                                 <th className='px-3 py-3' />
                             </tr>
                         </thead>
@@ -244,7 +247,7 @@ const NodeAllocationContainer = () => {
                                                 size='sm'
                                                 onClick={() => setConfirmSingle(allocation)}
                                             >
-                                                Delete
+                                                {t('common.delete')}
                                             </Button>
                                         )}
                                     </td>
@@ -253,7 +256,7 @@ const NodeAllocationContainer = () => {
                             {allocations.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className='px-3 py-8 text-center text-cream-400/50'>
-                                        No allocations assigned to this node.
+                                        {t('admin.nodes.allocations_empty')}
                                     </td>
                                 </tr>
                             )}
@@ -272,9 +275,9 @@ const NodeAllocationContainer = () => {
                     }}
                     className='flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'
                 >
-                    <h2 className='text-sm font-semibold text-cream-50'>Assign New Allocations</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nodes.assign_title')}</h2>
 
-                    <Field label='IP Address' error={errors.allocation_ip}>
+                    <Field label={t('admin.nodes.ip_address')} error={errors.allocation_ip}>
                         <Input.Text
                             list='node-allocation-ips'
                             value={ip}
@@ -289,9 +292,9 @@ const NodeAllocationContainer = () => {
                     </Field>
 
                     <Field
-                        label='IP Alias'
+                        label={t('admin.nodes.ip_alias')}
                         error={errors.allocation_alias}
-                        hint='Optional alias applied to the new allocations.'
+                        hint={t('admin.nodes.ip_alias_hint')}
                     >
                         <Input.Text
                             value={alias}
@@ -301,9 +304,9 @@ const NodeAllocationContainer = () => {
                     </Field>
 
                     <Field
-                        label='Ports'
+                        label={t('admin.nodes.ports')}
                         error={errors.allocation_ports ?? errors['allocation_ports.0']}
-                        hint='Individual ports or ranges separated by commas or spaces.'
+                        hint={t('admin.nodes.ports_hint')}
                     >
                         <Input.Text
                             value={ports}
@@ -314,50 +317,46 @@ const NodeAllocationContainer = () => {
 
                     <div className='flex justify-end'>
                         <Button type='submit' disabled={submitting}>
-                            Submit
+                            {t('common.submit')}
                         </Button>
                     </div>
                 </form>
 
                 <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Bulk IP Alias</h2>
-                    <p className='mt-1 text-xs text-cream-400/60'>
-                        Apply one alias to every allocation on an IP, or across every IP on this node.
-                    </p>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nodes.bulk_alias_title')}</h2>
+                    <p className='mt-1 text-xs text-cream-400/60'>{t('admin.nodes.bulk_alias_description')}</p>
                     <div className='mt-3 space-y-4'>
-                        <Field label='IP Address'>
+                        <Field label={t('admin.nodes.ip_address')}>
                             <Dropdown
                                 value={bulkIp}
                                 onChange={setBulkIp}
                                 options={[
-                                    { value: '', label: 'All IPs' },
+                                    { value: '', label: t('admin.nodes.all_ips') },
                                     ...data.ips.map((value) => ({ value, label: value })),
                                 ]}
                             />
                         </Field>
-                        <Field label='Alias' hint='Leave blank to clear the alias.'>
+                        <Field label={t('admin.nodes.alias')} hint={t('admin.nodes.alias_clear_hint')}>
                             <Input.Text
                                 value={bulkAlias}
-                                placeholder='none'
+                                placeholder={t('common.none')}
                                 onChange={(event) => setBulkAlias(event.target.value)}
                             />
                         </Field>
                     </div>
                     <Button className='mt-3' onClick={() => setConfirmBulkAlias(true)}>
-                        Apply Alias
+                        {t('admin.nodes.apply_alias')}
                     </Button>
                 </div>
 
                 <div className='rounded-xl border border-brand-400/40 bg-brand-400/5 p-4'>
-                    <h2 className='text-sm font-semibold text-brand-400'>Delete IP Block</h2>
-                    <p className='mt-1 text-xs text-cream-400/70'>
-                        Removes every unassigned allocation for the selected IP address.
-                    </p>
+                    <h2 className='text-sm font-semibold text-brand-400'>{t('admin.nodes.delete_block_title')}</h2>
+                    <p className='mt-1 text-xs text-cream-400/70'>{t('admin.nodes.delete_block_description')}</p>
                     <div className='mt-3'>
                         <Dropdown
                             value={blockIp}
                             onChange={setBlockIp}
-                            placeholder='Select an IP address…'
+                            placeholder={t('admin.nodes.select_ip')}
                             options={data.ips.map((value) => ({ value, label: value }))}
                         />
                     </div>
@@ -367,54 +366,59 @@ const NodeAllocationContainer = () => {
                         disabled={!blockIp}
                         onClick={() => setConfirmBlock(true)}
                     >
-                        Delete Allocations
+                        {t('admin.nodes.delete_allocations')}
                     </Button>
                 </div>
             </div>
 
             <Dialog.Confirm
                 open={!!confirmSingle}
-                title='Delete Allocation'
-                confirm='Delete'
+                title={t('admin.nodes.delete_allocation_title')}
+                confirm={t('common.delete')}
                 loading={busy}
                 onClose={() => setConfirmSingle(undefined)}
                 onConfirmed={removeSingle}
             >
-                Deleting {confirmSingle?.ip}:{confirmSingle?.port} is permanent and cannot be undone.
+                {t('admin.nodes.delete_allocation_confirm', {
+                    ip: confirmSingle?.ip ?? '',
+                    port: confirmSingle?.port ?? '',
+                })}
             </Dialog.Confirm>
 
             <Dialog.Confirm
                 open={confirmMultiple}
-                title='Delete Allocations'
-                confirm='Delete'
+                title={t('admin.nodes.delete_allocations')}
+                confirm={t('common.delete')}
                 loading={busy}
                 onClose={() => setConfirmMultiple(false)}
                 onConfirmed={removeSelected}
             >
-                Are you sure you want to delete {selected.length} allocation(s)? This cannot be undone.
+                {t('admin.nodes.delete_allocations_confirm', { count: selected.length })}
             </Dialog.Confirm>
 
             <Dialog.Confirm
                 open={confirmBlock}
-                title='Delete IP Block'
-                confirm='Delete'
+                title={t('admin.nodes.delete_block_title')}
+                confirm={t('common.delete')}
                 loading={busy}
                 onClose={() => setConfirmBlock(false)}
                 onConfirmed={removeBlock}
             >
-                Every unassigned allocation for {blockIp} will be removed. This cannot be undone.
+                {t('admin.nodes.delete_block_confirm', { ip: blockIp })}
             </Dialog.Confirm>
 
             <Dialog.Confirm
                 open={confirmBulkAlias}
-                title='Update IP Alias'
-                confirm='Apply'
+                title={t('admin.nodes.update_alias_title')}
+                confirm={t('common.apply')}
                 loading={busy}
                 onClose={() => setConfirmBulkAlias(false)}
                 onConfirmed={applyBulkAlias}
             >
-                Set the alias to {bulkAlias ? `"${bulkAlias}"` : 'blank'} for {bulkIp ? `the IP ${bulkIp}` : 'every IP'}{' '}
-                on this node?
+                {t('admin.nodes.update_alias_confirm', {
+                    alias: bulkAlias ? `"${bulkAlias}"` : t('admin.nodes.alias_blank'),
+                    target: bulkIp ? t('admin.nodes.target_ip', { ip: bulkIp }) : t('admin.nodes.target_every_ip'),
+                })}
             </Dialog.Confirm>
         </div>
     );

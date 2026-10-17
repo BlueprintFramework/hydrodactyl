@@ -5,6 +5,7 @@ import Logo from '@/components/elements/HydroLogo';
 import { Button } from '@/components/ui/button';
 import { useHeader } from '@/contexts/HeaderContext';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { MobileSidebarToggle } from '../sidebar/MobileSidebar';
 import '../sidebar/sidebar-modern.css';
@@ -43,6 +44,7 @@ const getSiteName = () => {
 
 const LogoSection = memo(({ admin }: { admin?: boolean }) => {
     const siteName = getSiteName();
+    const { t } = useTranslation();
     const className = 'sidebar-logo-link flex items-center shrink-0 h-8 min-w-0 gap-3 hydrodactyl';
 
     const content = (
@@ -56,14 +58,14 @@ const LogoSection = memo(({ admin }: { admin?: boolean }) => {
 
     if (admin) {
         return (
-            <a href='/' className={className} aria-label={`${siteName} home page`}>
+            <a href='/' className={className} aria-label={t('panel.home_page', { name: siteName })}>
                 {content}
             </a>
         );
     }
 
     return (
-        <NavLink to={'/'} className={className} aria-label={`${siteName} home page`}>
+        <NavLink to={'/'} className={className} aria-label={t('panel.home_page', { name: siteName })}>
             {content}
         </NavLink>
     );
@@ -72,13 +74,14 @@ LogoSection.displayName = 'LogoSection';
 
 const ToggleButton = memo(() => {
     const { toggleMinimized } = useSidebar();
+    const { t } = useTranslation();
 
     return (
         <Button
             variant={'secondary'}
             size={'sm'}
             className='sidebar-toggle-button p-1 gap-1 rounded-full size-8'
-            aria-label='Toggle sidebar'
+            aria-label={t('panel.toggle_sidebar')}
             onClick={toggleMinimized}
         >
             <LayoutSideContent width={16} height={16} />

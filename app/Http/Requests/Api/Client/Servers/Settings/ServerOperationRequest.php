@@ -36,8 +36,8 @@ class ServerOperationRequest extends ClientApiRequest
     public function messages(): array
     {
         return [
-            'operation_id.required' => 'An operation ID is required.',
-            'operation_id.uuid' => 'The operation ID must be a valid UUID.',
+            'operation_id.required' => __('validation.json_api.operation_id_required'),
+            'operation_id.uuid' => __('validation.json_api.operation_id_uuid'),
         ];
     }
 }

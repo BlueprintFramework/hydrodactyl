@@ -1,14 +1,15 @@
 import { Form, Formik, type FormikHelpers } from 'formik';
 import { join } from 'pathe';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { object, string } from 'yup';
 import createDirectory from '@/api/server/files/createDirectory';
 import Code from '@/components/elements/Code';
-import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
+import { Dialog, type DialogProps, DialogWrapperContext } from '@/components/elements/dialog';
 import Field from '@/components/elements/Field';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
 import asDialog from '@/hoc/asDialog';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { useFlashKey } from '@/plugins/useFlash';
 // import { FileObject } from '@/api/server/files/loadDirectory';
@@ -17,10 +18,6 @@ import { ServerContext } from '@/state/server';
 interface Values {
     directoryName: string;
 }
-
-const schema = object().shape({
-    directoryName: string().required('A valid directory name must be provided.'),
-});
 
 // removed to prevent linting issues, you're welcome.
 //
@@ -39,15 +36,18 @@ const schema = object().shape({
 //   isEditable: () => false,
 // });
 
-const NewDirectoryDialog = asDialog({
-    title: 'New Folder',
-})(() => {
+const NewDirectoryDialogContent = () => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
 
     const { mutate } = useFileManagerSwr();
     const { close } = useContext(DialogWrapperContext);
     const { clearAndAddHttpError } = useFlashKey('files:directory-modal');
+
+    const schema = object().shape({
+        directoryName: string().required(t('server.files.directory_name_required')),
+    });
 
     useEffect(() => {
         return () => {
@@ -72,9 +72,14 @@ const NewDirectoryDialog = asDialog({
                 <>
                     <FlashMessageRender byKey='files:directory-modal' />
                     <Form className={`m-0`}>
-                        <Field autoFocus id={'directoryName'} name={'directoryName'} label={'Name'} />
+                        <Field
+                            autoFocus
+                            id={'directoryName'}
+                            name={'directoryName'}
+                            label={t('server.files.name_label')}
+                        />
                         <p className={`mt-2 text-xs! break-all`}>
-                            <span className={`text-zinc-200`}>This folder will be created as&nbsp;</span>
+                            <span className={`text-zinc-200`}>{t('server.files.folder_created_as')}&nbsp;</span>
                             <Code>
                                 /root/
                                 <span className={`text-blue-200`}>
@@ -85,19 +90,30 @@ const NewDirectoryDialog = asDialog({
                     </Form>
                     <Dialog.Footer>
                         <Button variant='secondary' className={'w-full sm:w-auto'} onClick={close}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button variant='attention' className={'w-full sm:w-auto'} onClick={submitForm}>
-                            Create
+                            {t('common.create')}
                         </Button>
                     </Dialog.Footer>
                 </>
             )}
         </Formik>
     );
-});
+};
+
+const NewDirectoryDialog = ({ open, onClose }: DialogProps) => {
+    const { t } = useTranslation();
+    const DialogComponent = useMemo(
+        () => asDialog({ title: t('server.files.new_folder') })(NewDirectoryDialogContent),
+        [t],
+    );
+
+    return <DialogComponent open={open} onClose={onClose} />;
+};
 
 const NewDirectoryButton = () => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
 
     return (
@@ -108,7 +124,7 @@ const NewDirectoryButton = () => {
                 onClick={setOpen.bind(this, true)}
                 className='border-r-cream-600 rounded-r-none'
             >
-                New Folder
+                {t('server.files.new_folder')}
             </Button>
         </>
     );

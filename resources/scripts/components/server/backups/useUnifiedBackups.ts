@@ -1,10 +1,13 @@
 import { useContext } from 'react';
 import getServerBackups from '@/api/swr/getServerBackups';
+import { useTranslation } from '@/i18n/I18nProvider';
+import { ServerContext } from '@/state/server';
 import { LiveProgressContext } from './BackupContainer';
 import type { UnifiedBackup } from './types';
 import { useBackupMutations } from './useBackupMutations';
 
 export const useUnifiedBackups = () => {
+    const { t } = useTranslation();
     const { data: backups, error, isValidating, mutate } = getServerBackups();
 
     const liveProgress = useContext(LiveProgressContext);
@@ -37,10 +40,10 @@ export const useUnifiedBackups = () => {
                 message: live
                     ? live.message
                     : backup.isSuccessful
-                      ? 'Completed'
+                      ? t('server.backups.status_completed')
                       : isPending
-                        ? 'In progress…'
-                        : 'Failed',
+                        ? t('server.backups.status_in_progress')
+                        : t('server.backups.status_failed'),
                 isSuccessful: backup.isSuccessful,
                 isLocked: backup.isLocked,
                 isAutomatic: backup.isAutomatic,
@@ -65,7 +68,7 @@ export const useUnifiedBackups = () => {
         if (!existsInSwr && !live.isDeletion) {
             unifiedBackups.push({
                 uuid: backupUuid,
-                name: live.backupName || live.message || 'Processing...',
+                name: live.backupName || live.message || t('server.backups.processing'),
                 status: live.status as UnifiedBackup['status'],
                 progress: live.progress,
                 message: live.message,

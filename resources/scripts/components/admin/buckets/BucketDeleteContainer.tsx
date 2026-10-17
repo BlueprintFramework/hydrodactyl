@@ -7,8 +7,10 @@ import { useBucket } from '@/api/admin/useBuckets';
 import { Dialog } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const BucketDeleteContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const navigate = useNavigate();
     const { data: bucket } = useBucket(id);
@@ -28,10 +30,10 @@ const BucketDeleteContainer = () => {
 
         try {
             await deleteBucket(bucket.id);
-            toast.success('S3 configuration deleted.');
+            toast.success(t('admin.buckets.deleted'));
             navigate('/buckets');
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete the S3 configuration.'));
+            toast.error(errorToMessage(error, t('admin.buckets.delete_failed')));
             setDeleting(false);
             setConfirm(false);
         }
@@ -39,21 +41,16 @@ const BucketDeleteContainer = () => {
 
     return (
         <div className='max-w-2xl rounded-xl border border-brand-400/40 bg-brand-400/5 p-4'>
-            <h2 className='text-sm font-semibold text-brand-400'>Delete S3 Configuration</h2>
-            <p className='mt-1 text-sm text-cream-400/70'>
-                This action will permanently delete this S3 bucket configuration.
-            </p>
+            <h2 className='text-sm font-semibold text-brand-400'>{t('admin.buckets.delete')}</h2>
+            <p className='mt-1 text-sm text-cream-400/70'>{t('admin.buckets.delete_description')}</p>
 
             {bucket.servers_count > 0 ? (
                 <p className='mt-3 text-sm text-brand-400'>
-                    <strong>{bucket.servers_count} server(s)</strong> are currently using this configuration. Reassign
-                    them to another bucket before deleting.
+                    <strong>{t('admin.buckets.delete_in_use_bold', { count: bucket.servers_count })}</strong>{' '}
+                    {t('admin.buckets.delete_in_use_suffix')}
                 </p>
             ) : (
-                <p className='mt-3 text-xs text-brand-400'>
-                    Deleting an S3 configuration is irreversible. Any backups stored in this bucket will become
-                    inaccessible from the panel.
-                </p>
+                <p className='mt-3 text-xs text-brand-400'>{t('admin.buckets.delete_warning')}</p>
             )}
 
             <Button
@@ -62,18 +59,18 @@ const BucketDeleteContainer = () => {
                 disabled={bucket.servers_count > 0}
                 onClick={() => setConfirm(true)}
             >
-                Delete This Configuration
+                {t('admin.buckets.delete_button')}
             </Button>
 
             <Dialog.Confirm
                 open={confirm}
-                title='Delete S3 Configuration'
-                confirm='Delete'
+                title={t('admin.buckets.delete')}
+                confirm={t('common.delete')}
                 loading={deleting}
                 onClose={() => setConfirm(false)}
                 onConfirmed={remove}
             >
-                Are you sure that you want to delete this S3 configuration? There is no going back.
+                {t('admin.buckets.delete_confirm')}
             </Dialog.Confirm>
         </div>
     );

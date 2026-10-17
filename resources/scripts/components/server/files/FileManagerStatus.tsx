@@ -1,9 +1,10 @@
 import { FileArrowUp, Xmark } from '@gravity-ui/icons';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { Dialog, DialogWrapperContext } from '@/components/elements/dialog';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import asDialog from '@/hoc/asDialog';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { bytesToString } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { ServerContext } from '@/state/server';
@@ -50,6 +51,7 @@ const ProgressRing = ({ percent, size = 30, stroke = 3 }: { percent: number; siz
 };
 
 const FileUploadList = () => {
+    const { t } = useTranslation();
     const { close } = useContext(DialogWrapperContext);
     const cancelFileUpload = ServerContext.useStoreActions((actions) => actions.files.cancelFileUpload);
     // const clearFileUploads = ServerContext.useStoreActions((actions) => actions.files.clearFileUploads);
@@ -99,21 +101,21 @@ const FileUploadList = () => {
                                             size='sm'
                                             className='h-8 w-8 shrink-0 p-0'
                                             onClick={() => cancelFileUpload(name)}
-                                            aria-label={`Cancel upload of ${basename}`}
+                                            aria-label={t('server.files.cancel_upload_aria', { file: basename })}
                                         >
                                             <Xmark width={16} height={16} fill='currentColor' />
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent side='left'>Cancel upload</TooltipContent>
+                                    <TooltipContent side='left'>{t('server.files.cancel_upload')}</TooltipContent>
                                 </Tooltip>
                             </div>
                         </div>
                     );
                 })}
                 <Dialog.Footer>
-                    <Button variant='attention'>Cancel all</Button>
+                    <Button variant='attention'>{t('server.files.cancel_all')}</Button>
                     <Button variant='secondary' onClick={close}>
-                        Hide
+                        {t('common.hide')}
                     </Button>
                 </Dialog.Footer>
             </div>
@@ -121,13 +123,18 @@ const FileUploadList = () => {
     );
 };
 
-const FileUploadListDialog = asDialog({
-    title: 'File Uploads',
-    description: 'Files are transferring to your server.',
-})(FileUploadList);
-
 const FileManagerStatus = () => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
+
+    const FileUploadListDialog = useMemo(
+        () =>
+            asDialog({
+                title: t('server.files.uploads_title'),
+                description: t('server.files.uploads_description'),
+            })(FileUploadList),
+        [t],
+    );
 
     const count = ServerContext.useStoreState((state) => Object.keys(state.files.uploads).length);
     const overall = ServerContext.useStoreState((state) => {
@@ -162,7 +169,7 @@ const FileManagerStatus = () => {
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent side='top'>
-                        {count} {count === 1 ? 'file' : 'files'} uploading — click to view
+                        {t(count === 1 ? 'server.files.uploading_one' : 'server.files.uploading_other', { count })}
                     </TooltipContent>
                 </Tooltip>
             )}

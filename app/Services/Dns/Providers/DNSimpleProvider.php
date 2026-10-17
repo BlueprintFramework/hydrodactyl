@@ -156,13 +156,15 @@ class DNSimpleProvider implements DnsProviderInterface
             'api_token' => [
                 'type' => 'string',
                 'required' => true,
-                'description' => 'DNSimple API Access Token',
+                'label' => __('admin/domains.schema.dnsimple.api_token_label'),
+                'description' => __('admin/domains.schema.dnsimple.api_token'),
                 'sensitive' => true,
             ],
             'account_id' => [
                 'type' => 'string',
                 'required' => false,
-                'description' => 'DNSimple Account ID (Optional, will be auto-detected if not provided)',
+                'label' => __('admin/domains.schema.dnsimple.account_id_label'),
+                'description' => __('admin/domains.schema.dnsimple.account_id'),
                 'sensitive' => false,
             ],
         ];
@@ -196,7 +198,7 @@ class DNSimpleProvider implements DnsProviderInterface
         $data = json_decode($response->getBody()->getContents(), true);
 
         if (!isset($data['data']['account']['id'])) {
-            throw new \Exception('Unable to determine Account ID from DNSimple API.');
+            throw new \Exception(__('exceptions.dns.dnsimple_account_id'));
         }
 
         $this->accountId = (string) $data['data']['account']['id'];
