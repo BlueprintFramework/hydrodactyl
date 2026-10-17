@@ -6,28 +6,46 @@ on:
         description: 'Docker image tag (e.g. v6.5.0)'
         required: true
         type: string
+      source_ref:
+        description: 'Source tag or commit (defaults to the workflow commit)'
+        required: false
+        type: string
   push:
     tags:
       - 'v*'
 permissions:
   contents: read
   packages: write
+env:
+  IMAGE_TAG: ${{ inputs.image_tag || github.ref_name }}
 jobs:
   build-release:
-    runs-on: ubuntu-24.04
+    name: Build ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 30
-    env:
-      IMAGE_TAG: ${{ inputs.image_tag || github.ref_name }}
+    outputs:
+      image: ${{ steps.repo.outputs.image }}
+      revision: ${{ steps.repo.outputs.revision }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ inputs.source_ref || github.sha }}
           fetch-depth: 0
 
       - name: Set lowercase repository name
         id: repo
-        run: echo "repo=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -36,20 +54,69 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up QEMU (for multi-arch)
-        uses: docker/setup-qemu-action@v3
-
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ghcr.io/${{ steps.repo.outputs.repo }}:${{ env.IMAGE_TAG }}
-            ghcr.io/${{ steps.repo.outputs.repo }}:canary
-            ghcr.io/${{ steps.repo.outputs.repo }}:canary-${{ github.sha }}
-            ${{ !contains(env.IMAGE_TAG, '-') && format('ghcr.io/{0}:latest', steps.repo.outputs.repo) || '' }}
+          platforms: linux/${{ matrix.arch }}
+          outputs: type=image,name=${{ steps.repo.outputs.image }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=release-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=release-${{ matrix.arch }}
+
+      - name: Export digest
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p /tmp/digests
+          touch "/tmp/digests/${DIGEST#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    name: Publish multi-platform image
+    needs: build-release
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      IMAGE: ${{ needs.build-release.outputs.image }}
+      REVISION: ${{ needs.build-release.outputs.revision }}
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Publish tags
+        working-directory: /tmp/digests
+        run: |
+          tags=(--tag "$IMAGE:$IMAGE_TAG" --tag "$IMAGE:canary" --tag "$IMAGE:canary-$REVISION")
+          if [[ "$IMAGE_TAG" != *-* ]]; then
+            tags+=(--tag "$IMAGE:latest")
+          fi
+          sources=()
+          for digest in *; do
+            sources+=("$IMAGE@sha256:$digest")
+          done
+          docker buildx imagetools create "${tags[@]}" "${sources[@]}"
