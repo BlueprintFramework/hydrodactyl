@@ -11,6 +11,9 @@ export const appearanceAccents = {
 
 export const appearancePalettes = {
     neutral: 'Neutral',
+    obsidian: 'Obsidian',
+    dracula: 'Dracula',
+    nord: 'Nord',
     red: 'Red',
     blue: 'Blue',
     yellow: 'Yellow',

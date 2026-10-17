@@ -26,6 +26,16 @@ test('stores the application palette independently from accent and brightness', 
     });
 });
 
+test('offers Obsidian, Dracula and Nord alongside existing palettes', () => {
+    assert.deepEqual(
+        Object.keys(appearancePalettes).sort(),
+        ['blue', 'dracula', 'green', 'mocha', 'neutral', 'nord', 'obsidian', 'red', 'violet', 'yellow'].sort(),
+    );
+    assert.equal(appearancePalettes.obsidian, 'Obsidian');
+    assert.equal(appearancePalettes.dracula, 'Dracula');
+    assert.equal(appearancePalettes.nord, 'Nord');
+});
+
 test('defaults to dark and the panel accent, including corrupt or unsupported saved values', () => {
     for (const value of [null, '', '{', 'null', '[]', '42', '"light"', '{"mode":"invalid","accent":"url(evil)"}']) {
         assert.deepEqual(parseAppearance(value), { mode: 'dark', accent: 'panel', palette: 'neutral' });

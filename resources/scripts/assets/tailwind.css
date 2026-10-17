@@ -94,19 +94,28 @@
     --color-ring: var(--color-hydro-400);
 }
 
-:root[data-accent="blue"] {
+.appearance-preview {
+    --panel-accent: var(--brand-color);
+}
+
+:root[data-accent="blue"],
+.appearance-preview[data-accent="blue"] {
     --panel-accent: #52a9ff;
 }
-:root[data-accent="green"] {
+:root[data-accent="green"],
+.appearance-preview[data-accent="green"] {
     --panel-accent: #5ee4a0;
 }
-:root[data-accent="violet"] {
+:root[data-accent="violet"],
+.appearance-preview[data-accent="violet"] {
     --panel-accent: #c4a0ff;
 }
-:root[data-accent="orange"] {
+:root[data-accent="orange"],
+.appearance-preview[data-accent="orange"] {
     --panel-accent: #ffb36b;
 }
-:root[data-accent="rose"] {
+:root[data-accent="rose"],
+.appearance-preview[data-accent="rose"] {
     --panel-accent: #ff99b0;
 }
 
