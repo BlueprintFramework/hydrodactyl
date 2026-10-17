@@ -8,6 +8,7 @@ import Logo from '@/components/elements/HydroLogo';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { normalizeBrandColor } from '@/lib/brand-color';
 import { cn } from '@/lib/utils';
 
 const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => void }) => {
@@ -20,9 +21,26 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
     const [submitting, setSubmitting] = useState(false);
     const [removing, setRemoving] = useState(false);
     const [confirmRemove, setConfirmRemove] = useState(false);
-    const [brandColor, setBrandColor] = useState<string>(logo.brandColor || '#52A9FF');
+    const [brandColor, setBrandColor] = useState(
+        () => normalizeBrandColor(logo.brandColor) ?? normalizeBrandColor(logo.defaultBrandColor) ?? '',
+    );
+    const [lastValidBrandColor, setLastValidBrandColor] = useState(
+        () => normalizeBrandColor(logo.brandColor) ?? normalizeBrandColor(logo.defaultBrandColor),
+    );
+    const [colorTouched, setColorTouched] = useState(false);
+    const colorOperation = useRef(false);
     const [savingColor, setSavingColor] = useState(false);
     const [resettingColor, setResettingColor] = useState(false);
+    const savedBrandColor = normalizeBrandColor(logo.brandColor);
+    const defaultBrandColor = normalizeBrandColor(logo.defaultBrandColor);
+    const normalizedBrandColor = normalizeBrandColor(brandColor);
+    const invalidBrandColor = normalizedBrandColor === null;
+
+    const applyBrandColorResponse = (response: LogoResponse) => {
+        const color = normalizeBrandColor(response.brandColor) ?? normalizeBrandColor(response.defaultBrandColor);
+        setBrandColor(color ?? response.brandColor);
+        setLastValidBrandColor(color);
+    };
 
     const chooseFile = (selected: File) => {
         setFile(selected);
@@ -83,22 +101,30 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
     };
 
     const saveBrandColor = async () => {
-        const next = brandColor || '#52A9FF';
+        const next = normalizeBrandColor(brandColor);
+        if (colorOperation.current || !next) return;
 
+        colorOperation.current = true;
         setSavingColor(true);
 
         try {
-            await updateLogo({ brand_color: next });
+            const updated = await updateLogo({ brand_color: next });
+            applyBrandColorResponse(updated);
+            setColorTouched(false);
             await onSaved();
             toast.success('Brand color updated.');
         } catch (error) {
             toast.error(errorToMessage(error, 'Failed to save brand color.'));
         } finally {
+            colorOperation.current = false;
             setSavingColor(false);
         }
     };
 
     const resetBrandColor = async () => {
+        if (colorOperation.current) return;
+
+        colorOperation.current = true;
         setResettingColor(true);
 
         try {
@@ -106,11 +132,13 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
             // fall back to its default — the API returns that resolved value.
             const updated = await updateLogo({ brand_color: null });
             await onSaved();
-            setBrandColor(updated.brandColor);
+            applyBrandColorResponse(updated);
+            setColorTouched(false);
             toast.success('Brand color reset to default.');
         } catch (error) {
             toast.error(errorToMessage(error, 'Failed to reset brand color.'));
         } finally {
+            colorOperation.current = false;
             setResettingColor(false);
         }
     };
@@ -268,39 +296,101 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
                 <h2 className='text-sm font-semibold text-cream-50'>Brand Color</h2>
                 <p className='text-xs text-cream-400/50'>Accent color used across the panel interface.</p>
-                <div className='flex items-center gap-3'>
-                    <input
-                        type='color'
-                        value={brandColor}
-                        onChange={(event) => setBrandColor(event.target.value)}
-                        className='h-9 w-9 cursor-pointer rounded-lg border border-mocha-300 bg-transparent p-1'
-                        aria-label='Brand color'
+                {lastValidBrandColor ? (
+                    <div
+                        className='h-8 w-8 rounded-md border border-mocha-300'
+                        style={{ backgroundColor: lastValidBrandColor }}
+                        role='img'
+                        aria-label={`Current brand color ${lastValidBrandColor}`}
                     />
-                    <Input.Text
-                        value={brandColor}
-                        onChange={(event) => setBrandColor(event.target.value)}
-                        className='w-32 uppercase'
-                        aria-label='Brand color hex'
-                    />
-                    <div className='flex items-center gap-2'>
+                ) : (
+                    <p className='text-sm text-red-400' role='alert'>
+                        Brand color is unavailable because neither the saved color nor the server default is a valid hex
+                        color.
+                    </p>
+                )}
+                <div className='flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end'>
+                    {lastValidBrandColor && (
+                        <input
+                            id='brand-color-picker'
+                            type='color'
+                            value={lastValidBrandColor}
+                            disabled={savingColor || resettingColor}
+                            onChange={(event) => {
+                                setBrandColor(event.target.value.toUpperCase());
+                                setLastValidBrandColor(normalizeBrandColor(event.target.value));
+                                setColorTouched(true);
+                            }}
+                            className='h-11 w-11 shrink-0 cursor-pointer rounded-lg border border-mocha-300 bg-transparent p-1'
+                            aria-label='Brand color picker'
+                        />
+                    )}
+                    <div className='min-w-0 flex-1'>
+                        <label htmlFor='brand-color-hex' className='mb-1 block text-sm font-medium text-cream-100'>
+                            Brand color hex
+                        </label>
+                        <Input.Text
+                            id='brand-color-hex'
+                            value={brandColor}
+                            disabled={savingColor || resettingColor}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                setBrandColor(value);
+                                const normalized = normalizeBrandColor(value);
+                                if (normalized) setLastValidBrandColor(normalized);
+                                setColorTouched(true);
+                            }}
+                            className='h-11 w-full uppercase'
+                            aria-invalid={colorTouched && invalidBrandColor}
+                            aria-describedby={`brand-color-help${colorTouched && invalidBrandColor ? ' brand-color-error' : ''}`}
+                        />
+                        <p id='brand-color-help' className='mt-1 text-xs text-cream-400/70'>
+                            Use #RGB or #RRGGBB.
+                        </p>
+                        {colorTouched && invalidBrandColor && (
+                            <p id='brand-color-error' className='mt-1 text-sm text-red-400' role='alert'>
+                                Enter a valid hex color, such as #RGB or #RRGGBB.
+                            </p>
+                        )}
+                    </div>
+                    <div className='flex flex-wrap gap-2'>
                         <Button
                             onClick={saveBrandColor}
+                            className='h-11'
                             disabled={
-                                savingColor || brandColor.toLowerCase() === (logo.brandColor || '#52A9FF').toLowerCase()
+                                savingColor ||
+                                resettingColor ||
+                                invalidBrandColor ||
+                                normalizedBrandColor === savedBrandColor
                             }
                         >
-                            {savingColor ? <Spinner size={Spinner.Size.SMALL} /> : 'Save Color'}
+                            {savingColor ? (
+                                <span role='status' className='inline-flex items-center gap-2'>
+                                    <Spinner size={Spinner.Size.SMALL} />
+                                    <span>Saving color…</span>
+                                </span>
+                            ) : (
+                                'Save Color'
+                            )}
                         </Button>
                         <Button
                             variant='outline'
                             onClick={resetBrandColor}
+                            className='h-11'
                             disabled={
                                 resettingColor ||
                                 savingColor ||
-                                brandColor.toLowerCase() === (logo.defaultBrandColor || '').toLowerCase()
+                                (savedBrandColor === defaultBrandColor && normalizedBrandColor === defaultBrandColor)
                             }
                         >
-                            {resettingColor ? <Spinner size={Spinner.Size.SMALL} /> : 'Reset to default'}
+                            {resettingColor ? (
+                                <span role='status' className='inline-flex items-center gap-2'>
+                                    <Spinner size={Spinner.Size.SMALL} />
+                                    <span>Resetting color…</span>
+                                </span>
+                            ) : (
+                                'Reset to default'
+                            )}
                         </Button>
                     </div>
                 </div>
