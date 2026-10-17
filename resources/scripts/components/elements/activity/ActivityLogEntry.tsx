@@ -60,7 +60,9 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
 
                 <div className='mt-0.5 flex items-center gap-3 text-xs text-zinc-500'>
                     {activity.ip && <span className='font-mono'>{activity.ip}</span>}
-                    <span>{formatDistanceToNowStrict(activity.timestamp, { addSuffix: true, locale: dateFnsLocale })}</span>
+                    <span>
+                        {formatDistanceToNowStrict(activity.timestamp, { addSuffix: true, locale: dateFnsLocale })}
+                    </span>
                     {!activity.hasAdditionalMetadata &&
                         activity.properties &&
                         Object.keys(activity.properties).length > 0 && (

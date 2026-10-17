@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useSystemStatus } from '@/api/admin/useSystemStatus';
+import { useVersionCheck } from '@/api/admin/useVersion';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
@@ -86,6 +87,45 @@ function LoadGraph({ loads, config }: { loads: number[]; config: ChartConfig }) 
     );
 }
 
+function VersionCard() {
+    const { t } = useTranslation();
+    const { data } = useVersionCheck();
+
+    const state = !data
+        ? t('admin.overview.version_checking')
+        : data.up_to_date === true
+          ? t('admin.overview.version_up_to_date')
+          : data.up_to_date === false
+            ? t('admin.overview.version_update_to', { version: data.latest ?? '' })
+            : t('admin.overview.version_unknown');
+
+    const stateClass =
+        data?.up_to_date === true ? 'text-hydro-400' : data?.up_to_date === false ? 'text-brand-400' : 'text-cream-50';
+
+    return (
+        <Card label={t('admin.overview.version')}>
+            <dl className='space-y-2 text-sm'>
+                {[
+                    [t('admin.overview.version_panel'), data?.current ?? '—'],
+                    [t('admin.overview.version_latest'), data?.latest ?? '—'],
+                    [t('admin.overview.version_status'), state],
+                ].map(([key, value]) => (
+                    <div key={key} className='flex justify-between gap-4'>
+                        <dt className='text-cream-400/60'>{key}</dt>
+                        <dd
+                            className={
+                                key === t('admin.overview.version_status') ? stateClass : 'truncate text-cream-50'
+                            }
+                        >
+                            {value}
+                        </dd>
+                    </div>
+                ))}
+            </dl>
+        </Card>
+    );
+}
+
 const OverviewContainer = () => {
     const { t } = useTranslation();
     const { data } = useSystemStatus();
@@ -148,7 +188,7 @@ const OverviewContainer = () => {
                 </Card>
             </div>
 
-            <div className='mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4'>
+            <div className='mt-4 grid grid-cols-1 lg:grid-cols-3 gap-4'>
                 <Card label={t('admin.overview.system')}>
                     <dl className='space-y-2 text-sm'>
                         {[
@@ -163,6 +203,7 @@ const OverviewContainer = () => {
                         ))}
                     </dl>
                 </Card>
+                <VersionCard />
                 <Card label={t('admin.overview.load_average')}>
                     <LoadGraph loads={system.load_average} config={chartConfigs.load} />
                 </Card>

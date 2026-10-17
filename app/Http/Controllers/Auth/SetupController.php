@@ -108,6 +108,10 @@ class SetupController extends Controller
             $lock->release();
         }
 
+        // Setup is complete: prime the flag so guests skip the user existence
+        // check on future page renders and the setup surface 404s immediately.
+        Cache::forever('pterodactyl.setup_complete', true);
+
         // Persist the language chosen in the setup wizard as the panel-wide
         // default so guests, error pages and notification fallbacks start out
         // in the same locale as the administrator that just completed setup.

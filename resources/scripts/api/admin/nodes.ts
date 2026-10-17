@@ -88,6 +88,9 @@ export const getNode = (id: number | string): Promise<AdminNode> =>
 export interface NodeStatus {
     up: boolean;
     version: string | null;
+    latest: string | null;
+    up_to_date: boolean | null;
+    upgrade_supported: boolean;
     error: string | null;
 }
 
@@ -215,8 +218,11 @@ export const getCalagopusLog = (id: number | string, file: string, lines = 500):
         })
         .then(({ data }) => data);
 
-export const upgradeCalagopus = (
+/**
+ * Ask a node to install a fresh daemon binary. The daemon-side endpoint is
+ * chosen by the backend type on the server (see config/daemons.php).
+ */
+export const upgradeNode = (
     id: number | string,
     values: { url: string; sha256: string; headers?: Record<string, string> },
-): Promise<{ applied: boolean }> =>
-    http.post(`/admin/api/nodes/${id}/calagopus/upgrade`, values).then(({ data }) => data);
+): Promise<{ applied?: boolean }> => http.post(`/admin/api/nodes/${id}/upgrade`, values).then(({ data }) => data);

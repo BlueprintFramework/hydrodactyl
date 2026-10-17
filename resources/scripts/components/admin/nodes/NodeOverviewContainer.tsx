@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useNode } from '@/api/admin/useNodes';
+import { useNode, useNodeStatus } from '@/api/admin/useNodes';
 import Spinner from '@/components/elements/Spinner';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
@@ -59,6 +59,7 @@ const NodeOverviewContainer = () => {
     const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data: node } = useNode(id);
+    const { data: status } = useNodeStatus(id);
 
     if (!node) {
         return (
@@ -67,6 +68,20 @@ const NodeOverviewContainer = () => {
             </div>
         );
     }
+
+    const daemonVersion = !status
+        ? t('admin.nodes.daemon_checking')
+        : !status.up
+          ? t('admin.nodes.daemon_unreachable')
+          : !status.version
+            ? t('admin.nodes.daemon_unknown')
+            : `v${status.version} (${
+                  status.up_to_date === true
+                      ? t('admin.nodes.daemon_up_to_date')
+                      : status.up_to_date === false
+                        ? t('admin.nodes.daemon_update_to', { version: status.latest ?? '' })
+                        : t('admin.nodes.daemon_status_unknown')
+              })`;
 
     return (
         <div className='space-y-4'>
@@ -86,6 +101,7 @@ const NodeOverviewContainer = () => {
             </div>
 
             <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
+                <Stat label={t('admin.nodes.daemon_version')} value={daemonVersion} />
                 <Stat label={t('admin.common.fqdn')} value={node.fqdn} />
                 <Stat label={t('admin.nodes.internal_fqdn')} value={node.internal_fqdn || '—'} />
                 <Stat label={t('admin.nodes.scheme')} value={node.scheme.toUpperCase()} />

@@ -174,7 +174,7 @@ const NetworkContainer = () => {
                     onClose={() => setShowSubdomainModal(false)}
                     title={t('server.network.subdomain_management')}
                 >
-                    <SubdomainManagement onClose={() => setShowSubdomainModal(false)} />
+                    <SubdomainManagement />
                 </Dialog>
             )}
         </ServerContentBlock>

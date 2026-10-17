@@ -71,6 +71,18 @@
     --font-manrope: "Manrope", serif;
 }
 
+/* The configured brand color (server-rendered into --brand-color by
+   templates/wrapper.blade.php) drives the hydro accent ramp, so the admin
+   panel and user dashboard re-tint when branding changes. Must come after
+   @theme so it wins the cascade. */
+:root {
+    --color-hydro: var(--brand-color);
+    --color-hydro-300: color-mix(in srgb, var(--brand-color) 62%, white);
+    --color-hydro-400: color-mix(in srgb, var(--brand-color) 85%, white);
+    --color-hydro-500: var(--brand-color);
+    --color-hydro-600: color-mix(in srgb, var(--brand-color) 80%, black);
+}
+
 @keyframes groupFlyIn {
     from {
         opacity: 0;

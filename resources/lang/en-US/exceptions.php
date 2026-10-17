@@ -214,6 +214,9 @@ return [
         'server_failed_install' => 'This server is in a failed install state and cannot be recovered. Please delete and re-create the server.',
         'mail_smtp_only' => 'This feature is only available if SMTP is the selected email driver for the Panel.',
         'calagopus_unreachable' => 'The panel could not reach the Calagopus node.',
+        'daemon_upgrade_unsupported' => 'This daemon does not support remote upgrades.',
+        'daemon_unreachable' => 'The panel could not reach the node.',
+        'logo_update_failed' => 'Failed to update the logo. Please check the file and try again.',
     ],
     'dns' => [
         'marque_record_not_found' => 'DNS record \':record\' was not found in the Marque zone for \':domain\'.',

@@ -214,6 +214,9 @@ return [
         'server_failed_install' => 'Este servidor está en un estado de instalación fallida y no se puede recuperar. Elimínalo y vuelve a crearlo.',
         'mail_smtp_only' => 'Esta función solo está disponible si SMTP es el controlador de correo electrónico seleccionado para el Panel.',
         'calagopus_unreachable' => 'El panel no pudo alcanzar el nodo Calagopus.',
+        'daemon_upgrade_unsupported' => 'Este daemon no admite actualizaciones remotas.',
+        'daemon_unreachable' => 'El panel no pudo contactar con el nodo.',
+        'logo_update_failed' => 'No se pudo actualizar el logotipo. Revisa el archivo e inténtalo de nuevo.',
     ],
     'dns' => [
         'marque_record_not_found' => 'No se encontró el registro DNS \':record\' en la zona de Marque para \':domain\'.',

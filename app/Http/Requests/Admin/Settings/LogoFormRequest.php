@@ -13,6 +13,7 @@ class LogoFormRequest extends AdminFormRequest
             'logo_url' => 'nullable|url|max:2048',
             'remove' => 'nullable|boolean',
             'rewind' => 'nullable|integer|min:0',
+            'app:brand_color' => ['nullable', 'string', 'max:7', 'regex:/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/'],
         ];
     }
 
@@ -21,6 +22,7 @@ class LogoFormRequest extends AdminFormRequest
         return [
             'logo_file' => __('validation.attributes.logo_file'),
             'logo_url' => __('validation.attributes.logo_url'),
+            'app:brand_color' => __('validation.attributes.app_brand_color'),
         ];
     }
 
@@ -30,6 +32,7 @@ class LogoFormRequest extends AdminFormRequest
             'logo_file.mimes' => __('validation.json_api.logo_mimes'),
             'logo_file.max' => __('validation.json_api.logo_max'),
             'logo_url.url' => __('validation.json_api.logo_url_invalid'),
+            'app:brand_color.regex' => __('validation.json_api.brand_color_regex'),
         ];
     }
 }

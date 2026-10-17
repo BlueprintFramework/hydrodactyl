@@ -297,7 +297,9 @@ const ActivityLogContainer = () => {
                             <div className='w-5 h-5 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
                                 <Magnifier width={22} height={22} className='text-zinc-400' fill='currentColor' />
                             </div>
-                            <h3 className='text-base font-semibold text-zinc-100'>{t('account.activity.events_title')}</h3>
+                            <h3 className='text-base font-semibold text-zinc-100'>
+                                {t('account.activity.events_title')}
+                            </h3>
                             <span className='text-sm text-zinc-400'>
                                 {t(
                                     total === 1

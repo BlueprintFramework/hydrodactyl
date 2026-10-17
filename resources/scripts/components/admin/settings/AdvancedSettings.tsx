@@ -151,6 +151,8 @@ const AdvancedForm = ({
                             type='number'
                             value={values.rangeStart}
                             onChange={(e) => setValues({ ...values, rangeStart: e.target.value })}
+                            disabled={!values.allocationsEnabled}
+                            className='disabled:cursor-not-allowed disabled:opacity-60'
                         />
                     </Field>
                     <Field
@@ -161,6 +163,8 @@ const AdvancedForm = ({
                             type='number'
                             value={values.rangeEnd}
                             onChange={(e) => setValues({ ...values, rangeEnd: e.target.value })}
+                            disabled={!values.allocationsEnabled}
+                            className='disabled:cursor-not-allowed disabled:opacity-60'
                         />
                     </Field>
                 </div>

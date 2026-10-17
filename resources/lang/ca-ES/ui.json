@@ -284,7 +284,15 @@
             "used": "Usat",
             "free": "Lliure",
             "load": "Càrrega",
-            "usage": "Ús"
+            "usage": "Ús",
+            "version": "Versió",
+            "version_checking": "Comprovant...",
+            "version_up_to_date": "Actualitzat",
+            "version_update_to": "Actualitza a {{version}}",
+            "version_unknown": "Desconegut",
+            "version_panel": "Panell",
+            "version_latest": "Última",
+            "version_status": "Estat"
         },
         "users": {
             "description": "Tots els usuaris registrats al sistema.",
@@ -618,7 +626,14 @@
             "auto_deploy_description": "Genera una comanda que configura el daemon al servidor de destinació en un sol pas.",
             "generate_token": "Generar token",
             "deploy_command": "Comanda de desplegament",
-            "no_servers": "No hi ha servidors assignats a aquest node."
+            "no_servers": "No hi ha servidors assignats a aquest node.",
+            "daemon_version": "Versió del dimoni",
+            "daemon_checking": "Comprovant...",
+            "daemon_unreachable": "Inabastable",
+            "daemon_unknown": "Desconeguda",
+            "daemon_up_to_date": "actualitzat",
+            "daemon_update_to": "actualitza a {{version}}",
+            "daemon_status_unknown": "estat desconegut"
         },
         "servers": {
             "description": "Tots els servidors disponibles al sistema.",
@@ -1134,7 +1149,16 @@
                 "document": "Document",
                 "terminal": "Terminal",
                 "rocket": "Coet"
-            }
+            },
+            "brand_color": "Color de marca",
+            "brand_color_description": "Color d'accent utilitzat a tota la interfície del panell.",
+            "brand_color_hex": "Color de marca hexadecimal",
+            "save_color": "Desa el color",
+            "reset_to_default": "Restableix al valor per defecte",
+            "brand_color_updated": "Color de marca actualitzat.",
+            "brand_color_update_failed": "No s'ha pogut desar el color de marca.",
+            "brand_color_reset": "Color de marca restablert al valor per defecte.",
+            "brand_color_reset_failed": "No s'ha pogut restablir el color de marca."
         },
         "system_info": {
             "cpu_cores": "Nuclis de CPU",
@@ -1218,7 +1242,7 @@
         "enable": "Activa",
         "enabled": "Activat",
         "error": "Error",
-            "hide": "Amaga",
+        "hide": "Amaga",
         "inactive": "Inactiu",
         "loading": "S'està carregant...",
         "logo": "Logotip",
@@ -1245,7 +1269,7 @@
         "saved": "Desat",
         "saving": "S'està desant...",
         "search": "Cerca",
-            "select_placeholder": "Selecciona…",
+        "select_placeholder": "Selecciona…",
         "select": "Selecciona",
         "server": "Servidor",
         "submit": "Envia",
@@ -1360,7 +1384,8 @@
             "groups_aria": "Mostra els servidors agrupats.",
             "list": "Vista de llista",
             "list_aria": "Mostra els servidors en una llista."
-        }
+        },
+        "clear_filters": "Esborra els filtres"
     },
     "errors": {
         "access_denied": {
@@ -1606,7 +1631,7 @@
             "node_maintenance": "El node d'aquest servidor està actualment en manteniment i totes les accions no estan disponibles.",
             "not_available": "n/d",
             "nothing_to_copy": "Encara no hi ha res a la consola per copiar.",
-                "of_value": "de {{value}}",
+            "of_value": "de {{value}}",
             "outbound": "Sortint",
             "power_restarting": "El teu servidor s'està reiniciant.",
             "power_starting": "El teu servidor s'està iniciant!",
@@ -1747,9 +1772,9 @@
             "archive_success": "Fitxers arxivats correctament.",
             "archive_timeout": "Sembla que aquest arxiu triga molt a generar-se. Apareixerà quan es completi.",
             "archiving": "S'estan arxivant fitxers...",
-                "cancel_all": "Cancel·la-ho tot",
-                "cancel_upload": "Cancel·la la pujada",
-                "cancel_upload_aria": "Cancel·la la pujada de {{file}}",
+            "cancel_all": "Cancel·la-ho tot",
+            "cancel_upload": "Cancel·la la pujada",
+            "cancel_upload_aria": "Cancel·la la pujada de {{file}}",
             "cancel_uploads": "Cancel·la les pujades",
             "configure_permissions": "Configura els permisos",
             "create_file": "Crea un fitxer",
@@ -1783,7 +1808,7 @@
             "ignore_notice_middle": ". Els fitxers o directoris que s'indiquin aquí s'exclouran de les còpies de seguretat. S'admeten comodins amb un asterisc (",
             "ignore_notice_prefix": "Estàs editant un fitxer",
             "ignore_notice_suffix": ").",
-                "more_upload_options": "Més opcions de pujada",
+            "more_upload_options": "Més opcions de pujada",
             "language": "Llenguatge",
             "move": "Mou",
             "moving": "S'està movent...",
@@ -1807,9 +1832,9 @@
             "unarchive_success": "Fitxers desarxivats correctament.",
             "unarchive_timeout": "Sembla que aquest arxiu triga molt a descomprimir-se. Quan acabi, els fitxers descomprimits apareixeran.",
             "unarchiving": "S'estan desarxivant fitxers...",
-                "upload_files": "Puja fitxers",
-                "upload_files_to": "Puja fitxers a {{directory}}",
-                "upload_folder": "Puja una carpeta",
+            "upload_files": "Puja fitxers",
+            "upload_files_to": "Puja fitxers a {{directory}}",
+            "upload_folder": "Puja una carpeta",
             "upload_to": "Puja a {{name}}",
             "uploading_one": "S'està pujant {{count}} fitxer; fes clic per veure-ho",
             "uploading_other": "S'estan pujant {{count}} fitxers; fes clic per veure-ho",
@@ -1838,7 +1863,7 @@
             "install": "Instal·la",
             "install_complete": "{{filename}} instal·lat. Reinicia el teu servidor per carregar-lo.",
             "install_success": "S'ha instal·lat {{filename}} a {{directory}}/",
-                "install_success_restart": "{{filename}} instal·lat. Reinicia el servidor per carregar-lo.",
+            "install_success_restart": "{{filename}} instal·lat. Reinicia el servidor per carregar-lo.",
             "installed": "Instal·lat",
             "installed_count": "Instal·lats ({{count}})",
             "installing": "S'està instal·lant",
@@ -1911,7 +1936,8 @@
                 "no_domains_description": "Contacta amb el teu administrador per configurar el suport de subdominis per a aquest servidor.",
                 "no_domains_title": "No hi ha dominis configurats",
                 "placeholder": "elservidor",
-                "save_changes": "Desa els canvis"
+                "save_changes": "Desa els canvis",
+                "delete_title": "Voleu eliminar el subdomini?"
             },
             "subdomain_management": "Gestió de subdominis",
             "subdomains": "Subdominis",
@@ -2069,7 +2095,16 @@
             "sftp_password_notice": "La contrasenya de SFTP és la mateixa que utilitzes per accedir a aquest panell.",
             "sftp_username": "Nom d'usuari SFTP",
             "title": "Configuració",
-            "username": "Nom d'usuari"
+            "username": "Nom d'usuari",
+            "webhook": {
+                "title": "Webhook",
+                "subtitle": "Envia l'activitat del servidor a un webhook extern.",
+                "updating": "Actualitzant els detalls del servidor...",
+                "updated": "Detalls del servidor actualitzats!",
+                "type_label": "Tipus de webhook",
+                "type_placeholder": "Selecciona un tipus de webhook",
+                "url_label": "URL del webhook"
+            }
         },
         "software": {
             "clear_search": "Esborra la cerca",
@@ -2246,7 +2281,8 @@
             },
             "title": "Configuració d'arrencada",
             "variables": {
-                "builtin_title": "Variables integrades",                "builtin_description": "Sempre disponibles a l'ordre d'inici. Fes clic en un nom per copiar-lo.",
+                "builtin_title": "Variables integrades",
+                "builtin_description": "Sempre disponibles a l'ordre d'inici. Fes clic en un nom per copiar-lo.",
                 "description": "Valors específics d'aquest servidor. Els canvis es desen a mesura que els edites.",
                 "global": "Variables globals del servidor",
                 "off": "Desactivat",

@@ -38,6 +38,7 @@ Route::get('/', [Admin\AppController::class, 'index'])->name('admin.index');
 */
 Route::group(['prefix' => 'api'], function () {
     Route::get('/system-status', [Base\SystemStatusController::class, 'index'])->name('admin.api.system-status');
+    Route::get('/version-check', [Admin\Api\VersionController::class, 'index'])->name('admin.api.version');
 
     Route::group(['prefix' => 'users'], function () {
         Route::get('/', [Admin\Api\UserController::class, 'index'])->name('admin.api.users');
@@ -81,13 +82,15 @@ Route::group(['prefix' => 'api'], function () {
         Route::get('/{node:id}/configuration', [Admin\Api\NodeConfigurationController::class, 'index']);
         Route::post('/{node:id}/configuration/token', Admin\NodeAutoDeployController::class);
 
-        // Calagopus-only node endpoints (system info, stats, logs, self-upgrade).
+        // Backend-aware remote self-upgrade (endpoint defined per daemon in config/daemons.php).
+        Route::post('/{node:id}/upgrade', [Admin\Api\NodeUpgradeController::class, 'store']);
+
+        // Calagopus-only node endpoints (system info, stats, logs).
         Route::group(['prefix' => '{node:id}/calagopus'], function () {
             Route::get('/system', [Admin\Api\NodeCalagopusController::class, 'system']);
             Route::get('/stats', [Admin\Api\NodeCalagopusController::class, 'stats']);
             Route::get('/logs', [Admin\Api\NodeCalagopusController::class, 'logs']);
             Route::get('/logs/{file}', [Admin\Api\NodeCalagopusController::class, 'log']);
-            Route::post('/upgrade', [Admin\Api\NodeCalagopusController::class, 'upgrade']);
         });
 
         Route::get('/{node:id}/allocations', [Admin\Api\NodeAllocationController::class, 'index']);

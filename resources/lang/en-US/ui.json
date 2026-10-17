@@ -284,7 +284,15 @@
             "used": "Used",
             "free": "Free",
             "load": "Load",
-            "usage": "Usage"
+            "usage": "Usage",
+            "version": "Version",
+            "version_checking": "Checking...",
+            "version_up_to_date": "Up to date",
+            "version_update_to": "Update to {{version}}",
+            "version_unknown": "Unknown",
+            "version_panel": "Panel",
+            "version_latest": "Latest",
+            "version_status": "Status"
         },
         "users": {
             "description": "All registered users on the system.",
@@ -618,7 +626,14 @@
             "auto_deploy_description": "Generate a command that configures the daemon on the target server in a single step.",
             "generate_token": "Generate Token",
             "deploy_command": "Deploy Command",
-            "no_servers": "No servers are assigned to this node."
+            "no_servers": "No servers are assigned to this node.",
+            "daemon_version": "Daemon Version",
+            "daemon_checking": "Checking...",
+            "daemon_unreachable": "Unreachable",
+            "daemon_unknown": "Unknown",
+            "daemon_up_to_date": "up to date",
+            "daemon_update_to": "update to {{version}}",
+            "daemon_status_unknown": "status unknown"
         },
         "servers": {
             "description": "All servers available on the system.",
@@ -1134,7 +1149,16 @@
                 "document": "Document",
                 "terminal": "Terminal",
                 "rocket": "Rocket"
-            }
+            },
+            "brand_color": "Brand Color",
+            "brand_color_description": "Accent color used across the panel interface.",
+            "brand_color_hex": "Brand color hex",
+            "save_color": "Save Color",
+            "reset_to_default": "Reset to default",
+            "brand_color_updated": "Brand color updated.",
+            "brand_color_update_failed": "Failed to save brand color.",
+            "brand_color_reset": "Brand color reset to default.",
+            "brand_color_reset_failed": "Failed to reset brand color."
         },
         "system_info": {
             "cpu_cores": "CPU Cores",
@@ -1218,7 +1242,7 @@
         "enable": "Enable",
         "enabled": "Enabled",
         "error": "Error",
-            "hide": "Hide",
+        "hide": "Hide",
         "inactive": "Inactive",
         "loading": "Loading...",
         "logo": "Logo",
@@ -1245,7 +1269,7 @@
         "saved": "Saved",
         "saving": "Saving...",
         "search": "Search",
-            "select_placeholder": "Select…",
+        "select_placeholder": "Select…",
         "select": "Select",
         "server": "Server",
         "submit": "Submit",
@@ -1360,7 +1384,8 @@
             "groups_aria": "View servers grouped.",
             "list": "List view",
             "list_aria": "View servers in a list layout."
-        }
+        },
+        "clear_filters": "Clear Filters"
     },
     "errors": {
         "access_denied": {
@@ -1606,7 +1631,7 @@
             "node_maintenance": "The node of this server is currently under maintenance and all actions are unavailable.",
             "not_available": "n/a",
             "nothing_to_copy": "There is nothing in the console to copy yet.",
-                "of_value": "of {{value}}",
+            "of_value": "of {{value}}",
             "outbound": "Outbound",
             "power_restarting": "Your server is restarting.",
             "power_starting": "Your server is starting!",
@@ -1747,9 +1772,9 @@
             "archive_success": "Files successfully archived.",
             "archive_timeout": "It looks like this archive is taking a long time to generate. It will appear once completed.",
             "archiving": "Archiving files...",
-                "cancel_all": "Cancel all",
-                "cancel_upload": "Cancel upload",
-                "cancel_upload_aria": "Cancel upload of {{file}}",
+            "cancel_all": "Cancel all",
+            "cancel_upload": "Cancel upload",
+            "cancel_upload_aria": "Cancel upload of {{file}}",
             "cancel_uploads": "Cancel Uploads",
             "configure_permissions": "Configure permissions",
             "create_file": "Create File",
@@ -1783,7 +1808,7 @@
             "ignore_notice_middle": "file. Any files or directories listed in here will be excluded from backups. Wildcards are supported by using an asterisk (",
             "ignore_notice_prefix": "You're editing a",
             "ignore_notice_suffix": ").",
-                "more_upload_options": "More upload options",
+            "more_upload_options": "More upload options",
             "language": "Language",
             "move": "Move",
             "moving": "Moving...",
@@ -1807,9 +1832,9 @@
             "unarchive_success": "Files successfully unarchived.",
             "unarchive_timeout": "It looks like this archive is taking a long time to be unarchived. Once completed the unarchived files will appear.",
             "unarchiving": "Unarchiving files...",
-                "upload_files": "Upload Files",
-                "upload_files_to": "Upload files to {{directory}}",
-                "upload_folder": "Upload Folder",
+            "upload_files": "Upload Files",
+            "upload_files_to": "Upload files to {{directory}}",
+            "upload_folder": "Upload Folder",
             "upload_to": "Upload to {{name}}",
             "uploading_one": "{{count}} file is uploading — click to view",
             "uploading_other": "{{count}} files are uploading — click to view",
@@ -1838,7 +1863,7 @@
             "install": "Install",
             "install_complete": "{{filename}} installed. Restart your server to load it.",
             "install_success": "Installed {{filename}} into {{directory}}/",
-                "install_success_restart": "{{filename}} installed. Restart your server to load it.",
+            "install_success_restart": "{{filename}} installed. Restart your server to load it.",
             "installed": "Installed",
             "installed_count": "Installed ({{count}})",
             "installing": "Installing",
@@ -1911,7 +1936,8 @@
                 "no_domains_description": "Contact your administrator to configure subdomain support for this server.",
                 "no_domains_title": "No domains configured",
                 "placeholder": "myserver",
-                "save_changes": "Save Changes"
+                "save_changes": "Save Changes",
+                "delete_title": "Delete Subdomain?"
             },
             "subdomain_management": "Subdomain Management",
             "subdomains": "Subdomains",
@@ -2069,7 +2095,16 @@
             "sftp_password_notice": "Your SFTP password is the same as the password you use to access this panel.",
             "sftp_username": "SFTP username",
             "title": "Settings",
-            "username": "Username"
+            "username": "Username",
+            "webhook": {
+                "title": "Webhook",
+                "subtitle": "Send server activity to an external webhook.",
+                "updating": "Updating server details...",
+                "updated": "Server details updated!",
+                "type_label": "Webhook Type",
+                "type_placeholder": "Select a webhook type",
+                "url_label": "Webhook URL"
+            }
         },
         "software": {
             "clear_search": "Clear search",
@@ -2246,7 +2281,8 @@
             },
             "title": "Startup Settings",
             "variables": {
-                "builtin_title": "Built-in variables",                "builtin_description": "Always available in the startup command. Click a name to copy it.",
+                "builtin_title": "Built-in variables",
+                "builtin_description": "Always available in the startup command. Click a name to copy it.",
                 "description": "Values specific to this server. Changes are saved as you edit them.",
                 "global": "Global Server Variables",
                 "off": "Off",

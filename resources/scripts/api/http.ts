@@ -13,6 +13,13 @@ const http: AxiosInstance = axios.create({
 });
 
 http.interceptors.request.use((req) => {
+    if (req.data instanceof FormData) {
+        // The shared JSON content-type default would otherwise make axios
+        // serialize the FormData as JSON and drop the file — let the browser
+        // set the multipart boundary instead.
+        req.headers.delete('Content-Type');
+    }
+
     if (!req.url?.endsWith('/resources')) {
         store.getActions().progress.startContinuous();
     }

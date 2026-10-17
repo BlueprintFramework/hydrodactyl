@@ -375,4 +375,8 @@ return [
         'variable_value' => 'variable :env',
         'invalid_password' => 'La contraseña proporcionada no era válida para esta cuenta.',
     ],
+    'webhook' => [
+        'type_not_allowed' => 'El tipo de webhook no está permitido',
+        'invalid_protocol' => 'Protocolo no válido',
+    ],
 ];

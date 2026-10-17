@@ -4,6 +4,7 @@ php_version: "8.5"
 js_runtime: pnpm
 framework: laravel
 framework_version: "13"
+secured: true
 services:
   - mailpit
   - mariadb-11:

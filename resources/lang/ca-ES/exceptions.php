@@ -214,6 +214,9 @@ return [
         'server_failed_install' => 'Aquest servidor està en un estat d\'instal·lació fallida i no es pot recuperar. Elimina\'l i torna\'l a crear.',
         'mail_smtp_only' => 'Aquesta funció només està disponible si SMTP és el controlador de correu electrònic seleccionat per al panell.',
         'calagopus_unreachable' => 'El panell no ha pogut arribar al node Calagopus.',
+        'daemon_upgrade_unsupported' => 'Aquest dimoni no admet actualitzacions remotes.',
+        'daemon_unreachable' => 'El panell no ha pogut contactar amb el node.',
+        'logo_update_failed' => 'No s\'ha pogut actualitzar el logotip. Revisa el fitxer i torna-ho a provar.',
     ],
     'dns' => [
         'marque_record_not_found' => 'No s\'ha trobat el registre DNS \':record\' a la zona de Marque per a \':domain\'.',

@@ -8,6 +8,7 @@ import {
     type SubdomainInfo,
     setSubdomain,
 } from '@/api/server/network/subdomain';
+import ConfirmationModal from '@/components/elements/ConfirmationModal';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
@@ -63,11 +64,7 @@ const createValidationSchema = (t: Translate) =>
         domain_id: yup.string().required(t('server.network.subdomain.domain_required')),
     });
 
-interface Props {
-    onClose?: () => void;
-}
-
-const SubdomainManagement = ({ onClose: _onClose }: Props) => {
+const SubdomainManagement = () => {
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [subdomainInfo, setSubdomainInfo] = useState<SubdomainInfo | null>(null);
@@ -78,6 +75,7 @@ const SubdomainManagement = ({ onClose: _onClose }: Props) => {
         message: string;
     } | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const { clearFlashes, clearAndAddHttpError } = useFlashKey('server:network:subdomain');
@@ -183,18 +181,16 @@ const SubdomainManagement = ({ onClose: _onClose }: Props) => {
     };
 
     const handleDeleteSubdomain = async () => {
-        if (!confirm(t('server.network.subdomain.delete_confirm'))) {
-            return;
-        }
-
         try {
             clearFlashes();
             setLoading(true);
             await deleteSubdomain(uuid);
             await loadSubdomainInfo();
             setAvailabilityStatus(null);
+            setShowDeleteConfirmation(false);
         } catch (error) {
             clearAndAddHttpError(error as Error);
+            setShowDeleteConfirmation(false);
         } finally {
             setLoading(false);
         }
@@ -246,6 +242,18 @@ const SubdomainManagement = ({ onClose: _onClose }: Props) => {
 
     return (
         <div>
+            <ConfirmationModal
+                title={t('server.network.subdomain.delete_title')}
+                buttonText={t('server.network.subdomain.delete')}
+                visible={showDeleteConfirmation}
+                loading={loading}
+                disabled={loading}
+                onConfirmed={() => handleDeleteSubdomain()}
+                onModalDismissed={() => setShowDeleteConfirmation(false)}
+            >
+                {t('server.network.subdomain.delete_confirm')}
+            </ConfirmationModal>
+
             {subdomainInfo?.current_subdomain && (
                 <div className='flex items-center gap-2 text-sm mb-4'>
                     <div
@@ -279,7 +287,12 @@ const SubdomainManagement = ({ onClose: _onClose }: Props) => {
                         </div>
                     </div>
                     <div className='flex items-center justify-end gap-3 pt-4 border-t border-[#ffffff15]'>
-                        <Button type='button' variant='attention' onClick={handleDeleteSubdomain} disabled={loading}>
+                        <Button
+                            type='button'
+                            variant='attention'
+                            onClick={() => setShowDeleteConfirmation(true)}
+                            disabled={loading}
+                        >
                             {loading ? t('server.network.subdomain.deleting') : t('server.network.subdomain.delete')}
                         </Button>
                         <Button type='button' variant='secondary' onClick={() => setIsEditing(true)} disabled={loading}>

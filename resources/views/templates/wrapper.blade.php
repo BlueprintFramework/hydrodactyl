@@ -16,6 +16,10 @@
                 $_favVal = config('app.logo.value');
                 if ($_favType === 'upload' && $_favVal && Storage::disk('public')->exists($_favVal)) {
                     $_favUrl = url('storage/' . $_favVal);
+                    $_favPath = Storage::disk('public')->path($_favVal);
+                    if (file_exists($_favPath)) {
+                        $_favUrl .= '?v=' . filemtime($_favPath);
+                    }
                 } elseif ($_favType === 'link' && $_favVal) {
                     $_favUrl = $_favVal;
                 } else {
@@ -49,7 +53,7 @@
                     window.SiteConfiguration = {!! json_encode($siteConfiguration) !!};
                 </script>
             @endif
-            @if(Auth::guest() && !Cache::get('pterodactyl.setup_complete', false))
+            @if(Auth::guest() && !Cache::get('pterodactyl.setup_complete', false) && !\Pterodactyl\Models\User::query()->exists())
                 <script>window.SetupRequired = true;</script>
             @endif
         @show
@@ -63,6 +67,12 @@
 
         @viteReactRefresh
         @vite($viteEntry ?? 'resources/scripts/index.tsx')
+
+        <style>
+            :root {
+                --brand-color: {{ config('app.brand_color', '#52A9FF') }};
+            }
+        </style>
     </head>
     <body data-hydrodactyl-body class="{{ $css['body'] }}" style="background-color: #11100E; height: 100%; width: 100%; margin: 0; padding: 0;">
         @section('content')

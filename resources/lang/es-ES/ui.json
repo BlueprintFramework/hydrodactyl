@@ -284,7 +284,15 @@
             "used": "Usado",
             "free": "Libre",
             "load": "Carga",
-            "usage": "Uso"
+            "usage": "Uso",
+            "version": "Versión",
+            "version_checking": "Comprobando...",
+            "version_up_to_date": "Actualizado",
+            "version_update_to": "Actualizar a {{version}}",
+            "version_unknown": "Desconocido",
+            "version_panel": "Panel",
+            "version_latest": "Última",
+            "version_status": "Estado"
         },
         "users": {
             "description": "Todos los usuarios registrados en el sistema.",
@@ -618,7 +626,14 @@
             "auto_deploy_description": "Genera un comando que configura el daemon en el servidor de destino en un solo paso.",
             "generate_token": "Generar token",
             "deploy_command": "Comando de despliegue",
-            "no_servers": "No hay servidores asignados a este nodo."
+            "no_servers": "No hay servidores asignados a este nodo.",
+            "daemon_version": "Versión del daemon",
+            "daemon_checking": "Comprobando...",
+            "daemon_unreachable": "Inalcanzable",
+            "daemon_unknown": "Desconocida",
+            "daemon_up_to_date": "actualizado",
+            "daemon_update_to": "actualizar a {{version}}",
+            "daemon_status_unknown": "estado desconocido"
         },
         "servers": {
             "description": "Todos los servidores disponibles en el sistema.",
@@ -1134,7 +1149,16 @@
                 "document": "Documento",
                 "terminal": "Terminal",
                 "rocket": "Cohete"
-            }
+            },
+            "brand_color": "Color de marca",
+            "brand_color_description": "Color de acento usado en toda la interfaz del panel.",
+            "brand_color_hex": "Color de marca hexadecimal",
+            "save_color": "Guardar color",
+            "reset_to_default": "Restablecer al valor predeterminado",
+            "brand_color_updated": "Color de marca actualizado.",
+            "brand_color_update_failed": "No se pudo guardar el color de marca.",
+            "brand_color_reset": "Color de marca restablecido al valor predeterminado.",
+            "brand_color_reset_failed": "No se pudo restablecer el color de marca."
         },
         "system_info": {
             "cpu_cores": "Núcleos de CPU",
@@ -1218,7 +1242,7 @@
         "enable": "Activar",
         "enabled": "Activado",
         "error": "Error",
-            "hide": "Ocultar",
+        "hide": "Ocultar",
         "inactive": "Inactivo",
         "loading": "Cargando...",
         "logo": "Logotipo",
@@ -1245,7 +1269,7 @@
         "saved": "Guardado",
         "saving": "Guardando...",
         "search": "Buscar",
-            "select_placeholder": "Seleccionar…",
+        "select_placeholder": "Seleccionar…",
         "select": "Seleccionar",
         "server": "Servidor",
         "submit": "Enviar",
@@ -1360,7 +1384,8 @@
             "groups_aria": "Ver los servidores agrupados.",
             "list": "Vista de lista",
             "list_aria": "Ver los servidores en una lista."
-        }
+        },
+        "clear_filters": "Borrar filtros"
     },
     "errors": {
         "access_denied": {
@@ -1606,7 +1631,7 @@
             "node_maintenance": "El nodo de este servidor está actualmente en mantenimiento y ninguna acción está disponible.",
             "not_available": "n/a",
             "nothing_to_copy": "Todavía no hay nada en la consola para copiar.",
-                "of_value": "de {{value}}",
+            "of_value": "de {{value}}",
             "outbound": "Saliente",
             "power_restarting": "Tu servidor se está reiniciando.",
             "power_starting": "¡Tu servidor se está iniciando!",
@@ -1747,9 +1772,9 @@
             "archive_success": "Archivos archivados correctamente.",
             "archive_timeout": "Parece que este archivo está tardando mucho en generarse. Aparecerá cuando se complete.",
             "archiving": "Archivando archivos...",
-                "cancel_all": "Cancelar todo",
-                "cancel_upload": "Cancelar subida",
-                "cancel_upload_aria": "Cancelar la subida de {{file}}",
+            "cancel_all": "Cancelar todo",
+            "cancel_upload": "Cancelar subida",
+            "cancel_upload_aria": "Cancelar la subida de {{file}}",
             "cancel_uploads": "Cancelar subidas",
             "configure_permissions": "Configurar permisos",
             "create_file": "Crear archivo",
@@ -1783,7 +1808,7 @@
             "ignore_notice_middle": "archivo. Los archivos o directorios que se listen aquí se excluirán de las copias de seguridad. Se admiten comodines usando un asterisco (",
             "ignore_notice_prefix": "Estás editando un",
             "ignore_notice_suffix": ").",
-                "more_upload_options": "Más opciones de subida",
+            "more_upload_options": "Más opciones de subida",
             "language": "Lenguaje",
             "move": "Mover",
             "moving": "Moviendo...",
@@ -1807,9 +1832,9 @@
             "unarchive_success": "Archivos desarchivados correctamente.",
             "unarchive_timeout": "Parece que este archivo está tardando mucho en descomprimirse. Cuando termine, los archivos descomprimidos aparecerán.",
             "unarchiving": "Desarchivando archivos...",
-                "upload_files": "Subir archivos",
-                "upload_files_to": "Subir archivos a {{directory}}",
-                "upload_folder": "Subir carpeta",
+            "upload_files": "Subir archivos",
+            "upload_files_to": "Subir archivos a {{directory}}",
+            "upload_folder": "Subir carpeta",
             "upload_to": "Subir a {{name}}",
             "uploading_one": "Se está subiendo {{count}} archivo; haz clic para verlo",
             "uploading_other": "Se están subiendo {{count}} archivos; haz clic para verlos",
@@ -1838,7 +1863,7 @@
             "install": "Instalar",
             "install_complete": "{{filename}} instalado. Reinicia tu servidor para cargarlo.",
             "install_success": "Se ha instalado {{filename}} en {{directory}}/",
-                "install_success_restart": "{{filename}} instalado. Reinicia tu servidor para cargarlo.",
+            "install_success_restart": "{{filename}} instalado. Reinicia tu servidor para cargarlo.",
             "installed": "Instalado",
             "installed_count": "Instalados ({{count}})",
             "installing": "Instalando",
@@ -1911,7 +1936,8 @@
                 "no_domains_description": "Contacta con tu administrador para configurar la compatibilidad con subdominios para este servidor.",
                 "no_domains_title": "No hay dominios configurados",
                 "placeholder": "miservidor",
-                "save_changes": "Guardar cambios"
+                "save_changes": "Guardar cambios",
+                "delete_title": "¿Eliminar subdominio?"
             },
             "subdomain_management": "Gestión de subdominios",
             "subdomains": "Subdominios",
@@ -2069,7 +2095,16 @@
             "sftp_password_notice": "Tu contraseña de SFTP es la misma que la que usas para acceder a este panel.",
             "sftp_username": "Nombre de usuario SFTP",
             "title": "Ajustes",
-            "username": "Nombre de usuario"
+            "username": "Nombre de usuario",
+            "webhook": {
+                "title": "Webhook",
+                "subtitle": "Envía la actividad del servidor a un webhook externo.",
+                "updating": "Actualizando los detalles del servidor...",
+                "updated": "¡Detalles del servidor actualizados!",
+                "type_label": "Tipo de webhook",
+                "type_placeholder": "Selecciona un tipo de webhook",
+                "url_label": "URL del webhook"
+            }
         },
         "software": {
             "clear_search": "Borrar búsqueda",
@@ -2246,7 +2281,8 @@
             },
             "title": "Ajustes de inicio",
             "variables": {
-                "builtin_title": "Variables integradas",                "builtin_description": "Siempre disponibles en el comando de inicio. Haz clic en un nombre para copiarlo.",
+                "builtin_title": "Variables integradas",
+                "builtin_description": "Siempre disponibles en el comando de inicio. Haz clic en un nombre para copiarlo.",
                 "description": "Valores específicos de este servidor. Los cambios se guardan a medida que los editas.",
                 "global": "Variables globales del servidor",
                 "off": "Desactivado",
