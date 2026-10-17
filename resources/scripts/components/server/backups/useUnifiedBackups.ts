@@ -1,7 +1,6 @@
 import { useContext } from 'react';
 import getServerBackups from '@/api/swr/getServerBackups';
 import { useTranslation } from '@/i18n/I18nProvider';
-import { ServerContext } from '@/state/server';
 import { LiveProgressContext } from './BackupContainer';
 import type { UnifiedBackup } from './types';
 import { useBackupMutations } from './useBackupMutations';

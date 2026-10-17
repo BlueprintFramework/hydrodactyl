@@ -253,7 +253,7 @@ const Console = () => {
                 copyResetTimerRef.current = setTimeout(() => setCopiedConsole(false), 2000);
             })
             .catch(() => toast.error(t('server.console.copy_failed')));
-    }, [terminal]);
+    }, [terminal, t]);
 
     useEffect(
         () => () => {

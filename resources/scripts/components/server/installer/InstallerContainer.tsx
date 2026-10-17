@@ -350,7 +350,7 @@ const InstallerContainer = () => {
         }, 350);
 
         return () => clearTimeout(handle);
-    }, [uuid, tab, source, query, loader, gameVersion]);
+    }, [uuid, tab, source, query, loader, gameVersion, t]);
 
     const loadMore = useCallback(() => {
         if (!uuid || loadingMore || !hasMore) return;
@@ -374,7 +374,7 @@ const InstallerContainer = () => {
             })
             .catch((err) => toast.error(httpErrorToHuman(err) || t('server.installer.error_load_more')))
             .finally(() => setLoadingMore(false));
-    }, [uuid, loadingMore, hasMore, results, tab, source, query, loader, gameVersion]);
+    }, [uuid, loadingMore, hasMore, results, tab, source, query, loader, gameVersion, t]);
 
     const tabLoaders = useMemo(() => loadersFor(eggFeatures, tab, knownLoaders), [eggFeatures, tab, knownLoaders]);
 

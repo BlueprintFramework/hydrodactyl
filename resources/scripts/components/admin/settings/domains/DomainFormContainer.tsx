@@ -77,7 +77,7 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
             next.delete('atproto_error');
             setSearchParams(next, { replace: true });
         }
-    }, [searchParams, setSearchParams]);
+    }, [searchParams, setSearchParams, t]);
 
     useEffect(() => {
         if (!isMarque) {
