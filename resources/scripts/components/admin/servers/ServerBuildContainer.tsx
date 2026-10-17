@@ -16,6 +16,7 @@ import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import VirtualizedList from '@/components/elements/VirtualizedList';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 interface FormState {
     cpu: string;
@@ -45,6 +46,7 @@ const AllocationChecklist = ({
     onToggle: (id: number, checked: boolean) => void;
     emptyLabel: string;
 }) => {
+    const { t } = useTranslation();
     const [search, setSearch] = useState('');
     const term = search.trim().toLowerCase();
 
@@ -61,7 +63,7 @@ const AllocationChecklist = ({
     return (
         <div className='flex flex-col gap-2'>
             <Input.Text
-                placeholder='Search allocations…'
+                placeholder={t('admin.servers.search_allocations')}
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
             />
@@ -85,7 +87,7 @@ const AllocationChecklist = ({
                 )}
                 emptyState={
                     <div className='px-3 py-2 text-sm text-cream-400/50'>
-                        {allocations.length === 0 ? emptyLabel : 'No allocations match your search.'}
+                        {allocations.length === 0 ? emptyLabel : t('admin.servers.no_allocations_match')}
                     </div>
                 }
             />
@@ -102,6 +104,7 @@ const ServerBuildForm = ({
     build: ServerBuildResponse;
     onSaved: () => Promise<unknown>;
 }) => {
+    const { t } = useTranslation();
     const { data, assigned, unassigned } = build;
     const isElytra = data.node_daemon_type === 'elytra';
 
@@ -152,10 +155,10 @@ const ServerBuildForm = ({
             await onSaved();
             setAdd([]);
             setRemove([]);
-            toast.success('Build configuration updated.');
+            toast.success(t('admin.servers.build_updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update the build configuration.'));
+            toast.error(errorToMessage(error, t('admin.servers.build_update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -170,28 +173,36 @@ const ServerBuildForm = ({
             className='grid grid-cols-1 gap-4 lg:grid-cols-12'
         >
             <div className='flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4 lg:col-span-5'>
-                <h2 className='text-sm font-semibold text-cream-50'>Resource Management</h2>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.resource_title')}</h2>
 
                 <Field
-                    label='CPU Limit'
+                    label={t('admin.servers.cpu_limit')}
                     error={errors.cpu}
-                    hint='Each thread is 100%. Set to 0 for unrestricted CPU time.'
+                    hint={t('admin.servers.cpu_limit_hint_build')}
                 >
                     <Input.Text type='number' value={values.cpu} onChange={(e) => set('cpu', e.target.value)} />
                 </Field>
 
-                <Field label='CPU Pinning' error={errors.threads} hint='Advanced: e.g. 0, 0-1,3 or 0,1,3,4.'>
+                <Field
+                    label={t('admin.servers.cpu_pinning')}
+                    error={errors.threads}
+                    hint={t('admin.servers.cpu_pinning_hint_build')}
+                >
                     <Input.Text value={values.threads} onChange={(e) => set('threads', e.target.value)} />
                 </Field>
 
-                <Field label='Allocated Memory' error={errors.memory} hint='MiB. Set to 0 for unlimited.'>
+                <Field
+                    label={t('admin.servers.allocated_memory')}
+                    error={errors.memory}
+                    hint={t('admin.servers.allocated_memory_hint')}
+                >
                     <Input.Text type='number' value={values.memory} onChange={(e) => set('memory', e.target.value)} />
                 </Field>
 
                 <Field
-                    label='Overhead Memory'
+                    label={t('admin.servers.overhead_memory')}
                     error={errors.overhead_memory}
-                    hint='MiB. Extra memory not exposed to SERVER_MEMORY. 0 disables it.'
+                    hint={t('admin.servers.overhead_hint_build')}
                 >
                     <Input.Text
                         type='number'
@@ -200,59 +211,71 @@ const ServerBuildForm = ({
                     />
                 </Field>
 
-                <Field label='Allocated Swap' error={errors.swap} hint='MiB. 0 disables swap, -1 is unlimited.'>
+                <Field
+                    label={t('admin.servers.allocated_swap')}
+                    error={errors.swap}
+                    hint={t('admin.servers.swap_hint_build')}
+                >
                     <Input.Text type='number' value={values.swap} onChange={(e) => set('swap', e.target.value)} />
                 </Field>
 
-                <Field label='Disk Space Limit' error={errors.disk} hint='MiB. Set to 0 for unlimited disk usage.'>
+                <Field
+                    label={t('admin.servers.disk_limit')}
+                    error={errors.disk}
+                    hint={t('admin.servers.disk_limit_hint')}
+                >
                     <Input.Text type='number' value={values.disk} onChange={(e) => set('disk', e.target.value)} />
                 </Field>
 
-                <Field label='Block IO Proportion' error={errors.io} hint='Advanced: between 10 and 1000.'>
+                <Field
+                    label={t('admin.servers.block_io_proportion')}
+                    error={errors.io}
+                    hint={t('admin.servers.block_io_hint_build')}
+                >
                     <Input.Text type='number' value={values.io} onChange={(e) => set('io', e.target.value)} />
                 </Field>
 
                 <Field
-                    label='OOM Killer'
+                    label={t('admin.servers.oom_killer_label')}
                     error={errors.oom_disabled}
-                    hint='Enabling may cause processes to exit unexpectedly.'
+                    hint={t('admin.servers.oom_hint')}
                 >
                     <Dropdown
                         value={String(values.oom_disabled)}
                         onChange={(value) => set('oom_disabled', value === 'true')}
                         options={[
-                            { value: 'false', label: 'Enabled' },
-                            { value: 'true', label: 'Disabled' },
+                            { value: 'false', label: t('common.enabled') },
+                            { value: 'true', label: t('common.disabled') },
                         ]}
                     />
                 </Field>
 
                 <Field
-                    label='Resource Calculation'
+                    label={t('admin.servers.resource_calculation')}
                     error={errors.exclude_from_resource_calculation}
-                    hint='Excluded servers are ignored when provisioning new servers onto this node.'
+                    hint={t('admin.servers.resource_calculation_hint')}
                 >
                     <Dropdown
                         value={String(values.exclude_from_resource_calculation)}
                         onChange={(value) => set('exclude_from_resource_calculation', value === 'true')}
                         options={[
-                            { value: 'false', label: 'Included' },
-                            { value: 'true', label: 'Excluded' },
+                            { value: 'false', label: t('admin.servers.included') },
+                            { value: 'true', label: t('admin.servers.excluded') },
                         ]}
                     />
                 </Field>
 
                 <Field
-                    label='Software Page'
+                    label={t('admin.servers.software_page')}
                     error={errors.software_enabled}
-                    hint='When disabled, the built-in Software page is hidden from users on this server.'
+                    hint={t('admin.servers.software_page_hint')}
                 >
                     <Dropdown
                         value={String(values.software_enabled)}
                         onChange={(value) => set('software_enabled', value === 'true')}
                         options={[
-                            { value: 'true', label: 'Enabled' },
-                            { value: 'false', label: 'Disabled' },
+                            { value: 'true', label: t('common.enabled') },
+                            { value: 'false', label: t('common.disabled') },
                         ]}
                     />
                 </Field>
@@ -260,12 +283,12 @@ const ServerBuildForm = ({
 
             <div className='flex flex-col gap-4 lg:col-span-7'>
                 <div className='flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Application Feature Limits</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.feature_limits_title')}</h2>
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                         <Field
-                            label='Database Limit'
+                            label={t('admin.servers.database_limit')}
                             error={errors.database_limit}
-                            hint='Blank is unlimited, 0 disables.'
+                            hint={t('admin.servers.blank_unlimited_zero')}
                         >
                             <Input.Text
                                 type='number'
@@ -274,9 +297,9 @@ const ServerBuildForm = ({
                             />
                         </Field>
                         <Field
-                            label='Allocation Limit'
+                            label={t('admin.servers.allocation_limit')}
                             error={errors.allocation_limit}
-                            hint='Blank is unlimited, 0 disables.'
+                            hint={t('admin.servers.blank_unlimited_zero')}
                         >
                             <Input.Text
                                 type='number'
@@ -284,7 +307,11 @@ const ServerBuildForm = ({
                                 onChange={(e) => set('allocation_limit', e.target.value)}
                             />
                         </Field>
-                        <Field label='Backup Limit' error={errors.backup_limit} hint='Blank is unlimited, 0 disables.'>
+                        <Field
+                            label={t('admin.servers.backup_limit')}
+                            error={errors.backup_limit}
+                            hint={t('admin.servers.blank_unlimited_zero')}
+                        >
                             <Input.Text
                                 type='number'
                                 value={values.backup_limit}
@@ -293,9 +320,9 @@ const ServerBuildForm = ({
                         </Field>
                         {isElytra && (
                             <Field
-                                label='Backup Storage Limit'
+                                label={t('admin.servers.backup_storage_limit')}
                                 error={errors.backup_storage_limit}
-                                hint='MiB. Blank is unlimited. Elytra only.'
+                                hint={t('admin.servers.backup_storage_hint')}
                             >
                                 <Input.Text
                                     type='number'
@@ -308,12 +335,12 @@ const ServerBuildForm = ({
                 </div>
 
                 <div className='flex flex-1 flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Allocation Management</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.allocation_title')}</h2>
 
                     <Field
-                        label='Game Port'
+                        label={t('admin.servers.game_port')}
                         error={errors.allocation_id}
-                        hint='The default connection address for this server.'
+                        hint={t('admin.servers.game_port_hint')}
                     >
                         <Dropdown
                             value={allocationId}
@@ -327,34 +354,34 @@ const ServerBuildForm = ({
                     </Field>
 
                     <Field
-                        label='Assign Additional Ports'
+                        label={t('admin.servers.assign_ports')}
                         error={errors.add_allocations}
-                        hint='You cannot assign identical ports on different IPs to the same server.'
+                        hint={t('admin.servers.assign_ports_hint')}
                     >
                         <AllocationChecklist
                             allocations={unassigned}
                             selected={add}
                             onToggle={toggle('add')}
-                            emptyLabel='No unassigned allocations are available on this node.'
+                            emptyLabel={t('admin.servers.no_unassigned')}
                         />
                     </Field>
 
                     <Field
-                        label='Remove Additional Ports'
+                        label={t('admin.servers.remove_ports')}
                         error={errors.remove_allocations}
-                        hint='Select the ports you would like to remove from this server.'
+                        hint={t('admin.servers.remove_ports_hint')}
                     >
                         <AllocationChecklist
                             allocations={assigned}
                             selected={remove}
                             onToggle={toggle('remove')}
-                            emptyLabel='This server has no allocations to remove.'
+                            emptyLabel={t('admin.servers.no_allocations_remove')}
                         />
                     </Field>
 
                     <div className='flex justify-end'>
                         <Button type='submit' disabled={submitting}>
-                            Update Build Configuration
+                            {t('admin.servers.update_build')}
                         </Button>
                     </div>
                 </div>

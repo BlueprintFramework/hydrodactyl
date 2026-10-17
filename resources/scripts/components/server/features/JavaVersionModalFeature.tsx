@@ -7,6 +7,7 @@ import Modal from '@/components/elements/Modal';
 import Spinner from '@/components/elements/Spinner';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { ServerContext } from '@/state/server';
@@ -22,6 +23,7 @@ const MATCH_ERRORS = [
 ];
 
 const JavaVersionModalFeature = () => {
+    const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState('');
@@ -76,14 +78,11 @@ const JavaVersionModalFeature = () => {
             onDismissed={() => setVisible(false)}
             closeOnBackground={false}
             showSpinnerOverlay={loading}
-            title='Unsupported Java Version'
+            title={t('server.features.java_version.title')}
         >
             <div className='flex flex-col gap-4 w-full h-full'>
                 {/*<FlashMessageRender key={'feature:javaVersion'} />*/}
-                <p>
-                    This server is currently running an unsupported version of Java and cannot be started. Please select
-                    a supported version from the list below to continue starting the server.
-                </p>
+                <p>{t('server.features.java_version.description')}</p>
                 <div className={`mt-6 flex flex-row justify-end items-center gap-3 my-4`}>
                     <Can action={'startup.docker-image'}>
                         <Spinner size='small' visible={!data || isValidating} />
@@ -91,7 +90,7 @@ const JavaVersionModalFeature = () => {
                             value={selectedVersion}
                             onChange={setSelectedVersion}
                             disabled={!data}
-                            placeholder='Select a version'
+                            placeholder={t('server.features.java_version.select_version')}
                             triggerClassName='h-8 w-auto px-4'
                             options={
                                 data
@@ -108,7 +107,7 @@ const JavaVersionModalFeature = () => {
           </Button> */}
                     <Can action={'startup.docker-image'}>
                         <Button variant='attention' onClick={updateJava} className={`w-full sm:w-auto`}>
-                            Update
+                            {t('common.update')}
                         </Button>
                     </Can>
                 </div>

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import DescriptionText from './DescriptionText';
 import SoftwareCard from './SoftwareCard';
 import SoftwareSearch from './SoftwareSearch';
@@ -19,6 +20,7 @@ interface Props {
 }
 
 const GameSelection = ({ nests, isLoading, selectedEggUuid, onSelectNest, onSelectSoftware, onBack }: Props) => {
+    const { t } = useTranslation();
     const [query, setQuery] = useState('');
     const [debouncedQuery] = useDebounce(query, 150);
     const normalizedQuery = debouncedQuery.trim().toLowerCase();
@@ -56,11 +58,11 @@ const GameSelection = ({ nests, isLoading, selectedEggUuid, onSelectNest, onSele
     const hasResults = matchingNests.length > 0 || matchingSoftware.length > 0;
 
     return (
-        <SoftwareCard title='Select Category'>
+        <SoftwareCard title={t('server.software.game.title')}>
             <div className='space-y-4'>
                 <div className='flex justify-start'>
                     <Button variant='secondary' onClick={onBack} className='w-full sm:w-auto'>
-                        Back to Overview
+                        {t('server.software.game.back_to_overview')}
                     </Button>
                 </div>
 
@@ -68,18 +70,18 @@ const GameSelection = ({ nests, isLoading, selectedEggUuid, onSelectNest, onSele
                     id='software-category-search'
                     value={query}
                     onChange={setQuery}
-                    placeholder='Search categories and software...'
+                    placeholder={t('server.software.game.search_placeholder')}
                 />
 
                 {!normalizedQuery && (
-                    <p className='text-sm text-cream-400/70'>Choose the type of game or software you want to run</p>
+                    <p className='text-sm text-cream-400/70'>{t('server.software.game.description')}</p>
                 )}
 
                 {normalizedQuery && !hasResults && (
                     <div className='flex flex-col items-center justify-center py-12 text-center'>
-                        <p className='text-cream-400 font-medium'>No matches found</p>
+                        <p className='text-cream-400 font-medium'>{t('server.software.game.no_results')}</p>
                         <p className='text-sm text-cream-400/50 mt-1'>
-                            Nothing matched &ldquo;{query.trim()}&rdquo;. Try a different search term.
+                            {t('server.software.game.no_results_hint', { query: query.trim() })}
                         </p>
                     </div>
                 )}
@@ -87,7 +89,9 @@ const GameSelection = ({ nests, isLoading, selectedEggUuid, onSelectNest, onSele
                 {matchingNests.length > 0 && (
                     <div className='space-y-3'>
                         {normalizedQuery && (
-                            <h3 className='text-sm font-semibold text-cream-400 uppercase tracking-wide'>Categories</h3>
+                            <h3 className='text-sm font-semibold text-cream-400 uppercase tracking-wide'>
+                                {t('server.software.game.categories')}
+                            </h3>
                         )}
                         <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4'>
                             {matchingNests.map((nest) => (
@@ -112,7 +116,9 @@ const GameSelection = ({ nests, isLoading, selectedEggUuid, onSelectNest, onSele
 
                 {matchingSoftware.length > 0 && (
                     <div className='space-y-3'>
-                        <h3 className='text-sm font-semibold text-cream-400 uppercase tracking-wide'>Software</h3>
+                        <h3 className='text-sm font-semibold text-cream-400 uppercase tracking-wide'>
+                            {t('server.software.game.software')}
+                        </h3>
                         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4'>
                             {matchingSoftware.map(({ nest, egg }) => (
                                 <button
@@ -130,7 +136,9 @@ const GameSelection = ({ nests, isLoading, selectedEggUuid, onSelectNest, onSele
                                             {egg?.attributes?.name}
                                         </h3>
                                     </div>
-                                    <p className='text-xs text-cream-400/50 mb-2'>in {nest.attributes.name}</p>
+                                    <p className='text-xs text-cream-400/50 mb-2'>
+                                        {t('server.software.game.in_category', { nest: nest.attributes.name })}
+                                    </p>
                                     <DescriptionText
                                         description={egg?.attributes?.description || ''}
                                         id={`egg-${egg?.attributes?.uuid}`}

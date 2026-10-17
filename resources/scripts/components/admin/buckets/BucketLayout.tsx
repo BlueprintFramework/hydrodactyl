@@ -3,11 +3,13 @@ import { useBucket } from '@/api/admin/useBuckets';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 const tabClass = 'rounded-lg px-3 py-1.5 text-sm transition-colors';
 
 const BucketLayout = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data: bucket, error, isLoading } = useBucket(id);
 
@@ -21,9 +23,9 @@ const BucketLayout = () => {
 
     if (error || !bucket) {
         return (
-            <PageContentBlock title='S3 Configuration'>
+            <PageContentBlock title={t('admin.buckets.title_singular')}>
                 <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-8 text-center text-sm text-cream-400/60'>
-                    That S3 configuration could not be found.
+                    {t('admin.buckets.not_found')}
                 </div>
             </PageContentBlock>
         );
@@ -31,16 +33,18 @@ const BucketLayout = () => {
 
     const base = `/buckets/${bucket.id}`;
     const tabs = [
-        { label: 'About', to: base, end: true },
-        { label: 'Details', to: `${base}/details`, end: false },
-        { label: 'Servers', to: `${base}/servers`, end: false },
-        { label: 'Delete', to: `${base}/delete`, end: false },
+        { label: t('admin.buckets.tab_about'), to: base, end: true },
+        { label: t('admin.buckets.tab_details'), to: `${base}/details`, end: false },
+        { label: t('admin.buckets.tab_servers'), to: `${base}/servers`, end: false },
+        { label: t('admin.buckets.tab_delete'), to: `${base}/delete`, end: false },
     ];
 
     return (
         <PageContentBlock title={bucket.name}>
             <MainPageHeader direction='column' title={bucket.name}>
-                <p className='text-sm text-neutral-400'>{bucket.description || 'S3 configuration.'}</p>
+                <p className='text-sm text-neutral-400'>
+                    {bucket.description || t('admin.buckets.fallback_description')}
+                </p>
             </MainPageHeader>
 
             <div className='mb-6 flex flex-wrap gap-1 rounded-xl border border-mocha-400 bg-mocha-500 p-1'>

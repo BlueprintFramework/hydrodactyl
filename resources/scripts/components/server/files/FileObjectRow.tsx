@@ -1,5 +1,5 @@
 import { File, FileZipper, FolderOpenFill } from '@gravity-ui/icons';
-import { differenceInHours, format, formatDistanceToNow } from 'date-fns';
+import { differenceInHours, formatDistanceToNow } from 'date-fns';
 import { join } from 'pathe';
 import { memo, type ReactNode } from 'react';
 import isEqual from 'react-fast-compare';
@@ -9,7 +9,8 @@ import type { FileObject } from '@/api/server/files/loadDirectory';
 import { ContextMenu, ContextMenuTrigger } from '@/components/elements/ContextMenu';
 import SelectFileCheckbox from '@/components/server/files/SelectFileCheckbox';
 import { encodePathSegments } from '@/helpers';
-import { bytesToString } from '@/lib/formatters';
+import { useTranslation } from '@/i18n/I18nProvider';
+import { bytesToString, formatDateTime } from '@/lib/formatters';
 import { usePermissions } from '@/plugins/usePermissions';
 // import FileDropdownMenu from '@/components/server/files/FileDropdownMenu';
 import { ServerContext } from '@/state/server';
@@ -47,36 +48,45 @@ const icon = (fileName: string) => {
 
 const MemoizedClickable = memo(Clickable, isEqual);
 
-const FileObjectRow = ({ file }: { file: FileObject }) => (
-    <ContextMenu>
-        <ContextMenuTrigger asChild>
-            <div className={styles.file_row} key={file.name}>
-                <SelectFileCheckbox name={file.name} />
-                <MemoizedClickable file={file}>
-                    <div className={`flex-none text-zinc-400 mr-4 text-lg pl-3 mb-0.5`}>
-                        {file.isFile ? (
-                            <div>{icon(file.name)}</div>
-                        ) : (
-                            <div>
-                                <FolderOpenFill width={22} height={22} />
+const FileObjectRow = ({ file }: { file: FileObject }) => {
+    const { dateFnsLocale, locale } = useTranslation();
+
+    return (
+        <ContextMenu>
+            <ContextMenuTrigger asChild>
+                <div className={styles.file_row} key={file.name}>
+                    <SelectFileCheckbox name={file.name} />
+                    <MemoizedClickable file={file}>
+                        <div className={`flex-none text-zinc-400 mr-4 text-lg pl-3 mb-0.5`}>
+                            {file.isFile ? (
+                                <div>{icon(file.name)}</div>
+                            ) : (
+                                <div>
+                                    <FolderOpenFill width={22} height={22} />
+                                </div>
+                            )}
+                        </div>
+                        <div className='flex-1 truncate font-bold text-sm'>{file.name}</div>
+                        {file.isFile && (
+                            <div className='w-1/6 text-right mr-4 hidden sm:block text-xs'>
+                                {bytesToString(file.size, 2, locale)}
                             </div>
                         )}
-                    </div>
-                    <div className='flex-1 truncate font-bold text-sm'>{file.name}</div>
-                    {file.isFile && (
-                        <div className='w-1/6 text-right mr-4 hidden sm:block text-xs'>{bytesToString(file.size)}</div>
-                    )}
-                    <div className='w-1/5 text-right mr-4 hidden md:block text-xs' title={file.modifiedAt.toString()}>
-                        {Math.abs(differenceInHours(file.modifiedAt, new Date())) > 48
-                            ? format(file.modifiedAt, 'MMM do, yyyy h:mma')
-                            : formatDistanceToNow(file.modifiedAt, { addSuffix: true })}
-                    </div>
-                </MemoizedClickable>
-            </div>
-        </ContextMenuTrigger>
-        <FileDropdownMenu file={file} />
-    </ContextMenu>
-);
+                        <div
+                            className='w-1/5 text-right mr-4 hidden md:block text-xs'
+                            title={file.modifiedAt.toString()}
+                        >
+                            {Math.abs(differenceInHours(file.modifiedAt, new Date())) > 48
+                                ? formatDateTime(file.modifiedAt, locale, 'medium')
+                                : formatDistanceToNow(file.modifiedAt, { addSuffix: true, locale: dateFnsLocale })}
+                        </div>
+                    </MemoizedClickable>
+                </div>
+            </ContextMenuTrigger>
+            <FileDropdownMenu file={file} />
+        </ContextMenu>
+    );
+};
 
 export default memo(FileObjectRow, (prevProps, nextProps) => {
     const { isArchiveType, isEditable, ...prevFile } = prevProps.file;

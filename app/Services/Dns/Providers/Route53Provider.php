@@ -120,7 +120,7 @@ class Route53Provider implements DnsProviderInterface
                 'domain' => $domain,
                 'name' => $name
             ]);
-            throw DnsProviderException::recordCreationFailed($domain, $name, 'DNS service temporarily unavailable.');
+            throw DnsProviderException::recordCreationFailed($domain, $name, __('exceptions.dns.service_unavailable'));
         }
     }
 
@@ -194,7 +194,7 @@ class Route53Provider implements DnsProviderInterface
         $this->client->changeResourceRecordSets([
             'HostedZoneId' => $zoneId,
             'ChangeBatch'  => [
-                'Comment' => 'Delete subdomain record - Hydrodactyl',
+                'Comment' => __('admin/domains.route53_delete_comment'),
                 'Changes'  => [[
                     'Action'            => 'DELETE',
                     'ResourceRecordSet' => $rrset,
@@ -254,25 +254,29 @@ class Route53Provider implements DnsProviderInterface
             'access_key_id' => [
                 'type' => 'string',
                 'required' => true,
-                'description' => 'AWS Access Key ID with Route53 permissions',
+                'label' => __('admin/domains.schema.route53.access_key_id_label'),
+                'description' => __('admin/domains.schema.route53.access_key_id'),
                 'sensitive' => true,
             ],
             'secret_access_key' => [
                 'type' => 'string',
                 'required' => true,
-                'description' => 'AWS Secret Access Key',
+                'label' => __('admin/domains.schema.route53.secret_access_key_label'),
+                'description' => __('admin/domains.schema.route53.secret_access_key'),
                 'sensitive' => true,
             ],
             'hosted_zone_id' => [
                 'type' => 'string',
                 'required' => true,
-                'description' => 'Route53 Hosted Zone ID',
+                'label' => __('admin/domains.schema.route53.hosted_zone_id_label'),
+                'description' => __('admin/domains.schema.route53.hosted_zone_id'),
                 'sensitive' => false,
             ],
             'region' => [
                 'type' => 'string',
                 'required' => false,
-                'description' => 'AWS Region (default: us-east-1)',
+                'label' => __('admin/domains.schema.route53.region_label'),
+                'description' => __('admin/domains.schema.route53.region'),
                 'default' => 'us-east-1',
                 'sensitive' => false,
             ],
@@ -318,7 +322,7 @@ class Route53Provider implements DnsProviderInterface
                 }
             }
 
-            throw new \Exception("Domain zone not found for: $domain");
+            throw new \Exception(__('exceptions.dns.route53_zone_not_found', ['domain' => $domain]));
         } catch (AwsException $e) {
             throw DnsProviderException::connectionFailed('route53', $e->getAwsErrorMessage());
         }

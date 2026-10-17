@@ -20,7 +20,7 @@ class RusticConfigController extends Controller
         $type = $request->query('type', 'local');
 
         if (!in_array($type, ['local', 's3'])) {
-            return response()->json(['error' => 'Invalid backup type'], 400);
+            return response()->json(['error' => __('exceptions.remote.rustic.invalid_type')], 400);
         }
 
         $config = [
@@ -32,7 +32,7 @@ class RusticConfigController extends Controller
         if ($type === 's3') {
             $s3Credentials = $this->getS3Credentials($server);
             if (!$s3Credentials) {
-                return response()->json(['error' => 'S3 credentials not configured for this server'], 400);
+                return response()->json(['error' => __('exceptions.remote.rustic.credentials_missing')], 400);
             }
             $config['s3_credentials'] = $s3Credentials;
         }
@@ -64,7 +64,7 @@ class RusticConfigController extends Controller
         // For S3, use the server's node bucket to build the S3 path
         $s3Bucket = $server->node->s3Bucket;
         if (!$s3Bucket) {
-            throw new \InvalidArgumentException('S3 bucket not configured for this server\'s node');
+            throw new \InvalidArgumentException(__('exceptions.remote.rustic.bucket_missing'));
         }
 
         $config = $s3Bucket->toRusticS3Config();

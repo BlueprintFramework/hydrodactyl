@@ -1,0 +1,87 @@
+<?php
+
+return [
+    'websocket' => [
+        'description' => 'Permet a l\'usuari connectar-se al websocket del servidor, cosa que li dona accés a veure la sortida de la consola i les estadístiques del servidor en temps real.',
+        'connect' => 'Permet a un usuari connectar-se a la instància de websocket d\'un servidor per rebre la consola en streaming.',
+    ],
+    'control' => [
+        'description' => 'Permisos que controlen la capacitat d\'un usuari de controlar l\'estat d\'engegada d\'un servidor o d\'enviar ordres.',
+        'console' => 'Permet a un usuari enviar ordres a la instància del servidor a través de la consola.',
+        'start' => 'Permet a un usuari iniciar el servidor si està aturat.',
+        'stop' => 'Permet a un usuari aturar el servidor si està en marxa.',
+        'restart' => 'Permet a un usuari reiniciar el servidor. Això els permet iniciar el servidor si està aturat, però no deixar-lo completament aturat.',
+    ],
+    'user' => [
+        'description' => 'Permisos que permeten a un usuari gestionar altres subusuaris d\'un servidor. Mai podran editar el seu propi compte ni assignar permisos que ells mateixos no tinguin.',
+        'create' => 'Permet a un usuari crear subusuaris nous per al servidor.',
+        'read' => 'Permet a l\'usuari veure els subusuaris i els seus permisos per al servidor.',
+        'update' => 'Permet a un usuari modificar altres subusuaris.',
+        'delete' => 'Permet a un usuari eliminar un subusuari del servidor.',
+    ],
+    'file' => [
+        'description' => 'Permisos que controlen la capacitat d\'un usuari de modificar el sistema de fitxers d\'aquest servidor.',
+        'create' => 'Permet a un usuari crear fitxers i carpetes addicionals mitjançant el panell o la pujada directa.',
+        'read' => 'Permet a un usuari veure el contingut d\'un directori, però no veure el contingut dels fitxers ni descarregar-los.',
+        'read-content' => 'Permet a un usuari veure el contingut d\'un fitxer determinat. Això també permetrà a l\'usuari descarregar fitxers.',
+        'update' => 'Permet a un usuari actualitzar el contingut d\'un fitxer o directori existent.',
+        'delete' => 'Permet a un usuari eliminar fitxers o directoris.',
+        'archive' => 'Permet a un usuari arxivar el contingut d\'un directori, així com descomprimir arxius existents al sistema.',
+        'sftp' => 'Permet a un usuari connectar-se per SFTP i gestionar els fitxers del servidor amb la resta de permisos de fitxers assignats.',
+    ],
+    'backup' => [
+        'description' => 'Permisos que controlen la capacitat d\'un usuari de generar i gestionar còpies de seguretat del servidor.',
+        'create' => 'Permet a un usuari crear còpies de seguretat noves per a aquest servidor.',
+        'read' => 'Permet a un usuari veure totes les còpies de seguretat que existeixen per a aquest servidor.',
+        'delete' => 'Permet a un usuari eliminar còpies de seguretat del sistema.',
+        'download' => 'Permet a un usuari descarregar una còpia de seguretat del servidor. Perill: això permet a un usuari accedir a tots els fitxers del servidor que conté la còpia.',
+        'restore' => 'Permet a un usuari restaurar una còpia de seguretat del servidor. Perill: això permet a l\'usuari eliminar tots els fitxers del servidor durant el procés.',
+    ],
+    'allocation' => [
+        'description' => 'Permisos que controlen la capacitat d\'un usuari de modificar les assignacions de ports d\'aquest servidor.',
+        'read' => 'Permet a un usuari veure totes les assignacions assignades actualment a aquest servidor. Els usuaris amb qualsevol nivell d\'accés a aquest servidor sempre poden veure l\'assignació principal.',
+        'create' => 'Permet a un usuari assignar assignacions addicionals al servidor.',
+        'update' => 'Permet a un usuari canviar l\'assignació principal del servidor i adjuntar notes a cada assignació.',
+        'delete' => 'Permet a un usuari eliminar una assignació del servidor.',
+    ],
+    'startup' => [
+        'description' => 'Permisos que controlen la capacitat d\'un usuari de veure els paràmetres d\'arrencada d\'aquest servidor.',
+        'read' => 'Permet a un usuari veure les variables d\'arrencada d\'un servidor.',
+        'update' => 'Permet a un usuari modificar les variables d\'arrencada del servidor.',
+        'command' => 'Permet a un usuari modificar l\'ordre d\'arrencada del servidor.',
+        'docker-image' => 'Permet a un usuari modificar la imatge de Docker utilitzada en executar el servidor.',
+        'software' => 'Permet a un usuari modificar el joc o el programari utilitzat pel servidor.',
+    ],
+    'database' => [
+        'description' => 'Permisos que controlen l\'accés d\'un usuari a la gestió de bases de dades d\'aquest servidor.',
+        'create' => 'Permet a un usuari crear una base de dades nova per a aquest servidor.',
+        'read' => 'Permet a un usuari veure la base de dades associada a aquest servidor.',
+        'update' => 'Permet a un usuari rotar la contrasenya d\'una instància de base de dades. Si l\'usuari no té el permís de veure la contrasenya, no veurà la contrasenya actualitzada.',
+        'delete' => 'Permet a un usuari eliminar una instància de base de dades d\'aquest servidor.',
+        'view_password' => 'Permet a un usuari veure la contrasenya associada a una instància de base de dades d\'aquest servidor.',
+    ],
+    'schedule' => [
+        'description' => 'Permisos que controlen l\'accés d\'un usuari a la gestió de programacions d\'aquest servidor.',
+        'create' => 'Permet a un usuari crear programacions noves per a aquest servidor.',
+        'read' => 'Permet a un usuari veure les programacions i les tasques associades d\'aquest servidor.',
+        'update' => 'Permet a un usuari actualitzar les programacions i les tasques programades d\'aquest servidor.',
+        'delete' => 'Permet a un usuari eliminar programacions d\'aquest servidor.',
+    ],
+    'settings' => [
+        'description' => 'Permisos que controlen l\'accés d\'un usuari a la configuració d\'aquest servidor.',
+        'rename' => 'Permet a un usuari canviar el nom d\'aquest servidor i la seva descripció.',
+        'reinstall' => 'Permet a un usuari iniciar una reinstal·lació d\'aquest servidor.',
+    ],
+    'activity' => [
+        'description' => 'Permisos que controlen l\'accés d\'un usuari als registres d\'activitat del servidor.',
+        'read' => 'Permet a un usuari veure els registres d\'activitat del servidor.',
+    ],
+    'mod' => [
+        'description' => 'Permisos que controlen l\'accés d\'un usuari a descarregar i actualitzar mods.',
+        'version' => 'Permet a un usuari canviar la versió per a la qual descarregar',
+        'loader' => 'Permet a un usuari canviar el carregador per al qual descarregar',
+        'download' => 'Permet a un usuari descarregar mods al servidor',
+        'resolver' => 'Permet a un usuari accedir al resolutor de dependències',
+        'update' => 'Permet a un usuari actualitzar els mods instal·lats actualment',
+    ],
+];

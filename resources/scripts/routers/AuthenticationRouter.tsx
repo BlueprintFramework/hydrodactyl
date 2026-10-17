@@ -5,6 +5,7 @@ import LoginCheckpointContainer from '@/components/auth/LoginCheckpointContainer
 import LoginContainer from '@/components/auth/LoginContainer';
 import ResetPasswordContainer from '@/components/auth/ResetPasswordContainer';
 import Logo from '@/components/elements/HydroLogo';
+import LocaleDropdown from '@/components/elements/LocaleDropdown';
 import { NotFound } from '@/components/elements/ScreenBlock';
 
 const AuthenticationRouter = () => {
@@ -24,7 +25,8 @@ const AuthenticationRouter = () => {
                 className='pointer-events-none fixed inset-0 z-1 opacity-[0.4]'
             ></div>
             <div className='flex size-full flex-col lg:flex-row'>
-                <div className='w-full max-w-4xl z-2 flex items-start sm:items-center bg-bg-lowered min-h-dvh lg:min-h-0 px-6 py-8 sm:px-[calc(var(--page-padding)*3)] overflow-y-auto'>
+                <div className='relative w-full max-w-4xl z-2 flex items-start sm:items-center bg-bg-lowered min-h-dvh lg:min-h-0 px-6 py-8 sm:px-[calc(var(--page-padding)*3)] overflow-y-auto'>
+                    <LocaleDropdown className='absolute top-5 right-5 z-10' />
                     <Routes>
                         <Route path='login' element={<LoginContainer />} />
                         <Route path='login/checkpoint/*' element={<LoginCheckpointContainer />} />

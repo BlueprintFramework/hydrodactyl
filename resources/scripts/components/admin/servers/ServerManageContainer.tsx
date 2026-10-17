@@ -18,6 +18,7 @@ import { Dialog } from '@/components/elements/dialog';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const cardClass = 'flex flex-col gap-3 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
 
@@ -34,6 +35,7 @@ const TransferDialog = ({
     onClose: () => void;
     onDone: () => Promise<unknown>;
 }) => {
+    const { t } = useTranslation();
     const [nodeId, setNodeId] = useState('');
     const [allocationId, setAllocationId] = useState('');
     const [additional, setAdditional] = useState<number[]>([]);
@@ -63,10 +65,10 @@ const TransferDialog = ({
                 allocation_additional: additional,
             });
             await onDone();
-            toast.success('Server transfer has been queued.');
+            toast.success(t('admin.servers.transfer_queued'));
             onClose();
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to start the transfer.'));
+            toast.error(errorToMessage(error, t('admin.servers.transfer_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -75,7 +77,7 @@ const TransferDialog = ({
     return (
         <Dialog
             open={open}
-            title='Transfer Server'
+            title={t('admin.servers.transfer')}
             onClose={() => !submitting && onClose()}
             preventExternalClose={submitting}
         >
@@ -88,7 +90,7 @@ const TransferDialog = ({
                     }}
                     className='flex flex-col gap-4'
                 >
-                    <Field label='Node' hint='The node this server will be transferred to.'>
+                    <Field label={t('admin.common.node')} hint={t('admin.servers.transfer_node_hint')}>
                         <Dropdown
                             value={nodeId}
                             onChange={(value) => {
@@ -96,16 +98,21 @@ const TransferDialog = ({
                                 setAllocationId('');
                                 setAdditional([]);
                             }}
-                            placeholder='Select a node…'
+                            placeholder={t('admin.servers.select_node')}
                             options={nodeOptions}
                         />
                     </Field>
 
-                    <Field label='Default Allocation' hint='The main allocation assigned to this server.'>
+                    <Field
+                        label={t('admin.servers.default_allocation')}
+                        hint={t('admin.servers.default_allocation_hint')}
+                    >
                         <Dropdown
                             value={allocationId}
                             onChange={setAllocationId}
-                            placeholder={!nodeId ? 'Select a node first…' : 'Select an allocation…'}
+                            placeholder={
+                                !nodeId ? t('admin.servers.select_node_first') : t('admin.servers.select_allocation')
+                            }
                             disabled={!nodeId}
                             options={(allocations ?? []).map((allocation) => ({
                                 value: String(allocation.id),
@@ -117,8 +124,8 @@ const TransferDialog = ({
 
                     {nodeId && (
                         <Field
-                            label='Additional Allocations'
-                            hint='Optionally assign extra allocations to this server.'
+                            label={t('admin.servers.additional_allocations')}
+                            hint={t('admin.servers.additional_allocations_hint')}
                         >
                             <div className='max-h-48 overflow-y-auto rounded-lg border border-mocha-400'>
                                 {(allocations ?? [])
@@ -149,7 +156,7 @@ const TransferDialog = ({
                                     ))}
                                 {!isValidating && (allocations ?? []).length === 0 && (
                                     <div className='px-3 py-2 text-sm text-cream-400/50'>
-                                        No unassigned allocations on this node.
+                                        {t('admin.servers.no_unassigned_node')}
                                     </div>
                                 )}
                             </div>
@@ -158,14 +165,14 @@ const TransferDialog = ({
 
                     <Dialog.Footer>
                         <Button type='button' variant='secondary' onClick={onClose} disabled={submitting}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             type='submit'
                             form='transfer-server-form'
                             disabled={submitting || !nodeId || !allocationId}
                         >
-                            Confirm
+                            {t('common.confirm')}
                         </Button>
                     </Dialog.Footer>
                 </form>
@@ -175,6 +182,7 @@ const TransferDialog = ({
 };
 
 const ServerManageContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data: server, mutate: mutateServer } = useServer(id);
     const { data: manage, error: manageError, mutate: mutateManage } = useServerManage(id);
@@ -185,7 +193,7 @@ const ServerManageContainer = () => {
     if (manageError) {
         return (
             <div className='rounded-xl border border-brand-400/40 bg-brand-400/5 p-6 text-sm text-brand-400'>
-                {errorToMessage(manageError, 'Unable to load the management options for this server.')}
+                {errorToMessage(manageError, t('admin.servers.manage_load_failed'))}
             </div>
         );
     }
@@ -210,7 +218,7 @@ const ServerManageContainer = () => {
             await refresh();
             toast.success(message);
         } catch (error) {
-            toast.error(errorToMessage(error, 'That action failed.'));
+            toast.error(errorToMessage(error, t('admin.servers.action_failed')));
         } finally {
             setBusy(undefined);
         }
@@ -221,54 +229,50 @@ const ServerManageContainer = () => {
     return (
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4'>
             <div className={cardClass}>
-                <h3 className='text-sm font-semibold text-cream-50'>Reinstall Server</h3>
-                <p className='text-xs text-cream-400/60'>
-                    Reinstalls the server with the assigned service scripts. This could overwrite server data.
-                </p>
+                <h3 className='text-sm font-semibold text-cream-50'>{t('admin.servers.reinstall')}</h3>
+                <p className='text-xs text-cream-400/60'>{t('admin.servers.reinstall_description')}</p>
                 <Button
                     variant='attention'
                     className='mt-auto'
                     disabled={!server.is_installed || busy === 'reinstall'}
                     onClick={() => setConfirm('reinstall')}
                 >
-                    {server.is_installed ? 'Reinstall Server' : 'Server Must Install First'}
+                    {server.is_installed ? t('admin.servers.reinstall') : t('admin.servers.must_install')}
                 </Button>
             </div>
 
             <div className={cardClass}>
-                <h3 className='text-sm font-semibold text-cream-50'>Install Status</h3>
-                <p className='text-xs text-cream-400/60'>
-                    Toggle the install status between installed and uninstalled.
-                </p>
+                <h3 className='text-sm font-semibold text-cream-50'>{t('admin.servers.install_status')}</h3>
+                <p className='text-xs text-cream-400/60'>{t('admin.servers.install_status_description')}</p>
                 <Button
                     variant='secondary'
                     className='mt-auto'
                     disabled={busy === 'toggle'}
-                    onClick={() => void run('toggle', () => toggleServerInstall(server.id), 'Install status toggled.')}
+                    onClick={() =>
+                        void run('toggle', () => toggleServerInstall(server.id), t('admin.servers.install_toggled'))
+                    }
                 >
-                    Toggle Install Status
+                    {t('admin.servers.toggle_install')}
                 </Button>
             </div>
 
             {!server.is_suspended ? (
                 <div className={cardClass}>
-                    <h3 className='text-sm font-semibold text-cream-50'>Suspend Server</h3>
-                    <p className='text-xs text-cream-400/60'>
-                        Stops all processes and immediately blocks access for users.
-                    </p>
+                    <h3 className='text-sm font-semibold text-cream-50'>{t('admin.servers.suspend')}</h3>
+                    <p className='text-xs text-cream-400/60'>{t('admin.servers.suspend_description')}</p>
                     <Button
                         variant='attention'
                         className='mt-auto'
                         disabled={transferring || busy === 'suspend'}
                         onClick={() => setConfirm('suspend')}
                     >
-                        Suspend Server
+                        {t('admin.servers.suspend')}
                     </Button>
                 </div>
             ) : (
                 <div className={cardClass}>
-                    <h3 className='text-sm font-semibold text-cream-50'>Unsuspend Server</h3>
-                    <p className='text-xs text-cream-400/60'>Restores normal user access to this server.</p>
+                    <h3 className='text-sm font-semibold text-cream-50'>{t('admin.servers.unsuspend')}</h3>
+                    <p className='text-xs text-cream-400/60'>{t('admin.servers.unsuspend_description')}</p>
                     <Button
                         className='mt-auto'
                         disabled={busy === 'unsuspend'}
@@ -276,27 +280,25 @@ const ServerManageContainer = () => {
                             void run(
                                 'unsuspend',
                                 () => setServerSuspension(server.id, 'unsuspend'),
-                                'Server unsuspended.',
+                                t('admin.servers.unsuspended_toast'),
                             )
                         }
                     >
-                        Unsuspend Server
+                        {t('admin.servers.unsuspend')}
                     </Button>
                 </div>
             )}
 
             <div className={cardClass}>
-                <h3 className='text-sm font-semibold text-cream-50'>Transfer Server</h3>
+                <h3 className='text-sm font-semibold text-cream-50'>{t('admin.servers.transfer')}</h3>
                 {transferring ? (
                     <p className='text-xs text-cream-400/60'>
-                        This server is being transferred. Transfer started at{' '}
-                        <span className='text-cream-100'>
-                            {manage.transfer ? new Date(manage.transfer.created_at).toLocaleString() : ''}
-                        </span>
-                        .
+                        {t('admin.servers.transferring_description', {
+                            date: manage.transfer ? new Date(manage.transfer.created_at).toLocaleString() : '',
+                        })}
                     </p>
                 ) : (
-                    <p className='text-xs text-cream-400/60'>Transfer this server to another node on this panel.</p>
+                    <p className='text-xs text-cream-400/60'>{t('admin.servers.transfer_description')}</p>
                 )}
                 <Button
                     variant='secondary'
@@ -304,41 +306,43 @@ const ServerManageContainer = () => {
                     disabled={transferring || !manage.can_transfer}
                     onClick={() => setTransferOpen(true)}
                 >
-                    Transfer Server
+                    {t('admin.servers.transfer')}
                 </Button>
                 {!manage.can_transfer && (
-                    <p className='text-xs text-cream-400/50'>
-                        Transferring requires more than one node to be configured.
-                    </p>
+                    <p className='text-xs text-cream-400/50'>{t('admin.servers.transfer_requires_nodes')}</p>
                 )}
             </div>
 
             <Dialog.Confirm
                 open={confirm === 'reinstall'}
-                title='Reinstall Server'
-                confirm='Reinstall'
+                title={t('admin.servers.reinstall')}
+                confirm={t('admin.servers.reinstall_confirm')}
                 loading={busy === 'reinstall'}
                 onClose={() => setConfirm(undefined)}
                 onConfirmed={async () => {
-                    await run('reinstall', () => reinstallServer(server.id), 'Server is being reinstalled.');
+                    await run('reinstall', () => reinstallServer(server.id), t('admin.servers.reinstalling_toast'));
                     setConfirm(undefined);
                 }}
             >
-                Reinstalling this server could overwrite existing server data. Continue?
+                {t('admin.servers.reinstall_confirm_description')}
             </Dialog.Confirm>
 
             <Dialog.Confirm
                 open={confirm === 'suspend'}
-                title='Suspend Server'
-                confirm='Suspend'
+                title={t('admin.servers.suspend')}
+                confirm={t('admin.servers.suspend_button')}
                 loading={busy === 'suspend'}
                 onClose={() => setConfirm(undefined)}
                 onConfirmed={async () => {
-                    await run('suspend', () => setServerSuspension(server.id, 'suspend'), 'Server suspended.');
+                    await run(
+                        'suspend',
+                        () => setServerSuspension(server.id, 'suspend'),
+                        t('admin.servers.suspended_toast'),
+                    );
                     setConfirm(undefined);
                 }}
             >
-                This will stop the server and block all user access. Continue?
+                {t('admin.servers.suspend_confirm')}
             </Dialog.Confirm>
 
             <TransferDialog

@@ -1,8 +1,10 @@
 import { Link, useParams } from 'react-router-dom';
 import { useBucketServers } from '@/api/admin/useBuckets';
 import Spinner from '@/components/elements/Spinner';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const BucketServersContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data } = useBucketServers(id);
 
@@ -19,10 +21,10 @@ const BucketServersContainer = () => {
             <table className='w-full text-sm'>
                 <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                     <tr className='border-b border-mocha-400'>
-                        <th className='px-4 py-3'>ID</th>
-                        <th className='px-4 py-3'>Server Name</th>
-                        <th className='px-4 py-3'>Owner</th>
-                        <th className='px-4 py-3'>Service</th>
+                        <th className='px-4 py-3'>{t('admin.common.id')}</th>
+                        <th className='px-4 py-3'>{t('admin.servers.server_name')}</th>
+                        <th className='px-4 py-3'>{t('admin.servers.owner')}</th>
+                        <th className='px-4 py-3'>{t('admin.buckets.service')}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,18 +45,18 @@ const BucketServersContainer = () => {
                                         {server.owner.username}
                                     </Link>
                                 ) : (
-                                    'N/A'
+                                    t('common.not_available')
                                 )}
                             </td>
                             <td className='px-4 py-3 text-cream-400/70'>
-                                {server.nest ?? 'N/A'} ({server.egg ?? 'N/A'})
+                                {server.nest ?? t('common.not_available')} ({server.egg ?? t('common.not_available')})
                             </td>
                         </tr>
                     ))}
                     {data.length === 0 && (
                         <tr>
                             <td colSpan={4} className='px-4 py-6 text-center text-cream-400/50'>
-                                No servers are using this S3 configuration.
+                                {t('admin.buckets.no_servers')}
                             </td>
                         </tr>
                     )}

@@ -46,6 +46,7 @@ import TransferListener from '@/components/server/TransferListener';
 import WebsocketHandler from '@/components/server/WebsocketHandler';
 import { HeaderProvider } from '@/contexts/HeaderContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useNests } from '@/plugins/useNests';
 import routes from '@/routers/routes';
 
@@ -81,6 +82,7 @@ const UnifiedRouter = () => {
     const rootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
     const customNavItemsConfig = useStoreState((state) => state.settings.data?.customNavItems);
     const [error, setError] = useState('');
+    const { t } = useTranslation();
     const { data: nests } = useNests();
 
     // server-specific state
@@ -193,7 +195,7 @@ const UnifiedRouter = () => {
                           {
                               to: `/server/${id}`,
                               icon: Cardiogram01Icon,
-                              text: 'Console',
+                              text: t('navigation.console'),
                               tabName: 'console',
                               ref: NavigationConsole,
                               end: true,
@@ -203,7 +205,7 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/files`,
                                         icon: FolderIcon,
-                                        text: 'Files',
+                                        text: t('navigation.files'),
                                         tabName: 'files',
                                         ref: NavigationFiles,
                                         end: false,
@@ -214,7 +216,7 @@ const UnifiedRouter = () => {
                                               {
                                                   to: `/server/${id}/installer`,
                                                   icon: Download04Icon,
-                                                  text: 'Installer',
+                                                  text: t('navigation.installer'),
                                                   tabName: 'installer',
                                                   ref: NavigationInstaller,
                                                   end: false,
@@ -225,8 +227,8 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/databases`,
                                         icon: Database02Icon,
-                                        text: 'Database',
-                                        minimizedText: 'Database',
+                                        text: t('navigation.database'),
+                                        minimizedText: t('navigation.database'),
                                         tabName: 'databases',
                                         ref: NavigationDatabases,
                                         end: true,
@@ -235,7 +237,7 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/backups`,
                                         icon: CloudUploadIcon,
-                                        text: 'Backups',
+                                        text: t('navigation.backups'),
                                         tabName: 'backups',
                                         ref: NavigationBackups,
                                         end: true,
@@ -244,8 +246,8 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/network`,
                                         icon: ConnectIcon,
-                                        text: 'Network',
-                                        minimizedText: 'Network',
+                                        text: t('navigation.network'),
+                                        minimizedText: t('navigation.network'),
                                         tabName: 'networking',
                                         ref: NavigationNetworking,
                                         end: true,
@@ -254,7 +256,7 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/users`,
                                         icon: UserMultiple02Icon,
-                                        text: 'Users',
+                                        text: t('navigation.users'),
                                         tabName: 'users',
                                         ref: NavigationUsers,
                                         end: false,
@@ -263,7 +265,7 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/startup`,
                                         icon: Settings04Icon,
-                                        text: 'Startup',
+                                        text: t('navigation.startup'),
                                         tabName: 'startup',
                                         ref: NavigationStartup,
                                         end: true,
@@ -272,7 +274,7 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/schedules`,
                                         icon: ClockIcon,
-                                        text: 'Schedule',
+                                        text: t('navigation.schedule'),
                                         tabName: 'schedules',
                                         ref: NavigationSchedules,
                                         end: false,
@@ -281,7 +283,7 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/settings`,
                                         icon: Settings02Icon,
-                                        text: 'Settings',
+                                        text: t('navigation.settings'),
                                         tabName: 'settings',
                                         ref: NavigationServerSettings,
                                         end: true,
@@ -290,7 +292,7 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/activity`,
                                         icon: Activity02Icon,
-                                        text: 'Activity',
+                                        text: t('navigation.activity'),
                                         tabName: 'activity',
                                         ref: NavigationActivity,
                                         end: true,
@@ -303,7 +305,7 @@ const UnifiedRouter = () => {
                                     {
                                         to: `/server/${id}/shell`,
                                         icon: GameControllerIcon,
-                                        text: 'Software',
+                                        text: t('navigation.software'),
                                         tabName: 'shell',
                                         ref: NavigationShell,
                                         end: true,
@@ -317,7 +319,7 @@ const UnifiedRouter = () => {
                       {
                           to: '/',
                           icon: ServerStack02Icon,
-                          text: 'Servers',
+                          text: t('navigation.servers'),
                           tabName: 'servers',
                           ref: NavigationServers,
                           end: true,
@@ -325,8 +327,8 @@ const UnifiedRouter = () => {
                       {
                           to: '/account/api',
                           icon: NoteIcon,
-                          text: 'API Keys',
-                          minimizedText: 'API',
+                          text: t('navigation.api_keys'),
+                          minimizedText: t('navigation.api_short'),
                           tabName: 'api',
                           ref: NavigationApi,
                           end: true,
@@ -334,8 +336,8 @@ const UnifiedRouter = () => {
                       {
                           to: '/account/ssh',
                           icon: ComputerTerminal01Icon,
-                          text: 'SSH Keys',
-                          minimizedText: 'SSH',
+                          text: t('navigation.ssh_keys'),
+                          minimizedText: t('navigation.ssh_short'),
                           tabName: 'ssh',
                           ref: NavigationSSH,
                           end: true,
@@ -343,13 +345,13 @@ const UnifiedRouter = () => {
                       {
                           to: '/account',
                           icon: Settings02Icon,
-                          text: 'Settings',
+                          text: t('navigation.settings'),
                           tabName: 'settings',
                           ref: NavigationSettings,
                           end: true,
                       },
                   ],
-        [isServerRoute, id, egg_name, showInstaller, softwareEnabled],
+        [isServerRoute, id, egg_name, showInstaller, softwareEnabled, t],
     );
     const bottomNavItems = customNavItems;
 
@@ -379,7 +381,7 @@ const UnifiedRouter = () => {
                                 <MainWrapper>
                                     {/* server error state */}
                                     {isServerRoute && error && (
-                                        <ServerError title='Something went wrong' message={error} />
+                                        <ServerError title={t('errors.something_went_wrong')} message={error} />
                                     )}
 
                                     {/* server loading state */}

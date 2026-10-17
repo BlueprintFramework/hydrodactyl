@@ -7,9 +7,11 @@ import { useNode, useNodeOptions } from '@/api/admin/useNodes';
 import { Dialog } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import NodeForm from './NodeForm';
 
 const NodeSettingsContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const navigate = useNavigate();
     const { data: node } = useNode(id);
@@ -35,10 +37,10 @@ const NodeSettingsContainer = () => {
         try {
             await updateNode(node.id, { ...values, reset_secret: resetSecret });
             setResetSecret(false);
-            toast.success('Node updated.');
+            toast.success(t('admin.nodes.updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update node.'));
+            toast.error(errorToMessage(error, t('admin.nodes.update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -49,10 +51,10 @@ const NodeSettingsContainer = () => {
 
         try {
             await deleteNode(node.id);
-            toast.success('Node deleted.');
+            toast.success(t('admin.nodes.deleted'));
             navigate('/nodes');
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete node.'));
+            toast.error(errorToMessage(error, t('admin.nodes.delete_failed')));
             setDeleting(false);
             setConfirmDelete(false);
         }
@@ -85,7 +87,7 @@ const NodeSettingsContainer = () => {
                     backupDisk: node.backupDisk,
                     bucket: node.bucket ? String(node.bucket) : '',
                 }}
-                submitLabel='Save Changes'
+                submitLabel={t('admin.nodes.save_changes')}
                 submitting={submitting}
                 errors={errors}
                 onSubmit={submit}
@@ -96,29 +98,27 @@ const NodeSettingsContainer = () => {
             />
 
             <div className='rounded-xl border border-brand-400/40 bg-brand-400/5 p-4'>
-                <h2 className='text-sm font-semibold text-brand-400'>Delete Node</h2>
-                <p className='mt-1 text-sm text-cream-400/70'>
-                    A node must have no servers attached before it can be deleted.
-                </p>
+                <h2 className='text-sm font-semibold text-brand-400'>{t('admin.nodes.delete')}</h2>
+                <p className='mt-1 text-sm text-cream-400/70'>{t('admin.nodes.delete_description')}</p>
                 <Button
                     variant='attention'
                     className='mt-3'
                     disabled={node.servers_count > 0}
                     onClick={() => setConfirmDelete(true)}
                 >
-                    Delete Node
+                    {t('admin.nodes.delete')}
                 </Button>
             </div>
 
             <Dialog.Confirm
                 open={confirmDelete}
-                title='Delete Node'
-                confirm='Delete'
+                title={t('admin.nodes.delete')}
+                confirm={t('common.delete')}
                 onClose={() => setConfirmDelete(false)}
                 onConfirmed={remove}
                 loading={deleting}
             >
-                Deleting this node is permanent and cannot be undone.
+                {t('admin.nodes.delete_confirm')}
             </Dialog.Confirm>
         </div>
     );

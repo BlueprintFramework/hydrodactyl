@@ -5,6 +5,7 @@
         "build": {
             "outputs": ["public/build/**"]
         },
-        "lint": {}
+        "lint": {},
+        "typecheck": {}
     }
 }

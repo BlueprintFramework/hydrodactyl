@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- Copyright (c) 2025-Present BlueprintFramework, parent collaborators, and contributors -->
-<html data-hydrodactyl-html lang="en" style="background-color: var(--color-bg, #11100E); height: 100%; width: 100%; margin: 0; padding: 0;">
+<html data-hydrodactyl-html lang="{{ str_replace('_', '-', app()->getLocale()) }}" style="background-color: var(--color-bg, #11100E); height: 100%; width: 100%; margin: 0; padding: 0;">
     <head>
         @include('templates.appearance')
         <title>{{ config('app.name', 'Panel') }}</title>

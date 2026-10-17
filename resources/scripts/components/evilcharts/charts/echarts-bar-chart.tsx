@@ -56,6 +56,7 @@ import {
     tooltipRow,
     tooltipShell,
 } from '@/components/evilcharts/ui/echarts-tooltip';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 // Re-export the shared types that were previously declared inline here, so
 // existing consumers/examples keep importing them from the chart module.
@@ -1407,6 +1408,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     chartOptions,
     children,
 }: EChartsBarChartProps<TData>) {
+    const { t } = useTranslation();
     const rawId = useId();
     const chartId = `chart-${rawId.replace(/:/g, '')}`;
 
@@ -2128,7 +2130,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
                         className='flex items-center justify-center gap-2 rounded-md border border-mocha-400 bg-mocha-500 px-2 py-0.5 text-sm text-cream-200'
                     >
                         <div className='h-3 w-3 animate-spin rounded-full border border-mocha-300 border-t-cream-200' />
-                        <span>Loading</span>
+                        <span>{t('common.loading')}</span>
                     </motion.div>
                 </div>
             )}

@@ -22,7 +22,7 @@ class S3DeletionService
         $id = $s3 instanceof S3 ? $s3->id : $s3;
 
         if ($this->serverRepository->findCountWhere([['bucket', '=', $id]]) > 0) {
-            throw new DisplayException($this->translator->get('Cannot delete: in use by servers'));
+            throw new DisplayException($this->translator->get('exceptions.admin.bucket_in_use'));
         }
 
         Cache::forget('pterodactyl:s3:active');

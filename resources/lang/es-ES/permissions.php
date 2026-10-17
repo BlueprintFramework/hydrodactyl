@@ -1,0 +1,87 @@
+<?php
+
+return [
+    'websocket' => [
+        'description' => 'Permite al usuario conectarse al websocket del servidor, lo que le da acceso a ver la salida de la consola y las estadísticas del servidor en tiempo real.',
+        'connect' => 'Permite a un usuario conectarse a la instancia de websocket de un servidor para transmitir la consola.',
+    ],
+    'control' => [
+        'description' => 'Permisos que controlan la capacidad de un usuario de controlar el estado de encendido de un servidor o de enviar comandos.',
+        'console' => 'Permite a un usuario enviar comandos a la instancia del servidor a través de la consola.',
+        'start' => 'Permite a un usuario iniciar el servidor si está detenido.',
+        'stop' => 'Permite a un usuario detener un servidor si está en ejecución.',
+        'restart' => 'Permite a un usuario reiniciar el servidor. Esto le permite iniciar el servidor si está apagado, pero no dejarlo en un estado completamente detenido.',
+    ],
+    'user' => [
+        'description' => 'Permisos que permiten a un usuario gestionar otros subusuarios en un servidor. Nunca podrán editar su propia cuenta ni asignar permisos que ellos mismos no tengan.',
+        'create' => 'Permite a un usuario crear nuevos subusuarios para el servidor.',
+        'read' => 'Permite al usuario ver los subusuarios y sus permisos para el servidor.',
+        'update' => 'Permite a un usuario modificar otros subusuarios.',
+        'delete' => 'Permite a un usuario eliminar un subusuario del servidor.',
+    ],
+    'file' => [
+        'description' => 'Permisos que controlan la capacidad de un usuario de modificar el sistema de archivos de este servidor.',
+        'create' => 'Permite a un usuario crear archivos y carpetas adicionales a través del panel o mediante subida directa.',
+        'read' => 'Permite a un usuario ver el contenido de un directorio, pero no ver el contenido de los archivos ni descargarlos.',
+        'read-content' => 'Permite a un usuario ver el contenido de un archivo concreto. Esto también permitirá al usuario descargar archivos.',
+        'update' => 'Permite a un usuario actualizar el contenido de un archivo o directorio existente.',
+        'delete' => 'Permite a un usuario eliminar archivos o directorios.',
+        'archive' => 'Permite a un usuario archivar el contenido de un directorio, así como descomprimir archivos existentes en el sistema.',
+        'sftp' => 'Permite a un usuario conectarse por SFTP y gestionar los archivos del servidor usando los demás permisos de archivos asignados.',
+    ],
+    'backup' => [
+        'description' => 'Permisos que controlan la capacidad de un usuario de generar y gestionar copias de seguridad del servidor.',
+        'create' => 'Permite a un usuario crear nuevas copias de seguridad para este servidor.',
+        'read' => 'Permite a un usuario ver todas las copias de seguridad que existen para este servidor.',
+        'delete' => 'Permite a un usuario eliminar copias de seguridad del sistema.',
+        'download' => 'Permite a un usuario descargar una copia de seguridad del servidor. Peligro: esto permite a un usuario acceder a todos los archivos del servidor incluidos en la copia de seguridad.',
+        'restore' => 'Permite a un usuario restaurar una copia de seguridad del servidor. Peligro: esto permite al usuario eliminar todos los archivos del servidor durante el proceso.',
+    ],
+    'allocation' => [
+        'description' => 'Permisos que controlan la capacidad de un usuario de modificar las asignaciones de puertos de este servidor.',
+        'read' => 'Permite a un usuario ver todas las asignaciones asignadas actualmente a este servidor. Los usuarios con cualquier nivel de acceso a este servidor siempre pueden ver la asignación principal.',
+        'create' => 'Permite a un usuario asignar asignaciones adicionales al servidor.',
+        'update' => 'Permite a un usuario cambiar la asignación principal del servidor y adjuntar notas a cada asignación.',
+        'delete' => 'Permite a un usuario eliminar una asignación del servidor.',
+    ],
+    'startup' => [
+        'description' => 'Permisos que controlan la capacidad de un usuario de ver los parámetros de inicio de este servidor.',
+        'read' => 'Permite a un usuario ver las variables de inicio de un servidor.',
+        'update' => 'Permite a un usuario modificar las variables de inicio del servidor.',
+        'command' => 'Permite a un usuario modificar el comando de inicio del servidor.',
+        'docker-image' => 'Permite a un usuario modificar la imagen de Docker usada al ejecutar el servidor.',
+        'software' => 'Permite a un usuario modificar el juego o software usado para el servidor.',
+    ],
+    'database' => [
+        'description' => 'Permisos que controlan el acceso de un usuario a la gestión de bases de datos de este servidor.',
+        'create' => 'Permite a un usuario crear una nueva base de datos para este servidor.',
+        'read' => 'Permite a un usuario ver la base de datos asociada a este servidor.',
+        'update' => 'Permite a un usuario rotar la contraseña de una instancia de base de datos. Si el usuario no tiene el permiso view_password, no verá la contraseña actualizada.',
+        'delete' => 'Permite a un usuario eliminar una instancia de base de datos de este servidor.',
+        'view_password' => 'Permite a un usuario ver la contraseña asociada a una instancia de base de datos de este servidor.',
+    ],
+    'schedule' => [
+        'description' => 'Permisos que controlan el acceso de un usuario a la gestión de tareas programadas de este servidor.',
+        'create' => 'Permite a un usuario crear nuevas tareas programadas para este servidor.',
+        'read' => 'Permite a un usuario ver las tareas programadas y las tareas asociadas a ellas para este servidor.',
+        'update' => 'Permite a un usuario actualizar las tareas programadas y sus tareas para este servidor.',
+        'delete' => 'Permite a un usuario eliminar tareas programadas de este servidor.',
+    ],
+    'settings' => [
+        'description' => 'Permisos que controlan el acceso de un usuario a los ajustes de este servidor.',
+        'rename' => 'Permite a un usuario cambiar el nombre de este servidor y su descripción.',
+        'reinstall' => 'Permite a un usuario iniciar una reinstalación de este servidor.',
+    ],
+    'activity' => [
+        'description' => 'Permisos que controlan el acceso de un usuario a los registros de actividad del servidor.',
+        'read' => 'Permite a un usuario ver los registros de actividad del servidor.',
+    ],
+    'mod' => [
+        'description' => 'Permisos que controlan el acceso de un usuario a la descarga y actualización de mods.',
+        'version' => 'Permite a un usuario cambiar la versión para la que descargar',
+        'loader' => 'Permite a un usuario cambiar el loader para el que descargar',
+        'download' => 'Permite a un usuario descargar mods al servidor',
+        'resolver' => 'Permite a un usuario acceder al solucionador de dependencias',
+        'update' => 'Permite a un usuario actualizar los mods instalados actualmente',
+    ],
+];

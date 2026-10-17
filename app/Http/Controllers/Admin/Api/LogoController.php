@@ -60,7 +60,7 @@ class LogoController extends Controller
         } catch (\Throwable $exception) {
             Log::error('Failed to update logo settings.', ['error' => $exception->getMessage()]);
 
-            return response()->json(['error' => 'Failed to update the logo. Please check the file and try again.'], 422);
+            return response()->json(['error' => __('exceptions.admin.logo_update_failed')], 422);
         }
 
         return response()->json($this->state());

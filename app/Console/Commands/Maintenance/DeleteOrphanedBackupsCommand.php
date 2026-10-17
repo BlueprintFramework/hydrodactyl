@@ -31,7 +31,7 @@ class DeleteOrphanedBackupsCommand extends Command
             ->get();
 
         if ($orphanedBackups->isEmpty()) {
-            $this->info('No orphaned backups found.');
+            $this->info(__('command/messages.maintenance.no_orphaned_backups'));
             return;
         }
 
@@ -39,10 +39,19 @@ class DeleteOrphanedBackupsCommand extends Command
         $totalSize = $orphanedBackups->sum('bytes');
         
         if ($isDryRun) {
-            $this->warn("Found {$count} orphaned backup(s) that would be deleted (Total size: {$this->formatBytes($totalSize)}):");
+            $this->warn(__('command/messages.maintenance.dry_run_found', ['count' => $count, 'size' => $this->formatBytes($totalSize)]));
             
             $this->table(
-                ['ID', 'UUID', 'Name', 'Server ID', 'Disk', 'Size', 'Status', 'Created At'],
+                [
+                    __('command/messages.maintenance.table_id'),
+                    __('command/messages.maintenance.table_uuid'),
+                    __('command/messages.maintenance.table_name'),
+                    __('command/messages.maintenance.table_server_id'),
+                    __('command/messages.maintenance.table_disk'),
+                    __('command/messages.maintenance.table_size'),
+                    __('command/messages.maintenance.table_status'),
+                    __('command/messages.maintenance.table_created_at'),
+                ],
                 $orphanedBackups->map(function (Backup $backup) {
                     return [
                         $backup->id,
@@ -51,22 +60,22 @@ class DeleteOrphanedBackupsCommand extends Command
                         $backup->server_id,
                         $backup->disk,
                         $this->formatBytes($backup->bytes),
-                        $backup->trashed() ? 'Soft Deleted' : 'Active',
+                        $backup->trashed() ? __('command/messages.maintenance.status_soft_deleted') : __('command/messages.maintenance.status_active'),
                         $backup->created_at->format('Y-m-d H:i:s'),
                     ];
                 })->toArray()
             );
             
-            $this->info('Run without --dry-run to actually delete these backups.');
+            $this->info(__('command/messages.maintenance.dry_run_notice'));
             return;
         }
 
-        if (!$this->confirm("Are you sure you want to delete {$count} orphaned backup(s) ({$this->formatBytes($totalSize)})? This action cannot be undone.")) {
-            $this->info('Operation cancelled.');
+        if (!$this->confirm(__('command/messages.maintenance.delete_confirm', ['count' => $count, 'size' => $this->formatBytes($totalSize)]))) {
+            $this->info(__('command/messages.maintenance.operation_cancelled'));
             return;
         }
 
-        $this->warn("Deleting {$count} orphaned backup(s) ({$this->formatBytes($totalSize)})...");
+        $this->warn(__('command/messages.maintenance.deleting_count', ['count' => $count, 'size' => $this->formatBytes($totalSize)]));
 
         $deletedCount = 0;
         $failedCount = 0;
@@ -77,33 +86,33 @@ class DeleteOrphanedBackupsCommand extends Command
                 if ($backup->trashed()) {
                     $backup->forceDelete();
                     $deletedCount++;
-                    $this->info("Force deleted soft-deleted backup: {$backup->uuid} ({$backup->name}) - {$this->formatBytes($backup->bytes)}");
+                    $this->info(__('command/messages.maintenance.force_deleted', ['uuid' => $backup->uuid, 'name' => $backup->name, 'size' => $this->formatBytes($backup->bytes)]));
                 } else {
                     // Delete the orphaned backup from the database
                     $backup->forceDelete();
                     $deletedCount++;
-                    $this->info("Deleted backup: {$backup->uuid} ({$backup->name}) - {$this->formatBytes($backup->bytes)}");
+                    $this->info(__('command/messages.maintenance.deleted', ['uuid' => $backup->uuid, 'name' => $backup->name, 'size' => $this->formatBytes($backup->bytes)]));
                 }
             } catch (\Exception $exception) {
                 $failedCount++;
-                $this->error("Failed to delete backup {$backup->uuid}: {$exception->getMessage()}");
+                $this->error(__('command/messages.maintenance.delete_failed', ['uuid' => $backup->uuid, 'error' => $exception->getMessage()]));
                 
                 // If we can't delete from storage, at least remove the database record
                 try {
                     if ($backup->trashed()) {
                         $backup->forceDelete();
-                        $this->warn("Force deleted soft-deleted backup {$backup->uuid} (storage deletion failed)");
+                        $this->warn(__('command/messages.maintenance.force_deleted_storage_failed', ['uuid' => $backup->uuid]));
                     } else {
                         $backup->delete();
-                        $this->warn("Removed database record for backup {$backup->uuid} (storage deletion failed)");
+                        $this->warn(__('command/messages.maintenance.record_removed_storage_failed', ['uuid' => $backup->uuid]));
                     }
                 } catch (\Exception $dbException) {
-                    $this->error("Failed to remove database record for backup {$backup->uuid}: {$dbException->getMessage()}");
+                    $this->error(__('command/messages.maintenance.record_removal_failed', ['uuid' => $backup->uuid, 'error' => $dbException->getMessage()]));
                 }
             }
         }
 
-        $this->info("Cleanup completed. Deleted: {$deletedCount}, Failed: {$failedCount}");
+        $this->info(__('command/messages.maintenance.cleanup_completed', ['deleted' => $deletedCount, 'failed' => $failedCount]));
     }
 
     /**

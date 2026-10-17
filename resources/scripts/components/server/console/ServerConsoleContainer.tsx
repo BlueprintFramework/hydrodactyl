@@ -9,19 +9,21 @@ import Spinner from '@/components/elements/Spinner';
 import Console from '@/components/server/console/Console';
 import StatGraphs from '@/components/server/console/StatGraphs';
 import PowerButtons from '@/components/server/header/PowerButtons';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { ServerContext } from '@/state/server';
 import ServerHeader from '../header/ServerHeader';
 
 export type PowerAction = 'start' | 'stop' | 'restart' | 'kill';
 
 const ServerConsoleContainer = () => {
+    const { t } = useTranslation();
     const isInstalling = ServerContext.useStoreState((state) => state.server.isInstalling);
     const isTransferring = ServerContext.useStoreState((state) => state.server.data?.isTransferring);
     const eggFeatures = ServerContext.useStoreState((state) => state.server.data?.eggFeatures, isEqual);
     const isNodeUnderMaintenance = ServerContext.useStoreState((state) => state.server.data?.isNodeUnderMaintenance);
 
     return (
-        <PageContentBlock title={'Console'} background={false}>
+        <PageContentBlock title={t('server.console.title')} background={false}>
             <div className='w-full flex flex-col gap-4 lg:h-full lg:flex-row'>
                 <div className='flex flex-col gap-4 lg:flex-1 lg:min-h-0'>
                     <ServerHeader powerButtons={true} />
@@ -29,10 +31,10 @@ const ServerConsoleContainer = () => {
                     {(isNodeUnderMaintenance || isInstalling || isTransferring) && (
                         <Alert type={'warning'} className={''}>
                             {isNodeUnderMaintenance
-                                ? 'The node of this server is currently under maintenance and all actions are unavailable.'
+                                ? t('server.console.node_maintenance')
                                 : isInstalling
-                                  ? 'This server is currently running its installation process and most actions are unavailable.'
-                                  : 'This server is currently being transferred to another node and all actions are unavailable.'}
+                                  ? t('server.console.installing')
+                                  : t('server.console.transferring')}
                         </Alert>
                     )}
                     <div className='lg:h-full lg:flex-1 lg:min-h-0'>

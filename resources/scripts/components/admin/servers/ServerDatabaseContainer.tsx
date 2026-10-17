@@ -16,6 +16,7 @@ import { Dialog } from '@/components/elements/dialog';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const cardClass = 'flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
 
@@ -28,6 +29,7 @@ const DatabaseManager = ({
     data: ServerDatabasesResponse;
     onSaved: () => Promise<unknown>;
 }) => {
+    const { t } = useTranslation();
     const [hostId, setHostId] = useState(data.hosts[0] ? String(data.hosts[0].id) : '');
     const [database, setDatabase] = useState('');
     const [remote, setRemote] = useState('%');
@@ -48,13 +50,13 @@ const DatabaseManager = ({
                 max_connections: maxConnections,
                 database_host_id: Number(hostId),
             });
-            toast.success('Database created.');
+            toast.success(t('admin.servers.db_created'));
             setDatabase('');
             setMaxConnections('');
             await onSaved();
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to create the database.'));
+            toast.error(errorToMessage(error, t('admin.servers.db_create_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -65,9 +67,9 @@ const DatabaseManager = ({
 
         try {
             await resetServerDatabasePassword(serverId, record.id);
-            toast.success(`The password for ${record.database} has been reset.`);
+            toast.success(t('admin.servers.db_password_reset', { database: record.database }));
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to reset the password.'));
+            toast.error(errorToMessage(error, t('admin.servers.db_password_failed')));
         } finally {
             setBusy(undefined);
         }
@@ -82,11 +84,11 @@ const DatabaseManager = ({
 
         try {
             await deleteServerDatabase(serverId, confirm.id);
-            toast.success('Database deleted.');
+            toast.success(t('admin.servers.db_deleted'));
             setConfirm(undefined);
             await onSaved();
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete the database.'));
+            toast.error(errorToMessage(error, t('admin.servers.db_delete_failed')));
         } finally {
             setBusy(undefined);
         }
@@ -96,17 +98,17 @@ const DatabaseManager = ({
         <div className='grid grid-cols-1 gap-4 lg:grid-cols-12'>
             <div className='overflow-hidden rounded-xl border border-mocha-400 lg:col-span-7'>
                 <div className='border-b border-mocha-400 px-4 py-3'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Active Databases</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.active_databases')}</h2>
                 </div>
                 <div className='overflow-x-auto'>
                     <table className='w-full text-sm'>
                         <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                             <tr className='border-b border-mocha-400'>
-                                <th className='px-4 py-3'>Database</th>
-                                <th className='px-4 py-3'>Username</th>
-                                <th className='px-4 py-3'>Connections From</th>
-                                <th className='px-4 py-3'>Host</th>
-                                <th className='px-4 py-3'>Max Connections</th>
+                                <th className='px-4 py-3'>{t('admin.servers.database')}</th>
+                                <th className='px-4 py-3'>{t('admin.common.username')}</th>
+                                <th className='px-4 py-3'>{t('admin.databases.connections_from')}</th>
+                                <th className='px-4 py-3'>{t('admin.databases.host')}</th>
+                                <th className='px-4 py-3'>{t('admin.databases.max_connections')}</th>
                                 <th className='px-4 py-3' />
                             </tr>
                         </thead>
@@ -122,7 +124,7 @@ const DatabaseManager = ({
                                         </code>
                                     </td>
                                     <td className='px-4 py-3 text-cream-100'>
-                                        {record.max_connections ?? 'Unlimited'}
+                                        {record.max_connections ?? t('admin.common.unlimited')}
                                     </td>
                                     <td className='px-4 py-3'>
                                         <div className='flex justify-end gap-2'>
@@ -132,7 +134,7 @@ const DatabaseManager = ({
                                                 disabled={busy === record.id}
                                                 onClick={() => void reset(record)}
                                             >
-                                                Reset Password
+                                                {t('admin.servers.reset_password')}
                                             </Button>
                                             <Button
                                                 size='sm'
@@ -140,7 +142,7 @@ const DatabaseManager = ({
                                                 disabled={busy === record.id}
                                                 onClick={() => setConfirm(record)}
                                             >
-                                                Delete
+                                                {t('common.delete')}
                                             </Button>
                                         </div>
                                     </td>
@@ -149,7 +151,7 @@ const DatabaseManager = ({
                             {data.data.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className='px-4 py-6 text-center text-cream-400/50'>
-                                        This server has no databases.
+                                        {t('admin.servers.no_databases')}
                                     </td>
                                 </tr>
                             )}
@@ -166,25 +168,25 @@ const DatabaseManager = ({
                     }}
                     className={cardClass}
                 >
-                    <h2 className='text-sm font-semibold text-cream-50'>Create New Database</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.create_database')}</h2>
 
                     <Field
-                        label='Database Host'
+                        label={t('admin.servers.database_host')}
                         error={errors.database_host_id}
-                        hint='The host server this database will be created on.'
+                        hint={t('admin.servers.database_host_hint')}
                     >
                         <Dropdown
                             value={hostId}
                             onChange={setHostId}
-                            placeholder='Select a host…'
+                            placeholder={t('admin.servers.select_host')}
                             options={data.hosts.map((host) => ({ value: String(host.id), label: host.name }))}
                         />
                     </Field>
 
                     <Field
-                        label='Database Name'
+                        label={t('admin.databases.database_name')}
                         error={errors.database}
-                        hint={`The name is automatically prefixed with s${serverId}_.`}
+                        hint={t('admin.servers.db_name_hint', { id: serverId })}
                     >
                         <Input.Text
                             value={database}
@@ -194,17 +196,17 @@ const DatabaseManager = ({
                     </Field>
 
                     <Field
-                        label='Connections From'
+                        label={t('admin.databases.connections_from')}
                         error={errors.remote}
-                        hint='The IP connections are allowed from. Leave as % if unsure.'
+                        hint={t('admin.servers.connections_hint')}
                     >
                         <Input.Text value={remote} onChange={(event) => setRemote(event.target.value)} />
                     </Field>
 
                     <Field
-                        label='Concurrent Connections'
+                        label={t('admin.servers.concurrent_connections')}
                         error={errors.max_connections}
-                        hint='Leave empty for unlimited.'
+                        hint={t('admin.servers.concurrent_hint')}
                     >
                         <Input.Text
                             type='number'
@@ -215,7 +217,7 @@ const DatabaseManager = ({
 
                     <div className='flex justify-end'>
                         <Button type='submit' disabled={submitting || !hostId}>
-                            Create Database
+                            {t('admin.servers.create_database')}
                         </Button>
                     </div>
                 </form>
@@ -223,19 +225,20 @@ const DatabaseManager = ({
 
             <Dialog.Confirm
                 open={!!confirm}
-                title='Delete Database'
-                confirm='Delete'
+                title={t('admin.servers.delete_database')}
+                confirm={t('common.delete')}
                 loading={!!busy}
                 onClose={() => setConfirm(undefined)}
                 onConfirmed={remove}
             >
-                Deleting {confirm?.database} is permanent and all data will be removed.
+                {t('admin.servers.delete_database_confirm', { database: confirm?.database ?? '' })}
             </Dialog.Confirm>
         </div>
     );
 };
 
 const ServerDatabaseContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data, mutate } = useServerDatabases(id);
     const { data: server } = useServer(id);
@@ -251,11 +254,11 @@ const ServerDatabaseContainer = () => {
     return (
         <div className='flex flex-col gap-4'>
             <div className='rounded-xl border border-hydro-500/40 bg-hydro-500/10 px-4 py-3 text-sm text-hydro-300'>
-                Database passwords can be viewed when{' '}
+                {t('admin.servers.password_notice_prefix')}{' '}
                 <a href={`/server/${server.uuid_short}/databases`} className='underline'>
-                    visiting this server
+                    {t('admin.servers.password_notice_link')}
                 </a>{' '}
-                on the front-end.
+                {t('admin.servers.password_notice_suffix')}
             </div>
 
             <DatabaseManager key={String(id)} serverId={Number(id)} data={data} onSaved={mutate} />

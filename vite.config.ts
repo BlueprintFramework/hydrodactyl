@@ -121,6 +121,7 @@ export default defineConfig({
         dedupe: ['react', 'react-dom', 'react/jsx-runtime'],
         alias: {
             '@': resolve(dirname(fileURLToPath(import.meta.url)), 'resources', 'scripts'),
+            '@lang': resolve(dirname(fileURLToPath(import.meta.url)), 'resources', 'lang'),
             '@definitions': resolve(
                 dirname(fileURLToPath(import.meta.url)),
                 'resources',

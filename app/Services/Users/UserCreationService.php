@@ -35,6 +35,10 @@ class UserCreationService
             $data['password'] = $this->hasher->make($data['password']);
         }
 
+        // New accounts start in the panel's default language (the one picked
+        // by the administrator in the settings) unless a locale was given.
+        $data['language'] ??= config('app.locale', 'en-US');
+
         $this->connection->beginTransaction();
         if (!isset($data['password']) || empty($data['password'])) {
             $generateResetToken = true;

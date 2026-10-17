@@ -1,10 +1,11 @@
 import { CloudDownload, CloudUpload } from '@carbon/icons-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import getServerResourceHistory from '@/api/server/getServerResourceHistory';
 import CopyOnClick from '@/components/elements/CopyOnClick';
 import { type ChartConfig, EChartsLineChart } from '@/components/evilcharts/charts/echarts-line-chart';
 import ChartBlock from '@/components/server/console/ChartBlock';
 import { SocketEvent } from '@/components/server/events';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { bytesToString, ip, mbToBytes } from '@/lib/formatters';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { ServerContext } from '@/state/server';
@@ -58,20 +59,23 @@ const readCachedSamples = (uuid: string | undefined): Sample[] => {
     }
 };
 
-const cpuConfig = {
-    cpu: { label: 'CPU', colors: { light: ['#f1995a'], dark: ['#f1995a'] } },
-} satisfies ChartConfig;
-
-const memoryConfig = {
-    memory: { label: 'Memory', colors: { light: ['#52a9ff'], dark: ['#52a9ff'] } },
-} satisfies ChartConfig;
-
-const networkConfig = {
-    inbound: { label: 'Inbound', colors: { light: ['#5eead4'], dark: ['#5eead4'] } },
-    outbound: { label: 'Outbound', colors: { light: ['#c084fc'], dark: ['#c084fc'] } },
-} satisfies ChartConfig;
-
 const StatGraphs = () => {
+    const { t } = useTranslation();
+    const chartConfigs = useMemo(
+        () => ({
+            cpu: {
+                cpu: { label: t('server.console.cpu'), colors: { light: ['#f1995a'], dark: ['#f1995a'] } },
+            } satisfies ChartConfig,
+            memory: {
+                memory: { label: t('server.console.memory'), colors: { light: ['#52a9ff'], dark: ['#52a9ff'] } },
+            } satisfies ChartConfig,
+            network: {
+                inbound: { label: t('server.console.inbound'), colors: { light: ['#5eead4'], dark: ['#5eead4'] } },
+                outbound: { label: t('server.console.outbound'), colors: { light: ['#c084fc'], dark: ['#c084fc'] } },
+            } satisfies ChartConfig,
+        }),
+        [t],
+    );
     const status = ServerContext.useStoreState((state) => state.status.value);
     const limits = ServerContext.useStoreState((state) => state.server.data?.limits);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
@@ -173,32 +177,40 @@ const StatGraphs = () => {
     return (
         <div className='flex h-full flex-none flex-col gap-3 overflow-y-auto'>
             <div className='rounded-2xl border border-mocha-400 bg-mocha-500 p-4'>
-                <p className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>IP Address</p>
+                <p className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>
+                    {t('server.console.ip_address')}
+                </p>
                 <CopyOnClick text={allocation}>
                     <div className='mt-1 truncate text-sm font-medium text-cream-50 tabular-nums'>{allocation}</div>
                 </CopyOnClick>
             </div>
 
             <div className='rounded-2xl border border-mocha-400 bg-mocha-500 p-4'>
-                <p className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>Uptime</p>
-                <div className='mt-1 text-sm font-medium text-cream-50 tabular-nums'>{formatUptime(live.uptime)}</div>
+                <p className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>
+                    {t('server.console.uptime')}
+                </p>
+                <div className='mt-1 text-sm font-medium text-cream-50 tabular-nums'>
+                    {formatUptime(live.uptime, t)}
+                </div>
             </div>
 
             {description && (
                 <div className='rounded-2xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <p className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>Description</p>
+                    <p className='text-xs font-semibold uppercase tracking-wide text-cream-400/60'>
+                        {t('server.console.description')}
+                    </p>
                     <div className='mt-1 text-sm font-medium text-cream-50'>{description}</div>
                 </div>
             )}
 
             <ChartBlock
-                title='CPU'
-                hint={limits?.cpu ? `of ${limits.cpu}%` : undefined}
+                title={t('server.console.cpu')}
+                hint={limits?.cpu ? t('server.console.of_value', { value: `${limits.cpu}%` }) : undefined}
                 value={<span className='tabular-nums'>{live.cpu.toFixed(1)}%</span>}
             >
                 <EChartsLineChart
                     data={loading ? [] : samples}
-                    config={cpuConfig}
+                    config={chartConfigs.cpu}
                     xDataKey='index'
                     isLoading={loading}
                     curveType='bump'
@@ -210,13 +222,17 @@ const StatGraphs = () => {
             </ChartBlock>
 
             <ChartBlock
-                title='Memory'
-                hint={limits?.memory ? `of ${bytesToString(mbToBytes(limits.memory))}` : undefined}
+                title={t('server.console.memory')}
+                hint={
+                    limits?.memory
+                        ? t('server.console.of_value', { value: bytesToString(mbToBytes(limits.memory)) })
+                        : undefined
+                }
                 value={<span className='tabular-nums'>{bytesToString(live.memory)}</span>}
             >
                 <EChartsLineChart
                     data={loading ? [] : samples}
-                    config={memoryConfig}
+                    config={chartConfigs.memory}
                     xDataKey='index'
                     isLoading={loading}
                     curveType='bump'
@@ -228,7 +244,7 @@ const StatGraphs = () => {
             </ChartBlock>
 
             <ChartBlock
-                title='Network'
+                title={t('server.console.network_activity')}
                 value={
                     <div className='flex flex-col items-end gap-1 text-xs font-semibold tabular-nums'>
                         <span className='flex items-center gap-1.5'>
@@ -244,7 +260,7 @@ const StatGraphs = () => {
             >
                 <EChartsLineChart
                     data={loading ? [] : samples}
-                    config={networkConfig}
+                    config={chartConfigs.network}
                     xDataKey='index'
                     isLoading={loading}
                     curveType='bump'

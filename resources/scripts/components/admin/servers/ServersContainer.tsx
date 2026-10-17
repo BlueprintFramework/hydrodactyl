@@ -8,13 +8,16 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 const StatusBadge = ({ server }: { server: AdminServer }) => {
+    const { t } = useTranslation();
+
     if (server.is_suspended) {
         return (
             <span className='rounded-full bg-brand-400/20 px-2 py-0.5 text-[10px] font-semibold uppercase text-brand-400'>
-                Suspended
+                {t('admin.servers.suspended')}
             </span>
         );
     }
@@ -22,19 +25,20 @@ const StatusBadge = ({ server }: { server: AdminServer }) => {
     if (!server.is_installed) {
         return (
             <span className='rounded-full bg-cream-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase text-cream-300'>
-                Installing
+                {t('admin.servers.installing')}
             </span>
         );
     }
 
     return (
         <span className='rounded-full bg-hydro-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase text-hydro-400'>
-            Active
+            {t('admin.servers.active')}
         </span>
     );
 };
 
 const ServersContainer = () => {
+    const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [search] = useDebounce(searchTerm, 300);
@@ -43,14 +47,14 @@ const ServersContainer = () => {
     const servers = data?.items ?? [];
 
     return (
-        <PageContentBlock title='Servers'>
-            <MainPageHeader direction='column' title='Servers'>
-                <p className='text-sm text-neutral-400'>All servers available on the system.</p>
+        <PageContentBlock title={t('admin.nav.servers')}>
+            <MainPageHeader direction='column' title={t('admin.nav.servers')}>
+                <p className='text-sm text-neutral-400'>{t('admin.servers.description')}</p>
             </MainPageHeader>
 
             <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center'>
                 <Input.Text
-                    placeholder='Search servers...'
+                    placeholder={t('admin.servers.search_placeholder')}
                     value={searchTerm}
                     onChange={(event) => {
                         setSearchTerm(event.target.value);
@@ -59,7 +63,7 @@ const ServersContainer = () => {
                     className='w-full sm:max-w-sm'
                 />
                 <Button asChild className='sm:ml-auto'>
-                    <Link to='/servers/new'>Create Server</Link>
+                    <Link to='/servers/new'>{t('admin.servers.create')}</Link>
                 </Button>
             </div>
 
@@ -67,12 +71,12 @@ const ServersContainer = () => {
                 <table className='w-full text-sm'>
                     <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                         <tr className='border-b border-mocha-400'>
-                            <th className='px-4 py-3'>Server Name</th>
-                            <th className='px-4 py-3'>UUID</th>
-                            <th className='px-4 py-3'>Owner</th>
-                            <th className='px-4 py-3'>Node</th>
-                            <th className='px-4 py-3'>Connection</th>
-                            <th className='px-4 py-3 text-center'>Status</th>
+                            <th className='px-4 py-3'>{t('admin.servers.server_name')}</th>
+                            <th className='px-4 py-3'>{t('admin.servers.uuid')}</th>
+                            <th className='px-4 py-3'>{t('admin.servers.owner')}</th>
+                            <th className='px-4 py-3'>{t('admin.common.node')}</th>
+                            <th className='px-4 py-3'>{t('admin.servers.connection')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.common.status')}</th>
                             <th className='px-4 py-3' />
                         </tr>
                     </thead>
@@ -122,9 +126,9 @@ const ServersContainer = () => {
                                         {server.exclude_from_resource_calculation && (
                                             <span
                                                 className='rounded-full bg-mocha-300 px-2 py-0.5 text-[10px] uppercase text-cream-400'
-                                                title='Excluded from resource calculations'
+                                                title={t('admin.servers.excluded_title')}
                                             >
-                                                Excluded
+                                                {t('admin.servers.excluded')}
                                             </span>
                                         )}
                                     </div>
@@ -137,7 +141,7 @@ const ServersContainer = () => {
                                             'hover:bg-mocha-300',
                                         )}
                                     >
-                                        Console
+                                        {t('admin.servers.console_link')}
                                     </a>
                                 </td>
                             </tr>
@@ -145,7 +149,7 @@ const ServersContainer = () => {
                         {!isValidating && servers.length === 0 && (
                             <tr>
                                 <td colSpan={7} className='px-4 py-8 text-center text-cream-400/50'>
-                                    No servers found.
+                                    {t('admin.servers.empty')}
                                 </td>
                             </tr>
                         )}

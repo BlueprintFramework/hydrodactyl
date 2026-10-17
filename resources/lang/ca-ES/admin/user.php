@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'exceptions' => [
+        'user_has_servers' => 'No es pot eliminar un usuari amb servidors actius vinculats al seu compte. Elimina\'n els servidors abans de continuar.',
+    ],
+    'index' => [
+        'can_access' => 'Pot accedir',
+        'can_access_tooltip' => 'Servidors als quals aquest usuari pot accedir perquè figura com a subusuari.',
+        'create_new' => 'Crea\'n un de nou',
+        'list' => 'Llista d\'usuaris',
+        'servers_owned' => 'Servidors en propietat',
+        'servers_owned_tooltip' => 'Servidors dels quals aquest usuari figura com a propietari.',
+        'subtitle' => 'Tots els usuaris registrats al sistema.',
+        'title' => 'Llista usuaris',
+    ],
+    'new' => [
+        'administrator' => 'Administrador',
+        'administrator_help' => 'Establir-ho en «Sí» atorga a l\'usuari accés administratiu complet.',
+        'breadcrumb' => 'Crea',
+        'default_language' => 'Idioma predeterminat',
+        'default_language_help' => 'L\'idioma predeterminat que s\'utilitzarà en mostrar el panell a aquest usuari.',
+        'generated_password' => 'Contrasenya generada:',
+        'identity' => 'Identitat',
+        'name_first' => 'Nom del client',
+        'name_last' => 'Cognoms del client',
+        'password_notice' => 'Proporcionar una contrasenya d\'usuari és opcional. Els correus de nous usuaris els demanen que creïn una contrasenya la primera vegada que inicien sessió. Si proporciones una contrasenya aquí, hauràs de trobar un altre mètode per facilitar-la-hi a l\'usuari.',
+        'permissions' => 'Permisos',
+        'submit' => 'Crea l\'usuari',
+        'subtitle' => 'Afegeix un usuari nou al sistema.',
+        'title' => 'Crea un usuari',
+    ],
+    'notices' => [
+        'account_created' => 'El compte s\'ha creat correctament.',
+        'account_updated' => 'El compte s\'ha actualitzat correctament.',
+    ],
+    'view' => [
+        'administrator' => 'Administrador',
+        'administrator_help' => 'Establir-ho en «Sí» atorga a l\'usuari accés administratiu complet.',
+        'default_language' => 'Idioma predeterminat',
+        'default_language_help' => 'L\'idioma predeterminat que s\'utilitzarà en mostrar el panell a aquest usuari.',
+        'delete_button' => 'Elimina l\'usuari',
+        'delete_title' => 'Elimina l\'usuari',
+        'delete_warning' => 'No hi ha d\'haver cap servidor associat a aquest compte per poder-lo eliminar.',
+        'identity' => 'Identitat',
+        'name_first' => 'Nom del client',
+        'name_last' => 'Cognoms del client',
+        'password_help' => 'Deixa-ho en blanc per mantenir la contrasenya de l\'usuari. L\'usuari no rebrà cap notificació si es canvia la contrasenya.',
+        'permissions' => 'Permisos',
+        'submit' => 'Actualitza l\'usuari',
+        'title' => 'Gestiona l\'usuari: :username',
+    ],
+];

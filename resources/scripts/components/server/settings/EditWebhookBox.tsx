@@ -8,6 +8,7 @@ import Dropdown from '@/components/elements/Dropdown';
 import Field from '@/components/elements/Field';
 import FormikFieldWrapper from '@/components/elements/FormikFieldWrapper';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 
@@ -17,13 +18,14 @@ interface Values {
 }
 
 const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<string, string> }) => {
+    const { t } = useTranslation();
     const server = ServerContext.useStoreState((state) => state.server.data);
     const setServer = ServerContext.useStoreActions((actions) => actions.server.setServer);
     const { addError, clearFlashes } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
 
     const submit = ({ webhook_type, webhook_url }: Values) => {
         clearFlashes('settings');
-        toast('Updating server details...');
+        toast(t('server.settings.webhook.updating'));
         if (!server) return;
         editWebhookInfo(server.uuid, webhook_type, webhook_url)
             .then(() => setServer({ ...server, webhookType: webhook_type, webhookUrl: webhook_url }))
@@ -31,7 +33,7 @@ const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<s
                 console.error(error);
                 addError({ key: 'settings', message: httpErrorToHuman(error) });
             })
-            .then(() => toast.success('Server details updated!'));
+            .then(() => toast.success(t('server.settings.webhook.updated')));
     };
 
     return (
@@ -42,30 +44,53 @@ const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<s
                 webhook_url: server?.webhookUrl || '',
             }}
             validationSchema={object().shape({
-                webhook_type: string().required(),
-                webhook_url: string().url().required(),
+                webhook_type: string().test(
+                    'webhook-type-required',
+                    t('server.settings.webhook.type_required'),
+                    (value, context) => !context.parent.webhook_url || !!value,
+                ),
+                webhook_url: string()
+                    .test(
+                        'webhook-url-required',
+                        t('server.settings.webhook.url_required'),
+                        (value, context) => !context.parent.webhook_type || !!value,
+                    )
+                    .test(
+                        'webhook-url-valid',
+                        t('server.settings.webhook.url_invalid'),
+                        (value) => !value || /^https?:\/\/\S+$/.test(value),
+                    ),
             })}
         >
             {({ values, setFieldValue }) => (
                 <Form className='flex flex-col gap-4'>
                     <div className='flex max-w-lg flex-col gap-4'>
-                        <FormikFieldWrapper id={'webhook_type'} name={'webhook_type'} label={'Webhook Type'}>
+                        <FormikFieldWrapper
+                            id={'webhook_type'}
+                            name={'webhook_type'}
+                            label={t('server.settings.webhook.type_label')}
+                        >
                             <Dropdown
                                 id={'webhook_type'}
                                 value={values.webhook_type}
                                 onChange={(value) => setFieldValue('webhook_type', value)}
-                                placeholder='Select a webhook type'
+                                placeholder={t('server.settings.webhook.type_placeholder')}
                                 options={Object.entries(allowedWebhookTypes).map(([value, label]) => ({
                                     value,
                                     label,
                                 }))}
                             />
                         </FormikFieldWrapper>
-                        <Field id={'webhook_url'} name={'webhook_url'} label={'Webhook URL'} type={'url'} />
+                        <Field
+                            id={'webhook_url'}
+                            name={'webhook_url'}
+                            label={t('server.settings.webhook.url_label')}
+                            type={'url'}
+                        />
                     </div>
                     <div>
                         <Button variant='secondary' type={'submit'}>
-                            Save
+                            {t('common.save')}
                         </Button>
                     </div>
                 </Form>

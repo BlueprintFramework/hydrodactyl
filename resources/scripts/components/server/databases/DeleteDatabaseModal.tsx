@@ -7,6 +7,7 @@ import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import Spinner from '@/components/elements/Spinner';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useFlashKey } from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -20,6 +21,7 @@ interface Values {
 }
 
 const DeleteDatabaseModal = ({ database, onDeleted, visible, onDismissed, ...props }: Props) => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const { clearFlashes, clearAndAddHttpError } = useFlashKey('database:delete');
 
@@ -53,11 +55,8 @@ const DeleteDatabaseModal = ({ database, onDeleted, visible, onDismissed, ...pro
             initialValues={{ confirm: '' }}
             validationSchema={object().shape({
                 confirm: string()
-                    .required('The database name must be provided.')
-                    .oneOf(
-                        [database.name.split('_', 2)[1] || '', database.name],
-                        'The database name must be provided.',
-                    ),
+                    .required(t('server.databases.name_required'))
+                    .oneOf([database.name.split('_', 2)[1] || '', database.name], t('server.databases.name_required')),
             })}
             isInitialValid={false}
         >
@@ -71,21 +70,21 @@ const DeleteDatabaseModal = ({ database, onDeleted, visible, onDismissed, ...pro
                     {...props}
                     dismissable={!isSubmitting}
                     showSpinnerOverlay={isSubmitting}
-                    title='Confirm database deletion'
+                    title={t('server.databases.delete_confirm_title')}
                 >
                     <FlashMessageRender byKey={'database:delete'} />
                     <div className='flex flex-col'>
                         <p>
-                            Deleting a database is a permanent action, it cannot be undone. This will permanently delete
-                            the <strong>{database.name}</strong> database and remove all its data.
+                            {t('server.databases.delete_message_prefix')} <strong>{database.name}</strong>{' '}
+                            {t('server.databases.delete_message_suffix')}
                         </p>
                         <Form className='mt-6'>
                             <Field
                                 type={'text'}
                                 id={'confirm_name'}
                                 name={'confirm'}
-                                label={'Confirm Database Name'}
-                                description={'Enter the database name to confirm deletion.'}
+                                label={t('server.databases.confirm_name_label')}
+                                description={t('server.databases.confirm_name_description')}
                             />
                             <Button
                                 variant='attention'
@@ -94,7 +93,7 @@ const DeleteDatabaseModal = ({ database, onDeleted, visible, onDismissed, ...pro
                                 disabled={!isValid || isSubmitting}
                             >
                                 {isSubmitting && <Spinner size='small' />}
-                                {isSubmitting ? 'Deleting...' : 'Delete Database'}
+                                {isSubmitting ? t('server.databases.deleting') : t('server.databases.delete_confirm')}
                             </Button>
                         </Form>
                     </div>

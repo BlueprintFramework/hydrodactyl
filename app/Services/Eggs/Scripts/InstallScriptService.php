@@ -26,7 +26,7 @@ class InstallScriptService
     {
         if (!is_null(array_get($data, 'copy_script_from'))) {
             if (!$this->repository->isCopyableScript(array_get($data, 'copy_script_from'), $egg->nest_id)) {
-                throw new InvalidCopyFromException(trans('exceptions.nest.egg.invalid_copy_id'));
+                throw new InvalidCopyFromException(__('exceptions.nest.egg.invalid_copy_id'));
             }
         }
 

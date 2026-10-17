@@ -7,6 +7,7 @@ import Can from '@/components/elements/Can';
 import { Dialog } from '@/components/elements/dialog';
 import type { PowerAction } from '@/components/server/console/ServerConsoleContainer';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { ServerContext } from '@/state/server';
 
@@ -15,6 +16,7 @@ interface PowerButtonProps {
 }
 
 const PowerButtons = ({ className }: PowerButtonProps) => {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const status = ServerContext.useStoreState((state) => state.status.value);
     const instance = ServerContext.useStoreState((state) => state.socket.instance);
@@ -32,11 +34,11 @@ const PowerButtons = ({ className }: PowerButtonProps) => {
 
         if (instance) {
             if (action === 'start') {
-                toast.success('Your server is starting!');
+                toast.success(t('server.console.power_starting'));
             } else if (action === 'restart') {
-                toast.success('Your server is restarting.');
+                toast.success(t('server.console.power_restarting'));
             } else {
-                toast.success('Your server is being stopped.');
+                toast.success(t('server.console.power_stopping'));
             }
             setOpen(false);
             instance.send('set state', action === 'kill-confirmed' ? 'kill' : action);
@@ -65,11 +67,11 @@ const PowerButtons = ({ className }: PowerButtonProps) => {
                 open={open}
                 hideCloseIcon
                 onClose={() => setOpen(false)}
-                title={'Forcibly Stop Process'}
-                confirm={'Continue'}
+                title={t('server.console.forcibly_stop_title')}
+                confirm={t('server.console.continue')}
                 onConfirmed={onButtonClick.bind(this, 'kill-confirmed')}
             >
-                Forcibly stopping a server can lead to data corruption.
+                {t('server.console.forcibly_stop_message')}
             </Dialog.Confirm>
             <Can action={'control.start'}>
                 <Button
@@ -78,11 +80,11 @@ const PowerButtons = ({ className }: PowerButtonProps) => {
                     className='px-3 gap-1 rounded-full'
                     disabled={status !== 'offline'}
                     onClick={onButtonClick.bind(this, 'start')}
-                    aria-label='Start server'
+                    aria-label={t('server.console.start_server')}
                 >
                     <div className='flex flex-row items-center gap-1.5'>
                         <HugeiconsIcon size={16} strokeWidth={2} icon={PlayIcon} className='size-4' />
-                        Start
+                        {t('server.console.start')}
                     </div>
                 </Button>
             </Can>
@@ -93,7 +95,7 @@ const PowerButtons = ({ className }: PowerButtonProps) => {
                     className='p-1 gap-1 rounded-full size-8'
                     disabled={!status}
                     onClick={onButtonClick.bind(this, 'restart')}
-                    aria-label='Restart server'
+                    aria-label={t('server.console.restart_server')}
                 >
                     <HugeiconsIcon size={16} icon={Rotate01FreeIcons} />
                 </Button>
@@ -105,7 +107,7 @@ const PowerButtons = ({ className }: PowerButtonProps) => {
                     className='p-1 gap-1 rounded-full size-8'
                     disabled={status === 'offline'}
                     onClick={onButtonClick.bind(this, killable ? 'kill' : 'stop')}
-                    aria-label={`${killable ? 'Kill' : 'Stop'} server`}
+                    aria-label={killable ? t('server.console.kill_server') : t('server.console.stop_server')}
                 >
                     <HugeiconsIcon size={16} icon={StopIcon} />
                 </Button>

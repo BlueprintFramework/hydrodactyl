@@ -3,6 +3,8 @@ import { NavLink } from 'react-router-dom';
 import { getSubdomainInfo } from '@/api/server/network/subdomain';
 
 import Can from '@/components/elements/Can';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 import { isFeatureLimitEnabled, isNetworkFeatureEnabled } from '@/lib/featureLimits';
 import type { ServerRouteDefinition } from '@/routers/routes';
 
@@ -23,6 +25,7 @@ interface ServerSidebarNavItemProps {
 const ServerSidebarNavItem = forwardRef<HTMLAnchorElement, ServerSidebarNavItemProps>(
     ({ route, serverId, onClick }, ref) => {
         const { icon: Icon, name, path, permission, featureLimit, end } = route;
+        const { t } = useTranslation();
 
         // Feature limits from server state
         const featureLimits = ServerContext.useStoreState((state) => state.server.data?.featureLimits);
@@ -86,7 +89,7 @@ const ServerSidebarNavItem = forwardRef<HTMLAnchorElement, ServerSidebarNavItemP
                 className='flex flex-row items-center transition-colors duration-200 hover:bg-[#ffffff11] rounded-md'
             >
                 {Icon && <Icon className='ml-3' width={22} height={22} fill='currentColor' />}
-                <p>{name}</p>
+                <p>{name ? t(name as TranslationKey) : null}</p>
             </NavLink>
         );
 

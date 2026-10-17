@@ -7,6 +7,7 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 export interface DropdownOption {
@@ -35,15 +36,18 @@ const Dropdown = ({
     value,
     onChange,
     options,
-    placeholder = 'Select…',
+    placeholder,
     className,
     triggerClassName,
     disabled,
     id,
     searchable = false,
-    searchPlaceholder = 'Search…',
+    searchPlaceholder,
 }: Props) => {
+    const { t } = useTranslation();
     const selected = options.find((option) => option.value === value);
+    const resolvedPlaceholder = placeholder ?? t('common.select_placeholder');
+    const resolvedSearchPlaceholder = searchPlaceholder ?? t('common.search_placeholder');
 
     const [open, setOpen] = useState(false);
     const [query, setQuery] = useState('');
@@ -84,8 +88,11 @@ const Dropdown = ({
                         className,
                     )}
                 >
-                    <span className={cn('truncate', !selected && 'text-cream-400/50')}>
-                        {selected?.label ?? placeholder}
+                    <span
+                        className={cn('truncate', !selected && 'text-cream-400/50')}
+                        title={selected?.label ?? resolvedPlaceholder}
+                    >
+                        {selected?.label ?? resolvedPlaceholder}
                     </span>
                     <ChevronDown width={16} height={16} className='shrink-0 text-cream-400/50' />
                 </button>
@@ -109,7 +116,7 @@ const Dropdown = ({
                                 ref={searchInputRef}
                                 value={query}
                                 onChange={(event) => setQuery(event.target.value)}
-                                placeholder={searchPlaceholder}
+                                placeholder={resolvedSearchPlaceholder}
                                 className='w-full rounded-lg bg-overlay/4 py-1.5 pl-8 pr-8 text-sm text-cream-100 outline-none placeholder:text-cream-400/50 focus:ring-2 focus:ring-hydro-500/40'
                             />
                             {query && (
@@ -117,7 +124,7 @@ const Dropdown = ({
                                     type='button'
                                     onClick={() => setQuery('')}
                                     className='absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-cream-400/50 hover:text-cream-100'
-                                    aria-label='Clear search'
+                                    aria-label={t('common.clear_search')}
                                 >
                                     <Xmark width={14} height={14} fill='currentColor' />
                                 </button>
@@ -127,7 +134,7 @@ const Dropdown = ({
                 )}
                 <DropdownMenuRadioGroup value={value} onValueChange={onChange}>
                     {visibleOptions.length === 0 ? (
-                        <p className='px-3 py-2 text-sm text-cream-400/50'>No matches</p>
+                        <p className='px-3 py-2 text-sm text-cream-400/50'>{t('common.no_matches')}</p>
                     ) : (
                         visibleOptions.map((option) => (
                             <DropdownMenuRadioItem
@@ -135,7 +142,9 @@ const Dropdown = ({
                                 value={option.value}
                                 className='flex-col items-start gap-0.5'
                             >
-                                <span className='w-full truncate'>{option.label}</span>
+                                <span className='w-full truncate' title={option.label}>
+                                    {option.label}
+                                </span>
                                 {option.description && (
                                     <span className='text-xs font-normal text-cream-400/50'>{option.description}</span>
                                 )}

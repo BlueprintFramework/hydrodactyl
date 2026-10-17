@@ -2,7 +2,7 @@ import '@/assets/tailwind.css';
 import { EditorView } from '@codemirror/view';
 import { type AxiosAdapter, AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
 import { createStore, StoreProvider } from 'easy-peasy';
-import { act, useEffect, useRef, useState } from 'react';
+import { act, type ReactNode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MemoryRouter } from 'react-router-dom';
 import { SWRConfig } from 'swr';
@@ -23,9 +23,11 @@ import { Button } from '@/components/ui/button';
 import { AppearanceProvider, useAppearance } from '@/contexts/AppearanceContext';
 import { HeaderProvider, useHeader } from '@/contexts/HeaderContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
+import I18nProvider from '@/i18n/I18nProvider';
 import { appearanceAccents, appearancePalettes, appearanceStorageKey } from '@/lib/appearance';
 import { Websocket } from '@/plugins/Websocket';
 import { ServerContext } from '@/state/server';
+import settingsModel from '@/state/settings';
 import userModel from '@/state/user';
 
 // Run with Vite, then open /tests/Frontend/appearance-ui.html. No backend or test dependencies required.
@@ -107,12 +109,12 @@ const createBrandingFixtureAdapter =
     };
 
 const appearanceSWRConfig = { provider: () => new Map(), revalidateOnFocus: false };
-const headerStore = createStore({ user: userModel });
+const headerStore = createStore({ user: userModel, settings: settingsModel });
 headerStore.getActions().user.setUserData({
     uuid: 'appearance-fixture-user',
     username: 'Appearance Fixture',
     email: 'appearance.fixture.user.with.a.long.address@example.test',
-    language: 'en',
+    language: 'en-US',
     rootAdmin: true,
     useTotp: false,
     createdAt: new Date(0),
@@ -225,6 +227,16 @@ function MountThemeToggleAfterStorageFailure() {
             <ThemeToggle />
         </div>
     ) : null;
+}
+
+function FixtureProviders({ children }: { children: ReactNode }) {
+    return (
+        <StoreProvider store={headerStore}>
+            <I18nProvider>
+                <SWRConfig value={appearanceSWRConfig}>{children}</SWRConfig>
+            </I18nProvider>
+        </StoreProvider>
+    );
 }
 
 function Preview() {
@@ -938,9 +950,9 @@ async function run() {
         app = createRoot(root as HTMLElement);
         await act(async () => {
             app?.render(
-                <SWRConfig value={appearanceSWRConfig}>
+                <FixtureProviders>
                     <Preview />
-                </SWRConfig>,
+                </FixtureProviders>,
             );
         });
         for (let attempts = 0; attempts < 50 && brandingFixture.requests.length === 0; attempts++) {
@@ -1360,9 +1372,9 @@ async function run() {
         app = createRoot(root as HTMLElement);
         await act(async () => {
             app?.render(
-                <SWRConfig value={appearanceSWRConfig}>
+                <FixtureProviders>
                     <Preview />
-                </SWRConfig>,
+                </FixtureProviders>,
             );
         });
         const restoredPreferences = JSON.parse(localStorage.getItem(appearanceStorageKey) ?? '{}') as {
@@ -1390,9 +1402,9 @@ async function run() {
         const readsBeforeInvalidServerColor = brandingFixture.requests.filter(({ method }) => method === 'get').length;
         await act(async () => {
             app?.render(
-                <SWRConfig value={appearanceSWRConfig}>
+                <FixtureProviders>
                     <BrandingSettings />
-                </SWRConfig>,
+                </FixtureProviders>,
             );
         });
         for (
