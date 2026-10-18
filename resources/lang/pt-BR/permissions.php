@@ -1,0 +1,87 @@
+<?php
+
+return [
+    'websocket' => [
+        'description' => 'Permite conectar ao WebSocket do servidor para visualizar a saída do console e as estatísticas do servidor em tempo real.',
+        'connect' => 'Permite conectar ao WebSocket de um servidor para acompanhar o console.',
+    ],
+    'control' => [
+        'description' => 'Permissões para controlar o estado de energia de um servidor ou enviar comandos.',
+        'console' => 'Permite enviar comandos ao servidor pelo console.',
+        'start' => 'Permite iniciar o servidor quando estiver parado.',
+        'stop' => 'Permite parar o servidor quando estiver em execução.',
+        'restart' => 'Permite reiniciar o servidor. Também permite iniciá-lo quando estiver offline, mas não pará-lo completamente.',
+    ],
+    'user' => [
+        'description' => 'Permissões para gerenciar outros subusuários de um servidor. O usuário nunca poderá editar a própria conta nem atribuir permissões que não possui.',
+        'create' => 'Permite criar novos subusuários para o servidor.',
+        'read' => 'Permite visualizar os subusuários e suas permissões no servidor.',
+        'update' => 'Permite modificar outros subusuários.',
+        'delete' => 'Permite excluir um subusuário do servidor.',
+    ],
+    'file' => [
+        'description' => 'Permissões para modificar o sistema de arquivos deste servidor.',
+        'create' => 'Permite criar arquivos e pastas pelo painel ou por envio direto.',
+        'read' => 'Permite visualizar o conteúdo de uma pasta, mas não visualizar o conteúdo de arquivos nem baixá-los.',
+        'read-content' => 'Permite visualizar o conteúdo de um arquivo. Também permite baixar arquivos.',
+        'update' => 'Permite atualizar o conteúdo de um arquivo ou pasta existente.',
+        'delete' => 'Permite excluir arquivos ou pastas.',
+        'archive' => 'Permite compactar o conteúdo de uma pasta e descompactar arquivos existentes no sistema.',
+        'sftp' => 'Permite conectar via SFTP e gerenciar os arquivos do servidor conforme as demais permissões de arquivos atribuídas.',
+    ],
+    'backup' => [
+        'description' => 'Permissões para criar e gerenciar backups do servidor.',
+        'create' => 'Permite criar novos backups deste servidor.',
+        'read' => 'Permite visualizar todos os backups existentes deste servidor.',
+        'delete' => 'Permite remover backups do sistema.',
+        'download' => 'Permite baixar um backup do servidor. Perigo: isso permite acessar todos os arquivos do servidor contidos no backup.',
+        'restore' => 'Permite restaurar um backup do servidor. Perigo: isso permite excluir todos os arquivos do servidor durante o processo.',
+    ],
+    'allocation' => [
+        'description' => 'Permissões para modificar as alocações de portas deste servidor.',
+        'read' => 'Permite visualizar todas as alocações atribuídas a este servidor. Usuários com qualquer nível de acesso ao servidor sempre podem visualizar a alocação principal.',
+        'create' => 'Permite atribuir alocações adicionais ao servidor.',
+        'update' => 'Permite alterar a alocação principal do servidor e adicionar observações a cada alocação.',
+        'delete' => 'Permite excluir uma alocação do servidor.',
+    ],
+    'startup' => [
+        'description' => 'Permissões para visualizar os parâmetros de inicialização deste servidor.',
+        'read' => 'Permite visualizar as variáveis de inicialização de um servidor.',
+        'update' => 'Permite modificar as variáveis de inicialização do servidor.',
+        'command' => 'Permite modificar o comando de inicialização do servidor.',
+        'docker-image' => 'Permite modificar a imagem Docker usada para executar o servidor.',
+        'software' => 'Permite modificar o jogo ou software usado pelo servidor.',
+    ],
+    'database' => [
+        'description' => 'Permissões de acesso ao gerenciamento de bancos de dados deste servidor.',
+        'create' => 'Permite criar um novo banco de dados para este servidor.',
+        'read' => 'Permite visualizar o banco de dados associado a este servidor.',
+        'update' => 'Permite redefinir a senha de um banco de dados. Sem a permissão view_password, o usuário não poderá visualizar a senha atualizada.',
+        'delete' => 'Permite remover um banco de dados deste servidor.',
+        'view_password' => 'Permite visualizar a senha de um banco de dados deste servidor.',
+    ],
+    'schedule' => [
+        'description' => 'Permissões de acesso ao gerenciamento de agendamentos deste servidor.',
+        'create' => 'Permite criar novos agendamentos para este servidor.',
+        'read' => 'Permite visualizar os agendamentos e suas tarefas neste servidor.',
+        'update' => 'Permite atualizar agendamentos e suas tarefas neste servidor.',
+        'delete' => 'Permite excluir agendamentos deste servidor.',
+    ],
+    'settings' => [
+        'description' => 'Permissões de acesso às configurações deste servidor.',
+        'rename' => 'Permite renomear este servidor e alterar sua descrição.',
+        'reinstall' => 'Permite iniciar a reinstalação deste servidor.',
+    ],
+    'activity' => [
+        'description' => 'Permissões de acesso aos registros de atividade do servidor.',
+        'read' => 'Permite visualizar os registros de atividade do servidor.',
+    ],
+    'mod' => [
+        'description' => 'Permissões para baixar e atualizar mods.',
+        'version' => 'Permite alterar a versão de destino do download',
+        'loader' => 'Permite alterar o carregador de destino do download',
+        'download' => 'Permite baixar mods para o servidor',
+        'resolver' => 'Permite acessar o resolvedor de dependências',
+        'update' => 'Permite atualizar os mods instalados',
+    ],
+];
