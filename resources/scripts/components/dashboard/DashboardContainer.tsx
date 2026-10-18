@@ -203,7 +203,7 @@ const DashboardContainer = () => {
     }, []);
 
     const searchSection = useMemo(
-        () => <SearchSection className='max-w-360 hidden md:flex' onSearch={handleSearch} />,
+        () => <SearchSection className='max-w-260 min-w-[220px] hidden xl:flex' onSearch={handleSearch} />,
         [handleSearch],
     );
 
@@ -335,7 +335,7 @@ const DashboardContainer = () => {
 
     const filterControlsDesktop = useMemo(
         () => (
-            <div className='hidden lg:flex items-center gap-1.5 sm:gap-2'>
+            <div className='hidden 2xl:flex items-center gap-1.5 sm:gap-2'>
                 {groupsEnabled
                     ? [entityFilterDropdown, groupDropdown, sortDropdown]
                     : [entityFilterDropdown, sortDropdown]}
@@ -346,7 +346,7 @@ const DashboardContainer = () => {
 
     const filterControlsMobile = useMemo(
         () => (
-            <div className='lg:hidden'>
+            <div className='2xl:hidden'>
                 <FiltersMenu
                     filterOptions={filterOptions || EMPTY_FILTER_OPTIONS}
                     groups={filterOptions?.groups || []}

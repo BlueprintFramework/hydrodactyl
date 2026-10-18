@@ -48,7 +48,7 @@ const OwnerFilterDropdown = ({ value, rootAdmin, onChange }: OwnerFilterDropdown
                 >
                     <div className='flex flex-row items-center gap-1.5'>
                         <HugeiconsIcon size={16} strokeWidth={2} icon={UserCircle02Icon} className='size-4' />
-                        <span className='hidden sm:inline'>{labels[value]}</span>
+                        <span className='hidden lg:inline max-w-[200px] truncate'>{labels[value]}</span>
                     </div>
                 </Button>
             </DropdownMenuTrigger>

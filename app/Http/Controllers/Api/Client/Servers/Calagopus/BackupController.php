@@ -11,6 +11,7 @@ use Pterodactyl\Facades\Activity;
 use Pterodactyl\Models\Permission;
 use Pterodactyl\Enums\BackupAdapter;
 use Illuminate\Support\Facades\Crypt;
+use Laravel\Sanctum\TransientToken;
 use Pterodactyl\Enums\Daemon\Adapters;
 use Illuminate\Auth\Access\AuthorizationException;
 use Pterodactyl\Repositories\Eloquent\BackupRepository;
@@ -339,7 +340,11 @@ class BackupController extends ClientApiController
      */
     private function confirmDestructiveAction(Request $request): void
     {
-        if ($request->user()->currentAccessToken()) {
+        $token = $request->user()->currentAccessToken();
+
+        // Only requests carrying a real API key skip the confirmation; browser
+        // sessions arrive with a Sanctum transient token.
+        if ($token && !$token instanceof TransientToken) {
             return;
         }
 
