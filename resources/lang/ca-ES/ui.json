@@ -1939,8 +1939,8 @@
                 "save_changes": "Desa els canvis",
                 "delete_title": "Voleu eliminar el subdomini?"
             },
-            "subdomain_management": "Gestió de subdominis",
-            "subdomains": "Subdominis",
+            "subdomain_management": "Gestió de dominis",
+            "subdomains": "Dominis",
             "unavailable_description": "No es poden crear assignacions de xarxa per a aquest servidor.",
             "unavailable_title": "Assignacions no disponibles"
         },

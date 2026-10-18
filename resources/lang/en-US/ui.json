@@ -1939,8 +1939,8 @@
                 "save_changes": "Save Changes",
                 "delete_title": "Delete Subdomain?"
             },
-            "subdomain_management": "Subdomain Management",
-            "subdomains": "Subdomains",
+            "subdomain_management": "Domain Management",
+            "subdomains": "Domains",
             "unavailable_description": "Network allocations cannot be created for this server.",
             "unavailable_title": "Allocations unavailable"
         },

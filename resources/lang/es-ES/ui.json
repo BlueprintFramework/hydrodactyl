@@ -1939,8 +1939,8 @@
                 "save_changes": "Guardar cambios",
                 "delete_title": "¿Eliminar subdominio?"
             },
-            "subdomain_management": "Gestión de subdominios",
-            "subdomains": "Subdominios",
+            "subdomain_management": "Gestión de dominios",
+            "subdomains": "Dominios",
             "unavailable_description": "No se pueden crear asignaciones de red para este servidor.",
             "unavailable_title": "Asignaciones no disponibles"
         },
