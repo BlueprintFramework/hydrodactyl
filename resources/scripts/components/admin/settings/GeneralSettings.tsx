@@ -8,6 +8,7 @@ import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 interface Props {
     name: string;
@@ -18,6 +19,7 @@ interface Props {
 }
 
 const GeneralForm = ({ name, locale, twoFactor, languages, onSaved }: Props) => {
+    const { t } = useTranslation();
     const [values, setValues] = useState({ name, locale, twoFactor });
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -33,10 +35,10 @@ const GeneralForm = ({ name, locale, twoFactor, languages, onSaved }: Props) => 
                 'pterodactyl:auth:2fa_required': values.twoFactor,
             });
             await onSaved();
-            toast.success('Settings saved.');
+            toast.success(t('admin.settings.saved'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to save settings.'));
+            toast.error(errorToMessage(error, t('admin.settings.save_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -51,10 +53,10 @@ const GeneralForm = ({ name, locale, twoFactor, languages, onSaved }: Props) => 
             className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'
         >
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <Field label='Company Name' error={errors['app:name']}>
+                <Field label={t('admin.settings.company_name')} error={errors['app:name']}>
                     <Input.Text value={values.name} onChange={(e) => setValues({ ...values, name: e.target.value })} />
                 </Field>
-                <Field label='Default Language' error={errors['app:locale']}>
+                <Field label={t('admin.users.default_language')} error={errors['app:locale']}>
                     <Dropdown
                         value={values.locale}
                         onChange={(value) => setValues({ ...values, locale: value })}
@@ -64,25 +66,25 @@ const GeneralForm = ({ name, locale, twoFactor, languages, onSaved }: Props) => 
             </div>
 
             <Field
-                label='Require 2-Factor Authentication'
+                label={t('admin.settings.require_2fa')}
                 error={errors['pterodactyl:auth:2fa_required']}
-                hint='Accounts in the selected group must have 2FA enabled to use the panel.'
+                hint={t('admin.settings.require_2fa_hint')}
             >
                 <Dropdown
                     className='md:w-1/3'
                     value={String(values.twoFactor)}
                     onChange={(value) => setValues({ ...values, twoFactor: Number(value) })}
                     options={[
-                        { value: '0', label: 'Not Required' },
-                        { value: '1', label: 'Admin Only' },
-                        { value: '2', label: 'All Users' },
+                        { value: '0', label: t('admin.settings.not_required') },
+                        { value: '1', label: t('admin.settings.admin_only') },
+                        { value: '2', label: t('admin.settings.all_users') },
                     ]}
                 />
             </Field>
 
             <div className='flex justify-end'>
                 <Button type='submit' disabled={submitting}>
-                    Save
+                    {t('common.save')}
                 </Button>
             </div>
         </form>

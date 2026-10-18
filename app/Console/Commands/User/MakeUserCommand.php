@@ -27,16 +27,16 @@ class MakeUserCommand extends Command
      */
     public function handle()
     {
-        $root_admin = $this->option('admin') ?? $this->confirm(trans('command/messages.user.ask_admin'));
-        $email = $this->option('email') ?? $this->ask(trans('command/messages.user.ask_email'));
-        $username = $this->option('username') ?? $this->ask(trans('command/messages.user.ask_username'));
-        $name_first = $this->option('name-first') ?? $this->ask(trans('command/messages.user.ask_name_first'));
-        $name_last = $this->option('name-last') ?? $this->ask(trans('command/messages.user.ask_name_last'));
+        $root_admin = $this->option('admin') ?? $this->confirm(__('command/messages.user.ask_admin'));
+        $email = $this->option('email') ?? $this->ask(__('command/messages.user.ask_email'));
+        $username = $this->option('username') ?? $this->ask(__('command/messages.user.ask_username'));
+        $name_first = $this->option('name-first') ?? $this->ask(__('command/messages.user.ask_name_first'));
+        $name_last = $this->option('name-last') ?? $this->ask(__('command/messages.user.ask_name_last'));
 
         if (is_null($password = $this->option('password')) && !$this->option('no-password')) {
-            $this->warn(trans('command/messages.user.ask_password_help'));
-            $this->line(trans('command/messages.user.ask_password_tip'));
-            $password = $this->secret(trans('command/messages.user.ask_password'));
+            $this->warn(__('command/messages.user.ask_password_help'));
+            $this->line(__('command/messages.user.ask_password_tip'));
+            $password = $this->secret(__('command/messages.user.ask_password'));
         }
 
         $user = $this->creationService->handle(compact('email', 'username', 'name_first', 'name_last', 'password', 'root_admin'));

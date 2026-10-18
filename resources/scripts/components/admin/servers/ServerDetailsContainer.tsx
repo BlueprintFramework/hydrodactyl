@@ -8,9 +8,11 @@ import { Field } from '@/components/admin/Field';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import OwnerSelect from './OwnerSelect';
 
 const ServerDetailsForm = ({ server, onSaved }: { server: AdminServer; onSaved: () => Promise<unknown> }) => {
+    const { t } = useTranslation();
     const [name, setName] = useState(server.name);
     const [externalId, setExternalId] = useState(server.external_id ?? '');
     const [description, setDescription] = useState(server.description ?? '');
@@ -30,10 +32,10 @@ const ServerDetailsForm = ({ server, onSaved }: { server: AdminServer; onSaved: 
                 description,
             });
             await onSaved();
-            toast.success('Server details updated.');
+            toast.success(t('admin.servers.details_updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update server details.'));
+            toast.error(errorToMessage(error, t('admin.servers.details_update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -51,32 +53,37 @@ const ServerDetailsForm = ({ server, onSaved }: { server: AdminServer; onSaved: 
             }}
             className='flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'
         >
-            <Field label='Server Name' error={errors.name} hint='Allowed characters: a-z, A-Z, 0-9, _ and -.'>
+            <Field
+                label={t('admin.servers.server_name')}
+                error={errors.name}
+                hint={t('admin.servers.server_name_hint_details')}
+            >
                 <Input.Text value={name} onChange={(event) => setName(event.target.value)} />
             </Field>
 
             <Field
-                label='External Identifier'
+                label={t('admin.servers.external_identifier')}
                 error={errors.external_id}
-                hint='Leave empty to not assign an external identifier for this server.'
+                hint={t('admin.servers.external_id_hint')}
             >
                 <Input.Text value={externalId} onChange={(event) => setExternalId(event.target.value)} />
             </Field>
 
-            <Field
-                label='Server Owner'
-                hint='Changing the owner will automatically generate a new daemon security token.'
-            >
+            <Field label={t('admin.servers.server_owner')} hint={t('admin.servers.server_owner_hint_details')}>
                 <OwnerSelect initialLabel={ownerLabel} onChange={setOwnerId} error={errors.owner_id} />
             </Field>
 
-            <Field label='Server Description' error={errors.description} hint='A brief description of this server.'>
+            <Field
+                label={t('admin.servers.server_description')}
+                error={errors.description}
+                hint={t('admin.servers.server_description_hint')}
+            >
                 <Input.Text value={description} onChange={(event) => setDescription(event.target.value)} />
             </Field>
 
             <div className='flex justify-end'>
                 <Button type='submit' disabled={submitting}>
-                    Update Details
+                    {t('admin.servers.update_details')}
                 </Button>
             </div>
         </form>

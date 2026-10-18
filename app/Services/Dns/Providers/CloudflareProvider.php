@@ -99,7 +99,7 @@ class CloudflareProvider implements DnsProviderInterface
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (!$data['success']) {
-                throw new \Exception('DNS provider rejected the record creation request.');
+                throw new \Exception(__('exceptions.dns.provider_rejected_creation'));
             }
 
             /* Log::debug("Create Record", [ */
@@ -159,7 +159,7 @@ class CloudflareProvider implements DnsProviderInterface
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (!$data['success']) {
-                throw new \Exception('DNS provider rejected the record update request.');
+                throw new \Exception(__('exceptions.dns.provider_rejected_update'));
             }
 
             return true;
@@ -180,7 +180,7 @@ class CloudflareProvider implements DnsProviderInterface
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (!$data['success']) {
-                throw new \Exception('DNS provider rejected the record deletion request.');
+                throw new \Exception(__('exceptions.dns.provider_rejected_deletion'));
             }
         } catch (GuzzleException $e) {
             throw DnsProviderException::recordDeletionFailed($domain, [$recordId], $this->failureReason($e));
@@ -199,7 +199,7 @@ class CloudflareProvider implements DnsProviderInterface
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (!$data['success']) {
-                throw new \Exception("DNS record not found or inaccessible.");
+                throw new \Exception(__('exceptions.dns.record_not_found'));
             }
 
             return $data['result'];
@@ -231,7 +231,7 @@ class CloudflareProvider implements DnsProviderInterface
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (!$data['success']) {
-                throw new \Exception('Failed to retrieve DNS records.');
+                throw new \Exception(__('exceptions.dns.retrieve_failed'));
             }
 
             return $data['result'];
@@ -299,7 +299,7 @@ class CloudflareProvider implements DnsProviderInterface
     {
         $status = $e instanceof RequestException ? $e->getResponse()?->getStatusCode() : null;
 
-        return in_array($status, [401, 403], true) ? self::TOKEN_REJECTED : 'DNS service temporarily unavailable.';
+        return in_array($status, [401, 403], true) ? self::TOKEN_REJECTED : __('exceptions.dns.service_unavailable');
     }
 
     private function getRequestExceptionMessage(RequestException $e): string
@@ -311,7 +311,7 @@ class CloudflareProvider implements DnsProviderInterface
 
         $data = json_decode((string) $response->getBody(), true);
         if (!is_array($data)) {
-            return 'DNS provider rejected the record creation request.';
+            return __('exceptions.dns.provider_rejected_creation');
         }
 
         $messages = [];
@@ -321,7 +321,7 @@ class CloudflareProvider implements DnsProviderInterface
             }
         }
 
-        return empty($messages) ? 'DNS provider rejected the record creation request.' : implode(' ', $messages);
+        return empty($messages) ? __('exceptions.dns.provider_rejected_creation') : implode(' ', $messages);
     }
 
     /**
@@ -333,13 +333,15 @@ class CloudflareProvider implements DnsProviderInterface
             'api_token' => [
                 'type' => 'string',
                 'required' => true,
-                'description' => 'Cloudflare API Token with Zone:Edit permissions',
+                'label' => __('admin/domains.schema.cloudflare.api_token_label'),
+                'description' => __('admin/domains.schema.cloudflare.api_token'),
                 'sensitive' => true,
             ],
             'zone_id' => [
                 'type' => 'string',
                 'required' => true,
-                'description' => 'Cloudflare Zone ID',
+                'label' => __('admin/domains.schema.cloudflare.zone_id_label'),
+                'description' => __('admin/domains.schema.cloudflare.zone_id'),
                 'sensitive' => false,
             ],
         ];
@@ -384,7 +386,7 @@ class CloudflareProvider implements DnsProviderInterface
             $data = json_decode($response->getBody()->getContents(), true);
 
             if (!$data['success'] || empty($data['result'])) {
-                throw new \Exception("Domain zone not found or inaccessible.");
+                throw new \Exception(__('exceptions.dns.zone_not_found'));
             }
 
             return $data['result'][0]['id'];

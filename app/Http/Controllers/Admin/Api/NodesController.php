@@ -3,18 +3,19 @@
 namespace Pterodactyl\Http\Controllers\Admin\Api;
 
 use Pterodactyl\Models\S3;
-use Pterodactyl\Models\Node;
 use Illuminate\Http\Request;
+use Pterodactyl\Models\Node;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Enums\Daemon\Adapters;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\QueryBuilder;
+use Pterodactyl\Enums\Daemon\Adapters;
 use Pterodactyl\Enums\Daemon\DaemonType;
 use Pterodactyl\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
-use Pterodactyl\Repositories\Eloquent\NodeRepository;
 use Pterodactyl\Services\Nodes\NodeUpdateService;
 use Pterodactyl\Services\Nodes\NodeCreationService;
 use Pterodactyl\Services\Nodes\NodeDeletionService;
+use Pterodactyl\Repositories\Eloquent\NodeRepository;
+use Pterodactyl\Services\Daemons\DaemonVersionService;
 use Pterodactyl\Http\Requests\Admin\Node\NodeFormRequest;
 use Pterodactyl\Contracts\Repository\LocationRepositoryInterface;
 use Pterodactyl\Repositories\Wings\DaemonConfigurationRepository;
@@ -31,6 +32,7 @@ class NodesController extends Controller
         private NodeRepository $repository,
         private LocationRepositoryInterface $locationRepository,
         private DaemonConfigurationRepository $daemonConfigurationRepository,
+        private DaemonVersionService $daemonVersionService,
     ) {
     }
 
@@ -111,6 +113,10 @@ class NodesController extends Controller
      */
     public function status(Node $node): JsonResponse
     {
+        $type = DaemonType::tryFrom(strtolower((string) $node->daemonType));
+        $latest = $type ? $this->daemonVersionService->latest($type) : null;
+        $upgradeSupported = $type ? $this->daemonVersionService->upgradeEndpoint($type) !== null : false;
+
         try {
             $data = $this->daemonConfigurationRepository->setNode($node)->getSystemInformation();
         } catch (\Throwable $exception) {
@@ -118,15 +124,25 @@ class NodesController extends Controller
                 'data' => [
                     'up' => false,
                     'version' => null,
+                    'latest' => $latest,
+                    'up_to_date' => null,
+                    'upgrade_supported' => $upgradeSupported,
                     'error' => $exception->getMessage(),
                 ],
             ]);
         }
 
+        $version = $data['version'] ?? null;
+
         return response()->json([
             'data' => [
                 'up' => true,
-                'version' => $data['version'] ?? null,
+                'version' => $version,
+                'latest' => $latest,
+                'up_to_date' => $type && $version !== null && $latest !== null
+                    ? $this->daemonVersionService->isLatest($type, (string) $version)
+                    : null,
+                'upgrade_supported' => $upgradeSupported,
                 'error' => null,
             ],
         ]);

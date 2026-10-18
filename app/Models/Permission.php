@@ -101,143 +101,132 @@ class Permission extends Model
     ];
 
     /**
-     * All the permissions available on the system. You should use self::permissions()
-     * to retrieve them, and not directly access this array as it is subject to change.
-     *
-     * @see \Pterodactyl\Models\Permission::permissions()
-     */
-    protected static array $permissions = [
-        'websocket' => [
-            'description' => 'Allows the user to connect to the server websocket, giving them access to view console output and realtime server stats.',
-            'keys' => [
-                'connect' => 'Allows a user to connect to the websocket instance for a server to stream the console.',
-            ],
-        ],
-
-        'control' => [
-            'description' => 'Permissions that control a user\'s ability to control the power state of a server, or send commands.',
-            'keys' => [
-                'console' => 'Allows a user to send commands to the server instance via the console.',
-                'start' => 'Allows a user to start the server if it is stopped.',
-                'stop' => 'Allows a user to stop a server if it is running.',
-                'restart' => 'Allows a user to perform a server restart. This allows them to start the server if it is offline, but not put the server in a completely stopped state.',
-            ],
-        ],
-
-        'user' => [
-            'description' => 'Permissions that allow a user to manage other subusers on a server. They will never be able to edit their own account, or assign permissions they do not have themselves.',
-            'keys' => [
-                'create' => 'Allows a user to create new subusers for the server.',
-                'read' => 'Allows the user to view subusers and their permissions for the server.',
-                'update' => 'Allows a user to modify other subusers.',
-                'delete' => 'Allows a user to delete a subuser from the server.',
-            ],
-        ],
-
-        'file' => [
-            'description' => 'Permissions that control a user\'s ability to modify the filesystem for this server.',
-            'keys' => [
-                'create' => 'Allows a user to create additional files and folders via the Panel or direct upload.',
-                'read' => 'Allows a user to view the contents of a directory, but not view the contents of or download files.',
-                'read-content' => 'Allows a user to view the contents of a given file. This will also allow the user to download files.',
-                'update' => 'Allows a user to update the contents of an existing file or directory.',
-                'delete' => 'Allows a user to delete files or directories.',
-                'archive' => 'Allows a user to archive the contents of a directory as well as decompress existing archives on the system.',
-                'sftp' => 'Allows a user to connect to SFTP and manage server files using the other assigned file permissions.',
-            ],
-        ],
-
-        'backup' => [
-            'description' => 'Permissions that control a user\'s ability to generate and manage server backups.',
-            'keys' => [
-                'create' => 'Allows a user to create new backups for this server.',
-                'read' => 'Allows a user to view all backups that exist for this server.',
-                'delete' => 'Allows a user to remove backups from the system.',
-                'download' => 'Allows a user to download a backup for the server. Danger: this allows a user to access all files for the server in the backup.',
-                'restore' => 'Allows a user to restore a backup for the server. Danger: this allows the user to delete all of the server files in the process.',
-            ],
-        ],
-
-        // Controls permissions for editing or viewing a server's allocations.
-        'allocation' => [
-            'description' => 'Permissions that control a user\'s ability to modify the port allocations for this server.',
-            'keys' => [
-                'read' => 'Allows a user to view all allocations currently assigned to this server. Users with any level of access to this server can always view the primary allocation.',
-                'create' => 'Allows a user to assign additional allocations to the server.',
-                'update' => 'Allows a user to change the primary server allocation and attach notes to each allocation.',
-                'delete' => 'Allows a user to delete an allocation from the server.',
-                'custom_domain_read' => 'Allows a user to view the custom domains pointed at this server.',
-                'custom_domain_update' => 'Allows a user to add and remove custom domains for this server.',
-            ],
-        ],
-
-        // Controls permissions for editing or viewing a server's startup parameters.
-        'startup' => [
-            'description' => 'Permissions that control a user\'s ability to view this server\'s startup parameters.',
-            'keys' => [
-                'read' => 'Allows a user to view the startup variables for a server.',
-                'update' => 'Allows a user to modify the startup variables for the server.',
-                'command' => 'Allows a user to modify the startup command for the server.',
-                'docker-image' => 'Allows a user to modify the Docker image used when running the server.',
-                'software' => 'Allows a user to modify the game / software used for the server.',
-            ],
-        ],
-
-        'database' => [
-            'description' => 'Permissions that control a user\'s access to the database management for this server.',
-            'keys' => [
-                'create' => 'Allows a user to create a new database for this server.',
-                'read' => 'Allows a user to view the database associated with this server.',
-                'update' => 'Allows a user to rotate the password on a database instance. If the user does not have the view_password permission they will not see the updated password.',
-                'delete' => 'Allows a user to remove a database instance from this server.',
-                'view_password' => 'Allows a user to view the password associated with a database instance for this server.',
-            ],
-        ],
-
-        'schedule' => [
-            'description' => 'Permissions that control a user\'s access to the schedule management for this server.',
-            'keys' => [
-                'create' => 'Allows a user to create new schedules for this server.', // task.create-schedule
-                'read' => 'Allows a user to view schedules and the tasks associated with them for this server.', // task.view-schedule, task.list-schedules
-                'update' => 'Allows a user to update schedules and schedule tasks for this server.', // task.edit-schedule, task.queue-schedule, task.toggle-schedule
-                'delete' => 'Allows a user to delete schedules for this server.', // task.delete-schedule
-            ],
-        ],
-
-        'settings' => [
-            'description' => 'Permissions that control a user\'s access to the settings for this server.',
-            'keys' => [
-                'rename' => 'Allows a user to rename this server and change the description of it.',
-                'reinstall' => 'Allows a user to trigger a reinstall of this server.',
-
-            ],
-        ],
-
-        'activity' => [
-            'description' => 'Permissions that control a user\'s access to the server activity logs.',
-            'keys' => [
-                'read' => 'Allows a user to view the activity logs for the server.',
-            ],
-        ],
-
-        'mod' => [
-            'description' => 'Permissions that control a user\'s access to downloading and updating mods.',
-            'keys' => [
-                'version' => 'Allows a user to change what version to download for',
-                'loader' => 'Allows a user to change what loader to download for',
-                'download' => 'Allows a user to download mods to the server',
-                'resolver' => 'Allows a user to access the Dependency Resolver',
-                'update' => 'Allows a user to update Currently installed mods',
-            ],
-        ],
-    ];
-
-    /**
      * Returns all the permissions available on the system for a user to
      * have when controlling a server.
      */
     public static function permissions(): Collection
     {
-        return Collection::make(self::$permissions);
+        return Collection::make([
+            'websocket' => [
+                'description' => __('permissions.websocket.description'),
+                'keys' => [
+                    'connect' => __('permissions.websocket.connect'),
+                ],
+            ],
+
+            'control' => [
+                'description' => __('permissions.control.description'),
+                'keys' => [
+                    'console' => __('permissions.control.console'),
+                    'start' => __('permissions.control.start'),
+                    'stop' => __('permissions.control.stop'),
+                    'restart' => __('permissions.control.restart'),
+                ],
+            ],
+
+            'user' => [
+                'description' => __('permissions.user.description'),
+                'keys' => [
+                    'create' => __('permissions.user.create'),
+                    'read' => __('permissions.user.read'),
+                    'update' => __('permissions.user.update'),
+                    'delete' => __('permissions.user.delete'),
+                ],
+            ],
+
+            'file' => [
+                'description' => __('permissions.file.description'),
+                'keys' => [
+                    'create' => __('permissions.file.create'),
+                    'read' => __('permissions.file.read'),
+                    'read-content' => __('permissions.file.read-content'),
+                    'update' => __('permissions.file.update'),
+                    'delete' => __('permissions.file.delete'),
+                    'archive' => __('permissions.file.archive'),
+                    'sftp' => __('permissions.file.sftp'),
+                ],
+            ],
+
+            'backup' => [
+                'description' => __('permissions.backup.description'),
+                'keys' => [
+                    'create' => __('permissions.backup.create'),
+                    'read' => __('permissions.backup.read'),
+                    'delete' => __('permissions.backup.delete'),
+                    'download' => __('permissions.backup.download'),
+                    'restore' => __('permissions.backup.restore'),
+                ],
+            ],
+
+            'allocation' => [
+                'description' => __('permissions.allocation.description'),
+                'keys' => [
+                    'read' => __('permissions.allocation.read'),
+                    'create' => __('permissions.allocation.create'),
+                    'update' => __('permissions.allocation.update'),
+                    'delete' => __('permissions.allocation.delete'),
+                    'custom_domain_read' => __('permissions.allocation.custom_domain_read'),
+                    'custom_domain_update' => __('permissions.allocation.custom_domain_update'),
+                ],
+            ],
+
+            'startup' => [
+                'description' => __('permissions.startup.description'),
+                'keys' => [
+                    'read' => __('permissions.startup.read'),
+                    'update' => __('permissions.startup.update'),
+                    'command' => __('permissions.startup.command'),
+                    'docker-image' => __('permissions.startup.docker-image'),
+                    'software' => __('permissions.startup.software'),
+                ],
+            ],
+
+            'database' => [
+                'description' => __('permissions.database.description'),
+                'keys' => [
+                    'create' => __('permissions.database.create'),
+                    'read' => __('permissions.database.read'),
+                    'update' => __('permissions.database.update'),
+                    'delete' => __('permissions.database.delete'),
+                    'view_password' => __('permissions.database.view_password'),
+                ],
+            ],
+
+            'schedule' => [
+                'description' => __('permissions.schedule.description'),
+                'keys' => [
+                    'create' => __('permissions.schedule.create'),
+                    'read' => __('permissions.schedule.read'),
+                    'update' => __('permissions.schedule.update'),
+                    'delete' => __('permissions.schedule.delete'),
+                ],
+            ],
+
+            'settings' => [
+                'description' => __('permissions.settings.description'),
+                'keys' => [
+                    'rename' => __('permissions.settings.rename'),
+                    'reinstall' => __('permissions.settings.reinstall'),
+                ],
+            ],
+
+            'activity' => [
+                'description' => __('permissions.activity.description'),
+                'keys' => [
+                    'read' => __('permissions.activity.read'),
+                ],
+            ],
+
+            'mod' => [
+                'description' => __('permissions.mod.description'),
+                'keys' => [
+                    'version' => __('permissions.mod.version'),
+                    'loader' => __('permissions.mod.loader'),
+                    'download' => __('permissions.mod.download'),
+                    'resolver' => __('permissions.mod.resolver'),
+                    'update' => __('permissions.mod.update'),
+                ],
+            ],
+        ]);
     }
 }

@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import { useDebounce } from 'use-debounce';
 import { searchUsers } from '@/api/admin/servers';
 import { Input } from '@/components/elements/inputs';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const OwnerSelect = ({
     initialLabel,
@@ -13,6 +14,7 @@ const OwnerSelect = ({
     onChange: (id: number) => void;
     error?: string;
 }) => {
+    const { t } = useTranslation();
     const [label, setLabel] = useState(initialLabel ?? '');
     const [term, setTerm] = useState('');
     const [debounced] = useDebounce(term, 300);
@@ -27,10 +29,10 @@ const OwnerSelect = ({
     return (
         <div className='flex flex-col gap-2'>
             <div className='rounded-lg bg-[#ffffff11] px-4 py-2 text-sm text-cream-100'>
-                {label || 'No owner selected'}
+                {label || t('admin.servers.no_owner')}
             </div>
             <Input.Text
-                placeholder='Search by email to choose an owner…'
+                placeholder={t('admin.servers.owner_search_placeholder')}
                 value={term}
                 onChange={(event) => setTerm(event.target.value)}
             />
@@ -56,7 +58,7 @@ const OwnerSelect = ({
                         </button>
                     ))}
                     {!isValidating && results.length === 0 && (
-                        <div className='px-3 py-2 text-sm text-cream-400/50'>No users found.</div>
+                        <div className='px-3 py-2 text-sm text-cream-400/50'>{t('admin.users.empty')}</div>
                     )}
                 </div>
             )}

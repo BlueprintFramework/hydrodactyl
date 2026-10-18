@@ -7,8 +7,10 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const UsersContainer = () => {
+    const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [search] = useDebounce(searchTerm, 300);
@@ -18,14 +20,14 @@ const UsersContainer = () => {
     const users = data?.items ?? [];
 
     return (
-        <PageContentBlock title='Users'>
-            <MainPageHeader direction='column' title='Users'>
-                <p className='text-sm text-neutral-400'>All registered users on the system.</p>
+        <PageContentBlock title={t('admin.nav.users')}>
+            <MainPageHeader direction='column' title={t('admin.nav.users')}>
+                <p className='text-sm text-neutral-400'>{t('admin.users.description')}</p>
             </MainPageHeader>
 
             <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center'>
                 <Input.Text
-                    placeholder='Search by username or email...'
+                    placeholder={t('admin.users.search_placeholder')}
                     value={searchTerm}
                     onChange={(e) => {
                         setSearchTerm(e.target.value);
@@ -34,7 +36,7 @@ const UsersContainer = () => {
                     className='w-full sm:max-w-sm'
                 />
                 <Button asChild className='sm:ml-auto'>
-                    <Link to='/users/new'>Create User</Link>
+                    <Link to='/users/new'>{t('admin.users.create')}</Link>
                 </Button>
             </div>
 
@@ -42,12 +44,12 @@ const UsersContainer = () => {
                 <table className='w-full text-sm'>
                     <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                         <tr className='border-b border-mocha-300'>
-                            <th className='px-4 py-3'>ID</th>
-                            <th className='px-4 py-3'>Email</th>
-                            <th className='px-4 py-3'>Username</th>
-                            <th className='px-4 py-3 text-center'>2FA</th>
-                            <th className='px-4 py-3 text-center'>Servers Owned</th>
-                            <th className='px-4 py-3 text-center'>Can Access</th>
+                            <th className='px-4 py-3'>{t('admin.users.id')}</th>
+                            <th className='px-4 py-3'>{t('admin.users.email')}</th>
+                            <th className='px-4 py-3'>{t('admin.users.username')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.users.two_factor')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.users.servers_owned')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.users.can_access')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -60,13 +62,13 @@ const UsersContainer = () => {
                                     </Link>
                                     {user.root_admin && (
                                         <span className='ml-2 rounded-full bg-hydro-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase text-hydro-400'>
-                                            Admin
+                                            {t('admin.users.admin_badge')}
                                         </span>
                                     )}
                                 </td>
                                 <td className='px-4 py-3 text-cream-100'>{user.username}</td>
                                 <td className='px-4 py-3 text-center text-cream-400/70'>
-                                    {user.use_totp ? 'Enabled' : '—'}
+                                    {user.use_totp ? t('common.enabled') : '—'}
                                 </td>
                                 <td className='px-4 py-3 text-center text-cream-100'>{user.servers_count}</td>
                                 <td className='px-4 py-3 text-center text-cream-100'>{user.subuser_of_count}</td>
@@ -75,7 +77,7 @@ const UsersContainer = () => {
                         {!isValidating && users.length === 0 && (
                             <tr>
                                 <td colSpan={6} className='px-4 py-8 text-center text-cream-400/50'>
-                                    No users found.
+                                    {t('admin.users.empty')}
                                 </td>
                             </tr>
                         )}

@@ -20,7 +20,7 @@ class SetWebhookRequest extends ClientApiRequest
                 'max:64',
                 function ($attribute, $value, $fail) {
                     if (!array_key_exists($value, config('webhook.allowed_webhook_types', []))) {
-                        $fail("Webhook type not allowed");
+                        $fail(__('validation.webhook.type_not_allowed'));
                         return;
                     }
                 }
@@ -36,7 +36,7 @@ class SetWebhookRequest extends ClientApiRequest
                         $scheme = parse_url($value, PHP_URL_SCHEME);
 
                         if ($scheme !== 'http' && $scheme !== 'https') {
-                            $fail("Invalid protocol");
+                            $fail(__('validation.webhook.invalid_protocol'));
                             return;
                         }
                     }

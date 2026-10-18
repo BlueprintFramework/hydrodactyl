@@ -4,6 +4,7 @@ import deleteServerAllocation from '@/api/server/network/deleteServerAllocation'
 import getServerAllocations from '@/api/swr/getServerAllocations';
 import { Dialog } from '@/components/elements/dialog';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useFlashKey } from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const DeleteAllocationButton = ({ allocation }: Props) => {
+    const { t } = useTranslation();
     const [confirm, setConfirm] = useState(false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
@@ -42,15 +44,15 @@ const DeleteAllocationButton = ({ allocation }: Props) => {
             <Dialog.Confirm
                 open={confirm}
                 onClose={() => setConfirm(false)}
-                title={'Remove Allocation'}
-                confirm={'Delete'}
+                title={t('server.network.remove_title')}
+                confirm={t('common.delete')}
                 onConfirmed={deleteAllocation}
             >
-                This allocation will be immediately removed from your server.
+                {t('server.network.remove_confirm')}
             </Dialog.Confirm>
             <Button variant='attention' size='sm' onClick={() => setConfirm(true)} className='flex items-center gap-2'>
                 <TrashBin width={22} height={22} fill='currentColor' />
-                <span className='hidden sm:inline'>Delete</span>
+                <span className='hidden sm:inline'>{t('common.delete')}</span>
             </Button>
         </>
     );

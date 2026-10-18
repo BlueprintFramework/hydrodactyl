@@ -19,6 +19,7 @@ import Spinner from '@/components/elements/Spinner';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import VariableBox from '@/components/server/startup/VariableBox';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 import useFlash from '@/plugins/useFlash';
 import { usePermissions } from '@/plugins/usePermissions';
@@ -28,6 +29,7 @@ const commandClass =
     'w-full font-mono text-sm text-zinc-200 break-all whitespace-pre-wrap rounded-xl border border-[#ffffff10] bg-[#ffffff08] px-4 py-3';
 
 const StartupContainer = () => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [commandLoading, setCommandLoading] = useState(false);
     const [editingCommand, setEditingCommand] = useState(false);
@@ -195,31 +197,27 @@ const StartupContainer = () => {
             <div className='flex items-center justify-center py-24'>
                 <div className='flex flex-col items-center gap-3'>
                     <div className='h-6 w-6 animate-spin rounded-full border-b-2 border-brand' />
-                    <p className='text-sm text-neutral-400'>Loading startup configuration...</p>
+                    <p className='text-sm text-neutral-400'>{t('server.startup.loading')}</p>
                 </div>
             </div>
         ) : (
-            <ServerError title={'Oops!'} message={httpErrorToHuman(error)} />
+            <ServerError title={t('server.startup.error_title')} message={httpErrorToHuman(error)} />
         )
     ) : (
-        <ServerContentBlock title={'Startup Settings'} showFlashKey={'startup:image'} className='p-0!'>
+        <ServerContentBlock title={t('server.startup.title')} showFlashKey={'startup:image'} className='p-0!'>
             <ServerHeader />
             <Dialog.Confirm
                 open={revertModalVisible}
-                title={'Revert Docker Image'}
-                confirm={'Yes, revert to default'}
+                title={t('server.startup.revert.title')}
+                confirm={t('server.startup.revert.confirm')}
                 onClose={() => setRevertModalVisible(false)}
                 onConfirmed={revertToEggDefault}
                 loading={loading}
             >
                 <div className='space-y-3'>
-                    <p>
-                        This will revert your server&apos;s Docker image back to the egg&apos;s default specification.
-                    </p>
-                    <p className='text-sm text-amber-200'>
-                        You will not be able to set a custom image again without contacting support.
-                    </p>
-                    <p className='text-sm text-neutral-400'>Are you sure you want to continue?</p>
+                    <p>{t('server.startup.revert.description')}</p>
+                    <p className='text-sm text-amber-200'>{t('server.startup.revert.warning')}</p>
+                    <p className='text-sm text-neutral-400'>{t('server.startup.revert.confirm_question')}</p>
                 </div>
             </Dialog.Confirm>
 
@@ -227,15 +225,12 @@ const StartupContainer = () => {
                 <section className='flex flex-col gap-4'>
                     <div className='flex items-start justify-between gap-4'>
                         <div>
-                            <h2 className='text-sm font-medium text-zinc-100'>Startup command</h2>
-                            <p className='mt-1 text-sm text-zinc-400'>
-                                The command used to start this server. Variables are filled in before it runs. Click a
-                                command to copy it.
-                            </p>
+                            <h2 className='text-sm font-medium text-zinc-100'>{t('server.startup.command.title')}</h2>
+                            <p className='mt-1 text-sm text-zinc-400'>{t('server.startup.command.description')}</p>
                         </div>
                         {!editingCommand && (
                             <Button variant='secondary' className='shrink-0' onClick={startEditingCommand}>
-                                Edit command
+                                {t('server.startup.command.edit')}
                             </Button>
                         )}
                     </div>
@@ -245,7 +240,7 @@ const StartupContainer = () => {
                             <div className='grid grid-cols-1 gap-4 xl:grid-cols-2'>
                                 <div>
                                     <label htmlFor='raw_command' className='mb-1.5 block text-xs text-zinc-500'>
-                                        Raw command
+                                        {t('server.startup.command.raw_label')}
                                     </label>
                                     <textarea
                                         id='raw_command'
@@ -256,10 +251,12 @@ const StartupContainer = () => {
                                     />
                                 </div>
                                 <div>
-                                    <span className='mb-1.5 block text-xs text-zinc-500'>Preview</span>
+                                    <span className='mb-1.5 block text-xs text-zinc-500'>
+                                        {t('server.startup.command.preview_label')}
+                                    </span>
                                     <CopyOnClick text={liveProcessedCommand}>
                                         <div className={`${commandClass} min-h-40 cursor-pointer text-zinc-300`}>
-                                            {liveProcessedCommand || 'The resolved command shows up here.'}
+                                            {liveProcessedCommand || t('server.startup.command.preview_empty')}
                                         </div>
                                     </CopyOnClick>
                                 </div>
@@ -272,14 +269,14 @@ const StartupContainer = () => {
                                         disabled={commandLoading || !commandValue.trim()}
                                     >
                                         {commandLoading && <Spinner size='small' />}
-                                        {commandLoading ? 'Saving...' : 'Save'}
+                                        {commandLoading ? t('common.saving') : t('common.save')}
                                     </Button>
                                 </InputSpinner>
                                 <Button variant='outline' onClick={loadDefaultCommand} disabled={commandLoading}>
-                                    Load default
+                                    {t('server.startup.command.load_default')}
                                 </Button>
                                 <Button variant='ghost' onClick={cancelEditingCommand} disabled={commandLoading}>
-                                    Cancel
+                                    {t('common.cancel')}
                                 </Button>
                             </div>
                         </div>
@@ -287,7 +284,9 @@ const StartupContainer = () => {
                         <div className='flex flex-col gap-4'>
                             {data.rawStartupCommand && (
                                 <div>
-                                    <span className='mb-1.5 block text-xs text-zinc-500'>Raw</span>
+                                    <span className='mb-1.5 block text-xs text-zinc-500'>
+                                        {t('server.startup.command.raw_label')}
+                                    </span>
                                     <CopyOnClick text={data.rawStartupCommand}>
                                         <div className={`${commandClass} cursor-pointer hover:border-[#ffffff20]`}>
                                             {data.rawStartupCommand}
@@ -296,7 +295,9 @@ const StartupContainer = () => {
                                 </div>
                             )}
                             <div>
-                                <span className='mb-1.5 block text-xs text-zinc-500'>Processed</span>
+                                <span className='mb-1.5 block text-xs text-zinc-500'>
+                                    {t('server.startup.command.processed_label')}
+                                </span>
                                 <CopyOnClick text={data.invocation}>
                                     <div
                                         className={`${commandClass} cursor-pointer bg-transparent text-zinc-400 hover:border-[#ffffff20]`}
@@ -311,8 +312,8 @@ const StartupContainer = () => {
 
                 <section className='flex flex-col gap-3'>
                     <div>
-                        <h2 className='text-sm font-medium text-zinc-100'>Docker image</h2>
-                        <p className='mt-1 text-sm text-zinc-400'>The container this server runs in.</p>
+                        <h2 className='text-sm font-medium text-zinc-100'>{t('server.startup.docker_image.title')}</h2>
+                        <p className='mt-1 text-sm text-zinc-400'>{t('server.startup.docker_image.description')}</p>
                     </div>
                     {Object.keys(data.dockerImages).length > 1 && !isCustomImage ? (
                         <InputSpinner visible={loading}>
@@ -335,9 +336,7 @@ const StartupContainer = () => {
                             </CopyOnClick>
                             {isCustomImage && (
                                 <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-                                    <p className='text-sm text-amber-200'>
-                                        An administrator set this image. It can&apos;t be changed from here.
-                                    </p>
+                                    <p className='text-sm text-amber-200'>{t('server.startup.docker_image.notice')}</p>
                                     {canEditDockerImage && (
                                         <Button
                                             variant='outline'
@@ -346,7 +345,7 @@ const StartupContainer = () => {
                                             disabled={loading}
                                         >
                                             {loading && <Spinner size='small' />}
-                                            Revert to default
+                                            {t('server.startup.docker_image.revert')}
                                         </Button>
                                     )}
                                 </div>
@@ -356,10 +355,8 @@ const StartupContainer = () => {
                 </section>
 
                 <section className='flex flex-col gap-2'>
-                    <h2 className='text-sm font-medium text-zinc-100'>Built-in variables</h2>
-                    <p className='text-sm text-zinc-400'>
-                        Always available in the startup command. Click a name to copy it.
-                    </p>
+                    <h2 className='text-sm font-medium text-zinc-100'>{t('server.startup.variables.builtin_title')}</h2>
+                    <p className='text-sm text-zinc-400'>{t('server.startup.variables.builtin_description')}</p>
                     <div className='mt-2 grid grid-cols-1 gap-x-10 sm:grid-cols-2 xl:grid-cols-3'>
                         {builtinVariables.map((variable) => (
                             <div
@@ -380,10 +377,8 @@ const StartupContainer = () => {
                 {data.variables.length > 0 && (
                     <section className='flex flex-col'>
                         <div className='mb-2'>
-                            <h2 className='text-sm font-medium text-zinc-100'>Variables</h2>
-                            <p className='mt-1 text-sm text-zinc-400'>
-                                Values specific to this server. Changes are saved as you edit them.
-                            </p>
+                            <h2 className='text-sm font-medium text-zinc-100'>{t('server.startup.variables.title')}</h2>
+                            <p className='mt-1 text-sm text-zinc-400'>{t('server.startup.variables.description')}</p>
                         </div>
                         <div className='divide-y divide-[#ffffff10]'>
                             {data.variables.map((variable) => (

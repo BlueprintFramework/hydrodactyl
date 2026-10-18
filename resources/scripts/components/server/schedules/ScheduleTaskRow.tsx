@@ -9,6 +9,8 @@ import ItemContainer from '@/components/elements/ItemContainer';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import TaskDetailsModal from '@/components/server/schedules/TaskDetailsModal';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -20,23 +22,24 @@ interface Props {
 const getActionDetails = (
     action: string,
 ): [
-    string,
+    TranslationKey,
     React.ComponentType<React.SVGProps<SVGSVGElement>> | typeof import('@gravity-ui/icons').Terminal,
     boolean?,
 ] => {
     switch (action) {
         case 'command':
-            return ['Send Command', Terminal, true];
+            return ['server.schedules.task.row_command', Terminal, true];
         case 'power':
-            return ['Send Power Action', Power];
+            return ['server.schedules.task.row_power', Power];
         case 'backup':
-            return ['Create Backup', CloudArrowUpIn];
+            return ['server.schedules.task.row_backup', CloudArrowUpIn];
         default:
-            return ['Unknown Action', CircleQuestion];
+            return ['server.schedules.task.row_unknown', CircleQuestion];
     }
 };
 
 const ScheduleTaskRow = ({ schedule, task }: Props) => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const { clearFlashes, addError } = useFlash();
     const [visible, setVisible] = useState(false);
@@ -65,7 +68,7 @@ const ScheduleTaskRow = ({ schedule, task }: Props) => {
 
     return (
         <ItemContainer
-            title={title}
+            title={t(title)}
             description={
                 task.payload && task.payload.length > 100 ? `${task.payload.substring(0, 100)}...` : task.payload
             }
@@ -82,13 +85,13 @@ const ScheduleTaskRow = ({ schedule, task }: Props) => {
                 onDismissed={() => setIsEditing(false)}
             />
             <ConfirmationModal
-                title={'Confirm task deletion'}
-                buttonText={'Delete Task'}
+                title={t('server.schedules.task.delete_confirm_title')}
+                buttonText={t('server.schedules.task.delete_button')}
                 onConfirmed={onConfirmDeletion}
                 visible={visible}
                 onModalDismissed={() => setVisible(false)}
             >
-                Are you sure you want to delete this task? This action cannot be undone.
+                {t('server.schedules.task.delete_confirm')}
             </ConfirmationModal>
             {/* <FontAwesomeIcon icon={icon} className={`text-lg text-white hidden md:block`} /> */}
             {/* <div className={`flex-none sm:flex-1 w-full sm:w-auto overflow-x-auto`}>
@@ -112,11 +115,13 @@ const ScheduleTaskRow = ({ schedule, task }: Props) => {
                 <div className='mr-0 sm:mr-6'>
                     {task.continueOnFailure && (
                         <div className={`px-2 py-1 bg-yellow-500 text-yellow-800 text-sm rounded-full`}>
-                            Continues on Failure
+                            {t('server.schedules.task.continues_on_failure')}
                         </div>
                     )}
                     {task.sequenceId > 1 && task.timeOffset > 0 && (
-                        <div className={`px-2 py-1 bg-zinc-500 text-sm rounded-full`}>{task.timeOffset}s later</div>
+                        <div className={`px-2 py-1 bg-zinc-500 text-sm rounded-full`}>
+                            {t('server.schedules.task.seconds_later', { seconds: task.timeOffset })}
+                        </div>
                     )}
                 </div>
                 <Can action={'schedule.update'}>
@@ -125,10 +130,10 @@ const ScheduleTaskRow = ({ schedule, task }: Props) => {
                         size='sm'
                         className='flex flex-row items-center gap-2 ml-auto sm:ml-0'
                         onClick={() => setIsEditing(true)}
-                        aria-label='Edit scheduled task'
+                        aria-label={t('server.schedules.task.edit_aria')}
                     >
                         <PencilToLine width={22} height={22} fill='currentColor' />
-                        Edit
+                        {t('common.edit')}
                     </Button>
                 </Can>
                 <Can action={'schedule.update'}>
@@ -137,10 +142,10 @@ const ScheduleTaskRow = ({ schedule, task }: Props) => {
                         size='sm'
                         onClick={() => setVisible(true)}
                         className='flex items-center gap-2'
-                        aria-label='Delete scheduled task'
+                        aria-label={t('server.schedules.task.delete_aria')}
                     >
                         <TrashBin width={22} height={22} fill='currentColor' className='w-4 h-4' />
-                        <span className='hidden sm:inline'>Delete</span>
+                        <span className='hidden sm:inline'>{t('common.delete')}</span>
                     </Button>
                 </Can>
             </div>

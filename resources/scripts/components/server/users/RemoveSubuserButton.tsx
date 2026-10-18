@@ -5,12 +5,14 @@ import { httpErrorToHuman } from '@/api/http';
 import deleteSubuser from '@/api/server/users/deleteSubuser';
 import ConfirmationModal from '@/components/elements/ConfirmationModal';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 import type { Subuser } from '@/state/server/subusers';
 
 const RemoveSubuserButton = ({ subuser }: { subuser: Subuser }) => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -37,21 +39,21 @@ const RemoveSubuserButton = ({ subuser }: { subuser: Subuser }) => {
     return (
         <>
             <ConfirmationModal
-                title={`Remove ${subuser.username}?`}
-                buttonText={`Remove ${subuser.username}`}
+                title={t('server.users.remove_title', { username: subuser.username })}
+                buttonText={t('server.users.remove_button', { username: subuser.username })}
                 visible={showConfirmation}
                 loading={loading}
                 onConfirmed={() => doDeletion()}
                 onModalDismissed={() => setShowConfirmation(false)}
             >
-                All access to the server will be removed immediately.
+                {t('server.users.remove_description')}
             </ConfirmationModal>
             <Button
                 variant='attention'
                 size='sm'
                 className='p-2'
                 onClick={() => setShowConfirmation(true)}
-                title='Delete subuser'
+                title={t('server.users.delete_subuser')}
             >
                 <TrashBin width={22} height={22} fill='currentColor' />
             </Button>

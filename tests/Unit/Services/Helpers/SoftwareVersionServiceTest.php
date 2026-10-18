@@ -2,12 +2,12 @@
 
 namespace Pterodactyl\Tests\Unit\Services\Helpers;
 
-use Mockery\MockInterface;
 use GuzzleHttp\Client;
+use Mockery\MockInterface;
 use GuzzleHttp\Psr7\Response;
 use Pterodactyl\Tests\TestCase;
-use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Pterodactyl\Services\Helpers\SoftwareVersionService;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
 
 class SoftwareVersionServiceTest extends TestCase
 {
@@ -25,11 +25,44 @@ class SoftwareVersionServiceTest extends TestCase
 
     private function buildServiceWithCacheData(array $data): void
     {
-        $this->cache->shouldReceive('remember')
+        $this->cache->shouldReceive('get')
             ->once()
             ->andReturn($data);
 
+        if ($data === []) {
+            $this->client->shouldReceive('request')
+                ->andThrow(new \Exception('CDN unavailable'));
+        }
+
         $this->service = new SoftwareVersionService($this->cache, $this->client);
+    }
+
+    public function testEmptyCachedResultTriggersARefetchAndIsCached()
+    {
+        $this->cache->shouldReceive('get')->once()->andReturn([]);
+        $this->cache->shouldReceive('put')->once();
+
+        $this->client->shouldReceive('request')
+            ->once()
+            ->andReturn(new Response(200, [], json_encode(['version' => 'v6.4.1'])));
+
+        $this->service = new SoftwareVersionService($this->cache, $this->client);
+
+        $this->assertSame('v6.4.1', $this->service->getPanel());
+    }
+
+    public function testFailedFetchIsNotCached()
+    {
+        $this->cache->shouldReceive('get')->once()->andReturn([]);
+        $this->cache->shouldNotReceive('put');
+
+        $this->client->shouldReceive('request')
+            ->once()
+            ->andThrow(new \Exception('CDN unavailable'));
+
+        $this->service = new SoftwareVersionService($this->cache, $this->client);
+
+        $this->assertSame('error', $this->service->getPanel());
     }
 
     public function testGetPanelReturnsPanelVersion()
@@ -39,25 +72,18 @@ class SoftwareVersionServiceTest extends TestCase
         $this->assertSame('1.8.0', $this->service->getPanel());
     }
 
+    public function testGetPanelFallsBackToHydrodactylVersionKey()
+    {
+        $this->buildServiceWithCacheData(['version' => 'v6.4.1']);
+
+        $this->assertSame('v6.4.1', $this->service->getPanel());
+    }
+
     public function testGetPanelReturnsErrorWhenMissing()
     {
         $this->buildServiceWithCacheData([]);
 
         $this->assertSame('error', $this->service->getPanel());
-    }
-
-    public function testGetDaemonReturnsWingsVersion()
-    {
-        $this->buildServiceWithCacheData(['wings' => '1.5.0']);
-
-        $this->assertSame('1.5.0', $this->service->getDaemon());
-    }
-
-    public function testGetDaemonReturnsErrorWhenMissing()
-    {
-        $this->buildServiceWithCacheData([]);
-
-        $this->assertSame('error', $this->service->getDaemon());
     }
 
     public function testGetDiscordReturnsUrl()
@@ -124,24 +150,21 @@ class SoftwareVersionServiceTest extends TestCase
         $this->assertFalse($this->service->isLatestPanel());
     }
 
-    public function testIsLatestDaemonReturnsTrueForDevelop()
+    public function testIsLatestPanelStripsLeadingVFromLatest()
     {
-        $this->buildServiceWithCacheData(['wings' => '1.4.0']);
+        config()->set('app.version', '6.4.1');
 
-        $this->assertTrue($this->service->isLatestDaemon('develop'));
+        $this->buildServiceWithCacheData(['version' => 'v6.4.1']);
+
+        $this->assertTrue($this->service->isLatestPanel());
     }
 
-    public function testIsLatestDaemonReturnsTrueWhenVersionIsNewer()
+    public function testIsLatestPanelReturnsFalseWhenLatestIsUnavailable()
     {
-        $this->buildServiceWithCacheData(['wings' => '1.4.0']);
+        config()->set('app.version', '6.4.0');
 
-        $this->assertTrue($this->service->isLatestDaemon('1.5.0'));
-    }
+        $this->buildServiceWithCacheData([]);
 
-    public function testIsLatestDaemonReturnsFalseWhenVersionIsOlder()
-    {
-        $this->buildServiceWithCacheData(['wings' => '1.5.0']);
-
-        $this->assertFalse($this->service->isLatestDaemon('1.4.0'));
+        $this->assertFalse($this->service->isLatestPanel());
     }
 }

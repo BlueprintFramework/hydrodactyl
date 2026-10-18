@@ -35,13 +35,13 @@ class DeleteLocationCommand extends Command
     {
         $this->locations = $this->locations ?? $this->repository->all();
         $short = $this->option('short') ?? $this->anticipate(
-            trans('command/messages.location.ask_short'),
+            __('command/messages.location.ask_short'),
             $this->locations->pluck('short')->toArray()
         );
 
         $location = $this->locations->where('short', $short)->first();
         if (is_null($location)) {
-            $this->error(trans('command/messages.location.no_location_found'));
+            $this->error(__('command/messages.location.no_location_found'));
             if ($this->input->isInteractive()) {
                 $this->handle();
             }
@@ -50,6 +50,6 @@ class DeleteLocationCommand extends Command
         }
 
         $this->deletionService->handle($location->id);
-        $this->line(trans('command/messages.location.deleted'));
+        $this->line(__('command/messages.location.deleted'));
     }
 }

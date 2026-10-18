@@ -16,17 +16,11 @@ import Spinner from '@/components/elements/Spinner';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import { activityEventLabel } from '@/lib/activityEvents';
 
 import { useFlashKey } from '@/plugins/useFlash';
 import useLocationHash from '@/plugins/useLocationHash';
-
-const DATE_RANGE_OPTIONS = [
-    { value: 'all', label: 'All time' },
-    { value: '1h', label: 'Last hour' },
-    { value: '24h', label: 'Last 24 hours' },
-    { value: '7d', label: 'Last 7 days' },
-    { value: '30d', label: 'Last 30 days' },
-] as const;
 
 const computeAfter = (range: string): string | undefined => {
     if (range === 'all') return undefined;
@@ -51,6 +45,7 @@ const computeAfter = (range: string): string | undefined => {
 };
 
 const ActivityLogContainer = () => {
+    const { t } = useTranslation();
     const { hash, pathTo } = useLocationHash();
     const { clearAndAddHttpError } = useFlashKey('account');
 
@@ -61,6 +56,17 @@ const ActivityLogContainer = () => {
     const [dateRange, setDateRange] = useState('all');
     const [autoRefresh, setAutoRefresh] = useState(false);
     const [exporting, setExporting] = useState(false);
+
+    const dateRangeOptions = useMemo(
+        () => [
+            { value: 'all', label: t('account.activity.all_time') },
+            { value: '1h', label: t('account.activity.last_hour') },
+            { value: '24h', label: t('account.activity.last_24_hours') },
+            { value: '7d', label: t('account.activity.last_7_days') },
+            { value: '30d', label: t('account.activity.last_30_days') },
+        ],
+        [t],
+    );
 
     const filters = useMemo<ActivityLogFilters>(() => {
         const filter: NonNullable<ActivityLogFilters['filters']> = {};
@@ -119,12 +125,18 @@ const ActivityLogContainer = () => {
             if (items.length === 0) return;
 
             const csvContent = [
-                ['Timestamp', 'Event', 'Actor', 'IP Address', 'Properties'].join(','),
+                [
+                    t('account.activity.csv_timestamp'),
+                    t('account.activity.csv_event'),
+                    t('account.activity.csv_actor'),
+                    t('account.activity.csv_ip_address'),
+                    t('account.activity.csv_properties'),
+                ].join(','),
                 ...items.map((item) =>
                     [
                         new Date(item.timestamp).toISOString(),
                         item.event,
-                        item.relationships.actor?.username || 'System',
+                        item.relationships.actor?.username || t('account.activity.system'),
                         item.ip || '',
                         JSON.stringify(item.properties).replace(/"/g, '""'),
                     ]
@@ -143,24 +155,27 @@ const ActivityLogContainer = () => {
         } finally {
             setExporting(false);
         }
-    }, [data, exporting, filters]);
+    }, [data, exporting, filters, t]);
 
     const eventOptions = useMemo(() => {
         const events = eventTypes ?? [];
         const all = selectedEventType && !events.includes(selectedEventType) ? [selectedEventType, ...events] : events;
 
-        return [{ value: '', label: 'All events' }, ...all.map((event) => ({ value: event, label: event }))];
-    }, [eventTypes, selectedEventType]);
+        return [
+            { value: '', label: t('account.activity.all_events') },
+            ...all.map((event) => ({ value: event, label: activityEventLabel(t, event) })),
+        ];
+    }, [eventTypes, selectedEventType, t]);
 
     const total = data?.pagination.total ?? 0;
 
     return (
-        <PageContentBlock title={'Account Activity Log'}>
+        <PageContentBlock title={t('account.activity.title')}>
             <div className='w-full h-full min-h-full flex-1 flex flex-col px-2 sm:px-0'>
                 <FlashMessageRender byKey={'account'} />
 
                 <div className='transform-gpu skeleton-anim-2 mb-3 sm:mb-4'>
-                    <MainPageHeader title={'Activity Log'}>
+                    <MainPageHeader title={t('account.activity.heading')}>
                         <div className='flex flex-wrap items-center gap-2'>
                             <Button
                                 variant='secondary'
@@ -174,7 +189,7 @@ const ActivityLogContainer = () => {
                                     className={isValidating ? 'animate-spin' : ''}
                                     fill='currentColor'
                                 />
-                                Refresh
+                                {t('common.refresh')}
                             </Button>
                             <Button
                                 variant={autoRefresh ? 'default' : 'secondary'}
@@ -187,7 +202,7 @@ const ActivityLogContainer = () => {
                                         autoRefresh ? 'animate-pulse bg-emerald-400' : 'bg-transparent',
                                     ].join(' ')}
                                 />
-                                {autoRefresh ? 'Live' : 'Go live'}
+                                {autoRefresh ? t('account.activity.live') : t('account.activity.go_live')}
                             </Button>
                             <Button
                                 variant='secondary'
@@ -205,12 +220,12 @@ const ActivityLogContainer = () => {
                                 ) : (
                                     <ArrowDownToLine width={22} height={22} fill='currentColor' />
                                 )}
-                                {exporting ? 'Exporting…' : 'Export'}
+                                {exporting ? t('account.activity.exporting') : t('account.activity.export')}
                             </Button>
                             {hasActiveFilters && (
                                 <Button variant='ghost' onClick={clearAllFilters} className='flex items-center gap-1'>
                                     <Xmark width={20} height={20} fill='currentColor' />
-                                    Clear
+                                    {t('account.activity.clear')}
                                 </Button>
                             )}
                         </div>
@@ -228,7 +243,7 @@ const ActivityLogContainer = () => {
                         <Input.Text
                             id='activity-search'
                             type='text'
-                            placeholder='Search events, IPs, users...'
+                            placeholder={t('account.activity.search_placeholder')}
                             value={searchTerm}
                             onChange={(e) => {
                                 setSearchTerm(e.target.value);
@@ -241,7 +256,7 @@ const ActivityLogContainer = () => {
                                 type='button'
                                 onClick={() => setSearchTerm('')}
                                 className='absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-zinc-400 transition-colors hover:text-zinc-100'
-                                aria-label='Clear search'
+                                aria-label={t('account.activity.clear_search')}
                             >
                                 <Xmark width={16} height={16} fill='currentColor' />
                             </button>
@@ -251,9 +266,9 @@ const ActivityLogContainer = () => {
                         id='activity-event-type'
                         value={selectedEventType}
                         onChange={selectEventType}
-                        placeholder='All events'
+                        placeholder={t('account.activity.all_events')}
                         searchable
-                        searchPlaceholder='Filter events…'
+                        searchPlaceholder={t('account.activity.filter_events')}
                         triggerClassName='md:w-56'
                         options={eventOptions}
                     />
@@ -265,7 +280,7 @@ const ActivityLogContainer = () => {
                             setPage(1);
                         }}
                         triggerClassName='md:w-44'
-                        options={[...DATE_RANGE_OPTIONS]}
+                        options={dateRangeOptions}
                     />
                 </div>
 
@@ -282,9 +297,16 @@ const ActivityLogContainer = () => {
                             <div className='w-5 h-5 rounded-lg bg-[#ffffff11] flex items-center justify-center'>
                                 <Magnifier width={22} height={22} className='text-zinc-400' fill='currentColor' />
                             </div>
-                            <h3 className='text-base font-semibold text-zinc-100'>Activity Events</h3>
+                            <h3 className='text-base font-semibold text-zinc-100'>
+                                {t('account.activity.events_title')}
+                            </h3>
                             <span className='text-sm text-zinc-400'>
-                                ({total} {total === 1 ? 'event' : 'events'})
+                                {t(
+                                    total === 1
+                                        ? 'account.activity.events_count_one'
+                                        : 'account.activity.events_count_other',
+                                    { count: total },
+                                )}
                             </span>
                         </div>
 
@@ -299,17 +321,19 @@ const ActivityLogContainer = () => {
                                     fill='currentColor'
                                 />
                                 <h3 className='text-lg font-semibold text-zinc-300 mb-2'>
-                                    {hasActiveFilters ? 'No Matching Activity' : 'No Activity Yet'}
+                                    {hasActiveFilters
+                                        ? t('account.activity.empty_filtered_title')
+                                        : t('account.activity.empty_title')}
                                 </h3>
                                 <p className='text-sm text-zinc-400 mb-4 max-w-lg mx-auto leading-relaxed'>
                                     {hasActiveFilters
-                                        ? "Try adjusting your search or filters to find the activity you're looking for."
-                                        : 'Activity logs will appear here as you use your account. Check back later or perform some actions to see them here.'}
+                                        ? t('account.activity.empty_filtered_description')
+                                        : t('account.activity.empty_description')}
                                 </p>
                                 {hasActiveFilters && (
                                     <div className='flex gap-2 justify-center'>
                                         <Button variant='secondary' onClick={clearAllFilters}>
-                                            Clear All Filters
+                                            {t('account.activity.clear_filters')}
                                         </Button>
                                     </div>
                                 )}

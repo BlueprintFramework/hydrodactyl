@@ -4,10 +4,12 @@ import Modal from '@/components/elements/Modal';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
 const EulaModalFeature = () => {
+    const { t } = useTranslation();
     const [visible, setVisible] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -62,12 +64,12 @@ const EulaModalFeature = () => {
             onDismissed={() => setVisible(false)}
             closeOnBackground={false}
             showSpinnerOverlay={loading}
-            title='Accept Minecraft EULA'
+            title={t('server.features.eula.title')}
         >
             <div className='flex flex-col'>
                 <FlashMessageRender key={'feature:eula'} />
                 <p className={`text-zinc-200`}>
-                    Before starting your Minecraft server, you need to accept the{' '}
+                    {t('server.features.eula.description_prefix')}{' '}
                     <a
                         target={'_blank'}
                         className={`text-zinc-300 underline transition-colors duration-150 hover:text-zinc-400`}
@@ -80,10 +82,10 @@ const EulaModalFeature = () => {
                 </p>
                 <div className={`my-6 gap-3 flex items-center justify-end`}>
                     <Button variant='secondary' onClick={() => setVisible(false)}>
-                        I don&apos;t accept
+                        {t('server.features.eula.decline')}
                     </Button>
                     <Button variant='attention' onClick={onAcceptEULA}>
-                        I accept
+                        {t('server.features.eula.accept')}
                     </Button>
                 </div>
             </div>

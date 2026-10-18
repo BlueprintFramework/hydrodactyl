@@ -2,6 +2,7 @@ import React from 'react';
 
 import http from '@/api/http';
 import { getGlobalDaemonType } from '@/api/server/getServer';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 /**
  * Server operation status constants.
@@ -63,6 +64,11 @@ export const getServerOperations = async (uuid: string): Promise<{ operations: S
     return data;
 };
 
+export interface PollingMessages {
+    timeout: string;
+    inactive: string;
+}
+
 /**
  * Poll operation status with exponential backoff and jitter.
  */
@@ -72,6 +78,10 @@ export const pollOperationStatus = (
     onUpdate: (operation: ServerOperation) => void,
     onComplete: (operation: ServerOperation) => void,
     onError: (error: Error) => void,
+    messages: PollingMessages = {
+        timeout: 'Operation polling timed out after 15 minutes',
+        inactive: 'Operation is no longer active',
+    },
 ): (() => void) => {
     let timeoutId: NodeJS.Timeout | null = null;
     let intervalMs = POLLING_CONFIG.INITIAL_INTERVAL;
@@ -86,7 +96,7 @@ export const pollOperationStatus = (
             attempts++;
 
             if (attempts > POLLING_CONFIG.MAX_ATTEMPTS) {
-                onError(new Error('Operation polling timed out after 15 minutes'));
+                onError(new Error(messages.timeout));
                 return;
             }
 
@@ -109,7 +119,7 @@ export const pollOperationStatus = (
                 const jitter = Math.random() * POLLING_CONFIG.JITTER_RANGE;
                 timeoutId = setTimeout(poll, intervalMs + jitter);
             } else {
-                onError(new Error('Operation is no longer active'));
+                onError(new Error(messages.inactive));
             }
         } catch (error) {
             if (!stopped) {
@@ -133,6 +143,7 @@ export const pollOperationStatus = (
  * React hook for managing operation polling lifecycle.
  */
 export const useOperationPolling = () => {
+    const { t } = useTranslation();
     const activePollers = React.useRef(new Map<string, () => void>()).current;
 
     React.useEffect(() => {
@@ -164,10 +175,13 @@ export const useOperationPolling = () => {
             onError: (error: Error) => void,
         ) => {
             stopPolling(operationId);
-            const cleanup = pollOperationStatus(uuid, operationId, onUpdate, onComplete, onError);
+            const cleanup = pollOperationStatus(uuid, operationId, onUpdate, onComplete, onError, {
+                timeout: t('server.operations.timeout'),
+                inactive: t('server.operations.inactive'),
+            });
             activePollers.set(operationId, cleanup);
         },
-        [activePollers, stopPolling],
+        [activePollers, stopPolling, t],
     );
 
     const stopAllPolling = React.useCallback(() => {

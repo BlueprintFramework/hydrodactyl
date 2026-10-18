@@ -50,10 +50,10 @@ class StoreNodeRequest extends ApplicationApiRequest
     public function attributes(): array
     {
         return [
-            'daemon_base' => 'Daemon Base Path',
-            'upload_size' => 'File Upload Size Limit',
-            'location_id' => 'Location',
-            'public' => 'Node Visibility',
+            'daemon_base' => __('validation.attributes.daemon_base'),
+            'upload_size' => __('validation.attributes.upload_size'),
+            'location_id' => __('validation.attributes.location_id'),
+            'public' => __('validation.attributes.public'),
         ];
     }
 

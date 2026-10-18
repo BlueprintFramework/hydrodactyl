@@ -8,6 +8,7 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import PaginationFooter from '@/components/elements/table/PaginationFooter';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 const formatBytes = (bytes: number): string => {
@@ -38,11 +39,13 @@ const UsageBar = ({ percent, allocated, total }: { percent: number; allocated: n
 );
 
 const StatusIndicator = ({ state, title }: { state: 'checking' | 'up' | 'down'; title: string }) => {
+    const { t } = useTranslation();
+
     if (state === 'checking') {
         return (
             <span className='inline-flex items-center gap-1.5 text-xs text-cream-400/50'>
                 <span className='h-2 w-2 animate-pulse rounded-full bg-cream-400/40' />
-                Checking
+                {t('admin.nodes.checking')}
             </span>
         );
     }
@@ -58,7 +61,7 @@ const StatusIndicator = ({ state, title }: { state: 'checking' | 'up' | 'down'; 
             )}
         >
             <span className={cn('h-2 w-2 rounded-full', up ? 'bg-hydro-500' : 'bg-brand-400')} />
-            {up ? 'Up' : 'Down'}
+            {up ? t('admin.nodes.up') : t('admin.nodes.down')}
         </span>
     );
 };
@@ -102,21 +105,19 @@ const useBrowserReachability = (url: string): 'checking' | 'up' | 'down' => {
 };
 
 const BrowserStatus = ({ node }: { node: AdminNode }) => {
+    const { t } = useTranslation();
     const state = useBrowserReachability(`${node.scheme}://${node.fqdn}:${node.daemonListen}/api/system`);
 
     return (
         <StatusIndicator
             state={state}
-            title={
-                state === 'down'
-                    ? 'Your browser could not reach the daemon. It may be offline, unreachable from this network, or blocked as mixed content.'
-                    : 'Your browser opened a connection to the daemon.'
-            }
+            title={state === 'down' ? t('admin.nodes.browser_down_title') : t('admin.nodes.browser_up_title')}
         />
     );
 };
 
 const ServerStatus = ({ id }: { id: number }) => {
+    const { t } = useTranslation();
     const { data } = useNodeStatus(id);
 
     return (
@@ -124,18 +125,19 @@ const ServerStatus = ({ id }: { id: number }) => {
             state={!data ? 'checking' : data.up ? 'up' : 'down'}
             title={
                 !data
-                    ? 'Checking daemon reachability from the panel...'
+                    ? t('admin.nodes.server_checking_title')
                     : data.up
                       ? data.version
-                          ? `The panel reached the daemon (v${data.version}).`
-                          : 'The panel reached the daemon.'
-                      : (data.error ?? 'The panel could not reach the daemon.')
+                          ? t('admin.nodes.server_up_version_title', { version: data.version })
+                          : t('admin.nodes.server_up_title')
+                      : (data.error ?? t('admin.nodes.server_down_title'))
             }
         />
     );
 };
 
 const NodesContainer = () => {
+    const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [search] = useDebounce(searchTerm, 300);
@@ -144,14 +146,14 @@ const NodesContainer = () => {
     const nodes = data?.items ?? [];
 
     return (
-        <PageContentBlock title='Nodes'>
-            <MainPageHeader direction='column' title='Nodes'>
-                <p className='text-sm text-neutral-400'>All nodes available on the system.</p>
+        <PageContentBlock title={t('admin.nav.nodes')}>
+            <MainPageHeader direction='column' title={t('admin.nav.nodes')}>
+                <p className='text-sm text-neutral-400'>{t('admin.nodes.description')}</p>
             </MainPageHeader>
 
             <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center'>
                 <Input.Text
-                    placeholder='Search nodes...'
+                    placeholder={t('admin.nodes.search_placeholder')}
                     value={searchTerm}
                     onChange={(event) => {
                         setSearchTerm(event.target.value);
@@ -160,7 +162,7 @@ const NodesContainer = () => {
                     className='w-full sm:max-w-sm'
                 />
                 <Button asChild className='sm:ml-auto'>
-                    <Link to='/nodes/new'>Create Node</Link>
+                    <Link to='/nodes/new'>{t('admin.nodes.create')}</Link>
                 </Button>
             </div>
 
@@ -168,14 +170,14 @@ const NodesContainer = () => {
                 <table className='w-full text-sm'>
                     <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                         <tr className='border-b border-mocha-400'>
-                            <th className='px-4 py-3'>Browser</th>
-                            <th className='px-4 py-3'>Server</th>
-                            <th className='px-4 py-3'>Name</th>
-                            <th className='px-4 py-3'>Location</th>
-                            <th className='px-4 py-3'>Memory</th>
-                            <th className='px-4 py-3'>Disk</th>
-                            <th className='px-4 py-3 text-center'>Servers</th>
-                            <th className='px-4 py-3'>Daemon</th>
+                            <th className='px-4 py-3'>{t('admin.nodes.browser')}</th>
+                            <th className='px-4 py-3'>{t('common.server')}</th>
+                            <th className='px-4 py-3'>{t('admin.common.name')}</th>
+                            <th className='px-4 py-3'>{t('admin.nodes.location')}</th>
+                            <th className='px-4 py-3'>{t('admin.common.memory')}</th>
+                            <th className='px-4 py-3'>{t('admin.common.disk')}</th>
+                            <th className='px-4 py-3 text-center'>{t('admin.common.servers')}</th>
+                            <th className='px-4 py-3'>{t('admin.nodes.daemon')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -193,7 +195,7 @@ const NodesContainer = () => {
                                     </Link>
                                     {node.maintenance_mode && (
                                         <span className='ml-2 rounded-full bg-brand-400/20 px-2 py-0.5 text-[10px] font-semibold uppercase text-brand-400'>
-                                            Maintenance
+                                            {t('admin.nodes.maintenance_badge')}
                                         </span>
                                     )}
                                 </td>
@@ -219,7 +221,7 @@ const NodesContainer = () => {
                         {!isValidating && nodes.length === 0 && (
                             <tr>
                                 <td colSpan={8} className='px-4 py-8 text-center text-cream-400/50'>
-                                    No nodes found.
+                                    {t('admin.nodes.empty')}
                                 </td>
                             </tr>
                         )}

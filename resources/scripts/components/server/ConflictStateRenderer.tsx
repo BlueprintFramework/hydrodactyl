@@ -1,10 +1,12 @@
 import ScreenBlock from '@/components/elements/ScreenBlock';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { ServerContext } from '@/state/server';
 
 import Spinner from '../elements/Spinner';
 
 const ConflictStateRenderer = () => {
+    const { t } = useTranslation();
     const status = ServerContext.useStoreState((state) => state.server.data?.status || null);
     const isTransferring = ServerContext.useStoreState((state) => state.server.data?.isTransferring || false);
     const isNodeUnderMaintenance = ServerContext.useStoreState(
@@ -15,26 +17,29 @@ const ConflictStateRenderer = () => {
         <div className={'flex flex-col items-center justify-center h-full'}>
             <Spinner size={'large'} />
             <div className='flex flex-col mt-4 text-center'>
-                <span className='text-neutral-100 text-lg font-bold'>Server is Installing</span>
+                <span className='text-neutral-100 text-lg font-bold'>{t('server.conflict.installing_title')}</span>
                 <span className='text-neutral-500 text-md font-semibold mt-1'>
-                    Your server should be ready soon, for more details visit the home page.
+                    {t('server.conflict.installing_description')}
                 </span>
             </div>
         </div>
     ) : status === 'suspended' ? (
-        <ScreenBlock title={'Server Suspended'} message={'This server is suspended and cannot be accessed.'} />
+        <ScreenBlock
+            title={t('server.conflict.suspended_title')}
+            message={t('server.conflict.suspended_description')}
+        />
     ) : isNodeUnderMaintenance ? (
         <ScreenBlock
-            title={'Node under Maintenance'}
-            message={'The node of this server is currently under maintenance.'}
+            title={t('server.conflict.maintenance_title')}
+            message={t('server.conflict.maintenance_description')}
         />
     ) : (
         <ScreenBlock
-            title={isTransferring ? 'Transferring' : 'Restoring from Backup'}
+            title={isTransferring ? t('server.conflict.transferring_title') : t('server.conflict.restoring_title')}
             message={
                 isTransferring
-                    ? 'Your server is being transferred to a new node, please check back later.'
-                    : 'Your server is currently being restored from a backup, please check back in a few minutes.'
+                    ? t('server.conflict.transferring_description')
+                    : t('server.conflict.restoring_description')
             }
         />
     );

@@ -6,6 +6,7 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { Link } from 'react-router-dom';
 
 import ActivityLogMetaButton from '@/components/elements/activity/ActivityLogMetaButton';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { formatObjectToIdentString } from '@/lib/objects';
 
@@ -17,6 +18,7 @@ interface Props {
 }
 
 const ActivityLogEntry = ({ activity, children }: Props) => {
+    const { t, dateFnsLocale } = useTranslation();
     const { pathTo } = useLocationHash();
     const actor = activity.relationships.actor;
 
@@ -24,7 +26,11 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
         <div className='flex items-center gap-3 py-3'>
             <div className='h-7 w-7 shrink-0 overflow-hidden rounded-full bg-zinc-700'>
                 {actor?.image ? (
-                    <img src={actor.image} alt={actor.username || 'System'} className='h-full w-full object-cover' />
+                    <img
+                        src={actor.image}
+                        alt={actor.username || t('server.activity.system')}
+                        className='h-full w-full object-cover'
+                    />
                 ) : (
                     <div className='flex h-full w-full items-center justify-center text-xs font-medium text-zinc-300'>
                         {(actor?.username || 'S').charAt(0).toUpperCase()}
@@ -34,7 +40,7 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
 
             <div className='min-w-0 flex-1'>
                 <div className='flex items-center gap-2 text-sm'>
-                    <span className='truncate text-zinc-100'>{actor?.username || 'System'}</span>
+                    <span className='truncate text-zinc-100'>{actor?.username || t('server.activity.system')}</span>
                     <Link
                         to={`#${pathTo({ event: activity.event })}`}
                         className='truncate font-mono text-xs text-zinc-400 hover:text-zinc-100'
@@ -54,7 +60,9 @@ const ActivityLogEntry = ({ activity, children }: Props) => {
 
                 <div className='mt-0.5 flex items-center gap-3 text-xs text-zinc-500'>
                     {activity.ip && <span className='font-mono'>{activity.ip}</span>}
-                    <span>{formatDistanceToNowStrict(activity.timestamp, { addSuffix: true })}</span>
+                    <span>
+                        {formatDistanceToNowStrict(activity.timestamp, { addSuffix: true, locale: dateFnsLocale })}
+                    </span>
                     {!activity.hasAdditionalMetadata &&
                         activity.properties &&
                         Object.keys(activity.properties).length > 0 && (

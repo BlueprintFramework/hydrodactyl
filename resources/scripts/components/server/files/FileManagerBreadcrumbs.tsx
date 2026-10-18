@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import { encodePathSegments } from '@/helpers';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 import { ServerContext } from '@/state/server';
 
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const FileManagerBreadcrumbs = ({ renderLeft, withinFileEditor, isNewFile }: Props) => {
+    const { t } = useTranslation();
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
     const directory = ServerContext.useStoreState((state) => state.files.directory);
 
@@ -52,7 +54,7 @@ const FileManagerBreadcrumbs = ({ renderLeft, withinFileEditor, isNewFile }: Pro
         <div className={`group select-none flex grow-0 items-center text-sm overflow-x-hidden`}>
             {renderLeft || <div className={`w-12`} />}
             <NavLink to={`/server/${id}/files`} className={`px-1 text-zinc-200 no-underline hover:text-zinc-100`}>
-                root
+                {t('server.files.root')}
             </NavLink>
             <svg
                 xmlns='http://www.w3.org/2000/svg'

@@ -48,7 +48,7 @@ class DownloadLinkService
     {
         $s3Bucket = $backup->server->node->s3Bucket;
         if (!$s3Bucket) {
-            throw new \RuntimeException('No S3 bucket configured for the node associated with this backup.');
+            throw new \RuntimeException(__('exceptions.backups.no_s3_bucket_for_node'));
         }
 
         /** @var \Pterodactyl\Extensions\Filesystem\S3Filesystem $adapter */

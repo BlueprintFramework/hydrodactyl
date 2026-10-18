@@ -23,7 +23,7 @@ class RecordResourceUsageCommand extends Command
     public function handle(): int
     {
         if (!config('pterodactyl.client_features.resource_history.enabled', true)) {
-            $this->line('Resource history is disabled.');
+            $this->line(__('command/messages.server.resource_history_disabled'));
 
             return 0;
         }

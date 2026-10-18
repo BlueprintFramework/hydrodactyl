@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'breadcrumb' => [
+        'admin' => 'Admin',
+        'settings' => 'Configuració',
+    ],
+    'copyright' => 'Copyright &copy; 2015 - :year <a href="https://blueprint.zip/">BlueprintFramework</a> i <a href="https://hydrodactyl.dev">Hydrodactyl</a>.',
+    'exit_admin_control' => 'Surt del control d\'administració',
+    'logout' => 'Tanca la sessió',
+    'logout_confirm_button' => 'Tanca la sessió',
+    'logout_confirm_title' => 'Vols tancar la sessió?',
+    'settings_nav' => [
+        'advanced' => 'Avançat',
+        'branding' => 'Marca',
+        'captcha' => 'Captcha',
+        'custom_navigation' => 'Navegació personalitzada',
+        'domains' => 'Dominis',
+        'general' => 'General',
+        'mail' => 'Correu',
+    ],
+    'sidebar' => [
+        'application_api' => 'API d\'aplicació',
+        'basic_administration' => 'ADMINISTRACIÓ BÀSICA',
+        'databases' => 'Bases de dades',
+        'locations' => 'Ubicacions',
+        'management' => 'GESTIÓ',
+        'mounts' => 'Muntatges',
+        'nests' => 'Nius',
+        'nodes' => 'Nodes',
+        'overview' => 'Resum',
+        's3_buckets' => 'Cubs S3',
+        'servers' => 'Servidors',
+        'service_management' => 'GESTIÓ DE SERVEIS',
+        'settings' => 'Configuració',
+        'toggle_navigation' => 'Commuta la navegació',
+        'users' => 'Usuaris',
+    ],
+    'validation_error' => 'S\'ha produït un error en validar les dades proporcionades.',
+];

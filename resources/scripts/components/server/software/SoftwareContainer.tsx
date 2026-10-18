@@ -14,6 +14,7 @@ import Spinner from '@/components/elements/Spinner';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import OperationProgressModal from '@/components/server/operations/OperationProgressModal';
 import WingsOperationProgressModal from '@/components/server/operations/WingsOperationProgressModal';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 import { useNests } from '@/plugins/useNests';
 import { ServerContext } from '@/state/server';
@@ -27,6 +28,7 @@ import { validateEnvironmentVariables } from './types';
 import WipeConfirmationModal from './WipeConfirmationModal';
 
 const SoftwareContainer = () => {
+    const { t } = useTranslation();
     const serverData = ServerContext.useStoreState((state) => state.server.data);
     const daemonType = getGlobalDaemonType();
     const uuid = serverData?.uuid;
@@ -218,9 +220,13 @@ const SoftwareContainer = () => {
         if (eggPreview) {
             const variable = eggPreview.variables.find((v) => v.env_variable === envVariable);
             if (variable) {
-                const errors = validateEnvironmentVariables([variable], {
-                    [envVariable]: value,
-                });
+                const errors = validateEnvironmentVariables(
+                    [variable],
+                    {
+                        [envVariable]: value,
+                    },
+                    t,
+                );
                 setVariableErrors((prev) => {
                     const newErrors = { ...prev };
                     if (errors.length > 0 && errors[0]) {
@@ -255,10 +261,10 @@ const SoftwareContainer = () => {
         setIsLoading(true);
 
         try {
-            const validationErrors = validateEnvironmentVariables(eggPreview.variables, pendingVariables);
+            const validationErrors = validateEnvironmentVariables(eggPreview.variables, pendingVariables, t);
 
             if (validationErrors.length > 0) {
-                throw new Error(`Validation failed:\n${validationErrors.join('\n')}`);
+                throw new Error(`${t('server.software.validation.failed')}:\n${validationErrors.join('\n')}`);
             }
 
             const actualDockerImage =
@@ -297,10 +303,11 @@ const SoftwareContainer = () => {
                     environment: filteredEnvironment,
                     should_backup: shouldBackup,
                     should_wipe: shouldWipe,
+                    backup_name: t('server.software.backup_name'),
                 });
             }
 
-            toast.success('Software change operation started successfully');
+            toast.success(t('server.software.operation_started'));
 
             resetFlow();
         } catch (error) {
@@ -319,15 +326,15 @@ const SoftwareContainer = () => {
 
     const handleOperationComplete = (operation: ServerOperation) => {
         if (operation.is_completed) {
-            toast.success('Your software configuration has been applied successfully');
+            toast.success(t('server.software.operation_success'));
             mutate();
         } else if (operation.has_failed) {
-            toast.error(operation.message || 'The software configuration change failed');
+            toast.error(operation.message || t('server.software.operation_failed'));
         }
     };
 
     const handleOperationError = (error: Error) => {
-        toast.error(error.message || 'An error occurred while monitoring the operation');
+        toast.error(error.message || t('server.software.operation_monitor_error'));
     };
 
     const closeOperationModal = () => {
@@ -342,14 +349,14 @@ const SoftwareContainer = () => {
             <div className='flex items-center justify-center h-64'>
                 <div className='flex flex-col items-center text-center'>
                     <Spinner size='large' />
-                    <p className='text-cream-400/70 mt-4'>Loading server information...</p>
+                    <p className='text-cream-400/70 mt-4'>{t('server.software.loading')}</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <ServerContentBlock className='p-0!' title={'Software'} showFlashKey={'Software'}>
+        <ServerContentBlock className='p-0!' title={t('server.software.title')} showFlashKey={'Software'}>
             <ServerHeader />
             <div className='px-2 pt-2 pb-6 sm:px-14 sm:pt-14'>
                 <div className='space-y-6'>
@@ -446,7 +453,7 @@ const SoftwareContainer = () => {
                 <OperationProgressModal
                     visible={showOperationModal}
                     operationId={currentOperationId}
-                    operationType='Software Change'
+                    operationType={t('server.software.operation_type')}
                     onClose={closeOperationModal}
                     onComplete={handleOperationComplete}
                     onError={handleOperationError}
@@ -456,14 +463,18 @@ const SoftwareContainer = () => {
                 <WingsOperationProgressModal
                     visible={showOperationModal}
                     operationId={currentOperationId}
-                    operationType='Software Change'
+                    operationType={t('server.software.operation_type')}
                     onClose={closeOperationModal}
                     onComplete={handleOperationComplete}
                     onError={handleOperationError}
                 />
             )}
             {daemonType !== 'elytra' && daemonType !== 'wings' && daemonType !== 'calagopus' && (
-                <div>Could not find Operation Modal for this daemon: Using ${daemonType}</div>
+                <div>
+                    {t('server.software.operation_modal_missing', {
+                        daemon: daemonType,
+                    })}
+                </div>
             )}
         </ServerContentBlock>
     );

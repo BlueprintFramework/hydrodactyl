@@ -17,6 +17,7 @@ import { Dialog } from '@/components/elements/dialog';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const cardClass = 'flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
 const textareaClass = 'w-full rounded-lg bg-[#ffffff11] px-4 py-2 text-sm text-cream-100 outline-none';
@@ -30,6 +31,7 @@ const splitFeatures = (value: string) =>
         .filter(Boolean);
 
 const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOption[] }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const [name, setName] = useState(egg.name);
@@ -73,10 +75,10 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
 
         try {
             await updateEgg(egg.id, payload);
-            toast.success('Egg updated.');
+            toast.success(t('admin.nests.egg_updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update the egg.'));
+            toast.error(errorToMessage(error, t('admin.nests.egg_update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -84,7 +86,7 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
 
     const submitImport = async () => {
         if (!importFile) {
-            toast.error('Choose a file to import.');
+            toast.error(t('admin.nests.choose_file'));
             return;
         }
 
@@ -94,9 +96,9 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
             const formData = new FormData();
             formData.append('import_file', importFile);
             await importEggUpdate(egg.id, formData);
-            toast.success('Egg updated from file.');
+            toast.success(t('admin.nests.egg_imported'));
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to import the egg update.'));
+            toast.error(errorToMessage(error, t('admin.nests.egg_import_failed')));
         } finally {
             setImporting(false);
         }
@@ -107,10 +109,10 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
 
         try {
             await deleteEgg(egg.id);
-            toast.success('Egg deleted.');
+            toast.success(t('admin.nests.egg_deleted'));
             navigate(`/nests/${egg.nest_id}`);
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete the egg.'));
+            toast.error(errorToMessage(error, t('admin.nests.egg_delete_failed')));
         } finally {
             setDeleting(false);
             setConfirmDelete(false);
@@ -129,8 +131,8 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
     return (
         <div className='flex flex-col gap-4'>
             <div className={cardClass}>
-                <h2 className='text-sm font-semibold text-cream-50'>Update Egg</h2>
-                <Field label='Egg File' hint='Import an updated egg from a JSON export file.'>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.update_egg')}</h2>
+                <Field label={t('admin.nests.egg_file')} hint={t('admin.nests.egg_file_hint')}>
                     <input
                         type='file'
                         accept='application/json'
@@ -140,7 +142,7 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
                 </Field>
                 <div className='flex justify-end'>
                     <Button type='button' onClick={submitImport} disabled={importing || !importFile}>
-                        Upload &amp; Update
+                        {t('admin.nests.upload_update')}
                     </Button>
                 </div>
             </div>
@@ -154,23 +156,23 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
             >
                 <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
                     <div className={cardClass}>
-                        <h2 className='text-sm font-semibold text-cream-50'>Core Details</h2>
-                        <Field label='Nest' hint='The nest this egg is grouped into.'>
+                        <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.core_details')}</h2>
+                        <Field label={t('admin.nests.nest')} hint={t('admin.nests.nest_hint')}>
                             <Input.Text readOnly className='opacity-70' value={egg.nest?.name ?? ''} />
                         </Field>
-                        <Field label='Name' error={errors.name}>
+                        <Field label={t('admin.common.name')} error={errors.name}>
                             <Input.Text value={name} onChange={(event) => setName(event.target.value)} />
                         </Field>
-                        <Field label='UUID'>
+                        <Field label={t('admin.nests.uuid')}>
                             <Input.Text readOnly className='opacity-70' value={egg.uuid} />
                         </Field>
-                        <Field label='Author'>
+                        <Field label={t('admin.nests.author')}>
                             <Input.Text readOnly className='opacity-70' value={egg.author} />
                         </Field>
                         <Field
-                            label='Docker Images'
+                            label={t('admin.nests.docker_images')}
                             error={errors.docker_images}
-                            hint='One per line. A display name can prefix the image with name|image.'
+                            hint={t('admin.nests.docker_images_hint')}
                         >
                             <textarea
                                 className={textareaClass}
@@ -179,21 +181,21 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
                                 onChange={(event) => setDockerImages(event.target.value)}
                             />
                         </Field>
-                        <Field label='Force Outgoing IP' error={errors.force_outgoing_ip}>
+                        <Field label={t('admin.nests.force_outgoing_ip')} error={errors.force_outgoing_ip}>
                             <Dropdown
                                 value={forceOutgoingIp}
                                 onChange={setForceOutgoingIp}
                                 options={[
-                                    { value: 'true', label: 'True' },
-                                    { value: 'false', label: 'False' },
+                                    { value: 'true', label: t('admin.common.true') },
+                                    { value: 'false', label: t('admin.common.false') },
                                 ]}
                             />
                         </Field>
                     </div>
 
                     <div className={cardClass}>
-                        <h2 className='text-sm font-semibold text-cream-50'>Descriptions</h2>
-                        <Field label='Description' error={errors.description}>
+                        <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.descriptions')}</h2>
+                        <Field label={t('admin.common.description')} error={errors.description}>
                             <textarea
                                 className={textareaClass}
                                 rows={8}
@@ -201,7 +203,7 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
                                 onChange={(event) => setDescription(event.target.value)}
                             />
                         </Field>
-                        <Field label='Startup Command' error={errors.startup}>
+                        <Field label={t('admin.nests.startup_command')} error={errors.startup}>
                             <textarea
                                 className={textareaClass}
                                 rows={8}
@@ -210,9 +212,9 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
                             />
                         </Field>
                         <Field
-                            label='Features'
+                            label={t('admin.nests.features')}
                             error={errors.features}
-                            hint='Comma-separated list of features for this egg.'
+                            hint={t('admin.nests.features_hint')}
                         >
                             <Input.Text value={features} onChange={(event) => setFeatures(event.target.value)} />
                         </Field>
@@ -220,14 +222,14 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
                 </div>
 
                 <div className={cardClass}>
-                    <h2 className='text-sm font-semibold text-cream-50'>Process Management</h2>
-                    <Field label='Copy Settings From' error={errors.config_from}>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.process_management')}</h2>
+                    <Field label={t('admin.nests.copy_settings')} error={errors.config_from}>
                         <Dropdown value={configFrom} onChange={setConfigFrom} options={configFromOptions} />
                     </Field>
-                    <Field label='Stop Command' error={errors.config_stop}>
+                    <Field label={t('admin.nests.stop_command')} error={errors.config_stop}>
                         <Input.Text value={configStop} onChange={(event) => setConfigStop(event.target.value)} />
                     </Field>
-                    <Field label='Log Configuration' error={errors.config_logs}>
+                    <Field label={t('admin.nests.log_config')} error={errors.config_logs}>
                         <textarea
                             className={textareaClass}
                             rows={6}
@@ -235,7 +237,7 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
                             onChange={(event) => setConfigLogs(event.target.value)}
                         />
                     </Field>
-                    <Field label='Configuration Files' error={errors.config_files}>
+                    <Field label={t('admin.nests.config_files')} error={errors.config_files}>
                         <textarea
                             className={textareaClass}
                             rows={6}
@@ -243,7 +245,7 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
                             onChange={(event) => setConfigFiles(event.target.value)}
                         />
                     </Field>
-                    <Field label='Start Configuration' error={errors.config_startup}>
+                    <Field label={t('admin.nests.start_config')} error={errors.config_startup}>
                         <textarea
                             className={textareaClass}
                             rows={6}
@@ -255,14 +257,14 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
 
                 <div className='flex flex-wrap items-center justify-between gap-4'>
                     <Button type='submit' disabled={submitting}>
-                        Save
+                        {t('common.save')}
                     </Button>
                     <div className='flex items-center gap-2'>
                         <Button asChild variant='secondary'>
-                            <a href={`/admin/eggs/${egg.id}/export`}>Export</a>
+                            <a href={`/admin/eggs/${egg.id}/export`}>{t('admin.nests.export')}</a>
                         </Button>
                         <Button type='button' variant='attention' onClick={() => setConfirmDelete(true)}>
-                            Delete
+                            {t('common.delete')}
                         </Button>
                     </div>
                 </div>
@@ -270,13 +272,13 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
 
             <Dialog.Confirm
                 open={confirmDelete}
-                title='Delete Egg'
-                confirm='Delete'
+                title={t('admin.nests.delete_egg')}
+                confirm={t('common.delete')}
                 loading={deleting}
                 onClose={() => setConfirmDelete(false)}
                 onConfirmed={remove}
             >
-                Deleting this egg is permanent and cannot be undone. Servers using it may become unusable.
+                {t('admin.nests.delete_egg_confirm')}
             </Dialog.Confirm>
         </div>
     );

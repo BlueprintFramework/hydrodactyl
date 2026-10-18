@@ -28,6 +28,7 @@ import MobileSidebar from '@/components/layout/sidebar/MobileSidebar';
 import Sidebar from '@/components/layout/sidebar/Sidebar';
 import { HeaderProvider } from '@/contexts/HeaderContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
+import I18nProvider, { useTranslation } from '@/i18n/I18nProvider';
 import { store } from '@/state';
 import type { SiteSettings } from '@/state/settings';
 
@@ -126,6 +127,7 @@ interface AdminNavItem {
 }
 
 const AdminShell = () => {
+    const { t } = useTranslation();
     const NavigationOverview = useRef<HTMLAnchorElement>(null);
     const NavigationServers = useRef<HTMLAnchorElement>(null);
     const NavigationUsers = useRef<HTMLAnchorElement>(null);
@@ -142,7 +144,7 @@ const AdminShell = () => {
         {
             to: '/',
             icon: Home01Icon,
-            text: 'Overview',
+            text: t('admin.nav.overview'),
             tabName: 'overview',
             ref: NavigationOverview,
             end: true,
@@ -150,7 +152,7 @@ const AdminShell = () => {
         {
             to: '/settings',
             icon: Settings02Icon,
-            text: 'Settings',
+            text: t('admin.nav.settings'),
             tabName: 'settings',
             ref: NavigationSettings,
             end: false,
@@ -158,7 +160,7 @@ const AdminShell = () => {
         {
             to: '/servers',
             icon: ServerStack02Icon,
-            text: 'Servers',
+            text: t('admin.nav.servers'),
             tabName: 'servers',
             ref: NavigationServers,
             end: false,
@@ -166,7 +168,7 @@ const AdminShell = () => {
         {
             to: '/users',
             icon: UserMultiple02Icon,
-            text: 'Users',
+            text: t('admin.nav.users'),
             tabName: 'users',
             ref: NavigationUsers,
             end: false,
@@ -174,7 +176,7 @@ const AdminShell = () => {
         {
             to: '/nodes',
             icon: ServerStack01Icon,
-            text: 'Nodes',
+            text: t('admin.nav.nodes'),
             tabName: 'nodes',
             ref: NavigationNodes,
             end: false,
@@ -182,7 +184,7 @@ const AdminShell = () => {
         {
             to: '/locations',
             icon: Location01Icon,
-            text: 'Locations',
+            text: t('admin.nav.locations'),
             tabName: 'locations',
             ref: NavigationLocations,
             end: false,
@@ -190,7 +192,7 @@ const AdminShell = () => {
         {
             to: '/databases',
             icon: Database02Icon,
-            text: 'Databases',
+            text: t('admin.nav.databases'),
             tabName: 'databases',
             ref: NavigationDatabases,
             end: false,
@@ -198,8 +200,8 @@ const AdminShell = () => {
         {
             to: '/buckets',
             icon: Store01Icon,
-            text: 'S3 Buckets',
-            minimizedText: 'Buckets',
+            text: t('admin.nav.buckets'),
+            minimizedText: t('admin.nav.buckets_short'),
             tabName: 'buckets',
             ref: NavigationBuckets,
             end: false,
@@ -207,7 +209,7 @@ const AdminShell = () => {
         {
             to: '/nests',
             icon: Package01Icon,
-            text: 'Nests',
+            text: t('admin.nav.nests'),
             tabName: 'nests',
             ref: NavigationNests,
             end: false,
@@ -215,7 +217,7 @@ const AdminShell = () => {
         {
             to: '/mounts',
             icon: Folder01Icon,
-            text: 'Mounts',
+            text: t('admin.nav.mounts'),
             tabName: 'mounts',
             ref: NavigationMounts,
             end: false,
@@ -223,8 +225,8 @@ const AdminShell = () => {
         {
             to: '/api',
             icon: Key01Icon,
-            text: 'API',
-            minimizedText: 'API',
+            text: t('admin.nav.api'),
+            minimizedText: t('admin.nav.api'),
             tabName: 'api',
             ref: NavigationApi,
             end: false,
@@ -340,25 +342,27 @@ const AdminApp = () => {
         <>
             <GlobalStylesheet />
             <StoreProvider store={store}>
-                <HydrodactylProvider>
-                    <div
-                        data-hydrodactyl-routerwrap=''
-                        className='relative w-full h-full flex flex-row p-2 overflow-hidden rounded-lg'
-                    >
-                        <Toaster
-                            theme='dark'
-                            toastOptions={{
-                                unstyled: true,
-                                classNames: {
-                                    toast: 'p-4 bg-[#ffffff09] border border-[#ffffff12] rounded-2xl shadow-lg backdrop-blur-2xl flex items-center w-full gap-2',
-                                },
-                            }}
-                        />
-                        <BrowserRouter basename='/admin'>
-                            <AdminShell />
-                        </BrowserRouter>
-                    </div>
-                </HydrodactylProvider>
+                <I18nProvider>
+                    <HydrodactylProvider>
+                        <div
+                            data-hydrodactyl-routerwrap=''
+                            className='relative w-full h-full flex flex-row p-2 overflow-hidden rounded-lg'
+                        >
+                            <Toaster
+                                theme='dark'
+                                toastOptions={{
+                                    unstyled: true,
+                                    classNames: {
+                                        toast: 'p-4 bg-[#ffffff09] border border-[#ffffff12] rounded-2xl shadow-lg backdrop-blur-2xl flex items-center w-full gap-2',
+                                    },
+                                }}
+                            />
+                            <BrowserRouter basename='/admin'>
+                                <AdminShell />
+                            </BrowserRouter>
+                        </div>
+                    </HydrodactylProvider>
+                </I18nProvider>
             </StoreProvider>
         </>
     );

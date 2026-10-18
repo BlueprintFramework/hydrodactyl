@@ -6,11 +6,12 @@ import {
     getCalagopusLogs,
     getCalagopusStats,
     getCalagopusSystem,
-    upgradeCalagopus,
+    upgradeNode,
 } from '@/api/admin/nodes';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const formatBytes = (bytes: number): string => {
     if (!bytes) return '0 B';
@@ -33,6 +34,7 @@ const Card = ({ title, children }: { title: string; children: React.ReactNode })
  * only for nodes whose daemon is "calagopus".
  */
 const CalagopusNodePanel = ({ nodeId }: { nodeId: number | string }) => {
+    const { t } = useTranslation();
     const [system, setSystem] = useState<CalagopusSystem | null>(null);
     const [stats, setStats] = useState<Record<string, unknown> | null>(null);
     const [logs, setLogs] = useState<CalagopusLogFile[]>([]);
@@ -64,7 +66,7 @@ const CalagopusNodePanel = ({ nodeId }: { nodeId: number | string }) => {
         try {
             setLogContent(await getCalagopusLog(nodeId, file, 500));
         } catch {
-            toast.error('Failed to load the log file.');
+            toast.error(t('admin.nodes.calagopus_log_failed'));
         } finally {
             setLoadingLog(false);
         }
@@ -72,19 +74,21 @@ const CalagopusNodePanel = ({ nodeId }: { nodeId: number | string }) => {
 
     const submitUpgrade = async () => {
         if (!upgradeUrl || upgradeSha.length !== 64) {
-            toast.error('A download URL and a 64 character SHA-256 are required.');
+            toast.error(t('admin.nodes.calagopus_upgrade_required'));
             return;
         }
 
         setUpgrading(true);
 
         try {
-            const result = await upgradeCalagopus(nodeId, { url: upgradeUrl, sha256: upgradeSha });
+            const result = await upgradeNode(nodeId, { url: upgradeUrl, sha256: upgradeSha });
             toast.success(
-                result.applied ? 'Upgrade applied. The node is restarting.' : 'Upgrade was ignored by the node.',
+                result.applied
+                    ? t('admin.nodes.calagopus_upgrade_applied')
+                    : t('admin.nodes.calagopus_upgrade_ignored'),
             );
         } catch {
-            toast.error('Failed to request the upgrade.');
+            toast.error(t('admin.nodes.calagopus_upgrade_failed'));
         } finally {
             setUpgrading(false);
         }
@@ -100,42 +104,44 @@ const CalagopusNodePanel = ({ nodeId }: { nodeId: number | string }) => {
 
     return (
         <div className='space-y-4'>
-            <Card title='Calagopus Node'>
+            <Card title={t('admin.nodes.calagopus_title')}>
                 <dl className='grid grid-cols-2 gap-3 text-sm sm:grid-cols-3 lg:grid-cols-5'>
                     <div>
-                        <dt className='text-xs uppercase tracking-wide text-cream-400/50'>Version</dt>
+                        <dt className='text-xs uppercase tracking-wide text-cream-400/50'>
+                            {t('admin.nodes.version')}
+                        </dt>
                         <dd className='mt-1 text-cream-100'>{system.version}</dd>
                     </div>
                     <div>
-                        <dt className='text-xs uppercase tracking-wide text-cream-400/50'>OS</dt>
+                        <dt className='text-xs uppercase tracking-wide text-cream-400/50'>{t('admin.overview.os')}</dt>
                         <dd className='mt-1 text-cream-100'>
                             {system.os} / {system.architecture}
                         </dd>
                     </div>
                     <div>
-                        <dt className='text-xs uppercase tracking-wide text-cream-400/50'>CPUs</dt>
+                        <dt className='text-xs uppercase tracking-wide text-cream-400/50'>{t('admin.nodes.cpus')}</dt>
                         <dd className='mt-1 text-cream-100'>{system.cpu_count}</dd>
                     </div>
                     <div className='col-span-2'>
-                        <dt className='text-xs uppercase tracking-wide text-cream-400/50'>Kernel</dt>
+                        <dt className='text-xs uppercase tracking-wide text-cream-400/50'>{t('admin.nodes.kernel')}</dt>
                         <dd className='mt-1 break-words text-cream-100'>{system.kernel_version}</dd>
                     </div>
                 </dl>
             </Card>
 
-            <Card title='Live Stats'>
+            <Card title={t('admin.nodes.live_stats')}>
                 {stats ? (
                     <pre className='max-h-64 overflow-auto rounded-lg bg-mocha-600 p-3 text-xs text-cream-200'>
                         {JSON.stringify(stats, null, 2)}
                     </pre>
                 ) : (
-                    <p className='text-sm text-cream-400/60'>No stats available.</p>
+                    <p className='text-sm text-cream-400/60'>{t('admin.nodes.no_stats')}</p>
                 )}
             </Card>
 
-            <Card title='Log Files'>
+            <Card title={t('admin.nodes.log_files')}>
                 {logs.length === 0 ? (
-                    <p className='text-sm text-cream-400/60'>No log files were found on the node.</p>
+                    <p className='text-sm text-cream-400/60'>{t('admin.nodes.no_logs')}</p>
                 ) : (
                     <div className='flex flex-wrap gap-2'>
                         {logs.map((log) => (
@@ -164,18 +170,15 @@ const CalagopusNodePanel = ({ nodeId }: { nodeId: number | string }) => {
                             </div>
                         ) : (
                             <pre className='max-h-96 overflow-auto rounded-lg bg-mocha-600 p-3 text-xs text-cream-200'>
-                                {logContent || 'This log file is empty.'}
+                                {logContent || t('admin.nodes.log_empty')}
                             </pre>
                         )}
                     </div>
                 )}
             </Card>
 
-            <Card title='Remote Upgrade'>
-                <p className='mb-3 text-sm text-cream-400/60'>
-                    This is only available when the node is not running inside a container. The node validates the
-                    downloaded binary against the SHA-256 before replacing itself.
-                </p>
+            <Card title={t('admin.nodes.remote_upgrade')}>
+                <p className='mb-3 text-sm text-cream-400/60'>{t('admin.nodes.remote_upgrade_description')}</p>
                 <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
                     <Input.Text
                         placeholder='https://example.com/wings-rs-x86_64-linux'
@@ -183,14 +186,14 @@ const CalagopusNodePanel = ({ nodeId }: { nodeId: number | string }) => {
                         onChange={(e) => setUpgradeUrl(e.target.value)}
                     />
                     <Input.Text
-                        placeholder='SHA-256 (64 hex characters)'
+                        placeholder={t('admin.nodes.sha_placeholder')}
                         value={upgradeSha}
                         onChange={(e) => setUpgradeSha(e.target.value)}
                     />
                 </div>
                 <div className='mt-3'>
                     <Button onClick={submitUpgrade} disabled={upgrading}>
-                        {upgrading ? 'Requesting…' : 'Upgrade Node'}
+                        {upgrading ? t('admin.nodes.requesting') : t('admin.nodes.upgrade_node')}
                     </Button>
                 </div>
             </Card>

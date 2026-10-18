@@ -4,6 +4,7 @@ import Field from '@/components/elements/Field';
 import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import { Button } from '@/components/ui/button';
 import { fileBitsToString } from '@/helpers';
+import { useTranslation } from '@/i18n/I18nProvider';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
@@ -20,6 +21,7 @@ interface File {
 type OwnProps = RequiredModalProps & { files: File[] };
 
 const ChmodFileModal = ({ files, ...props }: OwnProps) => {
+    const { t } = useTranslation();
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const { mutate } = useFileManagerSwr();
     const { clearFlashes, clearAndAddHttpError } = useFlash();
@@ -55,7 +57,7 @@ const ChmodFileModal = ({ files, ...props }: OwnProps) => {
             {({ isSubmitting }) => (
                 <Modal
                     {...props}
-                    title='Configure permissions'
+                    title={t('server.files.configure_permissions')}
                     dismissable={!isSubmitting}
                     showSpinnerOverlay={isSubmitting}
                 >
@@ -66,16 +68,14 @@ const ChmodFileModal = ({ files, ...props }: OwnProps) => {
                                     type={'string'}
                                     id={'file_mode'}
                                     name={'mode'}
-                                    label={'File Mode'}
-                                    description={
-                                        'This is intended for advanced users. You may irreperably damage your server by changing file permissions.'
-                                    }
+                                    label={t('server.files.file_mode_label')}
+                                    description={t('server.files.file_mode_description')}
                                     autoFocus
                                 />
                             </div>
                             <div className={`flex justify-end w-full my-6`}>
                                 <Button variant='attention' type='submit'>
-                                    Update
+                                    {t('common.update')}
                                 </Button>
                             </div>
                         </div>

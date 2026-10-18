@@ -20,6 +20,7 @@ import { Dialog } from '@/components/elements/dialog';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const labelFor = (key: string) =>
     key
@@ -37,6 +38,7 @@ interface Props {
 }
 
 const DomainForm = ({ providers, domain, onSaved }: Props) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const [name, setName] = useState(domain?.name ?? '');
@@ -62,7 +64,7 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
 
         if (session) {
             setConfig((current) => ({ ...current, session_id: session }));
-            toast.success('AT Protocol account connected.');
+            toast.success(t('admin.settings.atproto_connected'));
         }
 
         if (error) {
@@ -75,7 +77,7 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
             next.delete('atproto_error');
             setSearchParams(next, { replace: true });
         }
-    }, [searchParams, setSearchParams]);
+    }, [searchParams, setSearchParams, t]);
 
     useEffect(() => {
         if (!isMarque) {
@@ -103,16 +105,16 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
             if (domain) {
                 await updateDomain(domain.id, payload());
                 await onSaved();
-                toast.success('Domain updated.');
+                toast.success(t('admin.settings.domain_updated'));
             } else {
                 const created = await createDomain(payload());
                 await onSaved();
-                toast.success('Domain created.');
+                toast.success(t('admin.settings.domain_created'));
                 navigate(`/settings/domains/${created.id}`);
             }
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to save domain.'));
+            toast.error(errorToMessage(error, t('admin.settings.domain_save_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -123,9 +125,9 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
 
         try {
             await testDomainConnection({ dns_provider: provider, dns_config: mergeConfig(schema, config) });
-            toast.success('Connection successful.');
+            toast.success(t('admin.settings.connection_successful'));
         } catch (error) {
-            toast.error(errorToMessage(error, 'Connection failed.'));
+            toast.error(errorToMessage(error, t('admin.buckets.connection_failed')));
         } finally {
             setTesting(false);
         }
@@ -134,7 +136,7 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
     const connectAtproto = () => {
         const identifier = atprotoIdentifier.trim();
         if (!identifier) {
-            toast.error('Enter an AT Protocol handle or DID first.');
+            toast.error(t('admin.settings.atproto_required'));
             return;
         }
 
@@ -153,10 +155,10 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
         try {
             await deleteDomain(domain.id);
             await onSaved();
-            toast.success('Domain deleted.');
+            toast.success(t('admin.settings.domain_deleted'));
             navigate('/settings/domains');
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete domain.'));
+            toast.error(errorToMessage(error, t('admin.settings.domain_delete_failed')));
             setDeleting(false);
             setConfirmDelete(false);
         }
@@ -173,7 +175,7 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
             >
                 <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <Field label='Domain Name' error={errors.name}>
+                        <Field label={t('admin.settings.domain_name')} error={errors.name}>
                             <Input.Text
                                 autoComplete='off'
                                 placeholder='example.com'
@@ -181,7 +183,7 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                                 onChange={(e) => setName(e.target.value)}
                             />
                         </Field>
-                        <Field label='DNS Provider' error={errors.dns_provider}>
+                        <Field label={t('admin.settings.dns_provider')} error={errors.dns_provider}>
                             <Dropdown
                                 value={provider}
                                 onChange={(value) => {
@@ -191,7 +193,7 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                                 options={Object.entries(providers).map(([value, item]) => ({
                                     value,
                                     label: item.name.charAt(0).toUpperCase() + item.name.slice(1),
-                                    description: item.description,
+                                    description: item.description !== item.name ? item.description : undefined,
                                 }))}
                             />
                         </Field>
@@ -199,20 +201,20 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                 </div>
 
                 <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Provider Configuration</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.provider_config')}</h2>
                     {errors.dns_config && <p className='text-xs text-brand-600'>{errors.dns_config}</p>}
 
                     {isMarque ? (
                         <div className='space-y-4'>
                             <Field
-                                label='AT Protocol account'
-                                hint='DNS records are written to the connected account’s repository. Connect the account that owns this domain.'
+                                label={t('admin.settings.atproto_account')}
+                                hint={t('admin.settings.atproto_account_hint')}
                                 error={errors['dns_config.session_id']}
                             >
                                 <Dropdown
                                     value={config.session_id ?? ''}
                                     onChange={(value) => setConfig({ ...config, session_id: value })}
-                                    placeholder='No account connected'
+                                    placeholder={t('admin.settings.no_account_connected')}
                                     options={atprotoSessions.map((session) => ({
                                         value: session.id,
                                         label: session.handle ?? session.did,
@@ -222,8 +224,8 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                             </Field>
                             <div className='grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 items-center'>
                                 <Field
-                                    label='Connect a new account'
-                                    hint='Enter a handle (e.g. you.bsky.social) or DID.'
+                                    label={t('admin.settings.connect_new_account')}
+                                    hint={t('admin.settings.connect_new_account_hint')}
                                 >
                                     <Input.Text
                                         autoComplete='off'
@@ -233,17 +235,17 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                                     />
                                 </Field>
                                 <Button type='button' variant='secondary' onClick={connectAtproto}>
-                                    Connect with AT Protocol
+                                    {t('admin.settings.connect_atproto')}
                                 </Button>
                             </div>
 
                             <div className='space-y-4 border-t border-mocha-400 pt-4'>
-                                <p className='text-xs text-cream-400/60'>
-                                    Or authenticate with an app password. This is only used when no account is connected
-                                    above.
-                                </p>
+                                <p className='text-xs text-cream-400/60'>{t('admin.settings.app_password_notice')}</p>
                                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                                    <Field label='Handle or DID' error={errors['dns_config.identifier']}>
+                                    <Field
+                                        label={t('admin.settings.handle_or_did')}
+                                        error={errors['dns_config.identifier']}
+                                    >
                                         <Input.Text
                                             autoComplete='off'
                                             placeholder='you.bsky.social'
@@ -251,7 +253,10 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                                             onChange={(e) => setConfig({ ...config, identifier: e.target.value })}
                                         />
                                     </Field>
-                                    <Field label='App password' error={errors['dns_config.app_password']}>
+                                    <Field
+                                        label={t('admin.settings.app_password')}
+                                        error={errors['dns_config.app_password']}
+                                    >
                                         <Input.Text
                                             type='password'
                                             autoComplete='off'
@@ -260,8 +265,8 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                                         />
                                     </Field>
                                     <Field
-                                        label='PDS URL'
-                                        hint='Optional. Leave empty to discover it automatically.'
+                                        label={t('admin.settings.pds_url')}
+                                        hint={t('admin.settings.pds_url_hint')}
                                         error={errors['dns_config.pds_url']}
                                     >
                                         <Input.Text
@@ -292,41 +297,41 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                                 </Field>
                             ))}
                             {schema && Object.keys(schema).length === 0 && (
-                                <p className='text-xs text-cream-400/60'>This provider has no configuration options.</p>
+                                <p className='text-xs text-cream-400/60'>{t('admin.settings.no_provider_options')}</p>
                             )}
                         </div>
                     )}
 
                     <div>
                         <Button type='button' variant='secondary' onClick={test} disabled={testing}>
-                            Test Connection
+                            {t('admin.buckets.test_connection')}
                         </Button>
                     </div>
                 </div>
 
                 <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <Field label='Status' error={errors.is_active}>
+                        <Field label={t('admin.common.status')} error={errors.is_active}>
                             <Dropdown
                                 value={isActive ? 'true' : 'false'}
                                 onChange={(value) => setIsActive(value === 'true')}
                                 options={[
-                                    { value: 'true', label: 'Active' },
-                                    { value: 'false', label: 'Inactive' },
+                                    { value: 'true', label: t('common.active') },
+                                    { value: 'false', label: t('common.inactive') },
                                 ]}
                             />
                         </Field>
                         <Field
-                            label='Default Domain'
+                            label={t('admin.settings.default_domain')}
                             error={errors.is_default}
-                            hint='The default domain used for new server subdomains.'
+                            hint={t('admin.settings.default_domain_hint')}
                         >
                             <Dropdown
                                 value={isDefault ? 'true' : 'false'}
                                 onChange={(value) => setIsDefault(value === 'true')}
                                 options={[
-                                    { value: 'false', label: 'No' },
-                                    { value: 'true', label: 'Yes' },
+                                    { value: 'false', label: t('common.no') },
+                                    { value: 'true', label: t('common.yes') },
                                 ]}
                             />
                         </Field>
@@ -340,44 +345,45 @@ const DomainForm = ({ providers, domain, onSaved }: Props) => {
                         onClick={() => navigate('/settings/domains')}
                         disabled={submitting}
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button type='submit' disabled={submitting}>
-                        {domain ? 'Update Domain' : 'Create Domain'}
+                        {domain ? t('admin.settings.update_domain') : t('admin.settings.create_domain')}
                     </Button>
                 </div>
             </form>
 
             {domain && (
                 <div className='rounded-xl border border-brand-400/40 bg-brand-400/5 p-4'>
-                    <h2 className='text-sm font-semibold text-brand-400'>Delete Domain</h2>
-                    <p className='mt-1 text-sm text-cream-400/70'>Domains with active subdomains cannot be deleted.</p>
+                    <h2 className='text-sm font-semibold text-brand-400'>{t('admin.settings.delete_domain')}</h2>
+                    <p className='mt-1 text-sm text-cream-400/70'>{t('admin.settings.delete_domain_description')}</p>
                     <Button
                         variant='attention'
                         className='mt-3'
                         disabled={domain.active_subdomains_count > 0}
                         onClick={() => setConfirmDelete(true)}
                     >
-                        Delete Domain
+                        {t('admin.settings.delete_domain')}
                     </Button>
                 </div>
             )}
 
             <Dialog.Confirm
                 open={confirmDelete}
-                title='Delete Domain'
-                confirm='Delete'
+                title={t('admin.settings.delete_domain')}
+                confirm={t('common.delete')}
                 onClose={() => setConfirmDelete(false)}
                 onConfirmed={remove}
                 loading={deleting}
             >
-                Deleting this domain is permanent and cannot be undone.
+                {t('admin.settings.delete_domain_confirm')}
             </Dialog.Confirm>
         </div>
     );
 };
 
 const DomainFormContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data, mutate } = useDomains();
 
@@ -394,7 +400,7 @@ const DomainFormContainer = () => {
     if (id && !domain) {
         return (
             <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-8 text-center text-sm text-cream-400/60'>
-                That domain could not be found.
+                {t('admin.settings.domain_not_found')}
             </div>
         );
     }

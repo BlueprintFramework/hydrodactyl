@@ -8,28 +8,31 @@ import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 
-const providerFields: Record<string, { key: keyof CaptchaValues; label: string; secret?: boolean }[]> = {
+const providerFields: Record<string, { key: keyof CaptchaValues; label: TranslationKey; secret?: boolean }[]> = {
     turnstile: [
-        { key: 'pterodactyl:captcha:turnstile:site_key', label: 'Site Key' },
-        { key: 'pterodactyl:captcha:turnstile:secret_key', label: 'Secret Key', secret: true },
+        { key: 'pterodactyl:captcha:turnstile:site_key', label: 'admin.settings.site_key' },
+        { key: 'pterodactyl:captcha:turnstile:secret_key', label: 'admin.buckets.secret_key', secret: true },
     ],
     hcaptcha: [
-        { key: 'pterodactyl:captcha:hcaptcha:site_key', label: 'Site Key' },
-        { key: 'pterodactyl:captcha:hcaptcha:secret_key', label: 'Secret Key', secret: true },
+        { key: 'pterodactyl:captcha:hcaptcha:site_key', label: 'admin.settings.site_key' },
+        { key: 'pterodactyl:captcha:hcaptcha:secret_key', label: 'admin.buckets.secret_key', secret: true },
     ],
     recaptcha: [
-        { key: 'pterodactyl:captcha:recaptcha:site_key', label: 'Site Key' },
-        { key: 'pterodactyl:captcha:recaptcha:secret_key', label: 'Secret Key', secret: true },
+        { key: 'pterodactyl:captcha:recaptcha:site_key', label: 'admin.settings.site_key' },
+        { key: 'pterodactyl:captcha:recaptcha:secret_key', label: 'admin.buckets.secret_key', secret: true },
     ],
     cap: [
-        { key: 'pterodactyl:captcha:cap:server_url', label: 'Server URL' },
-        { key: 'pterodactyl:captcha:cap:site_key', label: 'Site Key' },
-        { key: 'pterodactyl:captcha:cap:secret_key', label: 'Secret Key', secret: true },
+        { key: 'pterodactyl:captcha:cap:server_url', label: 'admin.settings.server_url' },
+        { key: 'pterodactyl:captcha:cap:site_key', label: 'admin.settings.site_key' },
+        { key: 'pterodactyl:captcha:cap:secret_key', label: 'admin.buckets.secret_key', secret: true },
     ],
 };
 
 const CaptchaForm = ({ settings, onSaved }: { settings: CaptchaValues; onSaved: () => void }) => {
+    const { t } = useTranslation();
     const [provider, setProvider] = useState(settings['pterodactyl:captcha:provider']);
     const [fields, setFields] = useState<Record<string, string>>(() =>
         Object.fromEntries(
@@ -51,10 +54,10 @@ const CaptchaForm = ({ settings, onSaved }: { settings: CaptchaValues; onSaved: 
                 ...fields,
             });
             await onSaved();
-            toast.success('Settings saved.');
+            toast.success(t('admin.settings.saved'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to save settings.'));
+            toast.error(errorToMessage(error, t('admin.settings.save_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -71,7 +74,7 @@ const CaptchaForm = ({ settings, onSaved }: { settings: CaptchaValues; onSaved: 
             className='space-y-4'
         >
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                <Field label='Provider' error={errors['pterodactyl:captcha:provider']}>
+                <Field label={t('admin.settings.provider')} error={errors['pterodactyl:captcha:provider']}>
                     <Dropdown
                         className='md:w-1/3'
                         value={provider}
@@ -83,10 +86,10 @@ const CaptchaForm = ({ settings, onSaved }: { settings: CaptchaValues; onSaved: 
 
             {active.length > 0 && (
                 <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Configuration</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.configuration')}</h2>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         {active.map(({ key, label, secret }) => (
-                            <Field key={key} label={label} error={errors[key]}>
+                            <Field key={key} label={t(label)} error={errors[key]}>
                                 <Input.Text
                                     type={secret ? 'password' : 'text'}
                                     autoComplete='off'
@@ -101,7 +104,7 @@ const CaptchaForm = ({ settings, onSaved }: { settings: CaptchaValues; onSaved: 
 
             <div className='flex justify-end'>
                 <Button type='submit' disabled={submitting}>
-                    Save
+                    {t('common.save')}
                 </Button>
             </div>
         </form>

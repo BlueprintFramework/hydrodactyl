@@ -1,6 +1,6 @@
 import { ChevronDown } from '@gravity-ui/icons';
 import { Field, Form, Formik, type FormikHelpers } from 'formik';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as yup from 'yup';
 import {
     checkSubdomainAvailability,
@@ -21,6 +21,8 @@ import {
     DropdownMenuRadioItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { Translate } from '@/i18n/types';
 import { useFlashKey } from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -47,20 +49,19 @@ const CleanInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<
 );
 CleanInput.displayName = 'CleanInput';
 
-const validationSchema = yup.object().shape({
-    subdomain: yup
-        .string()
-        .required('A subdomain name is required.')
-        .min(1, 'Subdomain must be at least 1 character.')
-        .max(63, 'Subdomain cannot exceed 63 characters.')
-        .matches(
-            /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/i,
-            'Subdomain can only contain lowercase letters, numbers, and hyphens. It must start and end with a letter or number.',
-        ),
-    domain_id: yup.string().required('A domain must be selected.'),
-});
+const createValidationSchema = (t: Translate) =>
+    yup.object().shape({
+        subdomain: yup
+            .string()
+            .required(t('server.network.subdomain.name_required'))
+            .min(1, t('server.network.subdomain.min_length'))
+            .max(63, t('server.network.subdomain.max_length'))
+            .matches(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/i, t('server.network.subdomain.format')),
+        domain_id: yup.string().required(t('server.network.subdomain.domain_required')),
+    });
 
 const SubdomainManagement = () => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [subdomainInfo, setSubdomainInfo] = useState<SubdomainInfo | null>(null);
     const [checkingAvailability, setCheckingAvailability] = useState(false);
@@ -74,6 +75,8 @@ const SubdomainManagement = () => {
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const { clearFlashes, clearAndAddHttpError } = useFlashKey('server:network:subdomain');
+
+    const validationSchema = useMemo(() => createValidationSchema(t), [t]);
 
     const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -120,13 +123,13 @@ const SubdomainManagement = () => {
                 setAvailabilityStatus({
                     checked: true,
                     available: false,
-                    message: 'Failed to check availability. Please try again.',
+                    message: t('server.network.subdomain.check_failed'),
                 });
             } finally {
                 setCheckingAvailability(false);
             }
         },
-        [uuid, subdomainInfo?.current_subdomain],
+        [uuid, t, subdomainInfo?.current_subdomain],
     );
 
     const debouncedCheckAvailability = useCallback(
@@ -197,7 +200,7 @@ const SubdomainManagement = () => {
             <div className='flex items-center justify-center py-12'>
                 <div className='flex flex-col items-center gap-3'>
                     <div className='animate-spin rounded-full h-6 w-6 border-b-2 border-brand'></div>
-                    <p className='text-sm text-neutral-400'>Loading subdomain configuration...</p>
+                    <p className='text-sm text-neutral-400'>{t('server.network.subdomain.loading')}</p>
                 </div>
             </div>
         );
@@ -225,9 +228,11 @@ const SubdomainManagement = () => {
                             />
                         </svg>
                     </div>
-                    <h4 className='text-md font-medium text-zinc-200 mb-1'>No domains configured</h4>
+                    <h4 className='text-md font-medium text-zinc-200 mb-1'>
+                        {t('server.network.subdomain.no_domains_title')}
+                    </h4>
                     <p className='text-sm text-zinc-400 max-w-sm'>
-                        Contact your administrator to configure subdomain support for this server.
+                        {t('server.network.subdomain.no_domains_description')}
                     </p>
                 </div>
                 <CustomDomains />
@@ -247,7 +252,9 @@ const SubdomainManagement = () => {
                             subdomainInfo.current_subdomain.attributes.is_active ? 'text-green-400' : 'text-red-400'
                         }
                     >
-                        {subdomainInfo.current_subdomain.attributes.is_active ? 'Active' : 'Inactive'}
+                        {subdomainInfo.current_subdomain.attributes.is_active
+                            ? t('common.active')
+                            : t('common.inactive')}
                     </span>
                 </div>
             )}
@@ -270,7 +277,7 @@ const SubdomainManagement = () => {
                     <div className='bg-[#ffffff08] border border-[#ffffff15] rounded-lg p-4'>
                         <div className='flex items-center justify-between'>
                             <div>
-                                <p className='text-sm text-zinc-400 mb-2'>Current Subdomain</p>
+                                <p className='text-sm text-zinc-400 mb-2'>{t('server.network.subdomain.current')}</p>
                                 <p className='text-lg font-medium text-white font-mono'>
                                     {subdomainInfo?.current_subdomain?.attributes?.full_domain}
                                 </p>
@@ -285,10 +292,10 @@ const SubdomainManagement = () => {
                             onClick={() => setShowDeleteConfirmation(true)}
                             disabled={loading}
                         >
-                            {loading ? 'Deleting...' : 'Delete Subdomain'}
+                            {loading ? t('server.network.subdomain.deleting') : t('server.network.subdomain.delete')}
                         </Button>
                         <Button type='button' variant='secondary' onClick={() => setIsEditing(true)} disabled={loading}>
-                            Edit Subdomain
+                            {t('server.network.subdomain.edit')}
                         </Button>
                     </div>
                 </div>
@@ -314,14 +321,14 @@ const SubdomainManagement = () => {
                             <div className='space-y-4'>
                                 <FormikFieldWrapper
                                     name='subdomain'
-                                    label='Subdomain'
-                                    description='Choose a unique name for your subdomain. Only lowercase letters, numbers, and hyphens are allowed.'
+                                    label={t('server.network.subdomain.label')}
+                                    description={t('server.network.subdomain.description')}
                                 >
                                     <div className='flex items-center overflow-hidden rounded-xl border border-mocha-300/50 bg-mocha-400/50 focus-within:border-brand-400/60'>
                                         <Field
                                             as={CleanInput}
                                             name='subdomain'
-                                            placeholder='myserver'
+                                            placeholder={t('server.network.subdomain.placeholder')}
                                             className='flex-1 px-4 py-3'
                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                 const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
@@ -397,7 +404,7 @@ const SubdomainManagement = () => {
                                         {checkingAvailability ? (
                                             <div className='flex items-center text-sm text-blue-300'>
                                                 <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400 mr-3'></div>
-                                                Checking availability...
+                                                {t('server.network.subdomain.checking')}
                                             </div>
                                         ) : (
                                             availabilityStatus && (
@@ -429,7 +436,7 @@ const SubdomainManagement = () => {
                                             }}
                                             disabled={isSubmitting || loading}
                                         >
-                                            Cancel
+                                            {t('common.cancel')}
                                         </Button>
                                         <Button
                                             type='submit'
@@ -443,7 +450,9 @@ const SubdomainManagement = () => {
                                                 (availabilityStatus?.checked && !availabilityStatus?.available)
                                             }
                                         >
-                                            {isSubmitting ? 'Saving...' : 'Save Changes'}
+                                            {isSubmitting
+                                                ? t('common.saving')
+                                                : t('server.network.subdomain.save_changes')}
                                         </Button>
                                     </>
                                 ) : (
@@ -459,7 +468,9 @@ const SubdomainManagement = () => {
                                             (availabilityStatus?.checked && !availabilityStatus?.available)
                                         }
                                     >
-                                        {isSubmitting ? 'Creating...' : 'Create Subdomain'}
+                                        {isSubmitting
+                                            ? t('server.network.subdomain.creating')
+                                            : t('server.network.subdomain.create')}
                                     </Button>
                                 )}
                             </div>

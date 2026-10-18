@@ -6,6 +6,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': resolve(dirname(fileURLToPath(import.meta.url)), 'resources', 'scripts'),
+            '@lang': resolve(dirname(fileURLToPath(import.meta.url)), 'resources', 'lang'),
         },
     },
     test: {

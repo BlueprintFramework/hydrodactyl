@@ -13,6 +13,7 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 type FilterCategory = 'owner_id' | 'nest_id' | 'egg_id' | 'node_id';
 
@@ -30,14 +31,15 @@ interface FilterDropdownProps {
 }
 
 const FilterDropdown = ({ filterOptions, activeField, activeValue, onFilterChange }: FilterDropdownProps) => {
+    const { t } = useTranslation();
     const groups: CategoryGroup[] = useMemo(
         () => [
-            { category: 'owner_id', label: 'Owner', options: filterOptions.owners },
-            { category: 'nest_id', label: 'Nest', options: filterOptions.nests },
-            { category: 'egg_id', label: 'Egg', options: filterOptions.eggs },
-            { category: 'node_id', label: 'Node', options: filterOptions.nodes },
+            { category: 'owner_id', label: t('dashboard.filters.owner'), options: filterOptions.owners },
+            { category: 'nest_id', label: t('dashboard.filters.nest'), options: filterOptions.nests },
+            { category: 'egg_id', label: t('dashboard.filters.egg'), options: filterOptions.eggs },
+            { category: 'node_id', label: t('dashboard.filters.node'), options: filterOptions.nodes },
         ],
-        [filterOptions],
+        [filterOptions, t],
     );
 
     const activeGroup = useMemo(() => groups.find((g) => g.category === activeField), [groups, activeField]);
@@ -58,14 +60,20 @@ const FilterDropdown = ({ filterOptions, activeField, activeValue, onFilterChang
                 <Button
                     size={'sm'}
                     variant={'secondary'}
-                    aria-label={activeLabel ? `Filter: ${activeLabel}` : 'Filter servers'}
+                    aria-label={
+                        activeLabel
+                            ? t('dashboard.filters.aria_filtered', { filter: activeLabel })
+                            : t('dashboard.filters.aria')
+                    }
                     className={`h-11 sm:h-8 px-2 sm:px-3 gap-1 rounded-full hover:cursor-pointer ${
                         hasActiveFilter ? 'border-accent/50' : ''
                     }`}
                 >
                     <div className='flex flex-row items-center gap-1.5'>
                         <HugeiconsIcon size={16} strokeWidth={2} icon={FilterIcon} className='size-4' />
-                        <span className='hidden sm:inline max-w-[140px] truncate'>{activeLabel || 'Filter'}</span>
+                        <span className='hidden sm:inline max-w-[140px] truncate'>
+                            {activeLabel || t('dashboard.filters.filter')}
+                        </span>
                     </div>
                 </Button>
             </DropdownMenuTrigger>
@@ -75,7 +83,7 @@ const FilterDropdown = ({ filterOptions, activeField, activeValue, onFilterChang
             >
                 {allEmpty ? (
                     <DropdownMenuItem disabled className='opacity-50'>
-                        No filter options available
+                        {t('dashboard.filters.no_options')}
                     </DropdownMenuItem>
                 ) : (
                     groups.map((group) =>
@@ -89,7 +97,7 @@ const FilterDropdown = ({ filterOptions, activeField, activeValue, onFilterChang
                                         onSelect={() => onFilterChange(undefined, undefined)}
                                         className='text-red-400 text-xs'
                                     >
-                                        Clear this filter
+                                        {t('dashboard.filters.clear_one')}
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     {group.options.map((option) => (
@@ -117,7 +125,7 @@ const FilterDropdown = ({ filterOptions, activeField, activeValue, onFilterChang
                             onSelect={() => onFilterChange(undefined, undefined)}
                             className='text-red-400'
                         >
-                            Clear All Filters
+                            {t('dashboard.filters.clear_all')}
                         </DropdownMenuItem>
                     </>
                 )}

@@ -74,24 +74,6 @@ class CalagopusRepository extends DaemonRepository
     }
 
     /**
-     * Ask the node to replace its own binary with the given download.
-     *
-     * @param array<string, string> $headers
-     *
-     * @throws DaemonConnectionException
-     */
-    public function upgrade(string $url, string $sha256, array $headers = [], string $restartCommand = 'systemctl', array $restartArgs = ['restart', 'wings']): array
-    {
-        return $this->decode($this->request('POST', '/api/system/upgrade', [
-            'url' => $url,
-            'headers' => $headers,
-            'sha256' => $sha256,
-            'restart_command' => $restartCommand,
-            'restart_command_args' => $restartArgs,
-        ], 60));
-    }
-
-    /**
      * Fetch the version hash for a single server's configuration.
      *
      * @throws DaemonConnectionException

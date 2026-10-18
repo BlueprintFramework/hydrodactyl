@@ -29,7 +29,7 @@ trait EnvironmentWriterTrait
     {
         $path = base_path('.env');
         if (!file_exists($path)) {
-            throw new PterodactylException('Cannot locate .env file, was this software installed correctly?');
+            throw new PterodactylException(__('exceptions.deployment.env_not_found'));
         }
 
         $saveContents = file_get_contents($path);

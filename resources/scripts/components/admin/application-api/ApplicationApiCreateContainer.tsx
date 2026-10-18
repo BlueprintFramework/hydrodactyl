@@ -11,6 +11,8 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 
 const cardClass = 'flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4';
 
@@ -21,6 +23,7 @@ const labelFor = (resource: string) =>
         .join(' ');
 
 const ApplicationApiCreateContainer = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { data, mutate } = useApplicationApiKeys();
     const [memo, setMemo] = useState('');
@@ -36,6 +39,13 @@ const ApplicationApiCreateContainer = () => {
         );
     }
 
+    const resourceLabel = (resource: string) => {
+        const key = `admin.api.resources.${resource}`;
+        const translated = t(key as TranslationKey);
+
+        return translated === key ? labelFor(resource) : translated;
+    };
+
     const valueFor = (resource: string) => values[resource] ?? data.permissions.none;
 
     const submit = async () => {
@@ -50,20 +60,20 @@ const ApplicationApiCreateContainer = () => {
         try {
             await createApplicationApiKey(payload);
             await mutate();
-            toast.success('A new application API key has been generated for your account.');
+            toast.success(t('admin.api.created'));
             navigate('/api');
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to create the API key.'));
+            toast.error(errorToMessage(error, t('admin.api.create_failed')));
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <PageContentBlock title='New Credentials'>
-            <MainPageHeader direction='column' title='New Credentials'>
-                <p className='text-sm text-neutral-400'>Create a new application API key.</p>
+        <PageContentBlock title={t('admin.api.new_credentials')}>
+            <MainPageHeader direction='column' title={t('admin.api.new_credentials')}>
+                <p className='text-sm text-neutral-400'>{t('admin.api.create_description')}</p>
             </MainPageHeader>
 
             <form
@@ -74,13 +84,13 @@ const ApplicationApiCreateContainer = () => {
                 className='grid grid-cols-1 gap-4 lg:grid-cols-3'
             >
                 <div className={`${cardClass} lg:col-span-2`}>
-                    <h2 className='text-sm font-semibold text-cream-50'>Select Permissions</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.api.select_permissions')}</h2>
                     <div className='overflow-hidden rounded-lg border border-mocha-400'>
                         <table className='w-full text-sm'>
                             <tbody>
                                 {data.resources.map((resource) => (
                                     <tr key={resource} className='border-b border-mocha-400/40 last:border-0'>
-                                        <td className='px-4 py-3 text-cream-100'>{labelFor(resource)}</td>
+                                        <td className='px-4 py-3 text-cream-100'>{resourceLabel(resource)}</td>
                                         <td className='w-56 px-4 py-3'>
                                             <Dropdown
                                                 value={String(valueFor(resource))}
@@ -88,12 +98,15 @@ const ApplicationApiCreateContainer = () => {
                                                     setValues((current) => ({ ...current, [resource]: Number(value) }))
                                                 }
                                                 options={[
-                                                    { value: String(data.permissions.read), label: 'Read' },
+                                                    {
+                                                        value: String(data.permissions.read),
+                                                        label: t('admin.api.read'),
+                                                    },
                                                     {
                                                         value: String(data.permissions.read_write),
-                                                        label: 'Read & Write',
+                                                        label: t('admin.api.read_write'),
                                                     },
-                                                    { value: String(data.permissions.none), label: 'None' },
+                                                    { value: String(data.permissions.none), label: t('common.none') },
                                                 ]}
                                             />
                                         </td>
@@ -105,20 +118,13 @@ const ApplicationApiCreateContainer = () => {
                 </div>
 
                 <div className={cardClass}>
-                    <Field
-                        label='Description'
-                        error={errors.memo}
-                        hint='A label to help you identify this set of credentials.'
-                    >
+                    <Field label={t('admin.common.description')} error={errors.memo} hint={t('admin.api.memo_hint')}>
                         <Input.Text value={memo} onChange={(event) => setMemo(event.target.value)} />
                     </Field>
-                    <p className='text-xs text-cream-400/60'>
-                        Once permissions are assigned and the credentials are created you will not be able to edit them.
-                        If you need to make changes later, create a new set of credentials.
-                    </p>
+                    <p className='text-xs text-cream-400/60'>{t('admin.api.warning')}</p>
                     <div className='flex justify-end'>
                         <Button type='submit' disabled={submitting}>
-                            Create Credentials
+                            {t('admin.api.create_credentials')}
                         </Button>
                     </div>
                 </div>

@@ -28,16 +28,16 @@ class DisableTwoFactorCommand extends Command
     public function handle()
     {
         if ($this->input->isInteractive()) {
-            $this->output->warning(trans('command/messages.user.2fa_help_text'));
+            $this->output->warning(__('command/messages.user.2fa_help_text'));
         }
 
-        $email = $this->option('email') ?? $this->ask(trans('command/messages.user.ask_email'));
+        $email = $this->option('email') ?? $this->ask(__('command/messages.user.ask_email'));
         $user = $this->repository->setColumns(['id', 'email'])->findFirstWhere([['email', '=', $email]]);
 
         $this->repository->withoutFreshModel()->update($user->id, [
             'use_totp' => false,
             'totp_secret' => null,
         ]);
-        $this->info(trans('command/messages.user.2fa_disabled', ['email' => $user->email]));
+        $this->info(__('command/messages.user.2fa_disabled', ['email' => $user->email]));
     }
 }

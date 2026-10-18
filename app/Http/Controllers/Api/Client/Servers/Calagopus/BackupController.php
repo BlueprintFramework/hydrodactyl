@@ -200,7 +200,7 @@ class BackupController extends ClientApiController
         }
 
         if ($backup->disk !== BackupAdapter::S3 && $backup->disk !== BackupAdapter::Wings && !$backup->disk->isCalagopus()) {
-            throw new BadRequestHttpException('The backup requested references an unknown disk driver type and cannot be downloaded.');
+            throw new BadRequestHttpException(__('exceptions.client.backups.unknown_disk'));
         }
 
         $url = $this->downloadLinkService->handle($backup, $request->user());
@@ -223,11 +223,11 @@ class BackupController extends ClientApiController
         // Cannot restore a backup unless a server is fully installed and not currently
         // processing a different backup restoration request.
         if (!is_null($server->status)) {
-            throw new BadRequestHttpException('This server is not currently in a state that allows for a backup to be restored.');
+            throw new BadRequestHttpException(__('exceptions.client.backups.restore_state_invalid'));
         }
 
         if (!$backup->is_successful && is_null($backup->completed_at)) {
-            throw new BadRequestHttpException('This backup cannot be restored at this time: not completed or failed.');
+            throw new BadRequestHttpException(__('exceptions.client.backups.restore_failed'));
         }
 
         $log = Activity::event('server:backup.restore')
@@ -264,7 +264,7 @@ class BackupController extends ClientApiController
 
         $backups = $server->backups()->get();
         if ($backups->isEmpty()) {
-            throw new BadRequestHttpException('No backups to delete.');
+            throw new BadRequestHttpException(__('exceptions.client.backups.none_to_delete'));
         }
 
         $deleted = 0;
@@ -303,16 +303,16 @@ class BackupController extends ClientApiController
 
         $backupUuids = $request->input('backup_uuids', []);
         if (empty($backupUuids) || !is_array($backupUuids)) {
-            throw new BadRequestHttpException('No backups specified for deletion.');
+            throw new BadRequestHttpException(__('exceptions.client.backups.none_specified'));
         }
 
         if (count($backupUuids) > 50) {
-            throw new BadRequestHttpException('Cannot delete more than 50 backups at once.');
+            throw new BadRequestHttpException(__('exceptions.client.backups.bulk_limit_exceeded'));
         }
 
         $backups = $server->backups()->whereIn('uuid', $backupUuids)->get();
         if ($backups->count() !== count($backupUuids)) {
-            throw new BadRequestHttpException('One or more backups not found or do not belong to this server.');
+            throw new BadRequestHttpException(__('exceptions.client.backups.not_found'));
         }
 
         $deleted = 0;
@@ -345,18 +345,18 @@ class BackupController extends ClientApiController
 
         $password = $request->input('password');
         if (empty($password) || !password_verify($password, $request->user()->password)) {
-            throw new BadRequestHttpException('The password provided was not valid.');
+            throw new BadRequestHttpException(__('exceptions.client.backups.password_not_valid'));
         }
 
         if ($request->user()->use_totp) {
             $totpCode = $request->input('totp_code');
             if (empty($totpCode)) {
-                throw new BadRequestHttpException('Two-factor authentication code is required.');
+                throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_required'));
             }
 
             $secret = Crypt::decrypt($request->user()->totp_secret);
             if (!$this->google2FA->verifyKey($secret, $totpCode)) {
-                throw new BadRequestHttpException('The two-factor authentication code provided was not valid.');
+                throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_invalid'));
             }
         }
     }

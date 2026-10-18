@@ -27,8 +27,8 @@ $output = new ConsoleOutput();
 
 $prefix = 'database.connections.' . config('database.default');
 if (!Str::contains(config("$prefix.database"), 'test')) {
-    $output->writeln(PHP_EOL . '<error>Cannot run test process against non-testing database.</error>');
-    $output->writeln(PHP_EOL . '<error>Environment is currently pointed at: "' . config("$prefix.database") . '".</error>');
+    $output->writeln(PHP_EOL . '<error>' . __('command/messages.testing.non_testing_database') . '</error>');
+    $output->writeln(PHP_EOL . '<error>' . __('command/messages.testing.environment_pointed_at', ['database' => config("$prefix.database")]) . '</error>');
     exit(1);
 }
 
@@ -37,11 +37,11 @@ if (!Str::contains(config("$prefix.database"), 'test')) {
  * running the tests.
  */
 if (!env('SKIP_MIGRATIONS')) {
-    $output->writeln(PHP_EOL . '<info>Refreshing database for Integration tests...</info>');
+    $output->writeln(PHP_EOL . '<info>' . __('command/messages.testing.refreshing_database') . '</info>');
     $kernel->call('migrate:fresh');
 
-    $output->writeln('<info>Seeding database for Integration tests...</info>' . PHP_EOL);
+    $output->writeln('<info>' . __('command/messages.testing.seeding_database') . '</info>' . PHP_EOL);
     $kernel->call('db:seed');
 } else {
-    $output->writeln(PHP_EOL . '<comment>Skipping database migrations...</comment>' . PHP_EOL);
+    $output->writeln(PHP_EOL . '<comment>' . __('command/messages.testing.skipping_migrations') . '</comment>' . PHP_EOL);
 }

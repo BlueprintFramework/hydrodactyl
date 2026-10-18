@@ -26,7 +26,7 @@ class NestDeletionService
     {
         $count = $this->serverRepository->findCountWhere([['nest_id', '=', $nest]]);
         if ($count > 0) {
-            throw new HasActiveServersException(trans('exceptions.nest.delete_has_servers'));
+            throw new HasActiveServersException(__('exceptions.nest.delete_has_servers'));
         }
 
         return $this->repository->delete($nest);

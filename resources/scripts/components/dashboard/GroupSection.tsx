@@ -20,6 +20,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 interface GroupSectionProps {
@@ -58,6 +59,7 @@ const DraggableServer = memo(
 DraggableServer.displayName = 'DraggableServer';
 
 const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: GroupSectionProps) => {
+    const { t } = useTranslation();
     const { data: groups, mutate: mutateGroups } = useSWR('server-groups', () => getServerGroups());
     const { mutate } = useSWRConfig();
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -202,24 +204,22 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
                     <div className='size-16 rounded-2xl bg-mocha-500/50 flex items-center justify-center mb-4'>
                         <FolderOpen className='size-8 text-cream-200/60' />
                     </div>
-                    <p className='text-sm font-medium text-cream-200 mb-1'>No groups yet</p>
-                    <p className='text-xs text-cream-200/40 mb-5 max-w-xs'>
-                        Create groups to organize your servers by purpose, game type, or anything else.
-                    </p>
+                    <p className='text-sm font-medium text-cream-200 mb-1'>{t('dashboard.groups.empty.title')}</p>
+                    <p className='text-xs text-cream-200/40 mb-5 max-w-xs'>{t('dashboard.groups.empty.description')}</p>
                     <button
                         type='button'
                         onClick={() => setShowCreateModal(true)}
                         className='flex items-center gap-2 px-4 py-2 bg-cream-400 text-mocha-500 hover:bg-cream-500/80 rounded-lg text-sm font-medium transition-colors'
                     >
                         <Plus className='size-4' />
-                        Create Group
+                        {t('dashboard.groups.create')}
                     </button>
                 </div>
                 {ungroupedServers.length > 0 && (
                     <div className='rounded-xl border border-cream-500/20 bg-mocha-500/30 overflow-hidden'>
                         <div className='px-4 py-3 border-b border-cream-500/20'>
                             <span className='text-xs font-medium text-cream-200/50 uppercase tracking-wider'>
-                                Ungrouped
+                                {t('dashboard.groups.ungrouped')}
                             </span>
                             <span className='text-xs text-cream-200/40 ml-2'>{ungroupedServers.length}</span>
                         </div>
@@ -256,7 +256,9 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
         <>
             <div className='flex items-center justify-between gap-3 mb-6'>
                 <div className='flex items-center gap-2 min-w-0'>
-                    <h3 className='text-xs font-medium text-cream-200/50 uppercase tracking-wider shrink-0'>Groups</h3>
+                    <h3 className='text-xs font-medium text-cream-200/50 uppercase tracking-wider shrink-0'>
+                        {t('dashboard.groups.title')}
+                    </h3>
                     <span className='text-xs text-cream-200/40'>{groups.length}</span>
                 </div>
                 <button
@@ -265,7 +267,7 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
                     className='flex items-center gap-1.5 px-3 py-1.5 bg-cream-400 text-mocha-500 hover:bg-cream-500/80 rounded-lg text-xs font-medium transition-colors shrink-0'
                 >
                     <Plus className='size-3.5' />
-                    New Group
+                    {t('dashboard.groups.new')}
                 </button>
             </div>
 
@@ -314,7 +316,7 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
                                         <button
                                             type='button'
                                             className='p-1.5 text-cream-200/50 hover:text-cream-200 hover:bg-cream-500/10 transition-colors rounded-md shrink-0'
-                                            title='Group options'
+                                            title={t('dashboard.groups.options')}
                                         >
                                             <EllipsisVertical className='size-4' />
                                         </button>
@@ -332,14 +334,14 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
                                             }}
                                         >
                                             <Pencil className='size-3.5 mr-2' />
-                                            Edit
+                                            {t('common.edit')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onSelect={() => setDeletingGroup({ id: group.id, name: group.name })}
                                             className='text-red-400'
                                         >
                                             <TrashBin className='size-3.5 mr-2' />
-                                            Delete
+                                            {t('common.delete')}
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
@@ -373,7 +375,7 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
                                     ) : (
                                         <div className='px-4 pb-5 pt-1'>
                                             <p className='text-xs text-cream-200/40 text-center py-3'>
-                                                Drag servers here to add them to this group
+                                                {t('dashboard.groups.drag_to_add')}
                                             </p>
                                         </div>
                                     )}
@@ -408,7 +410,7 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
                             <>
                                 <div className='px-4 py-3 border-b border-cream-500/20 flex items-center gap-2'>
                                     <span className='text-xs font-medium text-cream-200/50 uppercase tracking-wider'>
-                                        Ungrouped
+                                        {t('dashboard.groups.ungrouped')}
                                     </span>
                                     <span className='text-xs text-cream-200/40 tabular-nums'>
                                         {ungroupedServers.length}
@@ -432,7 +434,9 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
                             <div className='px-4 py-8 flex flex-col items-center justify-center text-center'>
                                 {dragOverUngrouped ? <ArrowDownToLine className='size-5 text-cream-400 mb-3' /> : null}
                                 <p className='text-xs text-cream-200/50'>
-                                    {dragOverUngrouped ? 'Drop to ungroup' : 'Drag servers here to ungroup them'}
+                                    {dragOverUngrouped
+                                        ? t('dashboard.groups.drop_to_ungroup')
+                                        : t('dashboard.groups.drag_to_ungroup')}
                                 </p>
                             </div>
                         )}
@@ -451,14 +455,14 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
             )}
 
             {renamingGroup && (
-                <Dialog open onClose={() => setRenamingGroup(null)} title='Edit Group'>
+                <Dialog open onClose={() => setRenamingGroup(null)} title={t('dashboard.groups.edit_title')}>
                     <div className='space-y-4 py-1'>
                         <div className='space-y-1.5'>
-                            <Label className='text-sm text-cream-200/50'>Group Name</Label>
+                            <Label className='text-sm text-cream-200/50'>{t('dashboard.groups.name_label')}</Label>
                             <Input
                                 value={renameValue}
                                 onChange={(e) => setRenameValue(e.target.value)}
-                                placeholder='e.g. Minecraft Servers'
+                                placeholder={t('dashboard.groups.name_placeholder')}
                                 autoFocus
                                 onKeyDown={(e) => {
                                     if (
@@ -474,20 +478,22 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
                             />
                         </div>
                         <div className='space-y-1.5'>
-                            <Label className='text-sm text-cream-200/50'>Description</Label>
+                            <Label className='text-sm text-cream-200/50'>
+                                {t('dashboard.groups.description_label')}
+                            </Label>
                             <Textarea
                                 value={renameDescription}
                                 onChange={(e) => setRenameDescription(e.target.value)}
-                                placeholder='Optional description for this group'
+                                placeholder={t('dashboard.groups.description_placeholder')}
                                 rows={3}
                                 className='w-full'
                             />
                         </div>
-                        <p className='text-xs text-cream-200/40'>Press Enter to save the name.</p>
+                        <p className='text-xs text-cream-200/40'>{t('dashboard.groups.press_enter')}</p>
                     </div>
                     <Dialog.Footer>
                         <Button variant='secondary' onClick={() => setRenamingGroup(null)}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             variant='attention'
@@ -498,31 +504,36 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
                                     renameDescription === (renamingGroup.description ?? ''))
                             }
                         >
-                            Save
+                            {t('common.save')}
                         </Button>
                     </Dialog.Footer>
                 </Dialog>
             )}
 
             {deletingGroup && (
-                <Dialog open onClose={() => setDeletingGroup(null)} title='Delete Group'>
+                <Dialog open onClose={() => setDeletingGroup(null)} title={t('dashboard.groups.delete_title')}>
                     {(() => {
                         const count = serversByGroup[deletingGroup.id]?.length ?? 0;
 
                         return (
                             <p className='text-sm text-cream-200/70 py-1'>
-                                Are you sure you want to delete{' '}
-                                <strong className='text-cream-200'>{deletingGroup.name}</strong>? {count} server
-                                {count === 1 ? '' : 's'} in this group will become ungrouped.
+                                {t('dashboard.groups.delete_confirm')}{' '}
+                                <strong className='text-cream-200'>{deletingGroup.name}</strong>
+                                {t(
+                                    count === 1
+                                        ? 'dashboard.groups.delete_confirm_one'
+                                        : 'dashboard.groups.delete_confirm_other',
+                                    { count },
+                                )}
                             </p>
                         );
                     })()}
                     <Dialog.Footer>
                         <Button variant='secondary' onClick={() => setDeletingGroup(null)}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button variant='destructive' onClick={handleDelete}>
-                            Delete
+                            {t('common.delete')}
                         </Button>
                     </Dialog.Footer>
                 </Dialog>

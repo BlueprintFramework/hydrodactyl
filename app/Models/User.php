@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
@@ -83,7 +84,8 @@ use Pterodactyl\Notifications\SendPasswordReset as ResetPasswordNotification;
 class User extends Model implements
     AuthenticatableContract,
     AuthorizableContract,
-    CanResetPasswordContract
+    CanResetPasswordContract,
+    HasLocalePreference
 {
     use Authenticatable;
     use Authorizable;
@@ -155,7 +157,7 @@ class User extends Model implements
         'external_id' => null,
         'root_admin' => false,
         'custom_domains' => false,
-        'language' => 'en',
+        'language' => 'en-US',
         'use_totp' => false,
         'totp_secret' => null,
     ];
@@ -193,6 +195,15 @@ class User extends Model implements
     }
 
     /**
+     * Return the user's preferred locale so queued notifications and mailables
+     * are rendered in the recipient's language.
+     */
+    public function preferredLocale(): ?string
+    {
+        return $this->language ?: config('app.locale', 'en-US');
+    }
+
+    /**
      * Return the user model in a format that can be passed over to Vue templates.
      */
     public function toVueObject(): array
@@ -210,7 +221,7 @@ class User extends Model implements
         Activity::event('auth:reset-password')
             ->withRequestMetadata()
             ->subject($this)
-            ->log('sending password reset email');
+            ->log();
 
         $this->notify(new ResetPasswordNotification($token));
     }

@@ -306,7 +306,22 @@ class ServerController extends Controller
                 ])
                 ->values(),
             'nests' => $nests->map(fn (Nest $nest) => $this->nestPayload($nest))->values(),
-            'templates' => config('server_templates.templates', []),
+            'templates' => collect(config('server_templates.templates', []))
+                ->map(function (array $template) {
+                    $nameKey = "admin/server.templates.{$template['id']}.name";
+                    $descriptionKey = "admin/server.templates.{$template['id']}.description";
+
+                    if (app('translator')->has($nameKey)) {
+                        $template['name'] = __($nameKey);
+                    }
+
+                    if (app('translator')->has($descriptionKey)) {
+                        $template['description'] = __($descriptionKey);
+                    }
+
+                    return $template;
+                })
+                ->values(),
         ]);
     }
 
@@ -357,7 +372,7 @@ class ServerController extends Controller
     {
         if ($server->status === Server::STATUS_INSTALL_FAILED) {
             throw new DisplayException(
-                'This server is in a failed install state and cannot be recovered. Please delete and re-create the server.'
+                __('exceptions.admin.server_failed_install')
             );
         }
 

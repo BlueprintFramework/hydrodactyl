@@ -87,7 +87,7 @@ class DomainsController extends Controller
             if ($newIsDefault && !$domain->is_default) {
                 Domain::where('is_default', true)->update(['is_default' => false]);
             } elseif (!$newIsDefault && $domain->is_default && Domain::where('is_default', true)->count() <= 1) {
-                throw new DisplayException('At least one domain must remain set as the default.');
+                throw new DisplayException(__('exceptions.admin.domain_default_required'));
             }
 
             $domain->update([
@@ -108,11 +108,11 @@ class DomainsController extends Controller
     public function destroy(Domain $domain): JsonResponse
     {
         if ($domain->activeSubdomains()->count() > 0) {
-            throw new DisplayException('Cannot delete a domain that still has active subdomains.');
+            throw new DisplayException(__('exceptions.admin.domain_has_subdomains'));
         }
 
         if ($domain->is_default && Domain::where('is_default', true)->count() <= 1) {
-            throw new DisplayException('Cannot delete the only default domain.');
+            throw new DisplayException(__('exceptions.admin.domain_only_default'));
         }
 
         $domain->delete();
@@ -159,7 +159,7 @@ class DomainsController extends Controller
     private function providerClass(string $provider): string
     {
         if (!in_array($provider, self::ALLOWED_PROVIDERS, true)) {
-            throw new DnsProviderException("Unsupported DNS provider: {$provider}");
+            throw new DnsProviderException(__('admin/domains.unsupported_provider', ['provider' => $provider]));
         }
 
         return Providers::getClass($provider);

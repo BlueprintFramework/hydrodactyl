@@ -11,6 +11,7 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 const formatMib = (mib: number): string => {
@@ -29,25 +30,33 @@ const percentColor = (percent: number) =>
 const barColor = (percent: number) =>
     percent >= 70 ? 'bg-brand-600' : percent >= 50 ? 'bg-brand-400' : 'bg-hydro-500';
 
-const ResourceBar = ({ title, usage }: { title: string; usage: LocationUsage }) => (
-    <div>
-        <div className='flex items-center justify-between'>
-            <h4 className='text-sm font-semibold text-cream-50'>{title}</h4>
-            <span className='text-sm text-cream-400/70'>{usage.percent}%</span>
+const ResourceBar = ({ title, usage }: { title: string; usage: LocationUsage }) => {
+    const { t } = useTranslation();
+
+    return (
+        <div>
+            <div className='flex items-center justify-between'>
+                <h4 className='text-sm font-semibold text-cream-50'>{title}</h4>
+                <span className='text-sm text-cream-400/70'>{usage.percent}%</span>
+            </div>
+            <div className='mt-2 h-2 w-full overflow-hidden rounded-full bg-mocha-400'>
+                <div
+                    className={cn('h-full rounded-full', barColor(usage.percent))}
+                    style={{ width: `${Math.min(100, usage.percent)}%` }}
+                />
+            </div>
+            <p className='mt-2 text-xs text-cream-400/60'>
+                {t('admin.locations.of_allocated', {
+                    used: formatMib(usage.allocated),
+                    total: formatMib(usage.total),
+                })}
+            </p>
         </div>
-        <div className='mt-2 h-2 w-full overflow-hidden rounded-full bg-mocha-400'>
-            <div
-                className={cn('h-full rounded-full', barColor(usage.percent))}
-                style={{ width: `${Math.min(100, usage.percent)}%` }}
-            />
-        </div>
-        <p className='mt-2 text-xs text-cream-400/60'>
-            <span className='text-cream-100'>{formatMib(usage.allocated)}</span> of {formatMib(usage.total)} allocated
-        </p>
-    </div>
-);
+    );
+};
 
 const LocationDetails = ({ location, onSaved }: { location: AdminLocationDetail; onSaved: () => Promise<unknown> }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [short, setShort] = useState(location.short);
     const [long, setLong] = useState(location.long ?? '');
@@ -63,10 +72,10 @@ const LocationDetails = ({ location, onSaved }: { location: AdminLocationDetail;
         try {
             await updateLocation(location.id, { short, long });
             await onSaved();
-            toast.success('Location updated.');
+            toast.success(t('admin.locations.updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update location.'));
+            toast.error(errorToMessage(error, t('admin.locations.update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -77,10 +86,10 @@ const LocationDetails = ({ location, onSaved }: { location: AdminLocationDetail;
 
         try {
             await deleteLocation(location.id);
-            toast.success('Location deleted.');
+            toast.success(t('admin.locations.deleted'));
             navigate('/locations');
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete location.'));
+            toast.error(errorToMessage(error, t('admin.locations.delete_failed')));
             setDeleting(false);
             setConfirmDelete(false);
         }
@@ -90,7 +99,7 @@ const LocationDetails = ({ location, onSaved }: { location: AdminLocationDetail;
         <div className='flex flex-col gap-4'>
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
                 <div className='flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Location Details</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.locations.details')}</h2>
                     <form
                         onSubmit={(event) => {
                             event.preventDefault();
@@ -98,43 +107,43 @@ const LocationDetails = ({ location, onSaved }: { location: AdminLocationDetail;
                         }}
                         className='flex flex-col gap-4'
                     >
-                        <Field label='Short Code' error={errors.short}>
+                        <Field label={t('admin.locations.short_code')} error={errors.short}>
                             <Input.Text value={short} onChange={(event) => setShort(event.target.value)} />
                         </Field>
-                        <Field label='Description' error={errors.long}>
+                        <Field label={t('admin.common.description')} error={errors.long}>
                             <Input.Text value={long} onChange={(event) => setLong(event.target.value)} />
                         </Field>
                         <div className='flex justify-end'>
                             <Button type='submit' disabled={submitting}>
-                                Save
+                                {t('common.save')}
                             </Button>
                         </div>
                     </form>
                 </div>
 
                 <div className='flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Resource Allocation</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.locations.resource_allocation')}</h2>
                     <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                        <ResourceBar title='Memory' usage={location.memory} />
-                        <ResourceBar title='Disk' usage={location.disk} />
+                        <ResourceBar title={t('admin.common.memory')} usage={location.memory} />
+                        <ResourceBar title={t('admin.common.disk')} usage={location.disk} />
                     </div>
                 </div>
             </div>
 
             <div className='overflow-hidden rounded-xl border border-mocha-400'>
                 <div className='border-b border-mocha-400 px-4 py-3'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Nodes</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.common.nodes')}</h2>
                 </div>
                 <div className='overflow-x-auto'>
                     <table className='w-full text-sm'>
                         <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                             <tr className='border-b border-mocha-400'>
-                                <th className='px-4 py-3'>ID</th>
-                                <th className='px-4 py-3'>Name</th>
-                                <th className='px-4 py-3'>FQDN</th>
-                                <th className='px-4 py-3 text-center'>Memory</th>
-                                <th className='px-4 py-3 text-center'>Disk</th>
-                                <th className='px-4 py-3 text-center'>Servers</th>
+                                <th className='px-4 py-3'>{t('admin.common.id')}</th>
+                                <th className='px-4 py-3'>{t('admin.common.name')}</th>
+                                <th className='px-4 py-3'>{t('admin.common.fqdn')}</th>
+                                <th className='px-4 py-3 text-center'>{t('admin.common.memory')}</th>
+                                <th className='px-4 py-3 text-center'>{t('admin.common.disk')}</th>
+                                <th className='px-4 py-3 text-center'>{t('admin.common.servers')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -159,7 +168,7 @@ const LocationDetails = ({ location, onSaved }: { location: AdminLocationDetail;
                             {location.nodes.length === 0 && (
                                 <tr>
                                     <td colSpan={6} className='px-4 py-6 text-center text-cream-400/50'>
-                                        No nodes are assigned to this location.
+                                        {t('admin.locations.no_nodes')}
                                     </td>
                                 </tr>
                             )}
@@ -169,35 +178,34 @@ const LocationDetails = ({ location, onSaved }: { location: AdminLocationDetail;
             </div>
 
             <div className='rounded-xl border border-brand-400/40 bg-brand-400/5 p-4'>
-                <h2 className='text-sm font-semibold text-brand-400'>Delete Location</h2>
-                <p className='mt-1 text-sm text-cream-400/70'>
-                    A location must have no nodes before it can be deleted.
-                </p>
+                <h2 className='text-sm font-semibold text-brand-400'>{t('admin.locations.delete')}</h2>
+                <p className='mt-1 text-sm text-cream-400/70'>{t('admin.locations.delete_description')}</p>
                 <Button
                     variant='attention'
                     className='mt-3'
                     disabled={location.nodes.length > 0}
                     onClick={() => setConfirmDelete(true)}
                 >
-                    Delete Location
+                    {t('admin.locations.delete')}
                 </Button>
             </div>
 
             <Dialog.Confirm
                 open={confirmDelete}
-                title='Delete Location'
-                confirm='Delete'
+                title={t('admin.locations.delete')}
+                confirm={t('common.delete')}
                 loading={deleting}
                 onClose={() => setConfirmDelete(false)}
                 onConfirmed={remove}
             >
-                Deleting this location is permanent and cannot be undone.
+                {t('admin.locations.delete_confirm')}
             </Dialog.Confirm>
         </div>
     );
 };
 
 const LocationViewContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data: location, error, isLoading, mutate } = useLocation(id);
 
@@ -211,9 +219,9 @@ const LocationViewContainer = () => {
 
     if (error || !location) {
         return (
-            <PageContentBlock title='Location'>
+            <PageContentBlock title={t('admin.locations.title')}>
                 <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-8 text-center text-sm text-cream-400/60'>
-                    That location could not be found.
+                    {t('admin.locations.not_found')}
                 </div>
             </PageContentBlock>
         );
@@ -222,7 +230,7 @@ const LocationViewContainer = () => {
     return (
         <PageContentBlock title={location.short}>
             <MainPageHeader direction='column' title={location.short}>
-                <p className='text-sm text-neutral-400'>{location.long || 'No description provided.'}</p>
+                <p className='text-sm text-neutral-400'>{location.long || t('admin.locations.no_description')}</p>
             </MainPageHeader>
 
             <LocationDetails key={location.id} location={location} onSaved={mutate} />

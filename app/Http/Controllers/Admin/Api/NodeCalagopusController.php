@@ -11,8 +11,8 @@ use Pterodactyl\Repositories\Calagopus\CalagopusRepository;
 use Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException;
 
 /**
- * Surface the Calagopus-only node endpoints (system info, stats, logs and
- * remote self-upgrade) to the admin API. These are unavailable on stock Wings.
+ * Surface the Calagopus-only node endpoints (system info, stats and logs) to
+ * the admin API. These are unavailable on stock Wings.
  */
 class NodeCalagopusController extends Controller
 {
@@ -72,38 +72,10 @@ class NodeCalagopusController extends Controller
         return new Response($contents, Response::HTTP_OK, ['Content-Type' => 'text/plain']);
     }
 
-    /**
-     * Replace the node's binary with a freshly downloaded build.
-     */
-    public function upgrade(Request $request, Node $node): JsonResponse
-    {
-        $data = $request->validate([
-            'url' => 'required|string',
-            'sha256' => 'required|string|size:64',
-            'headers' => 'sometimes|array',
-            'restart_command' => 'sometimes|string',
-            'restart_command_args' => 'sometimes|array',
-        ]);
-
-        try {
-            $result = $this->repository->setNode($node)->upgrade(
-                $data['url'],
-                $data['sha256'],
-                $data['headers'] ?? [],
-                $data['restart_command'] ?? 'systemctl',
-                $data['restart_command_args'] ?? ['restart', 'wings'],
-            );
-        } catch (DaemonConnectionException $exception) {
-            return $this->connectionError($exception);
-        }
-
-        return new JsonResponse($result, Response::HTTP_ACCEPTED);
-    }
-
     private function connectionError(DaemonConnectionException $exception): JsonResponse
     {
         return new JsonResponse([
-            'error' => 'The panel could not reach the Calagopus node.',
+            'error' => __('exceptions.admin.calagopus_unreachable'),
             'detail' => $exception->getMessage(),
         ], Response::HTTP_BAD_GATEWAY);
     }

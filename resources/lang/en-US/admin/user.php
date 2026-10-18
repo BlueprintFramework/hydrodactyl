@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'exceptions' => [
+        'user_has_servers' => 'Cannot delete a user with active servers attached to their account. Please delete their servers before continuing.',
+    ],
+    'index' => [
+        'can_access' => 'Can Access',
+        'can_access_tooltip' => 'Servers that this user can access because they are marked as a subuser.',
+        'create_new' => 'Create New',
+        'list' => 'User List',
+        'servers_owned' => 'Servers Owned',
+        'servers_owned_tooltip' => 'Servers that this user is marked as the owner of.',
+        'subtitle' => 'All registered users on the system.',
+        'title' => 'List Users',
+    ],
+    'new' => [
+        'administrator' => 'Administrator',
+        'administrator_help' => 'Setting this to \'Yes\' gives a user full administrative access.',
+        'breadcrumb' => 'Create',
+        'default_language' => 'Default Language',
+        'default_language_help' => 'The default language to use when rendering the Panel for this user.',
+        'generated_password' => 'Generated Password:',
+        'identity' => 'Identity',
+        'name_first' => 'Client First Name',
+        'name_last' => 'Client Last Name',
+        'password_notice' => 'Providing a user password is optional. New user emails prompt users to create a password the first time they login. If a password is provided here you will need to find a different method of providing it to the user.',
+        'permissions' => 'Permissions',
+        'submit' => 'Create User',
+        'subtitle' => 'Add a new user to the system.',
+        'title' => 'Create User',
+    ],
+    'notices' => [
+        'account_created' => 'Account has been created successfully.',
+        'account_updated' => 'Account has been successfully updated.',
+    ],
+    'view' => [
+        'administrator' => 'Administrator',
+        'administrator_help' => 'Setting this to \'Yes\' gives a user full administrative access.',
+        'default_language' => 'Default Language',
+        'default_language_help' => 'The default language to use when rendering the Panel for this user.',
+        'delete_button' => 'Delete User',
+        'delete_title' => 'Delete User',
+        'delete_warning' => 'There must be no servers associated with this account in order for it to be deleted.',
+        'identity' => 'Identity',
+        'name_first' => 'Client First Name',
+        'name_last' => 'Client Last Name',
+        'password_help' => 'Leave blank to keep this user\'s password the same. User will not receive any notification if password is changed.',
+        'permissions' => 'Permissions',
+        'submit' => 'Update User',
+        'title' => 'Manage User: :username',
+    ],
+];

@@ -195,9 +195,9 @@ class DatabaseHostController extends Controller
                 }
             }
 
-            $message = "Successfully connected to MySQL server (Version: {$version}).";
+            $message = __('exceptions.databases.test_connection_success', ['version' => $version]);
             if (!$hasGrantOption) {
-                $message .= ' Warning: The user appears to lack GRANT OPTION permission which is required for creating databases and users.';
+                $message .= ' ' . __('exceptions.databases.test_connection_grant_warning');
             }
 
             return response()->json([
@@ -209,12 +209,12 @@ class DatabaseHostController extends Controller
         } catch (PDOException $exception) {
             return response()->json([
                 'success' => false,
-                'message' => 'Connection failed: ' . $exception->getMessage(),
+                'message' => __('exceptions.databases.test_connection_failed', ['error' => $exception->getMessage()]),
             ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         } catch (\Exception $exception) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error: ' . $exception->getMessage(),
+                'message' => __('exceptions.databases.test_connection_error', ['error' => $exception->getMessage()]),
             ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
@@ -249,9 +249,6 @@ class DatabaseHostController extends Controller
             return null;
         }
 
-        return sprintf(
-            'There was an error while trying to connect to the host or while executing a query: "%s"',
-            $exception->getMessage()
-        );
+        return __('exceptions.databases.connection_error', ['error' => $exception->getMessage()]);
     }
 }

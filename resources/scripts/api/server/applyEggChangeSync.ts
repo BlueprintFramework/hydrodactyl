@@ -11,6 +11,7 @@ interface ApplyEggChangeData {
     environment?: Record<string, string>;
     should_backup?: boolean;
     should_wipe?: boolean;
+    backup_name?: string;
 }
 
 export default async (uuid: string, data: ApplyEggChangeData): Promise<void> => {
@@ -31,6 +32,7 @@ export default async (uuid: string, data: ApplyEggChangeData): Promise<void> => 
             environment = {},
             should_backup = false,
             should_wipe = false,
+            backup_name,
         } = data;
 
         try {
@@ -59,7 +61,7 @@ export default async (uuid: string, data: ApplyEggChangeData): Promise<void> => 
 
             if (should_backup) {
                 await http.post(`/api/client/servers/${daemonType}/${uuid}/backups`, {
-                    name: `Software Change Backup - ${new Date().toISOString()}`,
+                    name: `${backup_name || 'Software Change Backup'} - ${new Date().toISOString()}`,
                     is_locked: false,
                 });
             }

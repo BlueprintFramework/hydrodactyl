@@ -56,6 +56,7 @@ import {
     tooltipRow,
     tooltipShell,
 } from '@/components/evilcharts/ui/echarts-tooltip';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 // Re-export the shared types that were previously declared inline here, so
 // existing consumers/examples keep importing them from the chart module.
@@ -1407,6 +1408,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     chartOptions,
     children,
 }: EChartsBarChartProps<TData>) {
+    const { t } = useTranslation();
     const rawId = useId();
     const chartId = `chart-${rawId.replace(/:/g, '')}`;
 
@@ -1685,6 +1687,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     ]);
 
     // ── Init + resize + theme observer (per renderer instance) ──────────────────
+    // biome-ignore lint/correctness/useExhaustiveDependencies: deps are managed by hand; `live` is a mutable ref (its fields change without a re-render) and `renderer` is a real prop.
     useEffect(() => {
         const mount = mountRef.current;
         const container = containerRef.current;
@@ -1847,6 +1850,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     }, [renderer]);
 
     // ── Sync ECharts with props/theme/selection — resolve, build, push ────────────
+    // biome-ignore lint/correctness/useExhaustiveDependencies: deps are managed by hand; `live` is a mutable ref and `renderer` is a real prop.
     useEffect(() => {
         const chart = echartsRef.current;
         const container = containerRef.current;
@@ -2019,6 +2023,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     // ── Default tooltip — show the tooltip at `defaultIndex` with no hover ────────
     // Recharts' `defaultIndex` keeps a tooltip open on load; ECharts has no static
     // equivalent, so dispatch `showTip` once the layout has settled.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: deps are managed by hand; `renderer` is a real prop and the length deps are intentional.
     useEffect(() => {
         const chart = echartsRef.current;
         const index = tooltipSlot.defaultIndex;
@@ -2030,6 +2035,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     }, [renderer, tooltipSlot.present, tooltipSlot.defaultIndex, isLoading, data.length, seriesKeys.length]);
 
     // ── Loading shimmer — rAF sweeps a bright band across the gray bars ──────────
+    // biome-ignore lint/correctness/useExhaustiveDependencies: deps are managed by hand; `live` is a mutable ref and `renderer` is a real prop.
     useEffect(() => {
         const chart = echartsRef.current;
         if (!chart || !isLoading) return;
@@ -2124,7 +2130,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
                         className='flex items-center justify-center gap-2 rounded-md border border-mocha-400 bg-mocha-500 px-2 py-0.5 text-sm text-cream-200'
                     >
                         <div className='h-3 w-3 animate-spin rounded-full border border-mocha-300 border-t-cream-200' />
-                        <span>Loading</span>
+                        <span>{t('common.loading')}</span>
                     </motion.div>
                 </div>
             )}

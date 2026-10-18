@@ -17,6 +17,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { sha256Hash } from '@/lib/helpers';
 
 import { Button } from '../../ui/button';
@@ -46,6 +47,7 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
     const rootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
     const email = useStoreState((state) => state.user.data?.email);
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [emailHash, setEmailHash] = useState<string>('');
 
     useEffect(() => {
@@ -69,7 +71,7 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
     const defaultMenuItems: UserDropdownMenuItem[] = [
         {
             id: 'user-settings',
-            label: 'Settings',
+            label: t('navigation.settings'),
             icon: () => <HugeiconsIcon size={16} strokeWidth={2} icon={Settings02Icon} />,
             link: {
                 href: '/account',
@@ -84,9 +86,9 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
         },
         {
             id: 'admin-panel',
-            label: admin ? 'Client Panel' : 'Admin Panel',
+            label: admin ? t('panel.client_panel') : t('panel.admin_panel'),
             icon: () => <HugeiconsIcon size={16} strokeWidth={2} icon={UserShield02Icon} />,
-            badge: 'Staff',
+            badge: t('panel.staff'),
             link: {
                 href: admin ? '/' : '/admin',
                 external: true,
@@ -96,7 +98,7 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
         },
         {
             id: 'logout',
-            label: 'Log Out',
+            label: t('panel.log_out'),
             icon: () => <HugeiconsIcon size={16} strokeWidth={2} icon={Logout03Icon} />,
             onSelect: onTriggerLogout,
             type: 'item',
@@ -109,13 +111,13 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
     if (serverId && rootAdmin) {
         const manageServerItem: UserDropdownMenuItem = {
             id: 'manage-server',
-            label: 'Manage Server',
+            label: t('panel.manage_server'),
             icon: () => <HugeiconsIcon size={16} strokeWidth={2} icon={ServerStack02Icon} />,
             link: {
                 href: `/admin/servers/${serverId}`,
                 external: true,
             },
-            badge: 'Staff',
+            badge: t('panel.staff'),
             type: 'item',
         };
 
@@ -135,14 +137,14 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
                 <Button
                     variant={'secondary'}
                     size={'sm'}
-                    aria-label='Account menu'
+                    aria-label={t('panel.account_menu')}
                     className='h-11 sm:h-8 px-2 sm:px-3 gap-1 rounded-full'
                 >
                     <div className='flex flex-row items-center gap-1.5'>
                         <div className='grid aspect-square size-5 place-content-center overflow-hidden rounded-full border border-mocha-400 bg-mocha-400'>
                             <img
                                 src={`https://www.gravatar.com/avatar/${emailHash}?d=identicon&s=32`}
-                                alt='User avatar'
+                                alt={t('panel.user_avatar')}
                                 className='w-full h-full object-cover'
                                 draggable={false}
                             />

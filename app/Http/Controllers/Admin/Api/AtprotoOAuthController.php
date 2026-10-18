@@ -31,7 +31,7 @@ class AtprotoOAuthController extends Controller
         $identifier = trim((string) $request->query('identifier', ''));
 
         if ($identifier === '') {
-            return redirect()->to($this->appendQuery($return, ['atproto_error' => 'Enter an AT Protocol handle or DID to connect.']));
+            return redirect()->to($this->appendQuery($return, ['atproto_error' => __('exceptions.atproto.enter_identifier')]));
         }
 
         try {

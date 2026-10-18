@@ -31,7 +31,7 @@ class AuthenticateServerAccess
         $server = $request->route()->parameter('server');
 
         if (!$server instanceof Server) {
-            throw new NotFoundHttpException(trans('exceptions.api.resource_not_found'));
+            throw new NotFoundHttpException(__('exceptions.api.resource_not_found'));
         }
 
         // At the very least, ensure that the user trying to make this request is the
@@ -41,7 +41,7 @@ class AuthenticateServerAccess
             // Check for subuser status without pulling the entire subuser collection
             // into memory just to perform an existence check.
             if (!$server->subusers()->where('user_id', $user->id)->exists()) {
-                throw new NotFoundHttpException(trans('exceptions.api.resource_not_found'));
+                throw new NotFoundHttpException(__('exceptions.api.resource_not_found'));
             }
         }
 

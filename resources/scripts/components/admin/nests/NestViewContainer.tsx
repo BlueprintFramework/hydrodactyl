@@ -11,8 +11,10 @@ import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => Promise<unknown> }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [name, setName] = useState(nest.name);
     const [description, setDescription] = useState(nest.description ?? '');
@@ -28,10 +30,10 @@ const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => 
         try {
             await updateNest(nest.id, { name, description });
             await onSaved();
-            toast.success('Nest updated.');
+            toast.success(t('admin.nests.updated'));
         } catch (error) {
             setErrors(parseValidationErrors(error));
-            toast.error(errorToMessage(error, 'Failed to update the nest.'));
+            toast.error(errorToMessage(error, t('admin.nests.update_failed')));
         } finally {
             setSubmitting(false);
         }
@@ -42,10 +44,10 @@ const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => 
 
         try {
             await deleteNest(nest.id);
-            toast.success('Nest deleted.');
+            toast.success(t('admin.nests.deleted'));
             navigate('/nests');
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete the nest.'));
+            toast.error(errorToMessage(error, t('admin.nests.delete_failed')));
             setDeleting(false);
             setConfirmDelete(false);
         }
@@ -55,7 +57,7 @@ const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => 
         <div className='flex flex-col gap-4'>
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
                 <div className='flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Nest Details</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.details')}</h2>
                     <form
                         onSubmit={(event) => {
                             event.preventDefault();
@@ -63,10 +65,10 @@ const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => 
                         }}
                         className='flex flex-col gap-4'
                     >
-                        <Field label='Name' error={errors.name} hint='Must be unique, 1-191 characters.'>
+                        <Field label={t('admin.common.name')} error={errors.name} hint={t('admin.nests.name_hint')}>
                             <Input.Text value={name} onChange={(event) => setName(event.target.value)} />
                         </Field>
-                        <Field label='Description' error={errors.description}>
+                        <Field label={t('admin.common.description')} error={errors.description}>
                             <Input.Text value={description} onChange={(event) => setDescription(event.target.value)} />
                         </Field>
                         <div className='flex items-center justify-between'>
@@ -76,24 +78,24 @@ const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => 
                                 disabled={deleting}
                                 onClick={() => setConfirmDelete(true)}
                             >
-                                Delete
+                                {t('common.delete')}
                             </Button>
                             <Button type='submit' disabled={submitting}>
-                                Save
+                                {t('common.save')}
                             </Button>
                         </div>
                     </form>
                 </div>
 
                 <div className='flex flex-col gap-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Nest Information</h2>
-                    <Field label='Nest ID'>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.information')}</h2>
+                    <Field label={t('admin.nests.nest_id')}>
                         <Input.Text readOnly className='opacity-70' value={String(nest.id)} />
                     </Field>
-                    <Field label='Author'>
+                    <Field label={t('admin.nests.author')}>
                         <Input.Text readOnly className='opacity-70' value={nest.author} />
                     </Field>
-                    <Field label='UUID'>
+                    <Field label={t('admin.nests.uuid')}>
                         <Input.Text readOnly className='opacity-70' value={nest.uuid} />
                     </Field>
                 </div>
@@ -101,19 +103,19 @@ const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => 
 
             <div className='overflow-hidden rounded-xl border border-mocha-400 bg-mocha-500'>
                 <div className='flex items-center justify-between border-b border-mocha-400 px-4 py-3'>
-                    <h2 className='text-sm font-semibold text-cream-50'>Nest Eggs</h2>
+                    <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nests.nest_eggs')}</h2>
                     <Button asChild size='sm'>
-                        <Link to='/eggs/new'>New Egg</Link>
+                        <Link to='/eggs/new'>{t('admin.nests.new_egg')}</Link>
                     </Button>
                 </div>
                 <div className='overflow-x-auto'>
                     <table className='w-full text-sm'>
                         <thead className='text-left text-xs uppercase tracking-wide text-cream-400/60'>
                             <tr className='border-b border-mocha-400'>
-                                <th className='px-4 py-3'>ID</th>
-                                <th className='px-4 py-3'>Name</th>
-                                <th className='px-4 py-3'>Description</th>
-                                <th className='px-4 py-3 text-center'>Servers</th>
+                                <th className='px-4 py-3'>{t('admin.common.id')}</th>
+                                <th className='px-4 py-3'>{t('admin.common.name')}</th>
+                                <th className='px-4 py-3'>{t('admin.common.description')}</th>
+                                <th className='px-4 py-3 text-center'>{t('admin.common.servers')}</th>
                                 <th className='px-4 py-3' />
                             </tr>
                         </thead>
@@ -133,7 +135,7 @@ const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => 
                                             href={`/admin/eggs/${egg.id}/export`}
                                             className='text-xs text-cream-400/70 hover:text-hydro-400'
                                         >
-                                            Export
+                                            {t('admin.nests.export')}
                                         </a>
                                     </td>
                                 </tr>
@@ -141,7 +143,7 @@ const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => 
                             {nest.eggs.length === 0 && (
                                 <tr>
                                     <td colSpan={5} className='px-4 py-6 text-center text-cream-400/50'>
-                                        No eggs have been added to this nest.
+                                        {t('admin.nests.no_eggs')}
                                     </td>
                                 </tr>
                             )}
@@ -152,19 +154,20 @@ const NestDetails = ({ nest, onSaved }: { nest: AdminNestDetail; onSaved: () => 
 
             <Dialog.Confirm
                 open={confirmDelete}
-                title='Delete Nest'
-                confirm='Delete'
+                title={t('admin.nests.delete_nest')}
+                confirm={t('common.delete')}
                 loading={deleting}
                 onClose={() => setConfirmDelete(false)}
                 onConfirmed={remove}
             >
-                Deleting this nest is permanent and cannot be undone.
+                {t('admin.nests.delete_nest_confirm')}
             </Dialog.Confirm>
         </div>
     );
 };
 
 const NestViewContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data: nest, error, isLoading, mutate } = useNest(id);
 
@@ -178,9 +181,9 @@ const NestViewContainer = () => {
 
     if (error || !nest) {
         return (
-            <PageContentBlock title='Nest'>
+            <PageContentBlock title={t('admin.nests.title_singular')}>
                 <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-8 text-center text-sm text-cream-400/60'>
-                    That nest could not be found.
+                    {t('admin.nests.not_found')}
                 </div>
             </PageContentBlock>
         );
@@ -189,7 +192,7 @@ const NestViewContainer = () => {
     return (
         <PageContentBlock title={nest.name}>
             <MainPageHeader direction='column' title={nest.name}>
-                <p className='text-sm text-neutral-400'>{nest.description || 'No description provided.'}</p>
+                <p className='text-sm text-neutral-400'>{nest.description || t('admin.nests.no_description')}</p>
             </MainPageHeader>
 
             <NestDetails key={nest.id} nest={nest} onSaved={mutate} />

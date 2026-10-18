@@ -152,7 +152,7 @@ class MarqueProvider implements DnsProviderInterface
         }
 
         if ($entry === null) {
-            throw new DnsProviderException("DNS record '{$recordId}' was not found in the Marque zone for '{$domain}'.");
+            throw new DnsProviderException(__('exceptions.dns.marque_record_not_found', ['record' => $recordId, 'domain' => $domain]));
         }
 
         return $this->normalizeRecord($entry);
@@ -203,30 +203,30 @@ class MarqueProvider implements DnsProviderInterface
         return [
             'session_id' => [
                 'type' => 'string',
-                'label' => 'AT Protocol account',
+                'label' => __('admin/domains.schema.marque.session_id_label'),
                 'required' => false,
-                'description' => 'The connected AT Protocol account whose repository holds this domain\'s DNS records.',
+                'description' => __('admin/domains.schema.marque.session_id'),
                 'sensitive' => false,
             ],
             'identifier' => [
                 'type' => 'string',
-                'label' => 'Handle or DID',
+                'label' => __('admin/domains.schema.marque.identifier_label'),
                 'required' => false,
-                'description' => 'Used with an app password. The AT Protocol handle (e.g. alice.bsky.social) or DID of the account that owns the domain.',
+                'description' => __('admin/domains.schema.marque.identifier'),
                 'sensitive' => false,
             ],
             'app_password' => [
                 'type' => 'string',
-                'label' => 'App password',
+                'label' => __('admin/domains.schema.marque.app_password_label'),
                 'required' => false,
-                'description' => 'Used with a handle/DID. An AT Protocol app password created for this panel. Never use the account\'s main password.',
+                'description' => __('admin/domains.schema.marque.app_password'),
                 'sensitive' => true,
             ],
             'pds_url' => [
                 'type' => 'string',
-                'label' => 'PDS URL',
+                'label' => __('admin/domains.schema.marque.pds_url_label'),
                 'required' => false,
-                'description' => 'Optional. Base URL of the account\'s PDS when using an app password. Leave empty to discover it automatically.',
+                'description' => __('admin/domains.schema.marque.pds_url'),
                 'sensitive' => false,
                 'default' => '',
             ],
@@ -243,7 +243,7 @@ class MarqueProvider implements DnsProviderInterface
         }
 
         if (empty($config['identifier']) || empty($config['app_password'])) {
-            throw new DnsProviderException('Connect an AT Protocol account or provide a handle/DID and app password for Marque.');
+            throw new DnsProviderException(__('exceptions.dns.marque_credentials_required'));
         }
 
         return true;
@@ -280,7 +280,7 @@ class MarqueProvider implements DnsProviderInterface
         $session = AtprotoOauthSession::query()->find($this->config['session_id'] ?? null);
 
         if (!$session || !$session->isAuthorized()) {
-            throw new DnsProviderException('The configured Marque AT Protocol connection is missing or no longer authorized. Reconnect the account in the admin panel.');
+            throw new DnsProviderException(__('exceptions.dns.marque_connection_invalid'));
         }
 
         return $this->session = $session;
@@ -363,7 +363,7 @@ class MarqueProvider implements DnsProviderInterface
         $record = $this->readRemoteRecord(self::DOMAIN_COLLECTION, $this->zoneKey($domain));
 
         if ($record === null || empty($record['cid'])) {
-            throw new DnsProviderException("No at.marque.domain record was found for '{$domain}' in the connected AT Protocol repository.");
+            throw new DnsProviderException(__('exceptions.dns.marque_domain_record_missing', ['domain' => $domain]));
         }
 
         return [

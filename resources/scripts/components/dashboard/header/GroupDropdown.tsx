@@ -9,6 +9,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 interface GroupDropdownProps {
     groups: FilterOption[];
@@ -17,6 +18,7 @@ interface GroupDropdownProps {
 }
 
 const GroupDropdown = ({ groups, activeGroupId, onGroupChange }: GroupDropdownProps) => {
+    const { t } = useTranslation();
     const activeLabel = useMemo(() => {
         if (!activeGroupId) return null;
         const group = groups.find((g) => g.value === activeGroupId);
@@ -29,12 +31,18 @@ const GroupDropdown = ({ groups, activeGroupId, onGroupChange }: GroupDropdownPr
                 <Button
                     size='sm'
                     variant='secondary'
-                    aria-label={activeLabel ? `Group: ${activeLabel}` : 'Filter by group'}
+                    aria-label={
+                        activeLabel
+                            ? t('dashboard.group_filter.aria_filtered', { group: activeLabel })
+                            : t('dashboard.group_filter.aria')
+                    }
                     className='h-11 sm:h-8 px-2 sm:px-3 gap-1 rounded-full hover:cursor-pointer'
                 >
                     <div className='flex flex-row items-center gap-1.5'>
                         <Folder width={16} height={16} />
-                        <span className='hidden sm:inline max-w-[140px] truncate'>{activeLabel || 'Groups'}</span>
+                        <span className='hidden sm:inline max-w-[140px] truncate'>
+                            {activeLabel || t('dashboard.groups.title')}
+                        </span>
                     </div>
                 </Button>
             </DropdownMenuTrigger>
@@ -44,7 +52,7 @@ const GroupDropdown = ({ groups, activeGroupId, onGroupChange }: GroupDropdownPr
             >
                 {groups.length === 0 ? (
                     <DropdownMenuItem disabled className='opacity-50'>
-                        No groups available
+                        {t('dashboard.group_filter.no_groups')}
                     </DropdownMenuItem>
                 ) : (
                     groups.map((group) => (
@@ -64,7 +72,7 @@ const GroupDropdown = ({ groups, activeGroupId, onGroupChange }: GroupDropdownPr
                     <>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onSelect={() => onGroupChange(undefined)} className='text-red-400'>
-                            Clear Group Filter
+                            {t('dashboard.group_filter.clear')}
                         </DropdownMenuItem>
                     </>
                 )}

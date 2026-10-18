@@ -1,5 +1,5 @@
 import { Form, Formik, Field as FormikField, type FormikHelpers, useField } from 'formik';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { boolean, number, object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
@@ -13,6 +13,8 @@ import { Textarea } from '@/components/elements/Input';
 import Modal, { type RequiredModalProps } from '@/components/elements/Modal';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { Translate } from '@/i18n/types';
 import useFlash from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 
@@ -37,21 +39,24 @@ interface Values {
     continueOnFailure: boolean;
 }
 
-const schema = object().shape({
-    action: string().required().oneOf(['command', 'power', 'backup']),
-    payload: string().when('action', {
-        is: (v) => v !== 'backup',
-        // biome-ignore lint/suspicious/noThenProperty: yup's when() API uses `then` as property name
-        then: () => string().required('A task payload must be provided.'),
-        otherwise: () => string(),
-    }),
-    continueOnFailure: boolean(),
-    timeOffset: number()
-        .typeError('The time offset must be a valid number between 0 and 900.')
-        .required('A time offset value must be provided.')
-        .min(0, 'The time offset must be at least 0 seconds.')
-        .max(900, 'The time offset must be less than 900 seconds.'),
-});
+const createSchema = (t: Translate) =>
+    object().shape({
+        action: string()
+            .required(t('server.schedules.task.action_required'))
+            .oneOf(['command', 'power', 'backup'], t('server.schedules.task.action_invalid')),
+        payload: string().when('action', {
+            is: (v) => v !== 'backup',
+            // biome-ignore lint/suspicious/noThenProperty: yup's when() API uses `then` as property name
+            then: () => string().required(t('server.schedules.task.payload_required')),
+            otherwise: () => string(),
+        }),
+        continueOnFailure: boolean(),
+        timeOffset: number()
+            .typeError(t('server.schedules.task.time_offset_invalid'))
+            .required(t('server.schedules.task.time_offset_required'))
+            .min(0, t('server.schedules.task.time_offset_min'))
+            .max(900, t('server.schedules.task.time_offset_max')),
+    });
 
 const ActionListener = () => {
     const [{ value }, { initialValue: initialAction }] = useField<string>('action');
@@ -88,7 +93,9 @@ export const completeTaskSubmission = (
 };
 
 const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Props) => {
+    const { t } = useTranslation();
     const { clearFlashes, addError } = useFlash();
+    const schema = useMemo(() => createSchema(t), [t]);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const appendSchedule = ServerContext.useStoreActions((actions) => actions.schedules.appendSchedule);
@@ -103,7 +110,7 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
         if (backupLimit === 0 && values.action === 'backup') {
             setSubmitting(false);
             addError({
-                message: "A backup task cannot be created when the server's backup limit is set to 0.",
+                message: t('server.schedules.task.backup_limit_error'),
                 key: 'schedule:task',
             });
         } else {
@@ -136,22 +143,22 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
                     onDismissed={onDismissed}
                     {...props}
                     showSpinnerOverlay={isSubmitting}
-                    title={task ? 'Edit Task' : 'Create Task'}
+                    title={task ? t('server.schedules.task.edit_title') : t('server.schedules.task.create_title')}
                 >
                     <Form>
                         <FlashMessageRender byKey={'schedule:task'} />
                         <div className={`flex flex-col gap-3`}>
                             <div>
-                                <Label>Action</Label>
+                                <Label>{t('server.schedules.task.action_label')}</Label>
                                 <ActionListener />
                                 <FormikFieldWrapper name={'action'}>
                                     <Dropdown
                                         value={values.action}
                                         onChange={(value) => setFieldValue('action', value)}
                                         options={[
-                                            { value: 'command', label: 'Send command' },
-                                            { value: 'power', label: 'Power' },
-                                            { value: 'backup', label: 'Create backup' },
+                                            { value: 'command', label: t('server.schedules.task.action_command') },
+                                            { value: 'power', label: t('server.schedules.task.action_power') },
+                                            { value: 'backup', label: t('server.schedules.task.action_backup') },
                                         ]}
                                     />
                                 </FormikFieldWrapper>
@@ -159,17 +166,15 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
                             <div>
                                 <Field
                                     name={'timeOffset'}
-                                    label={'Time offset (in seconds)'}
-                                    description={
-                                        'The amount of time to wait after the previous task executes before running this one. If this is the first task on a schedule this will not be applied.'
-                                    }
+                                    label={t('server.schedules.task.time_offset_label')}
+                                    description={t('server.schedules.task.time_offset_description')}
                                 />
                             </div>
                         </div>
                         <div className={`my-6`}>
                             {values.action === 'command' ? (
                                 <div>
-                                    <Label>Payload</Label>
+                                    <Label>{t('server.schedules.task.payload_label')}</Label>
                                     <FormikFieldWrapper name={'payload'}>
                                         <FormikField
                                             className='w-full rounded-xl p-2 bg-[#ffffff11]'
@@ -181,28 +186,26 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
                                 </div>
                             ) : values.action === 'power' ? (
                                 <div>
-                                    <Label>Payload</Label>
+                                    <Label>{t('server.schedules.task.payload_label')}</Label>
                                     <FormikFieldWrapper name={'payload'}>
                                         <Dropdown
                                             value={values.payload}
                                             onChange={(value) => setFieldValue('payload', value)}
                                             options={[
-                                                { value: 'start', label: 'Start the server' },
-                                                { value: 'restart', label: 'Restart the server' },
-                                                { value: 'stop', label: 'Stop the server' },
-                                                { value: 'kill', label: 'Terminate the server' },
+                                                { value: 'start', label: t('server.schedules.task.power_start') },
+                                                { value: 'restart', label: t('server.schedules.task.power_restart') },
+                                                { value: 'stop', label: t('server.schedules.task.power_stop') },
+                                                { value: 'kill', label: t('server.schedules.task.power_kill') },
                                             ]}
                                         />
                                     </FormikFieldWrapper>
                                 </div>
                             ) : (
                                 <div>
-                                    <Label>Ignored files (optional)</Label>
+                                    <Label>{t('server.schedules.task.ignored_files_label')}</Label>
                                     <FormikFieldWrapper
                                         name={'payload'}
-                                        description={
-                                            'Include the files and folders to be excluded in this backup. By default, the contents of your .pteroignore file will be used. If you have reached your backup limit, the oldest backup will be rotated.'
-                                        }
+                                        description={t('server.schedules.task.ignored_files_description')}
                                     >
                                         <FormikField
                                             className='w-full rounded-2xl bg-[#ffffff11]'
@@ -216,12 +219,12 @@ const TaskDetailsModal = ({ schedule, task, visible, onDismissed, ...props }: Pr
                         </div>
                         <FormikSwitchV2
                             name={'continueOnFailure'}
-                            description={'Future tasks will be run if this task fails.'}
-                            label={'Continue on Failure'}
+                            description={t('server.schedules.task.continue_on_failure_description')}
+                            label={t('server.schedules.task.continue_on_failure_label')}
                         />
                         <div className={`flex justify-end my-6`}>
                             <Button variant='attention' type={'submit'} disabled={isSubmitting}>
-                                {task ? 'Save Changes' : 'Create Task'}
+                                {task ? t('server.schedules.save_changes') : t('server.schedules.task.create_title')}
                             </Button>
                         </div>
                     </Form>

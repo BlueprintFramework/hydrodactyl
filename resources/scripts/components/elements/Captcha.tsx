@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useTranslation } from '@/i18n/I18nProvider';
 import CaptchaManager from '@/lib/captcha';
 
 interface CaptchaProps {
@@ -19,6 +20,7 @@ export default function Captcha({
     theme = 'dark',
     size = 'flexible',
 }: CaptchaProps) {
+    const { t } = useTranslation();
     const containerRef = useRef<HTMLDivElement>(null);
     const widgetIdRef = useRef<string | null>(null);
     const [, setWidgetId] = useState<string | null>(null);
@@ -41,15 +43,18 @@ export default function Captcha({
         onSuccessRef.current?.(token);
     }, []);
 
-    const handleError = useCallback((err: unknown) => {
-        setError('Captcha verification failed');
-        onErrorRef.current?.(err);
-    }, []);
+    const handleError = useCallback(
+        (err: unknown) => {
+            setError(t('auth.captcha.verification_failed'));
+            onErrorRef.current?.(err);
+        },
+        [t],
+    );
 
     const handleExpired = useCallback(() => {
-        setError('Captcha expired');
+        setError(t('auth.captcha.expired'));
         onExpiredRef.current?.();
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         if (!CaptchaManager.isEnabled()) {
@@ -83,7 +88,7 @@ export default function Captcha({
                 }
             } catch (_err) {
                 if (mounted) {
-                    setError('Failed to load captcha');
+                    setError(t('auth.captcha.load_failed'));
                 }
             } finally {
                 if (mounted) {
@@ -101,7 +106,7 @@ export default function Captcha({
                 widgetIdRef.current = null;
             }
         };
-    }, [theme, size, handleSuccess, handleExpired, handleError]);
+    }, [theme, size, handleSuccess, handleExpired, handleError, t]);
 
     // Set up event listeners for captcha events
     useEffect(() => {
@@ -110,11 +115,11 @@ export default function Captcha({
         };
 
         const handleError = (_event: CustomEvent) => {
-            setError('Captcha verification failed');
+            setError(t('auth.captcha.verification_failed'));
         };
 
         const handleExpired = (_event: CustomEvent) => {
-            setError('Captcha expired');
+            setError(t('auth.captcha.expired'));
         };
 
         window.addEventListener('captcha:success', handleSuccess as EventListener);
@@ -126,7 +131,7 @@ export default function Captcha({
             window.removeEventListener('captcha:error', handleError as EventListener);
             window.removeEventListener('captcha:expired', handleExpired as EventListener);
         };
-    }, []);
+    }, [t]);
 
     // Don't render anything if captcha is disabled
     if (!CaptchaManager.isEnabled()) {
@@ -136,7 +141,7 @@ export default function Captcha({
     return (
         <div className={className}>
             <div ref={containerRef} />
-            {isLoading && <div className='text-sm text-gray-500 mt-2'>Loading captcha...</div>}
+            {isLoading && <div className='text-sm text-gray-500 mt-2'>{t('auth.captcha.loading')}</div>}
             {error && <div className='text-sm text-red-500 mt-2'>{error}</div>}
         </div>
     );

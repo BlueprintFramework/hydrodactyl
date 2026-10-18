@@ -3,11 +3,13 @@ import { useEgg } from '@/api/admin/useNests';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
+import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
 const tabClass = 'rounded-lg px-3 py-1.5 text-sm transition-colors';
 
 const EggLayout = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const { data: response, error, isLoading } = useEgg(id);
 
@@ -23,9 +25,9 @@ const EggLayout = () => {
 
     if (error || !egg) {
         return (
-            <PageContentBlock title='Egg'>
+            <PageContentBlock title={t('admin.nests.title_singular')}>
                 <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-8 text-center text-sm text-cream-400/60'>
-                    That egg could not be found.
+                    {t('admin.nests.not_found')}
                 </div>
             </PageContentBlock>
         );
@@ -33,9 +35,9 @@ const EggLayout = () => {
 
     const base = `/eggs/${egg.id}`;
     const tabs = [
-        { label: 'Configuration', to: base, end: true },
-        { label: 'Variables', to: `${base}/variables`, end: false },
-        { label: 'Install Script', to: `${base}/scripts`, end: false },
+        { label: t('admin.nests.tab_configuration'), to: base, end: true },
+        { label: t('admin.nests.tab_variables'), to: `${base}/variables`, end: false },
+        { label: t('admin.nests.tab_scripts'), to: `${base}/scripts`, end: false },
     ];
 
     const classes = ({ isActive }: { isActive: boolean }) =>
@@ -49,7 +51,9 @@ const EggLayout = () => {
     return (
         <PageContentBlock title={egg.name}>
             <MainPageHeader direction='column' title={egg.name}>
-                <p className='text-sm text-neutral-400'>{egg.description || egg.nest?.name || 'Egg'}</p>
+                <p className='text-sm text-neutral-400'>
+                    {egg.description || egg.nest?.name || t('admin.nests.title_singular')}
+                </p>
             </MainPageHeader>
 
             <div className='mb-6 flex flex-wrap items-center gap-1 rounded-xl border border-mocha-400 bg-mocha-500 p-1'>

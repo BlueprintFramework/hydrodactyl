@@ -141,7 +141,7 @@ class SpaceshipProvider implements DnsProviderInterface
         }
 
         if (empty($existing)) {
-            throw new DnsProviderException("DNS record not found or inaccessible: {$recordId}");
+            throw new DnsProviderException(__('exceptions.dns.record_not_found', ['record' => $recordId]));
         }
 
         $record = $existing[0];
@@ -200,16 +200,16 @@ class SpaceshipProvider implements DnsProviderInterface
         return [
             'api_key' => [
                 'type' => 'string',
-                'label' => 'API key',
+                'label' => __('admin/domains.schema.spaceship.api_key_label'),
                 'required' => true,
-                'description' => 'The key Spaceship shows under "Use this key in your external application". Needs the domains:read, dnsrecords:read and dnsrecords:write scopes',
+                'description' => __('admin/domains.schema.spaceship.api_key'),
                 'sensitive' => true,
             ],
             'api_secret' => [
                 'type' => 'string',
-                'label' => 'Secret',
+                'label' => __('admin/domains.schema.spaceship.api_secret_label'),
                 'required' => true,
-                'description' => 'The value Spaceship shows under "Secret" when the API key is created',
+                'description' => __('admin/domains.schema.spaceship.api_secret'),
                 'sensitive' => true,
             ],
         ];
@@ -282,7 +282,7 @@ class SpaceshipProvider implements DnsProviderInterface
         }
 
         if (empty($service) || empty($protocol) || !isset($content['port'], $content['target'])) {
-            throw new DnsProviderException("Incomplete SRV record data for '{$name}'.");
+            throw new DnsProviderException(__('exceptions.dns.srv_incomplete', ['name' => $name]));
         }
 
         return [
@@ -310,7 +310,7 @@ class SpaceshipProvider implements DnsProviderInterface
     {
         $parts = explode('/', $recordId, 2);
         if (count($parts) !== 2 || $parts[0] === '' || $parts[1] === '') {
-            throw new DnsProviderException("Invalid Spaceship DNS record identifier: {$recordId}");
+            throw new DnsProviderException(__('exceptions.dns.invalid_record_id', ['record' => $recordId]));
         }
 
         return [strtoupper($parts[0]), $parts[1]];

@@ -35,21 +35,22 @@ trait RequiresDatabaseMigrations
      */
     protected function showMigrationWarning(): void
     {
+        $title = str_pad(__('command/messages.console.migration_title'), 78, ' ', STR_PAD_BOTH);
+
         $this->getOutput()->writeln('<options=bold>
 | @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ |
 |                                                                              |
-|               Your database has not been properly migrated!                  |
+|' . $title . '|
 |                                                                              |
 | @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ |</>
 
-You must run the following command to finish migrating your database:
+' . __('command/messages.console.migration_command') . '
 
   <fg=green;options=bold>php artisan migrate --step --force</>
 
-You will not be able to use Pterodactyl Panel as expected without fixing your
-database state by running the command above.
+' . __('command/messages.console.migration_note') . '
 ');
 
-        $this->getOutput()->error('You must correct the error above before continuing.');
+        $this->getOutput()->error(__('command/messages.console.migrations_required'));
     }
 }

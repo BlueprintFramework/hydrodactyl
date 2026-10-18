@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight } from '@gravity-ui/icons';
 import clsx from 'clsx';
 import type { PaginationDataSet } from '@/api/http';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 interface Props {
     className?: string;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const PaginationFooter = ({ pagination, className, onPageSelect }: Props) => {
+    const { t } = useTranslation();
     const start = (pagination.currentPage - 1) * pagination.perPage;
     const end = (pagination.currentPage - 1) * pagination.perPage + pagination.count;
 
@@ -29,14 +31,31 @@ const PaginationFooter = ({ pagination, className, onPageSelect }: Props) => {
         return null;
     }
 
+    const values: Record<string, number> = {
+        start: Math.max(start, Math.min(pagination.total, 1)),
+        end,
+        total: pagination.total,
+    };
+
     return (
         <div className={clsx('flex items-center justify-between my-2', className)}>
             <p className={'text-sm text-zinc-500'}>
-                Showing&nbsp;
-                <span className={'font-semibold text-zinc-400'}>{Math.max(start, Math.min(pagination.total, 1))}</span>
-                &nbsp;to&nbsp;
-                <span className={'font-semibold text-zinc-400'}>{end}</span> of&nbsp;
-                <span className={'font-semibold text-zinc-400'}>{pagination.total}</span> results.
+                {t('common.pagination_showing')
+                    .split(/(\{\{\w+\}\})/)
+                    .map((part, index) => {
+                        const match = /^\{\{(\w+)\}\}$/.exec(part);
+                        const value = match ? values[match[1]] : undefined;
+
+                        if (value !== undefined) {
+                            return (
+                                <span key={index} className={'font-semibold text-zinc-400'}>
+                                    {value}
+                                </span>
+                            );
+                        }
+
+                        return part;
+                    })}
             </p>
             {pagination.totalPages > 1 && (
                 <div className={'flex space-x-1'}>

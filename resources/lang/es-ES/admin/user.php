@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'exceptions' => [
+        'user_has_servers' => 'No se puede eliminar un usuario con servidores activos vinculados a su cuenta. Elimina sus servidores antes de continuar.',
+    ],
+    'index' => [
+        'can_access' => 'Puede acceder',
+        'can_access_tooltip' => 'Servidores a los que este usuario puede acceder porque figura como subusuario.',
+        'create_new' => 'Crear nuevo',
+        'list' => 'Lista de usuarios',
+        'servers_owned' => 'Servidores en propiedad',
+        'servers_owned_tooltip' => 'Servidores de los que este usuario figura como propietario.',
+        'subtitle' => 'Todos los usuarios registrados en el sistema.',
+        'title' => 'Listar usuarios',
+    ],
+    'new' => [
+        'administrator' => 'Administrador',
+        'administrator_help' => 'Establecerlo en «Sí» otorga al usuario acceso administrativo completo.',
+        'breadcrumb' => 'Crear',
+        'default_language' => 'Idioma predeterminado',
+        'default_language_help' => 'El idioma predeterminado que se usará al mostrar el Panel a este usuario.',
+        'generated_password' => 'Contraseña generada:',
+        'identity' => 'Identidad',
+        'name_first' => 'Nombre del cliente',
+        'name_last' => 'Apellidos del cliente',
+        'password_notice' => 'Proporcionar una contraseña de usuario es opcional. Los correos de nuevos usuarios les piden crear una contraseña la primera vez que inician sesión. Si proporcionas una contraseña aquí, tendrás que encontrar otro método para facilitársela al usuario.',
+        'permissions' => 'Permisos',
+        'submit' => 'Crear usuario',
+        'subtitle' => 'Añade un nuevo usuario al sistema.',
+        'title' => 'Crear usuario',
+    ],
+    'notices' => [
+        'account_created' => 'La cuenta se ha creado correctamente.',
+        'account_updated' => 'La cuenta se ha actualizado correctamente.',
+    ],
+    'view' => [
+        'administrator' => 'Administrador',
+        'administrator_help' => 'Establecerlo en «Sí» otorga al usuario acceso administrativo completo.',
+        'default_language' => 'Idioma predeterminado',
+        'default_language_help' => 'El idioma predeterminado que se usará al mostrar el Panel a este usuario.',
+        'delete_button' => 'Eliminar usuario',
+        'delete_title' => 'Eliminar usuario',
+        'delete_warning' => 'No debe haber servidores asociados a esta cuenta para poder eliminarla.',
+        'identity' => 'Identidad',
+        'name_first' => 'Nombre del cliente',
+        'name_last' => 'Apellidos del cliente',
+        'password_help' => 'Déjalo en blanco para mantener la misma contraseña del usuario. El usuario no recibirá ninguna notificación si se cambia la contraseña.',
+        'permissions' => 'Permisos',
+        'submit' => 'Actualizar usuario',
+        'title' => 'Gestionar usuario: :username',
+    ],
+];

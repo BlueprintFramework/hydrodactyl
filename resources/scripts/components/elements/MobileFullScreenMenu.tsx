@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { getSubdomainInfo } from '@/api/server/network/subdomain';
 import Can from '@/components/elements/Can';
+import { useTranslation } from '@/i18n/I18nProvider';
+import type { TranslationKey } from '@/i18n/types';
 import { isFeatureLimitEnabled, isNetworkFeatureEnabled } from '@/lib/featureLimits';
 import type { ServerRouteDefinition } from '@/routers/routes';
 import { getServerNavRoutes } from '@/routers/routes';
@@ -17,6 +19,8 @@ interface MobileFullScreenMenuProps {
 }
 
 const MobileFullScreenMenu = ({ isVisible, onClose, children }: MobileFullScreenMenuProps) => {
+    const { t } = useTranslation();
+
     if (!isVisible) return null;
 
     return (
@@ -26,7 +30,7 @@ const MobileFullScreenMenu = ({ isVisible, onClose, children }: MobileFullScreen
                 type='button'
                 onClick={onClose}
                 className='absolute top-4 right-4 p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200'
-                aria-label='Close menu'
+                aria-label={t('panel.close_menu')}
             >
                 <Xmark width={22} height={22} fill='currentColor' />
             </button>
@@ -76,19 +80,21 @@ interface DashboardMobileMenuProps {
 }
 
 export const DashboardMobileMenu = ({ isVisible, onClose }: DashboardMobileMenuProps) => {
+    const { t } = useTranslation();
+
     return (
         <MobileFullScreenMenu isVisible={isVisible} onClose={onClose}>
             <NavigationItem to='/' icon={House} end onClick={onClose}>
-                Servers
+                {t('navigation.servers')}
             </NavigationItem>
             <NavigationItem to='/account/api' icon={AbbrApi} end onClick={onClose}>
-                API Keys
+                {t('navigation.api_keys')}
             </NavigationItem>
             <NavigationItem to='/account/ssh' icon={Key} end onClick={onClose}>
-                SSH Keys
+                {t('navigation.ssh_keys')}
             </NavigationItem>
             <NavigationItem to='/account' icon={Gear} end onClick={onClose}>
-                Settings
+                {t('navigation.settings')}
             </NavigationItem>
         </MobileFullScreenMenu>
     );
@@ -105,6 +111,7 @@ interface ServerMobileNavItemProps {
  */
 const ServerMobileNavItem = ({ route, serverId, onClose }: ServerMobileNavItemProps) => {
     const { icon: Icon, name, path, permission, featureLimit, end } = route;
+    const { t } = useTranslation();
 
     // Feature limits from server state
     const featureLimits = ServerContext.useStoreState((state) => state.server.data?.featureLimits);
@@ -159,7 +166,7 @@ const ServerMobileNavItem = ({ route, serverId, onClose }: ServerMobileNavItemPr
 
     const NavContent = (
         <NavigationItem to={to} icon={Icon} end={end} onClick={onClose}>
-            {name}
+            {t(name as TranslationKey)}
         </NavigationItem>
     );
 

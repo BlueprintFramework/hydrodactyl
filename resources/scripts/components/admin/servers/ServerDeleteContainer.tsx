@@ -7,8 +7,10 @@ import { useServer } from '@/api/admin/useServers';
 import { Dialog } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 const ServerDeleteContainer = () => {
+    const { t } = useTranslation();
     const { id } = useParams<'id'>();
     const navigate = useNavigate();
     const { data: server } = useServer(id);
@@ -28,10 +30,10 @@ const ServerDeleteContainer = () => {
 
         try {
             await deleteServer(server.id, force);
-            toast.success('Server deleted.');
+            toast.success(t('admin.servers.deleted'));
             navigate('/servers');
         } catch (error) {
-            toast.error(errorToMessage(error, 'Failed to delete server.'));
+            toast.error(errorToMessage(error, t('admin.servers.delete_failed')));
             setBusy(undefined);
             setConfirm(undefined);
         }
@@ -40,48 +42,40 @@ const ServerDeleteContainer = () => {
     return (
         <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
             <div className='flex flex-col gap-3 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
-                <h2 className='text-sm font-semibold text-cream-50'>Safely Delete Server</h2>
-                <p className='text-sm text-cream-400/70'>
-                    This will attempt to delete the server from both the panel and the daemon. If either reports an
-                    error the action is cancelled.
-                </p>
+                <h2 className='text-sm font-semibold text-cream-50'>{t('admin.servers.safe_delete_title')}</h2>
+                <p className='text-sm text-cream-400/70'>{t('admin.servers.safe_delete_description')}</p>
                 <p className='text-xs text-brand-400'>
-                    Deleting a server is irreversible. <strong>All server data</strong> (including files and users) will
-                    be removed.
+                    {t('admin.servers.safe_delete_warning')}{' '}
+                    <strong>{t('admin.servers.safe_delete_warning_bold')}</strong>{' '}
+                    {t('admin.servers.safe_delete_warning_suffix')}
                 </p>
                 <div className='mt-auto flex justify-end'>
                     <Button variant='attention' disabled={!!busy} onClick={() => setConfirm('safe')}>
-                        Safely Delete This Server
+                        {t('admin.servers.safe_delete_button')}
                     </Button>
                 </div>
             </div>
 
             <div className='flex flex-col gap-3 rounded-xl border border-brand-400/40 bg-brand-400/5 p-4'>
-                <h2 className='text-sm font-semibold text-brand-400'>Force Delete Server</h2>
-                <p className='text-sm text-cream-400/70'>
-                    This will attempt to delete the server from the panel and daemon, but will continue even if the
-                    daemon reports an error.
-                </p>
-                <p className='text-xs text-brand-400'>
-                    This may leave dangling files on your daemon if it reports an error.
-                </p>
+                <h2 className='text-sm font-semibold text-brand-400'>{t('admin.servers.force_delete_title')}</h2>
+                <p className='text-sm text-cream-400/70'>{t('admin.servers.force_delete_description')}</p>
+                <p className='text-xs text-brand-400'>{t('admin.servers.force_delete_warning')}</p>
                 <div className='mt-auto flex justify-end'>
                     <Button variant='attention' disabled={!!busy} onClick={() => setConfirm('force')}>
-                        Forcibly Delete This Server
+                        {t('admin.servers.force_delete_button')}
                     </Button>
                 </div>
             </div>
 
             <Dialog.Confirm
                 open={!!confirm}
-                title='Delete Server'
-                confirm='Delete'
+                title={t('admin.servers.delete')}
+                confirm={t('common.delete')}
                 loading={!!busy}
                 onClose={() => setConfirm(undefined)}
                 onConfirmed={() => void remove(confirm === 'force')}
             >
-                Are you sure you want to delete this server? There is no going back, all data will immediately be
-                removed.
+                {t('admin.servers.delete_confirm')}
             </Dialog.Confirm>
         </div>
     );
