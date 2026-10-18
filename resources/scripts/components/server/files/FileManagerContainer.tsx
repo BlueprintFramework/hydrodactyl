@@ -81,7 +81,7 @@ const FileManagerContainer = () => {
         if (searchInputRef.current) {
             searchInputRef.current.value = '';
         }
-    }, []);
+    }, [hash]);
 
     if (error) {
         return <ServerError title={t('server.files.error_title')} message={httpErrorToHuman(error)} />;
