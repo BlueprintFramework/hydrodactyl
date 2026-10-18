@@ -75,6 +75,8 @@ body:
       required: false
     - label: Pterodactyl Wings
       required: false
+    - label: Calagopus Wings
+      required: false
     # - label: I used official installation script.
     #   required: false
     - label: I used a third party installation script or Docker image.
