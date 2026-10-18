@@ -36,7 +36,7 @@ class BackupAuthorizationTest extends ClientApiIntegrationTestCase
 
         // This is the only valid call for this test, accessing the backup for the same
         // server that the API user is the owner of.
-        $this->actingAs($user)->json($method, $this->link($server1, '/backups/' . $backup1->uuid . $endpoint))
+        $this->actingAs($user)->json($method, $this->link($server1, '/backups/' . $backup1->uuid . $endpoint), ['password' => 'password'])
             ->assertStatus($method === 'DELETE' ? 204 : 200);
 
         // This request fails because the backup is valid for that server but the user
