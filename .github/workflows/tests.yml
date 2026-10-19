@@ -33,7 +33,15 @@ jobs:
       - name: Test appearance and brand color
         run: pnpm test:appearance
 
+      - name: Upload frontend assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-assets
+          path: public/build
+          if-no-files-found: error
+
   tests:
+    needs: frontend
     strategy:
       fail-fast: false
       matrix:
@@ -109,7 +117,6 @@ jobs:
       - name: Prepare environment (${{ matrix.db }})
         run: |
           cp .env.ci .env
-          php artisan key:generate
           if [ "${{ matrix.db }}" = "pgsql" ]; then
             echo "DB_CONNECTION=pgsql" >> .env
             echo "DB_HOST=127.0.0.1" >> .env
@@ -119,6 +126,12 @@ jobs:
             echo "DB_HOST=127.0.0.1" >> .env
             echo "DB_PORT=3307" >> .env
           fi
+
+      - name: Download frontend assets
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-assets
+          path: public/build
 
       - name: Run tests
         run: php vendor/bin/phpunit --testsuite=Integration,Unit
@@ -153,6 +166,8 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Run translation tests
+        env:
+          SKIP_MIGRATIONS: true
         run: php vendor/bin/phpunit --testsuite=Translations
 
   build-dev:
