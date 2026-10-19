@@ -86,12 +86,14 @@ const MassActionsBar = () => {
                     </span>
                     {t('server.files.delete_confirm_suffix')}
                 </p>
-                {selectedFiles.slice(0, 15).map((file) => (
-                    <li key={file}>{file}</li>
-                ))}
-                {selectedFiles.length > 15 && (
-                    <li>{t('server.files.delete_others', { count: selectedFiles.length - 15 })}</li>
-                )}
+                <ul className={'list-disc space-y-0.5 pl-5'}>
+                    {selectedFiles.slice(0, 15).map((file) => (
+                        <li key={file}>{file}</li>
+                    ))}
+                    {selectedFiles.length > 15 && (
+                        <li>{t('server.files.delete_others', { count: selectedFiles.length - 15 })}</li>
+                    )}
+                </ul>
             </Dialog.Confirm>
             {showMove && (
                 <RenameFileModal

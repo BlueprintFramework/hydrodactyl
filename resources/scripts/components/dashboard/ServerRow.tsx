@@ -159,7 +159,7 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                 </div>
             </div>
             <div
-                className={`h-full hidden sm:flex items-center justify-center bg-mocha-500 border-[1px] border-[#ffffff11] shadow-xs rounded-md w-fit whitespace-nowrap px-4 py-2 text-sm gap-4`}
+                className={`h-full hidden sm:flex items-center justify-center bg-mocha-500 border-[1px] border-[#ffffff11] shadow-xs rounded-md w-fit min-w-0 max-w-full flex-wrap whitespace-nowrap px-4 py-2 text-sm gap-4`}
             >
                 {!stats || isSuspended || isInstalling ? (
                     isSuspended ? (

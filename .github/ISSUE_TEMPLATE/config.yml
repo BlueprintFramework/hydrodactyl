@@ -1,5 +1,7 @@
 blank_issues_enabled: true
 contact_links:
+  - name: Migrating to Hydrodactyl
+    url: https://hydrodactyl.dev/docs/hydrodactyl/migrations
   - name: Installation Help
     url: https://discord.gg/mnTJVSSaKp?utm_source=githubreadme&utm_medium=readme&utm_campaign=OSSLAUNCH&utm_id=OSSLAUNCH
     about: Please visit our Discord for help with your installation.

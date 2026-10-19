@@ -3,6 +3,7 @@ import { useStoreState } from 'easy-peasy';
 import type { FormikHelpers } from 'formik';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { httpErrorToHuman } from '@/api/http';
 import deleteAllServerBackups from '@/api/server/backups/deleteAllServerBackups';
 import getServerBackups, { Context as ServerBackupContext } from '@/api/swr/getServerBackups';
 import Can from '@/components/elements/Can';
@@ -96,8 +97,9 @@ const BackupContainer = () => {
             await deleteAllServerBackups(uuid, password, hasTwoFactor, totpCode || '');
             toast.success(t('server.backups.delete_all_success'));
             setDeleteAllModalVisible(false);
+            await refresh();
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : t('server.backups.delete_failed'));
+            toast.error(httpErrorToHuman(error) || t('server.backups.delete_failed'));
         } finally {
             setIsDeleting(false);
         }

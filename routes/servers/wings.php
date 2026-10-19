@@ -96,6 +96,7 @@ Route::group([
         Route::get('/{backup}/download', [Wings\BackupController::class, 'download']);
         Route::post('/{backup}/lock', [Wings\BackupController::class, 'toggleLock']);
         Route::post('/{backup}/restore', [Wings\BackupController::class, 'restore']);
+        Route::delete('/delete-all', [Wings\BackupController::class, 'deleteAll']);
         Route::delete('/{backup}', [Wings\BackupController::class, 'delete']);
     });
 

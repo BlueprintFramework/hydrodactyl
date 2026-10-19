@@ -81,7 +81,7 @@ const AccountOverviewContainer = () => {
                     </div>
 
                     <div
-                        className='transform-gpu skeleton-anim-2'
+                        className='transform-gpu skeleton-anim-2 pb-7'
                         style={{
                             animationDelay: '100ms',
                             animationTimingFunction:
