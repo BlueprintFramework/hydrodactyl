@@ -1,0 +1,87 @@
+<?php
+
+return [
+    'websocket' => [
+        'description' => 'Erlaubt Ihnen, sich mit dem WebSocket des Servers zu verbinden und die Konsolenausgabe sowie Echtzeit-Serverstatistiken anzuzeigen.',
+        'connect' => 'Erlaubt Ihnen, sich mit der WebSocket-Instanz eines Servers zu verbinden, um die Konsole zu streamen.',
+    ],
+    'control' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie den Energiezustand eines Servers steuern oder Befehle senden können.',
+        'console' => 'Erlaubt Ihnen, Befehle an die Server-Instanz über die Konsole zu senden.',
+        'start' => 'Erlaubt Ihnen, den Server zu starten, wenn er gestoppt ist.',
+        'stop' => 'Erlaubt Ihnen, einen Server zu stoppen, wenn er läuft.',
+        'restart' => 'Erlaubt Ihnen, einen Server neu zu starten. Dadurch kann der Server gestartet werden, wenn er offline ist, aber nicht in einen vollständig gestoppten Zustand versetzt werden.',
+    ],
+    'user' => [
+        'description' => 'Berechtigungen, die es Ihnen ermöglichen, andere Subbenutzer auf einem Server zu verwalten. Sie können niemals Ihr eigenes Konto bearbeiten oder Berechtigungen zuweisen, die Sie nicht selbst besitzen.',
+        'create' => 'Erlaubt Ihnen, neue Subbenutzer für den Server zu erstellen.',
+        'read' => 'Erlaubt Ihnen, die Subbenutzer und deren Berechtigungen für den Server anzuzeigen.',
+        'update' => 'Erlaubt Ihnen, andere Subbenutzer zu bearbeiten.',
+        'delete' => 'Erlaubt Ihnen, einen Subbenutzer vom Server zu entfernen.',
+    ],
+    'file' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie das Dateisystem dieses Servers bearbeiten können.',
+        'create' => 'Erlaubt Ihnen, zusätzliche Dateien und Ordner über das Panel oder per direktem Upload zu erstellen.',
+        'read' => 'Erlaubt Ihnen, den Inhalt eines Ordners anzuzeigen, aber nicht den Inhalt von Dateien anzuzeigen oder sie herunterzuladen.',
+        'read-content' => 'Erlaubt Ihnen, den Inhalt einer bestimmten Datei anzuzeigen. Dadurch können Sie außerdem Dateien herunterladen.',
+        'update' => 'Erlaubt Ihnen, den Inhalt einer vorhandenen Datei oder eines vorhandenen Ordners zu aktualisieren.',
+        'delete' => 'Erlaubt Ihnen, Dateien oder Ordner zu löschen.',
+        'archive' => 'Erlaubt Ihnen, den Inhalt eines Ordners zu archivieren und vorhandene Archive auf dem System zu entpacken.',
+        'sftp' => 'Erlaubt Ihnen, sich mit SFTP zu verbinden und Serverdateien mithilfe der anderen zugewiesenen Dateiberechtigungen zu verwalten.',
+    ],
+    'backup' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie Server-Backups erstellen und verwalten können.',
+        'create' => 'Erlaubt Ihnen, neue Backups für diesen Server zu erstellen.',
+        'read' => 'Erlaubt Ihnen, alle für diesen Server vorhandenen Backups anzuzeigen.',
+        'delete' => 'Erlaubt Ihnen, Backups vom System zu entfernen.',
+        'download' => 'Erlaubt Ihnen, ein Backup des Servers herunterzuladen. Achtung: Dadurch erhalten Sie Zugriff auf alle Dateien des Servers im Backup.',
+        'restore' => 'Erlaubt Ihnen, ein Backup des Servers wiederherzustellen. Achtung: Dadurch können alle Serverdateien im Prozess gelöscht werden.',
+    ],
+    'allocation' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie die Port-Belegungen dieses Servers bearbeiten können.',
+        'read' => 'Erlaubt Ihnen, alle diesem Server derzeit zugewiesenen Belegungen anzuzeigen. Benutzer mit beliebiger Zugriffsstufe auf diesen Server können immer die primäre Belegung ansehen.',
+        'create' => 'Erlaubt Ihnen, dem Server weitere Belegungen zuzuweisen.',
+        'update' => 'Erlaubt Ihnen, die primäre Server-Belegung zu ändern und jeder Belegung Notizen hinzuzufügen.',
+        'delete' => 'Erlaubt Ihnen, eine Belegung vom Server zu löschen.',
+    ],
+    'startup' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie die Startparameter dieses Servers ansehen können.',
+        'read' => 'Erlaubt Ihnen, die Startvariablen eines Servers anzuzeigen.',
+        'update' => 'Erlaubt Ihnen, die Startvariablen des Servers zu bearbeiten.',
+        'command' => 'Erlaubt Ihnen, den Startbefehl des Servers zu bearbeiten.',
+        'docker-image' => 'Erlaubt Ihnen, das Docker-Image zu bearbeiten, das beim Ausführen des Servers verwendet wird.',
+        'software' => 'Erlaubt Ihnen, die für den Server verwendete Spiel-/Software zu bearbeiten.',
+    ],
+    'database' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie auf die Datenbankverwaltung dieses Servers zugreifen können.',
+        'create' => 'Erlaubt Ihnen, eine neue Datenbank für diesen Server zu erstellen.',
+        'read' => 'Erlaubt Ihnen, die mit diesem Server verknüpfte Datenbank anzuzeigen.',
+        'update' => 'Erlaubt Ihnen, das Passwort einer Datenbank-Instanz zu ändern. Wenn Sie nicht über die Berechtigung view_password verfügen, sehen Sie das aktualisierte Passwort nicht.',
+        'delete' => 'Erlaubt Ihnen, eine Datenbank-Instanz von diesem Server zu entfernen.',
+        'view_password' => 'Erlaubt Ihnen, das mit einer Datenbank-Instanz für diesen Server verknüpfte Passwort anzuzeigen.',
+    ],
+    'schedule' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie auf die Zeitplanverwaltung dieses Servers zugreifen können.',
+        'create' => 'Erlaubt Ihnen, neue Zeitpläne für diesen Server zu erstellen.',
+        'read' => 'Erlaubt Ihnen, Zeitpläne und die zugehörigen Aufgaben für diesen Server anzuzeigen.',
+        'update' => 'Erlaubt Ihnen, Zeitpläne und Zeitplanaufgaben für diesen Server zu aktualisieren.',
+        'delete' => 'Erlaubt Ihnen, Zeitpläne für diesen Server zu löschen.',
+    ],
+    'settings' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie auf die Einstellungen dieses Servers zugreifen können.',
+        'rename' => 'Erlaubt Ihnen, diesen Server umzubenennen und seine Beschreibung zu ändern.',
+        'reinstall' => 'Erlaubt Ihnen, eine Neuinstallation dieses Servers auszulösen.',
+    ],
+    'activity' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie auf die Aktivitätsprotokolle des Servers zugreifen können.',
+        'read' => 'Erlaubt Ihnen, die Aktivitätsprotokolle des Servers anzuzeigen.',
+    ],
+    'mod' => [
+        'description' => 'Berechtigungen, die steuern, ob Sie Mods herunterladen und aktualisieren können.',
+        'version' => 'Erlaubt Ihnen zu ändern, welche Version heruntergeladen werden soll',
+        'loader' => 'Erlaubt Ihnen zu ändern, welcher Loader heruntergeladen werden soll',
+        'download' => 'Erlaubt Ihnen, Mods auf den Server herunterzuladen',
+        'resolver' => 'Erlaubt Ihnen den Zugriff auf den Dependency Resolver',
+        'update' => 'Erlaubt Ihnen, aktuell installierte Mods zu aktualisieren',
+    ],
+];

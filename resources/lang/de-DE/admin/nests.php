@@ -1,0 +1,68 @@
+<?php
+
+return [
+    'notices' => [
+        'created' => 'Ein neues Nest, :name, wurde erfolgreich erstellt.',
+        'deleted' => 'Das angeforderte Nest wurde erfolgreich aus dem Panel gelöscht.',
+        'updated' => 'Die Konfigurationsoptionen des Nests wurden erfolgreich aktualisiert.',
+    ],
+    'eggs' => [
+        'notices' => [
+            'imported' => 'Dieses Egg und die zugehörigen Variablen wurden erfolgreich importiert.',
+            'import_url_host' => 'Die Egg-Import-URL stammt nicht von einem zulässigen Host.',
+            'import_url_scheme' => 'Das Schema der Egg-Import-URL ist ungültig.',
+            'import_fetch_failed' => 'Das Abrufen des Eggs von der URL ist fehlgeschlagen.',
+            'updated_via_import' => 'Dieses Egg wurde anhand der bereitgestellten Datei aktualisiert.',
+            'deleted' => 'Das angeforderte Egg wurde erfolgreich aus dem Panel gelöscht.',
+            'updated' => 'Die Egg-Konfiguration wurde erfolgreich aktualisiert.',
+            'script_updated' => 'Das Egg-Installationsskript wurde aktualisiert und wird bei jeder Server-Installation ausgeführt.',
+            'egg_created' => 'Ein neues Egg wurde erfolgreich erstellt. Sie müssen alle laufenden Daemons neu starten, damit dieses neue Egg übernommen wird.',
+        ],
+    ],
+    'variables' => [
+        'notices' => [
+            'variable_deleted' => 'Die Variable „:variable“ wurde gelöscht und steht Servern nach einem Neuaufbau nicht mehr zur Verfügung.',
+            'variable_updated' => 'Die Variable „:variable“ wurde aktualisiert. Sie müssen alle Server, die diese Variable verwenden, neu aufbauen, damit die Änderungen wirksam werden.',
+            'variable_created' => 'Die neue Variable wurde erfolgreich erstellt und diesem Egg zugewiesen.',
+        ],
+    ],
+    'index' => [
+        'title' => 'Nests',
+        'subtitle' => 'Alle derzeit auf diesem System verfügbaren Nests.',
+        'warning' => '<strong>Eggs sind mächtig</strong> — falsche Änderungen können Ihre Server unbrauchmachbar machen. Bearbeiten Sie Standard-Eggs nicht, es sei denn, Sie wissen, was Sie tun.',
+        'configured_nests' => 'Konfigurierte Nests',
+        'import_egg' => 'Egg importieren',
+        'import_egg_from_url' => 'Egg von URL importieren',
+        'create_new' => 'Neu erstellen',
+        'table_description' => 'Beschreibung',
+        'table_eggs' => 'Eggs',
+        'import_modal_title' => 'Ein Egg importieren',
+        'egg_file' => 'Egg-Datei',
+        'egg_file_help' => 'Wählen Sie die <code>.json</code>-Datei für das Egg aus, das Sie importieren möchten.',
+        'associated_nest' => 'Zugehöriges Nest',
+        'associated_nest_help' => 'Wählen Sie im Dropdown aus, mit welchem Nest dieses Egg verknüpft werden soll. Wenn Sie es mit einem neuen Nest verknüpfen möchten, müssen Sie dieses Nest vor dem Fortfahren erstellen.',
+        'import_button' => 'Importieren',
+        'egg_url' => 'Egg-URL',
+        'egg_url_help' => 'Geben Sie die URL der Datei für das Egg ein, das Sie importieren möchten.',
+    ],
+    'new' => [
+        'title' => 'Neues Nest',
+        'subtitle' => 'Konfigurieren Sie ein neues Nest, das auf alle Knoten bereitgestellt wird.',
+        'name_help' => 'Dies sollte ein beschreibender Kategoriename sein, der alle Eggs im Nest umfasst.',
+        'description' => 'Beschreibung',
+    ],
+    'view' => [
+        'title' => 'Nests &rarr; :name',
+        'name_help' => 'Dies sollte ein beschreibender Kategoriename sein, der alle Optionen innerhalb des Dienstes umfasst.',
+        'description' => 'Beschreibung',
+        'nest_id' => 'Nest-ID',
+        'nest_id_help' => 'Eine eindeutige ID, die zur Kennung dieses Nests intern und über die API verwendet wird.',
+        'author' => 'Autor',
+        'author_help' => 'Der Autor dieser Dienstoption. Bitte richten Sie Fragen und Probleme an ihn, es sei denn, dies ist eine offizielle Option von <code>support@pterodactyl.io</code>.',
+        'uuid' => 'UUID',
+        'uuid_help' => 'Eine UUID, die allen Servern, die diese Option verwenden, zu Identifikationszwecken zugewiesen wird.',
+        'nest_eggs' => 'Nest-Eggs',
+        'new_egg' => 'Neues Egg',
+        'delete_js' => ' Nest löschen',
+    ],
+];

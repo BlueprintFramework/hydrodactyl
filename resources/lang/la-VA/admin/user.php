@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'exceptions' => [
+        'user_has_servers' => 'Usorem cum activis serveris rationi suae adiunctis delere non potest. Quaeso eorum serveros dele antequam pergas.',
+    ],
+    'index' => [
+        'can_access' => 'Adire Potest',
+        'can_access_tooltip' => 'Serveri quibus hic usor adire potest quia ut subusor notatus est.',
+        'create_new' => 'Crea Novum',
+        'list' => 'Index Usorum',
+        'servers_owned' => 'Serveri Possessi',
+        'servers_owned_tooltip' => 'Serveri quorum hic usor possessor notatus est.',
+        'subtitle' => 'Omnes usores registrati in systemate.',
+        'title' => 'Index Usorum',
+    ],
+    'new' => [
+        'administrator' => 'Administrator',
+        'administrator_help' => 'Hoc in «Ita» ponendo usori administrationem totam praebes.',
+        'breadcrumb' => 'Crea',
+        'default_language' => 'Lingua Defalta',
+        'default_language_help' => 'Lingua defalta quae in exhibendo panel pro hoc usore adhibetur.',
+        'generated_password' => 'Tessera Generata:',
+        'identity' => 'Identitas',
+        'name_first' => 'Praenomen Clientis',
+        'name_last' => 'Cognomen Clientis',
+        'password_notice' => 'Praebere tesseram usoris liberum est. Epistulae usorum novorum usores hortantur ut tesseram creent primo tempore quo introeant. Si tessera hic praebita sit, aliam viam invenire debebis eam usori praebendi.',
+        'permissions' => 'Permissiones',
+        'submit' => 'Crea Usorem',
+        'subtitle' => 'Adde usorem novum in systema.',
+        'title' => 'Crea Usorem',
+    ],
+    'notices' => [
+        'account_created' => 'Ratio feliciter creata est.',
+        'account_updated' => 'Ratio feliciter renovata est.',
+    ],
+    'view' => [
+        'administrator' => 'Administrator',
+        'administrator_help' => 'Hoc in «Ita» ponendo usori administrationem totam praebes.',
+        'default_language' => 'Lingua Defalta',
+        'default_language_help' => 'Lingua defalta quae in exhibendo panel pro hoc usore adhibetur.',
+        'delete_button' => 'Dele Usorem',
+        'delete_title' => 'Dele Usorem',
+        'delete_warning' => 'Nulli serveri huic rationi adiuncti esse debent ut ea deleri possit.',
+        'identity' => 'Identitas',
+        'name_first' => 'Praenomen Clientis',
+        'name_last' => 'Cognomen Clientis',
+        'password_help' => 'Vacuum relinque ut tessera huius usoris eadem maneat. Usor nullam notificationem accipiet si tessera mutetur.',
+        'permissions' => 'Permissiones',
+        'submit' => 'Renova Usorem',
+        'title' => 'Administra Usorem: :username',
+    ],
+];

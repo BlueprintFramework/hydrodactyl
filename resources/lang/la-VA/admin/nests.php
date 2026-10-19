@@ -1,0 +1,68 @@
+<?php
+
+return [
+    'notices' => [
+        'created' => 'Nidus novus, :name, feliciter creatus est.',
+        'deleted' => 'Nidus petitus feliciter ex panel deletus est.',
+        'updated' => 'Optiones configurationis nidii feliciter renovatae sunt.',
+    ],
+    'eggs' => [
+        'notices' => [
+            'imported' => 'Hoc ovum et variabiles ei adiunctae feliciter importatae sunt.',
+            'import_url_host' => 'URL importationis ovii non est ex hospite permisso.',
+            'import_url_scheme' => 'Schema URL importationis ovii non validum est.',
+            'import_fetch_failed' => 'Comparare ovum ex URL cessavit.',
+            'updated_via_import' => 'Hoc ovum ex fasciculo praebito renovatum est.',
+            'deleted' => 'Ovum petitus feliciter ex panel deletus est.',
+            'updated' => 'Configuratio ovii feliciter renovata est.',
+            'script_updated' => 'Scriptum institutionis ovii renovatum est et cum serveri instillantur curiet.',
+            'egg_created' => 'Ovum novum feliciter positum est. Daemons quosvis currentes denuo incipere debebis ut hoc ovum novum adhibeatur.',
+        ],
+    ],
+    'variables' => [
+        'notices' => [
+            'variable_deleted' => 'Variabilis «:variable» deleta est et serveribus post reaedificationem amplius non praebita erit.',
+            'variable_updated' => 'Variabilis «:variable» renovata est. Omnes serveros hac variabili utentes reaedificare debebis ut mutationes adhibeantur.',
+            'variable_created' => 'Variabilis nova feliciter creata et huic ovo assignata est.',
+        ],
+    ],
+    'index' => [
+        'title' => 'Nidi',
+        'subtitle' => 'Omnes nidi nunc in hoc systemate praebiti.',
+        'warning' => '<strong>Ova potentia sunt</strong> — ea male mutando serveros tuos frangere potes. Ne ova defaltata emendes nisi scias quid facias.',
+        'configured_nests' => 'Nidi Configurati',
+        'import_egg' => 'Importa Ovum',
+        'import_egg_from_url' => 'Importa Ovum ex URL',
+        'create_new' => 'Crea Novum',
+        'table_description' => 'Descriptio',
+        'table_eggs' => 'Ova',
+        'import_modal_title' => 'Importa Ovum',
+        'egg_file' => 'Fasciculus Ovii',
+        'egg_file_help' => 'Elige fasciculum <code>.json</code> novi ovii quem importare vis.',
+        'associated_nest' => 'Nidus Adiunctus',
+        'associated_nest_help' => 'Elige nidum cum quo hoc ovum adiungetur ex indice. Si cum novo nido adiungere vis, eum nidum creare debebis antequam pergas.',
+        'import_button' => 'Importa',
+        'egg_url' => 'URL Ovii',
+        'egg_url_help' => 'Scribe URL fasciculi novi ovii quem importare vis.',
+    ],
+    'new' => [
+        'title' => 'Nidus Novus',
+        'subtitle' => 'Configure nidum novum in omnes nodos instituendum.',
+        'name_help' => 'Haec debet esse nomen categoriae descriptivum quod omnia ova intra nidum complectitur.',
+        'description' => 'Descriptio',
+    ],
+    'view' => [
+        'title' => 'Nidi &rarr; :name',
+        'name_help' => 'Haec debet esse nomen categoriae descriptivum quod omnes optiones intra servitutem complectitur.',
+        'description' => 'Descriptio',
+        'nest_id' => 'ID Nidii',
+        'nest_id_help' => 'ID unicum quo hic nidus interne et per API dignoscitur.',
+        'author' => 'Auctor',
+        'author_help' => 'Auctor huius optionis servitutis. Quaesita et problemata ad eos dirige nisi haec sit optio officialis a <code>support@pterodactyl.io</code> aucta.',
+        'uuid' => 'UUID',
+        'uuid_help' => 'UUID omnibus serveris hac optione utentibus assignatus ad significationem.',
+        'nest_eggs' => 'Ova Nidii',
+        'new_egg' => 'Ovum Novum',
+        'delete_js' => ' Dele Nidum',
+    ],
+];
