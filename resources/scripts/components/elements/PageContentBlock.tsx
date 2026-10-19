@@ -19,7 +19,11 @@ const PageContentBlock: React.FC<PageContentBlockProps> = ({
 }) => {
     useEffect(() => {
         if (title) {
-            document.title = `${title} | Hydrodactyl`;
+            const configuredName = (window as { SiteConfiguration?: { name?: unknown } }).SiteConfiguration?.name;
+            const siteName =
+                typeof configuredName === 'string' && configuredName.trim().length > 0 ? configuredName : 'Hydrodactyl';
+
+            document.title = `${title} | ${siteName}`;
         }
     }, [title]);
 

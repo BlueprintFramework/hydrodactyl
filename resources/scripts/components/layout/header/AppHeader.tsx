@@ -50,7 +50,7 @@ const LogoSection = memo(({ admin }: { admin?: boolean }) => {
     const content = (
         <>
             <Logo className='flex h-8 w-8 shrink-0 object-contain' />
-            <span className='sidebar-logo-name hydrodactyl-logo content-center truncate text-sm font-semibold leading-none tracking-wide text-cream-50'>
+            <span className='sidebar-logo-name hydrodactyl-logo content-center truncate text-sm font-semibold leading-tight tracking-wide text-cream-50'>
                 {siteName}
             </span>
         </>
@@ -132,13 +132,15 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
     if (hasSlottedLayout) {
         return (
             <div className='h-16 w-full py-4 pr-2 flex align-middle items-center justify-between'>
-                <div className='flex items-center gap-2'>
+                <div className='flex min-w-0 items-center gap-2'>
                     <SidebarLogo admin={admin} />
                     <MobileSidebarToggle />
                     <SlotActions actions={leftActions} />
                 </div>
-                <SlotActions actions={centerActions} />
-                <div className='flex items-center gap-1.5 sm:gap-2 justify-end min-w-0 overflow-hidden'>
+                <div className='flex min-w-0 flex-1 items-center justify-center px-2'>
+                    <SlotActions actions={centerActions} />
+                </div>
+                <div className='ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 justify-end'>
                     <SlotActions actions={rightActions} />
                     <StaticButtons serverId={serverId} admin={admin} />
                 </div>
@@ -148,13 +150,13 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
 
     // Servers page
     return (
-        <div className='h-16 w-full py-4 pr-2 flex align-middle items-center'>
-            <div className='flex items-center gap-2 flex-1'>
+        <div className='h-16 w-full py-4 pr-2 flex align-middle items-center gap-3'>
+            <div className='flex grow shrink-0 items-center gap-2'>
                 <MobileSidebarToggle />
                 <SidebarLogo admin={admin} />
             </div>
             <HeaderActions />
-            <div className='flex items-center gap-1.5 sm:gap-2 justify-end min-w-0 overflow-hidden flex-1'>
+            <div className='flex grow shrink-0 items-center gap-1.5 sm:gap-2 justify-end'>
                 <SlotActions actions={rightActions} />
                 <StaticButtons serverId={serverId} admin={admin} />
             </div>

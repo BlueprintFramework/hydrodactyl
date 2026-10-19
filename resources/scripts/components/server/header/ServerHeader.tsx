@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react';
-import HeaderCentered from '@/components/dashboard/header/HeaderCentered';
 import { useHeader } from '@/contexts/HeaderContext';
 import { ServerContext } from '@/state/server';
 import PowerButtons from './PowerButtons';
@@ -25,16 +24,16 @@ const ServerHeader = (props: headerProps) => {
 
     const statusSection = useMemo(
         () => (
-            <HeaderCentered className='flex items-center gap-4'>
-                <div className='flex items-center gap-3'>
+            <div className='flex min-w-0 items-center gap-4'>
+                <div className='flex min-w-0 items-center gap-3'>
                     <StatusPillHeader />
                     <span className='min-w-0 -translate-y-0.5 truncate xl:max-w-[20vw]'>{name}</span>
                 </div>
 
-                <div className='hidden md:flex'>
+                <div className='hidden lg:flex'>
                     <ServerDetailsHeader />
                 </div>
-            </HeaderCentered>
+            </div>
         ),
         [name],
     );

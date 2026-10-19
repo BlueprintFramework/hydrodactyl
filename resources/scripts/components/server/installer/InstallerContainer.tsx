@@ -131,7 +131,7 @@ const VersionDropdown = ({
                                         position: 'absolute',
                                         insetInline: 0,
                                     }}
-                                    className='flex cursor-default items-center rounded-xl px-2 py-1.5 text-sm outline-none select-none hover:bg-mocha-400 data-[selected=true]:bg-mocha-400'
+                                    className='flex cursor-pointer items-center rounded-xl px-2 py-1.5 text-sm outline-none select-none hover:bg-mocha-400 data-[selected=true]:bg-mocha-400'
                                     data-selected={v === value}
                                     role='option'
                                     aria-selected={v === value}
@@ -430,14 +430,14 @@ const InstallerContainer = () => {
                     <p className='text-cream-400/60'>{t('server.installer.description')}</p>
                 </MainPageHeader>
 
-                <div className='inline-flex rounded-xl border border-mocha-300/50 bg-mocha-400/50 p-1'>
+                <div className='inline-flex mr-3 rounded-xl border border-mocha-300/50 bg-mocha-400/50 p-1'>
                     {(['browse', 'installed'] as const).map((v) => (
                         <button
                             key={v}
                             type='button'
                             onClick={() => setView(v)}
                             className={cn(
-                                'rounded-lg px-4 py-2 text-sm font-medium capitalize transition',
+                                'rounded-lg px-4 py-2 text-sm font-medium capitalize transition cursor-pointer',
                                 view === v
                                     ? 'bg-brand-400/70 text-mocha-500'
                                     : 'text-cream-400/70 hover:bg-mocha-300/40',
@@ -460,7 +460,7 @@ const InstallerContainer = () => {
                                     title={t(entry.hint)}
                                     onClick={() => setTab(entry.key)}
                                     className={cn(
-                                        'rounded-lg px-4 py-2 text-sm font-medium transition',
+                                        'rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer',
                                         tab === entry.key
                                             ? 'bg-brand-400/70 text-mocha-500'
                                             : 'text-cream-400/70 hover:bg-mocha-300/40',

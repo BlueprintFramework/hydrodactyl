@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Models\Permission;
 use PragmaRX\Google2FA\Google2FA;
+use Laravel\Sanctum\TransientToken;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Auth\Access\AuthorizationException;
 use Pterodactyl\Services\Elytra\ElytraJobService;
@@ -147,27 +148,7 @@ class BackupsController extends ClientApiController
             throw new AuthorizationException();
         }
 
-        // Only require password/2FA for web session requests, not API keys
-        if (!$request->user()->currentAccessToken()) {
-            // Require password confirmation for this destructive operation
-            $password = $request->input('password');
-            if (empty($password) || !password_verify($password, $request->user()->password)) {
-                throw new BadRequestHttpException(__('exceptions.client.backups.password_not_valid'));
-            }
-
-            // If user has 2FA enabled, require TOTP code
-            if ($request->user()->use_totp) {
-                $totpCode = $request->input('totp_code');
-                if (empty($totpCode)) {
-                    throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_required'));
-                }
-
-                $secret = Crypt::decrypt($request->user()->totp_secret);
-                if (!$this->google2FA->verifyKey($secret, $totpCode)) {
-                    throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_invalid'));
-                }
-            }
-        }
+        $this->confirmDestructiveAction($request);
 
         $result = $this->elytraJobService->submitJob(
             $server,
@@ -197,27 +178,7 @@ class BackupsController extends ClientApiController
             throw new AuthorizationException();
         }
 
-        // Only require password/2FA for web session requests, not API keys
-        if (!$request->user()->currentAccessToken()) {
-            // Require password confirmation for this destructive operation
-            $password = $request->input('password');
-            if (empty($password) || !password_verify($password, $request->user()->password)) {
-                throw new BadRequestHttpException(__('exceptions.client.backups.password_not_valid'));
-            }
-
-            // If user has 2FA enabled, require TOTP code
-            if ($request->user()->use_totp) {
-                $totpCode = $request->input('totp_code');
-                if (empty($totpCode)) {
-                    throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_required'));
-                }
-
-                $secret = Crypt::decrypt($request->user()->totp_secret);
-                if (!$this->google2FA->verifyKey($secret, $totpCode)) {
-                    throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_invalid'));
-                }
-            }
-        }
+        $this->confirmDestructiveAction($request);
 
         $result = $this->elytraJobService->submitJob(
             $server,
@@ -320,6 +281,38 @@ class BackupsController extends ClientApiController
     }
 
     /**
+     * Require password (and TOTP when enabled) for destructive actions made
+     * through a browser session. API keys are exempt.
+     */
+    private function confirmDestructiveAction(Request $request): void
+    {
+        $token = $request->user()->currentAccessToken();
+
+        // Only requests carrying a real API key skip the confirmation; browser
+        // sessions arrive with a Sanctum transient token.
+        if ($token && !$token instanceof TransientToken) {
+            return;
+        }
+
+        $password = $request->input('password');
+        if (empty($password) || !password_verify($password, $request->user()->password)) {
+            throw new BadRequestHttpException(__('exceptions.client.backups.password_not_valid'));
+        }
+
+        if ($request->user()->use_totp) {
+            $totpCode = $request->input('totp_code');
+            if (empty($totpCode)) {
+                throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_required'));
+            }
+
+            $secret = Crypt::decrypt($request->user()->totp_secret);
+            if (!$this->google2FA->verifyKey($secret, $totpCode)) {
+                throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_invalid'));
+            }
+        }
+    }
+
+    /**
      * Delete all backups
      */
     public function deleteAll(Request $request, Server $server): JsonResponse
@@ -328,27 +321,7 @@ class BackupsController extends ClientApiController
             throw new AuthorizationException();
         }
 
-        // Only require password/2FA for web session requests, not API keys
-        if (!$request->user()->currentAccessToken()) {
-            // Require password confirmation for this destructive operation
-            $password = $request->input('password');
-            if (empty($password) || !password_verify($password, $request->user()->password)) {
-                throw new BadRequestHttpException(__('exceptions.client.backups.password_not_valid'));
-            }
-
-            // If user has 2FA enabled, require TOTP code
-            if ($request->user()->use_totp) {
-                $totpCode = $request->input('totp_code');
-                if (empty($totpCode)) {
-                    throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_required'));
-                }
-
-                $secret = Crypt::decrypt($request->user()->totp_secret);
-                if (!$this->google2FA->verifyKey($secret, $totpCode)) {
-                    throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_invalid'));
-                }
-            }
-        }
+        $this->confirmDestructiveAction($request);
 
         $backupCount = $server->backups()->count();
 
@@ -384,27 +357,7 @@ class BackupsController extends ClientApiController
             throw new AuthorizationException();
         }
 
-        // Only require password/2FA for web session requests, not API keys
-        if (!$request->user()->currentAccessToken()) {
-            // Require password confirmation for this destructive operation
-            $password = $request->input('password');
-            if (empty($password) || !password_verify($password, $request->user()->password)) {
-                throw new BadRequestHttpException(__('exceptions.client.backups.password_not_valid'));
-            }
-
-            // If user has 2FA enabled, require TOTP code
-            if ($request->user()->use_totp) {
-                $totpCode = $request->input('totp_code');
-                if (empty($totpCode)) {
-                    throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_required'));
-                }
-
-                $secret = Crypt::decrypt($request->user()->totp_secret);
-                if (!$this->google2FA->verifyKey($secret, $totpCode)) {
-                    throw new BadRequestHttpException(__('exceptions.client.backups.two_factor_invalid'));
-                }
-            }
-        }
+        $this->confirmDestructiveAction($request);
 
         // Validate backup_uuids
         $backupUuids = $request->input('backup_uuids', []);
