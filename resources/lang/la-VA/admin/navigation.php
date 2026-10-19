@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'breadcrumb' => [
+        'admin' => 'Administrator',
+        'settings' => 'Ordinationes',
+    ],
+    'copyright' => 'Ius auctoris &copy; 2015 - :year <a href="https://blueprint.zip/">BlueprintFramework</a> et <a href="https://hydrodactyl.dev">Hydrodactyl</a>.',
+    'exit_admin_control' => 'Exe Administratione',
+    'logout' => 'Egredere',
+    'logout_confirm_button' => 'Egredere',
+    'logout_confirm_title' => 'Vis egredi?',
+    'settings_nav' => [
+        'advanced' => 'Provecta',
+        'branding' => 'Branding',
+        'captcha' => 'Captcha',
+        'custom_navigation' => 'Navigatio Consueta',
+        'domains' => 'Dominia',
+        'general' => 'Generale',
+        'mail' => 'Epistulae',
+    ],
+    'sidebar' => [
+        'application_api' => 'API Applicationis',
+        'basic_administration' => 'ADMINISTRATIO FUNDAMENTALIS',
+        'databases' => 'Thecae Datorum',
+        'locations' => 'Sedes',
+        'management' => 'ADMINISTRATIO',
+        'mounts' => 'Copulamina',
+        'nests' => 'Nidi',
+        'nodes' => 'Nodi',
+        'overview' => 'Conspectus',
+        's3_buckets' => 'Bucket S3',
+        'servers' => 'Serveri',
+        'service_management' => 'ADMINISTRATIO SERVITUTUM',
+        'settings' => 'Ordinationes',
+        'toggle_navigation' => 'Commuta navigationem',
+        'users' => 'Usores',
+    ],
+    'validation_error' => 'Error in validatione datorum praebitorum accidit.',
+];
