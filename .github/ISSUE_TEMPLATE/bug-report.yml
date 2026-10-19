@@ -75,6 +75,8 @@ body:
       required: false
     - label: Pterodactyl Wings
       required: false
+    - label: Calagopus Wings
+      required: false
     # - label: I used official installation script.
     #   required: false
     - label: I used a third party installation script or Docker image.
@@ -123,5 +125,5 @@ body:
       required: true
     - label: I have checked in the Discord server and believe this is a bug with the software, and not a configuration issue with my specific system.
       required: true
-
-# rawr
+    - label: I am checking every checkbox without reading the label.
+      required: false
