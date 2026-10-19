@@ -86,12 +86,14 @@ const MassActionsBar = () => {
                     </span>
                     {t('server.files.delete_confirm_suffix')}
                 </p>
-                {selectedFiles.slice(0, 15).map((file) => (
-                    <li key={file}>{file}</li>
-                ))}
-                {selectedFiles.length > 15 && (
-                    <li>{t('server.files.delete_others', { count: selectedFiles.length - 15 })}</li>
-                )}
+                <ul className={'list-disc space-y-0.5 pl-5'}>
+                    {selectedFiles.slice(0, 15).map((file) => (
+                        <li key={file}>{file}</li>
+                    ))}
+                    {selectedFiles.length > 15 && (
+                        <li>{t('server.files.delete_others', { count: selectedFiles.length - 15 })}</li>
+                    )}
+                </ul>
             </Dialog.Confirm>
             {showMove && (
                 <RenameFileModal
@@ -108,7 +110,7 @@ const MassActionsBar = () => {
                         'pointer-events-none fixed bottom-0 left-0 right-0 mb-[calc(4rem+env(safe-area-inset-bottom))] lg:mb-6 flex justify-center w-full z-50'
                     }
                 >
-                    <div className={`flex items-center space-x-4 pointer-events-auto rounded-sm p-4 bg-black/50`}>
+                    <div className='flex items-center space-x-4 pointer-events-auto rounded-sm p-4 bg-bg-raised text-primary'>
                         <Button onClick={() => setShowMove(true)} disabled={loading}>
                             {loading && loadingMessage === t('server.files.moving') && <Spinner size='small' />}
                             {t('server.files.move')}

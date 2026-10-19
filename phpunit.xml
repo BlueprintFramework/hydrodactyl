@@ -6,11 +6,16 @@
     </testsuite>
     <testsuite name="Unit">
       <directory>./tests/Unit</directory>
+      <exclude>./tests/Unit/I18n</exclude>
+    </testsuite>
+    <testsuite name="Translations">
+      <directory>./tests/Unit/I18n</directory>
     </testsuite>
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing"/>
     <env name="APP_DEBUG" value="false"/>
+    <env name="APP_KEY" value="base64:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="/>
     <env name="APP_LOCALE" value="en-US"/>
     <env name="APP_MAINTENANCE_DRIVER" value="file"/>
     <env name="BCRYPT_ROUNDS" value="4"/>

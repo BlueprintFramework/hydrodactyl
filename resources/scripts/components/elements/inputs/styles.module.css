@@ -15,7 +15,7 @@
 }
 
 .text_input {
-    @apply w-full rounded-lg border-0 bg-[#ffffff11] px-4 py-2 outline-none;
+    @apply w-full rounded-lg border-0 bg-overlay/7 px-4 py-2 text-primary outline-none;
 
     &.loose {
         @apply px-6 py-3;

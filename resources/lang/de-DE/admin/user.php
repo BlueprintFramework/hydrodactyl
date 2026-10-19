@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'exceptions' => [
+        'user_has_servers' => 'Ein Benutzer mit aktiven Servern auf seinem Konto kann nicht gelöscht werden. Bitte löschen Sie seine Server, bevor Sie fortfahren.',
+    ],
+    'index' => [
+        'can_access' => 'Zugriff möglich',
+        'can_access_tooltip' => 'Server, auf die dieser Benutzer zugreifen kann, da er als Subbenutzer gekennzeichnet ist.',
+        'create_new' => 'Neu erstellen',
+        'list' => 'Benutzerliste',
+        'servers_owned' => 'Eigene Server',
+        'servers_owned_tooltip' => 'Server, bei denen dieser Benutzer als Besitzer gekennzeichnet ist.',
+        'subtitle' => 'Alle registrierten Benutzer im System.',
+        'title' => 'Benutzer auflisten',
+    ],
+    'new' => [
+        'administrator' => 'Administrator',
+        'administrator_help' => 'Wenn Sie dies auf „Ja“ setzen, erhält der Benutzer vollen administrativen Zugriff.',
+        'breadcrumb' => 'Erstellen',
+        'default_language' => 'Standardsprache',
+        'default_language_help' => 'Die Standardsprache, die beim Anzeigen des Panels für diesen Benutzer verwendet wird.',
+        'generated_password' => 'Generiertes Passwort:',
+        'identity' => 'Identität',
+        'name_first' => 'Vorname des Kunden',
+        'name_last' => 'Nachname des Kunden',
+        'password_notice' => 'Die Angabe eines Benutzerpassworts ist optional. In der Begrüßungs-E-Mail für neue Benutzer werden diese aufgefordert, beim ersten Anmelden ein Passwort zu erstellen. Wenn Sie hier ein Passwort angeben, müssen Sie einen anderen Weg finden, es dem Benutzer mitzuteilen.',
+        'permissions' => 'Berechtigungen',
+        'submit' => 'Benutzer erstellen',
+        'subtitle' => 'Fügen Sie dem System einen neuen Benutzer hinzu.',
+        'title' => 'Benutzer erstellen',
+    ],
+    'notices' => [
+        'account_created' => 'Das Konto wurde erfolgreich erstellt.',
+        'account_updated' => 'Das Konto wurde erfolgreich aktualisiert.',
+    ],
+    'view' => [
+        'administrator' => 'Administrator',
+        'administrator_help' => 'Wenn Sie dies auf „Ja“ setzen, erhält der Benutzer vollen administrativen Zugriff.',
+        'default_language' => 'Standardsprache',
+        'default_language_help' => 'Die Standardsprache, die beim Anzeigen des Panels für diesen Benutzer verwendet wird.',
+        'delete_button' => 'Benutzer löschen',
+        'delete_title' => 'Benutzer löschen',
+        'delete_warning' => 'Es dürfen keine Server mit diesem Konto verknüpft sein, damit es gelöscht werden kann.',
+        'identity' => 'Identität',
+        'name_first' => 'Vorname des Kunden',
+        'name_last' => 'Nachname des Kunden',
+        'password_help' => 'Lassen Sie das Feld leer, um das Passwort dieses Benutzers beizubehalten. Der Benutzer erhält keine Benachrichtigung, wenn das Passwort geändert wird.',
+        'permissions' => 'Berechtigungen',
+        'submit' => 'Benutzer aktualisieren',
+        'title' => 'Benutzer verwalten: :username',
+    ],
+];

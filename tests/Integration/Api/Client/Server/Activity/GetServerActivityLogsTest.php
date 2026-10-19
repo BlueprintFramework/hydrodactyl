@@ -45,17 +45,28 @@ class GetServerActivityLogsTest extends ClientApiIntegrationTestCase
      * Test that the events endpoint still works correctly when admin activity is
      * hidden, since that code path adds a join onto the users table.
      */
-    public function testServerActivityEventsEndpointWithHiddenAdminActivity(): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('daemonDataProvider')]
+    public function testServerActivityEventsEndpointWithHiddenAdminActivity(string $daemon): void
     {
         config()->set('activity.hide_admin_activity', true);
 
         [$user, $server] = $this->generateTestAccount([Permission::ACTION_ACTIVITY_READ]);
-        $this->createActivityLogs($server, ['server:power:start', 'server:backup:create']);
+        $server->node->update(['daemonType' => $daemon]);
+        $this->createActivityLogs($server, ['server:power:start', 'server:backup:create', 'server:power:start']);
 
-        $response = $this->actingAs($user)->getJson($this->link($server, '/activity/events'));
+        $response = $this->actingAs($user)->getJson("/api/client/servers/{$daemon}/{$server->uuid}/activity/events");
 
         $response->assertOk();
         $this->assertSame(['server:backup:create', 'server:power:start'], $response->json());
+    }
+
+    public static function daemonDataProvider(): array
+    {
+        return [
+            'wings' => ['wings'],
+            'elytra' => ['elytra'],
+            'calagopus' => ['calagopus'],
+        ];
     }
 
     /**

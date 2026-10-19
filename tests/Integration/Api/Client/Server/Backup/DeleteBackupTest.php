@@ -28,8 +28,28 @@ class DeleteBackupTest extends ClientApiIntegrationTestCase
 
         $backup = Backup::factory()->create(['server_id' => $server->id]);
 
-        $this->actingAs($user)->deleteJson($this->link($backup))
+        $this->actingAs($user)->deleteJson($this->link($backup), ['password' => 'password'])
             ->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    /**
+     * Destructive backup endpoints must confirm the account password for
+     * browser sessions; a wrong (or missing) password is rejected.
+     */
+    public function testBackupCannotBeDeletedWithoutAValidPassword()
+    {
+        [$user, $server] = $this->generateTestAccount([Permission::ACTION_BACKUP_DELETE]);
+
+        /** @var Backup $backup */
+        $backup = Backup::factory()->create(['server_id' => $server->id]);
+
+        $this->actingAs($user)->deleteJson($this->link($backup), ['password' => 'not-the-password'])
+            ->assertStatus(Response::HTTP_BAD_REQUEST);
+
+        $this->actingAs($user)->deleteJson($this->link($backup))
+            ->assertStatus(Response::HTTP_BAD_REQUEST);
+
+        $this->assertNotSoftDeleted($backup);
     }
 
     /**
@@ -52,13 +72,13 @@ class DeleteBackupTest extends ClientApiIntegrationTestCase
             })
         )->andReturn(new Response());
 
-        $this->actingAs($user)->deleteJson($this->link($backup))->assertStatus(Response::HTTP_NO_CONTENT);
+        $this->actingAs($user)->deleteJson($this->link($backup), ['password' => 'password'])->assertStatus(Response::HTTP_NO_CONTENT);
 
         $backup->refresh();
         $this->assertSoftDeleted($backup);
 
         $this->assertActivityFor('server:backup.delete', $user, [$backup, $backup->server]);
 
-        $this->actingAs($user)->deleteJson($this->link($backup))->assertStatus(Response::HTTP_NOT_FOUND);
+        $this->actingAs($user)->deleteJson($this->link($backup), ['password' => 'password'])->assertStatus(Response::HTTP_NOT_FOUND);
     }
 }

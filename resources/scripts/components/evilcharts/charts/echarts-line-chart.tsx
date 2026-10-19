@@ -1667,7 +1667,7 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
         });
         themeObserver.observe(document.documentElement, {
             attributes: true,
-            attributeFilter: ['class'],
+            attributeFilter: ['class', 'data-theme', 'data-accent', 'data-palette'],
         });
 
         chart.on('click', (params) => {

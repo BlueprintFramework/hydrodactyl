@@ -11,10 +11,10 @@ export default createGlobalStyle`
         width: 100%;
         overflow: hidden;
         --tw-bg-opacity: 1;
-        background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+        background-color: var(--color-canvas);
         font-family: "Plus Jakarta Sans", sans-serif;
         --tw-text-opacity: 1;
-        color: rgb(255 255 255 / var(--tw-text-opacity));
+        color: var(--color-primary);
     }
 
     button {
@@ -27,6 +27,11 @@ export default createGlobalStyle`
 
     textarea, select, input, button, button:focus, button:focus-visible {
         outline: none;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-hydro-400);
+        outline-offset: 2px;
     }
 
     input[type=number]::-webkit-outer-spin-button,
@@ -108,7 +113,7 @@ export default createGlobalStyle`
         overflow: hidden;
         padding: 0;
         outline: none;
-        background: radial-gradient(124.75% 124.75% at 50.01% -10.55%, rgba(46, 46, 46, 0.3) 0%, rgb(26, 26, 26, 0.2) 100%);
+        background: var(--color-bg-raised);
         backdrop-filter: blur(20px);
         box-shadow: rgba(0, 0, 0, 0.5) 0px 16px 70px;
         position: relative;
@@ -130,14 +135,14 @@ export default createGlobalStyle`
         padding: 20px;
         outline: none;
         background: transparent;
-        border-bottom: 1px solid #3a3a3a44;
-        color: #eee;
+        border-bottom: 1px solid var(--color-mocha-400);
+        color: var(--color-primary);
         border-radius: 0;
         caret-color: var(--color-brand);
         margin: 0;
 
         &::placeholder {
-            color: #444;
+            color: var(--color-secondary);
         }
     }
 
@@ -161,11 +166,11 @@ export default createGlobalStyle`
         margin-right: 8px;
 
         &[data-selected='true'] {
-            background: #3a3a3add;
+            background: var(--color-mocha-400);
             box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 
             svg {
-                color: #fff;
+                color: var(--color-primary);
             }
 
             /* &:after {
@@ -180,23 +185,23 @@ export default createGlobalStyle`
         }
 
         &[data-disabled='true'] {
-            color: #444;
+            color: var(--color-secondary);
             cursor: not-allowed;
         }
 
         &[data-disabled='true'] svg {
-            color: #444;
+            color: var(--color-secondary);
         }
 
         &:active {
             transition-property: background;
-            background: #3a3a3add;
+            background: var(--color-mocha-400);
         }
 
         svg {
             width: 16px;
             height: 16px;
-            color: #ddd;
+            color: var(--color-primary);
         }
     }
 
@@ -236,6 +241,6 @@ export default createGlobalStyle`
     }
 
     input::placeholder {
-        color: #ffffff55 !important;
+        color: var(--color-secondary);
     }
 `;

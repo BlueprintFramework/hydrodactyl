@@ -283,7 +283,7 @@ const EditScheduleModal = ({ schedule, visible, onDismissed, ...props }: Props) 
                                 </p>
                             )}
 
-                            <div className='my-3'>
+                            <div className='my-3 space-y-3'>
                                 <FormikSwitchV2
                                     name={'onlyWhenOnline'}
                                     description={t('server.schedules.only_when_online_description')}

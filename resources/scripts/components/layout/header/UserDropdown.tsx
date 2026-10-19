@@ -149,7 +149,7 @@ export default function UserDropdown({ serverId, admin = false }: UserDropdownPr
                                 draggable={false}
                             />
                         </div>
-                        <span className='hidden sm:inline max-w-[140px] truncate'>{email}</span>
+                        <span className='hidden sm:inline max-w-[120px] truncate'>{email}</span>
                     </div>
                     <HugeiconsIcon size={16} strokeWidth={2} icon={ArrowDown01Icon} className='hidden sm:inline' />
                 </Button>

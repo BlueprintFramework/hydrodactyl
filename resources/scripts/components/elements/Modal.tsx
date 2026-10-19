@@ -152,7 +152,7 @@ const Modal: React.FC<ModalProps> = ({
                                                 </button>
                                             )}
                                         </div>
-                                        <div className={'flex px-6 overflow-y-auto'}>
+                                        <div className={'flex px-6 pb-6 overflow-y-auto'}>
                                             <hr
                                                 style={{
                                                     boxShadow: 'inset 0 0 .4rem .4rem #fff',

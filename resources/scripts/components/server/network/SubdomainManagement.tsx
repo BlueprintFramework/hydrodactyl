@@ -42,7 +42,7 @@ const CleanInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<
     ({ className = '', ...props }, ref) => (
         <input
             ref={ref}
-            className={`border-0 bg-transparent focus:ring-0 outline-none text-sm text-cream-400 placeholder:text-cream-400/40 ${className}`}
+            className={`border-0 bg-transparent focus:ring-0 outline-none text-primary placeholder-zinc-400 ${className}`}
             {...props}
         />
     ),
@@ -278,7 +278,7 @@ const SubdomainManagement = () => {
                         <div className='flex items-center justify-between'>
                             <div>
                                 <p className='text-sm text-zinc-400 mb-2'>{t('server.network.subdomain.current')}</p>
-                                <p className='text-lg font-medium text-white font-mono'>
+                                <p className='text-lg font-medium text-primary font-mono'>
                                     {subdomainInfo?.current_subdomain?.attributes?.full_domain}
                                 </p>
                                 <p className='text-sm text-zinc-400 mt-2'>Points to primary allocation</p>

@@ -45,7 +45,7 @@ const CreateGroupModal = ({ onClose, onCreated }: CreateGroupModalProps) => {
         >
             <div className='space-y-4'>
                 <div>
-                    <Label className='text-sm text-[#ffffff77]'>{t('dashboard.groups.name_label')}</Label>
+                    <Label className='text-sm text-secondary'>{t('dashboard.groups.name_label')}</Label>
                     <Input
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -55,7 +55,7 @@ const CreateGroupModal = ({ onClose, onCreated }: CreateGroupModalProps) => {
                     />
                 </div>
                 <div>
-                    <Label className='text-sm text-[#ffffff77]'>{t('dashboard.groups.description_label')}</Label>
+                    <Label className='text-sm text-secondary'>{t('dashboard.groups.description_label')}</Label>
                     <Textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}

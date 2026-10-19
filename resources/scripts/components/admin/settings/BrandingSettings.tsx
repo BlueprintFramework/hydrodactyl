@@ -9,6 +9,7 @@ import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
+import { normalizeBrandColor } from '@/lib/brand-color';
 import { cn } from '@/lib/utils';
 
 const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => void }) => {
@@ -22,9 +23,26 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
     const [submitting, setSubmitting] = useState(false);
     const [removing, setRemoving] = useState(false);
     const [confirmRemove, setConfirmRemove] = useState(false);
-    const [brandColor, setBrandColor] = useState<string>(logo.brandColor || '#52A9FF');
+    const [brandColor, setBrandColor] = useState(
+        () => normalizeBrandColor(logo.brandColor) ?? normalizeBrandColor(logo.defaultBrandColor) ?? '',
+    );
+    const [lastValidBrandColor, setLastValidBrandColor] = useState(
+        () => normalizeBrandColor(logo.brandColor) ?? normalizeBrandColor(logo.defaultBrandColor),
+    );
+    const [colorTouched, setColorTouched] = useState(false);
+    const colorOperation = useRef(false);
     const [savingColor, setSavingColor] = useState(false);
     const [resettingColor, setResettingColor] = useState(false);
+    const savedBrandColor = normalizeBrandColor(logo.brandColor);
+    const defaultBrandColor = normalizeBrandColor(logo.defaultBrandColor);
+    const normalizedBrandColor = normalizeBrandColor(brandColor);
+    const invalidBrandColor = normalizedBrandColor === null;
+
+    const applyBrandColorResponse = (response: LogoResponse) => {
+        const color = normalizeBrandColor(response.brandColor) ?? normalizeBrandColor(response.defaultBrandColor);
+        setBrandColor(color ?? response.brandColor);
+        setLastValidBrandColor(color);
+    };
 
     const chooseFile = (selected: File) => {
         setFile(selected);
@@ -85,22 +103,30 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
     };
 
     const saveBrandColor = async () => {
-        const next = brandColor || '#52A9FF';
+        const next = normalizeBrandColor(brandColor);
+        if (colorOperation.current || !next) return;
 
+        colorOperation.current = true;
         setSavingColor(true);
 
         try {
-            await updateLogo({ brand_color: next });
+            const updated = await updateLogo({ brand_color: next });
+            applyBrandColorResponse(updated);
+            setColorTouched(false);
             await onSaved();
             toast.success(t('admin.settings.brand_color_updated'));
         } catch (error) {
             toast.error(errorToMessage(error, t('admin.settings.brand_color_update_failed')));
         } finally {
+            colorOperation.current = false;
             setSavingColor(false);
         }
     };
 
     const resetBrandColor = async () => {
+        if (colorOperation.current) return;
+
+        colorOperation.current = true;
         setResettingColor(true);
 
         try {
@@ -108,17 +134,19 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
             // fall back to its default — the API returns that resolved value.
             const updated = await updateLogo({ brand_color: null });
             await onSaved();
-            setBrandColor(updated.brandColor);
+            applyBrandColorResponse(updated);
+            setColorTouched(false);
             toast.success(t('admin.settings.brand_color_reset'));
         } catch (error) {
             toast.error(errorToMessage(error, t('admin.settings.brand_color_reset_failed')));
         } finally {
+            colorOperation.current = false;
             setResettingColor(false);
         }
     };
 
     return (
-        <div className='space-y-4'>
+        <div className='flex flex-col gap-4'>
             <div className='rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
                 <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.current_logo')}</h2>
                 <div className='mt-4 flex min-h-[120px] items-center justify-center'>
@@ -277,40 +305,97 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
             <div className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'>
                 <h2 className='text-sm font-semibold text-cream-50'>{t('admin.settings.brand_color')}</h2>
                 <p className='text-xs text-cream-400/50'>{t('admin.settings.brand_color_description')}</p>
-                <div className='flex items-center gap-3'>
-                    <input
-                        type='color'
-                        value={brandColor}
-                        onChange={(event) => setBrandColor(event.target.value)}
-                        className='h-9 w-9 cursor-pointer rounded-lg border border-mocha-300 bg-transparent p-1'
-                        aria-label={t('admin.settings.brand_color')}
+                {lastValidBrandColor ? (
+                    <div
+                        className='h-8 w-8 rounded-md border border-mocha-300'
+                        style={{ backgroundColor: lastValidBrandColor }}
+                        role='img'
+                        aria-label={t('appearance.brand_current', { color: lastValidBrandColor })}
                     />
-                    <Input.Text
-                        value={brandColor}
-                        onChange={(event) => setBrandColor(event.target.value)}
-                        className='w-32 uppercase'
-                        aria-label={t('admin.settings.brand_color_hex')}
-                    />
-                    <div className='flex items-center gap-2'>
+                ) : (
+                    <p className='text-sm text-red-400' role='alert'>
+                        {t('appearance.brand_unavailable')}
+                    </p>
+                )}
+                <div className='flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end'>
+                    {lastValidBrandColor && (
+                        <input
+                            id='brand-color-picker'
+                            type='color'
+                            value={lastValidBrandColor}
+                            disabled={savingColor || resettingColor}
+                            onChange={(event) => {
+                                setBrandColor(event.target.value.toUpperCase());
+                                setLastValidBrandColor(normalizeBrandColor(event.target.value));
+                                setColorTouched(true);
+                            }}
+                            className='h-11 w-11 shrink-0 cursor-pointer rounded-lg border border-mocha-300 bg-transparent p-1'
+                            aria-label={t('appearance.brand_picker')}
+                        />
+                    )}
+                    <div className='min-w-0 flex-1'>
+                        <label htmlFor='brand-color-hex' className='mb-1 block text-sm font-medium text-cream-100'>
+                            {t('admin.settings.brand_color_hex')}
+                        </label>
+                        <Input.Text
+                            id='brand-color-hex'
+                            value={brandColor}
+                            disabled={savingColor || resettingColor}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                setBrandColor(value);
+                                const normalized = normalizeBrandColor(value);
+                                if (normalized) setLastValidBrandColor(normalized);
+                                setColorTouched(true);
+                            }}
+                            className='h-11 w-full uppercase'
+                            aria-invalid={colorTouched && invalidBrandColor}
+                            aria-describedby={`brand-color-help${colorTouched && invalidBrandColor ? ' brand-color-error' : ''}`}
+                        />
+                        <p id='brand-color-help' className='mt-1 text-xs text-cream-400/70'>
+                            {t('appearance.brand_help')}
+                        </p>
+                        {colorTouched && invalidBrandColor && (
+                            <p id='brand-color-error' className='mt-1 text-sm text-red-400' role='alert'>
+                                {t('appearance.brand_invalid')}
+                            </p>
+                        )}
+                    </div>
+                    <div className='flex flex-wrap gap-2'>
                         <Button
                             onClick={saveBrandColor}
+                            className='h-11'
                             disabled={
-                                savingColor || brandColor.toLowerCase() === (logo.brandColor || '#52A9FF').toLowerCase()
+                                savingColor ||
+                                resettingColor ||
+                                invalidBrandColor ||
+                                normalizedBrandColor === savedBrandColor
                             }
                         >
-                            {savingColor ? <Spinner size={Spinner.Size.SMALL} /> : t('admin.settings.save_color')}
+                            {savingColor ? (
+                                <span role='status' className='inline-flex items-center gap-2'>
+                                    <Spinner size={Spinner.Size.SMALL} />
+                                    <span>{t('appearance.brand_saving')}</span>
+                                </span>
+                            ) : (
+                                t('admin.settings.save_color')
+                            )}
                         </Button>
                         <Button
                             variant='outline'
                             onClick={resetBrandColor}
+                            className='h-11'
                             disabled={
                                 resettingColor ||
                                 savingColor ||
-                                brandColor.toLowerCase() === (logo.defaultBrandColor || '').toLowerCase()
+                                (savedBrandColor === defaultBrandColor && normalizedBrandColor === defaultBrandColor)
                             }
                         >
                             {resettingColor ? (
-                                <Spinner size={Spinner.Size.SMALL} />
+                                <span role='status' className='inline-flex items-center gap-2'>
+                                    <Spinner size={Spinner.Size.SMALL} />
+                                    <span>{t('appearance.brand_resetting')}</span>
+                                </span>
                             ) : (
                                 t('admin.settings.reset_to_default')
                             )}

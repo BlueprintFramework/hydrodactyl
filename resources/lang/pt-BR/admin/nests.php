@@ -1,0 +1,68 @@
+<?php
+
+return [
+    'notices' => [
+        'created' => 'O novo nest :name foi criado com sucesso.',
+        'deleted' => 'O nest solicitado foi excluído do painel com sucesso.',
+        'updated' => 'As configurações do nest foram atualizadas com sucesso.',
+    ],
+    'eggs' => [
+        'notices' => [
+            'imported' => 'Este egg e suas variáveis foram importados com sucesso.',
+            'import_url_host' => 'A URL de importação do egg não pertence a um host permitido.',
+            'import_url_scheme' => 'O esquema da URL de importação do egg é inválido.',
+            'import_fetch_failed' => 'Não foi possível obter o egg pela URL.',
+            'updated_via_import' => 'Este egg foi atualizado com o arquivo fornecido.',
+            'deleted' => 'O egg solicitado foi excluído do painel com sucesso.',
+            'updated' => 'As configurações do egg foram atualizadas com sucesso.',
+            'script_updated' => 'O script de instalação do egg foi atualizado e será executado nas instalações dos servidores.',
+            'egg_created' => 'Um novo egg foi criado com sucesso. Reinicie os daemons em execução para aplicá-lo.',
+        ],
+    ],
+    'variables' => [
+        'notices' => [
+            'variable_deleted' => 'A variável ":variable" foi excluída e não estará mais disponível para os servidores após serem reconstruídos.',
+            'variable_updated' => 'A variável ":variable" foi atualizada. Reconstrua os servidores que a utilizam para aplicar as alterações.',
+            'variable_created' => 'Uma nova variável foi criada e associada a este egg com sucesso.',
+        ],
+    ],
+    'index' => [
+        'title' => 'Nests',
+        'subtitle' => 'Todos os nests disponíveis neste sistema.',
+        'warning' => '<strong>Eggs são poderosos</strong>. Alterações incorretas podem causar falhas nos servidores. Evite editar os eggs padrão sem saber o que está fazendo.',
+        'configured_nests' => 'Nests configurados',
+        'import_egg' => 'Importar egg',
+        'import_egg_from_url' => 'Importar egg por URL',
+        'create_new' => 'Criar novo',
+        'table_description' => 'Descrição',
+        'table_eggs' => 'Eggs',
+        'import_modal_title' => 'Importar um egg',
+        'egg_file' => 'Arquivo do egg',
+        'egg_file_help' => 'Selecione o arquivo <code>.json</code> do novo egg que deseja importar.',
+        'associated_nest' => 'Nest associado',
+        'associated_nest_help' => 'Selecione na lista o nest ao qual este egg será associado. Para associá-lo a um novo nest, crie o nest antes de continuar.',
+        'import_button' => 'Importar',
+        'egg_url' => 'URL do egg',
+        'egg_url_help' => 'Informe a URL do arquivo do novo egg que deseja importar.',
+    ],
+    'new' => [
+        'title' => 'Novo nest',
+        'subtitle' => 'Configure um novo nest para disponibilizar em todos os nós.',
+        'name_help' => 'Use um nome de categoria descritivo que abranja todos os eggs deste nest.',
+        'description' => 'Descrição',
+    ],
+    'view' => [
+        'title' => 'Nests &rarr; :name',
+        'name_help' => 'Use um nome de categoria descritivo que abranja todas as opções deste serviço.',
+        'description' => 'Descrição',
+        'nest_id' => 'ID do nest',
+        'nest_id_help' => 'Um ID exclusivo para identificar este nest internamente e pela API.',
+        'author' => 'Autor',
+        'author_help' => 'O autor desta opção de serviço. Direcione dúvidas e problemas a ele, a menos que esta seja uma opção oficial de <code>support@pterodactyl.io</code>.',
+        'uuid' => 'UUID',
+        'uuid_help' => 'Um UUID atribuído a todos os servidores que usam esta opção para identificação.',
+        'nest_eggs' => 'Eggs do nest',
+        'new_egg' => 'Novo egg',
+        'delete_js' => ' Excluir nest',
+    ],
+];

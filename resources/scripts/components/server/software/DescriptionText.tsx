@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type KeyboardEvent, type MouseEvent, useState } from 'react';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { MAX_DESCRIPTION_LENGTH } from './types';
 
@@ -12,16 +12,33 @@ const DescriptionText = ({ description, id: _id }: Props) => {
     const [showFull, setShowFull] = useState(false);
     const isLong = description.length > MAX_DESCRIPTION_LENGTH;
 
-    const toggle = () => setShowFull((prev) => !prev);
+    // The description lives inside cards that are themselves buttons, so the
+    // toggle cannot be a real <button> (nested buttons are invalid and the
+    // click would select the card). Stop the event instead of bubbling it up.
+    const toggle = (event: MouseEvent | KeyboardEvent) => {
+        event.stopPropagation();
+        setShowFull((prev) => !prev);
+    };
+
+    const toggleProps = {
+        role: 'button' as const,
+        tabIndex: 0,
+        onClick: toggle,
+        onKeyDown: (event: KeyboardEvent) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(event);
+            }
+        },
+        className: 'text-brand hover:underline font-medium cursor-pointer',
+    };
 
     return (
         <p className='text-sm text-cream-400/70 leading-relaxed'>
             {isLong && !showFull ? (
                 <>
                     {description.slice(0, MAX_DESCRIPTION_LENGTH)}...{' '}
-                    <button type='button' onClick={toggle} className='text-brand hover:underline font-medium'>
-                        {t('server.software.show_more')}
-                    </button>
+                    <span {...toggleProps}>{t('server.software.show_more')}</span>
                 </>
             ) : (
                 <>
@@ -29,9 +46,7 @@ const DescriptionText = ({ description, id: _id }: Props) => {
                     {isLong && (
                         <>
                             {' '}
-                            <button type='button' onClick={toggle} className='text-brand hover:underline font-medium'>
-                                {t('server.software.show_less')}
-                            </button>
+                            <span {...toggleProps}>{t('server.software.show_less')}</span>
                         </>
                     )}
                 </>

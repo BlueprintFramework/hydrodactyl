@@ -1,0 +1,87 @@
+<?php
+
+return [
+    'websocket' => [
+        'description' => 'Permitit usori WebSocket serveri iungere, cuius facultatem habet output conloquii et statisticas serveri reali temporis videndi.',
+        'connect' => 'Permitit usori exemplar WebSocket serveri iungere ut conloquium fluat.',
+    ],
+    'control' => [
+        'description' => 'Permissa quae facultatem usoris statum potestatis serveri moderandi vel mandata mittendi moderantur.',
+        'console' => 'Permitit usori mandata in exemplar serveri per conloquium mittere.',
+        'start' => 'Permitit usori serverum incipere si intermissus est.',
+        'stop' => 'Permitit usori serverum sistere si currit.',
+        'restart' => 'Permitit usori reinitiationem serveri facere. Hoc ei permittit serverum incipere si offline est, sed non serverum in statu penitus intermisso ponere.',
+    ],
+    'user' => [
+        'description' => 'Permissa quae usori permittunt alios subusores in servero administrare. Numquam rationem suam ipsius emendare poterit, aut permissa quae ipse non habet assignare.',
+        'create' => 'Permitit usori subusores novos pro servero creare.',
+        'read' => 'Permitit usori subusores eorumque permissa pro servero videre.',
+        'update' => 'Permitit usori alios subusores mutare.',
+        'delete' => 'Permitit usori subusorem e servero delere.',
+    ],
+    'file' => [
+        'description' => 'Permissa quae facultatem usoris systematem fasciculorum huius serveri mutandi moderantur.',
+        'create' => 'Permitit usori fasciculos et capsas additivas per Panel vel immissionem directam creare.',
+        'read' => 'Permitit usori contenta capsae videre, sed contenta fasciculorum videre vel eos depromere non licet.',
+        'read-content' => 'Permitit usori contenta fasciculi dati videre. Hoc etiam usori permittit fasciculos deprimere.',
+        'update' => 'Permitit usori contenta fasciculi vel capsae exstantis renovare.',
+        'delete' => 'Permitit usori fasciculos vel capsas delere.',
+        'archive' => 'Permitit usori contenta capsae in archivum redigere simulque archiva exstantia in systemate explicare.',
+        'sftp' => 'Permitit usori SFTP iungere et fasciculos serveri moderari aliis permissis fasciculorum assignatis utens.',
+    ],
+    'backup' => [
+        'description' => 'Permissa quae facultatem usoris exemplaria serveri generandi et administrandi moderantur.',
+        'create' => 'Permitit usori exemplaria nova pro hoc servero creare.',
+        'read' => 'Permitit usori omnia exemplaria quae pro hoc servero existunt videre.',
+        'delete' => 'Permitit usori exemplaria e systemate removere.',
+        'download' => 'Permitit usori exemplar serveri deprimere. Periculum: hoc usori permittit omnes fasciculos serveri in exemplari accedere.',
+        'restore' => 'Permitit usori exemplar serveri restituere. Periculum: hoc usori permittit omnes fasciculos serveri in hoc processu delere.',
+    ],
+    'allocation' => [
+        'description' => 'Permissa quae facultatem usoris attributiones portuum huius serveri mutandi moderantur.',
+        'read' => 'Permitit usori omnes attributiones nunc huic servero assignatas videre. Usores cum quolibet gradu accessus ad hunc serverum semper attributionem primariam videre possunt.',
+        'create' => 'Permitit usori attributiones additivas servero assignare.',
+        'update' => 'Permitit usori attributionem primariam serveri mutare et adnotationes singulis attributionibus adiungere.',
+        'delete' => 'Permitit usori attributionem e servero delere.',
+    ],
+    'startup' => [
+        'description' => 'Permissa quae facultatem usoris parametros incipiendi huius serveri videndi moderantur.',
+        'read' => 'Permitit usori variabiles incipiendi serveri videre.',
+        'update' => 'Permitit usori variabiles incipiendi serveri mutare.',
+        'command' => 'Permitit usori mandatum incipiendi serveri mutare.',
+        'docker-image' => 'Permitit usori imaginem Docker quae curriendo servero adhibetur mutare.',
+        'software' => 'Permitit usori lusum / programmatum pro servero usum mutare.',
+    ],
+    'database' => [
+        'description' => 'Permissa quae accessum usoris ad administrationem thecae datorum huius serveri moderantur.',
+        'create' => 'Permitit usori thecam datorum novam pro hoc servero creare.',
+        'read' => 'Permitit usori thecam datorum huic servero coniunctam videre.',
+        'update' => 'Permitit usori tesseram in exemplari thecae datorum commutare. Si usor permissum view_password non habet tesseram renovatam non videbit.',
+        'delete' => 'Permitit usori exemplar thecae datorum e hoc servero removere.',
+        'view_password' => 'Permitit usori tesseram exemplari thecae datorum huic servero coniunctam videre.',
+    ],
+    'schedule' => [
+        'description' => 'Permissa quae accessum usoris ad ordinationem temporum huius serveri moderantur.',
+        'create' => 'Permitit usori ordines temporum novos pro hoc servero creare.',
+        'read' => 'Permitit usori ordines temporum et munera eis coniuncta pro hoc servero videre.',
+        'update' => 'Permitit usori ordines temporum et munera eorum pro hoc servero renovare.',
+        'delete' => 'Permitit usori ordines temporum pro hoc servero delere.',
+    ],
+    'settings' => [
+        'description' => 'Permissa quae accessum usoris ad ordinationes huius serveri moderantur.',
+        'rename' => 'Permitit usori hunc serverum nominare et descriptionem eius mutare.',
+        'reinstall' => 'Permitit usori reinstallationem huius serveri incitare.',
+    ],
+    'activity' => [
+        'description' => 'Permissa quae accessum usoris ad diaria gestorum serveri moderantur.',
+        'read' => 'Permitit usori diaria gestorum serveri videre.',
+    ],
+    'mod' => [
+        'description' => 'Permissa quae accessum usoris ad deprimendum et renovandum mods moderantur.',
+        'version' => 'Permitit usori mutare quam versionem deprimat',
+        'loader' => 'Permitit usori mutare quem loader deprimat',
+        'download' => 'Permitit usori mods in serverum deprimere',
+        'resolver' => 'Permitit usori Resolver dependentiarum adire',
+        'update' => 'Permitit usori mods iam installatos renovare',
+    ],
+];

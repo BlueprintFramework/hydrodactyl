@@ -1,0 +1,251 @@
+:root {
+    --palette-hue: 0;
+    --palette-chroma: 0;
+    --color-brand: var(--color-hydro);
+    --color-brand-50: var(--color-hydro-50);
+    --color-brand-100: var(--color-hydro-100);
+    --color-brand-200: var(--color-hydro-200);
+    --color-brand-300: var(--color-hydro-300);
+    --color-brand-400: var(--color-hydro-400);
+    --color-brand-500: var(--color-hydro-500);
+    --color-brand-600: var(--color-hydro-600);
+    --color-brand-700: var(--color-hydro-700);
+    --color-brand-800: var(--color-hydro-800);
+    --color-brand-900: var(--color-hydro-900);
+}
+
+:root[data-palette="red"],
+.appearance-preview[data-palette="red"] {
+    --palette-hue: 25;
+    --palette-chroma: 0.04;
+}
+
+:root[data-palette="blue"],
+.appearance-preview[data-palette="blue"] {
+    --palette-hue: 255;
+    --palette-chroma: 0.04;
+}
+
+:root[data-palette="yellow"],
+.appearance-preview[data-palette="yellow"] {
+    --palette-hue: 95;
+    --palette-chroma: 0.035;
+}
+
+:root[data-palette="green"],
+.appearance-preview[data-palette="green"] {
+    --palette-hue: 145;
+    --palette-chroma: 0.035;
+}
+
+:root[data-palette="violet"],
+.appearance-preview[data-palette="violet"] {
+    --palette-hue: 295;
+    --palette-chroma: 0.04;
+}
+
+/* Keep existing mocha/cream utility names so every panel screen uses the palette. */
+:root:not([data-palette="mocha"]),
+.appearance-preview:not([data-palette="mocha"]) {
+    --color-primary: var(--color-cream-400);
+    --color-accent: var(--color-cream-400);
+    --color-accent-foreground: var(--color-mocha-500);
+}
+
+:root:not([data-theme="light"]):not([data-palette="mocha"]),
+.appearance-preview:not([data-theme="light"]):not([data-palette="mocha"]) {
+    --color-canvas: oklch(0.11 var(--palette-chroma) var(--palette-hue));
+    --color-bg: oklch(0.14 var(--palette-chroma) var(--palette-hue));
+    --color-bg-raised: oklch(0.18 var(--palette-chroma) var(--palette-hue));
+    --color-bg-lowered: oklch(0.12 var(--palette-chroma) var(--palette-hue));
+    --color-secondary: oklch(0.78 var(--palette-chroma) var(--palette-hue));
+
+    --color-cream-50: oklch(0.99 calc(var(--palette-chroma) * 0.2) var(--palette-hue));
+    --color-cream-100: oklch(0.98 calc(var(--palette-chroma) * 0.3) var(--palette-hue));
+    --color-cream-200: oklch(0.97 calc(var(--palette-chroma) * 0.4) var(--palette-hue));
+    --color-cream-300: oklch(0.95 calc(var(--palette-chroma) * 0.5) var(--palette-hue));
+    --color-cream-400: oklch(0.93 calc(var(--palette-chroma) * 0.6) var(--palette-hue));
+    --color-cream-500: oklch(0.9 calc(var(--palette-chroma) * 0.7) var(--palette-hue));
+
+    --color-mocha-50: oklch(0.65 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-100: oklch(0.58 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-200: oklch(0.46 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-300: oklch(0.33 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-400: oklch(0.26 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-500: oklch(0.21 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-600: oklch(0.17 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-700: oklch(0.14 var(--palette-chroma) var(--palette-hue));
+}
+
+:root[data-theme="light"]:not([data-palette="mocha"]),
+.appearance-preview[data-theme="light"]:not([data-palette="mocha"]) {
+    --panel-ink-rgb: 24, 24, 27;
+    --color-overlay: var(--color-cream-100);
+    --color-canvas: oklch(0.98 calc(var(--palette-chroma) * 0.25) var(--palette-hue));
+    --color-bg: var(--color-canvas);
+    --color-bg-raised: oklch(0.995 calc(var(--palette-chroma) * 0.1) var(--palette-hue));
+    --color-bg-lowered: oklch(0.94 calc(var(--palette-chroma) * 0.5) var(--palette-hue));
+    --color-secondary: oklch(0.44 var(--palette-chroma) var(--palette-hue));
+
+    --color-cream-50: oklch(0.18 var(--palette-chroma) var(--palette-hue));
+    --color-cream-100: oklch(0.22 var(--palette-chroma) var(--palette-hue));
+    --color-cream-200: oklch(0.26 var(--palette-chroma) var(--palette-hue));
+    --color-cream-300: oklch(0.28 var(--palette-chroma) var(--palette-hue));
+    --color-cream-400: oklch(0.3 var(--palette-chroma) var(--palette-hue));
+    --color-cream-500: oklch(0.34 var(--palette-chroma) var(--palette-hue));
+
+    --color-mocha-50: oklch(0.5 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-100: oklch(0.64 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-200: oklch(0.76 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-300: oklch(0.86 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-400: oklch(0.92 var(--palette-chroma) var(--palette-hue));
+    --color-mocha-500: var(--color-bg-raised);
+    --color-mocha-600: oklch(0.965 calc(var(--palette-chroma) * 0.4) var(--palette-hue));
+    --color-mocha-700: var(--color-canvas);
+}
+
+.appearance-preview {
+    --palette-hue: 0;
+    --palette-chroma: 0;
+}
+
+.appearance-preview:not([data-theme="light"])[data-palette="mocha"] {
+    --color-bg: #0c0a09;
+    --color-bg-raised: #110f0d;
+    --color-primary: #fff1e0;
+}
+
+.appearance-preview[data-theme="light"][data-palette="mocha"] {
+    --color-bg: #f8f6f3;
+    --color-bg-raised: #ffffff;
+    --color-primary: #40352b;
+}
+
+:root[data-theme="dark"][data-palette="obsidian"],
+.appearance-preview[data-theme="dark"][data-palette="obsidian"] {
+    --palette-canvas: #0b0c12;
+    --palette-background: #11121a;
+    --palette-raised: #1b1d28;
+    --palette-lowered: #08090e;
+    --palette-foreground: #f2f0fa;
+    --palette-muted: #c6c2d7;
+}
+
+:root[data-theme="light"][data-palette="obsidian"],
+.appearance-preview[data-theme="light"][data-palette="obsidian"] {
+    --palette-canvas: #f6f5fa;
+    --palette-background: #f8f7fc;
+    --palette-raised: #ffffff;
+    --palette-lowered: #e8e6f0;
+    --palette-foreground: #272633;
+    --palette-muted: #565468;
+}
+
+:root[data-theme="dark"][data-palette="dracula"],
+.appearance-preview[data-theme="dark"][data-palette="dracula"] {
+    --palette-canvas: #21222c;
+    --palette-background: #282a36;
+    --palette-raised: #343746;
+    --palette-lowered: #191a21;
+    --palette-foreground: #f8f8f2;
+    --palette-muted: #c9ccdc;
+}
+
+:root[data-theme="light"][data-palette="dracula"],
+.appearance-preview[data-theme="light"][data-palette="dracula"] {
+    --palette-canvas: #f5f1e4;
+    --palette-background: #fffbeb;
+    --palette-raised: #efeddc;
+    --palette-lowered: #dedccf;
+    --palette-foreground: #1f1f1f;
+    --palette-muted: #625c46;
+}
+
+:root[data-theme="dark"][data-palette="nord"],
+.appearance-preview[data-theme="dark"][data-palette="nord"] {
+    --palette-canvas: #2e3440;
+    --palette-background: #2e3440;
+    --palette-raised: #3b4252;
+    --palette-lowered: #272d38;
+    --palette-foreground: #eceff4;
+    --palette-muted: #d8dee9;
+}
+
+:root[data-theme="light"][data-palette="nord"],
+.appearance-preview[data-theme="light"][data-palette="nord"] {
+    --palette-canvas: #eceff4;
+    --palette-background: #eceff4;
+    --palette-raised: #e5e9f0;
+    --palette-lowered: #d8dee9;
+    --palette-foreground: #2e3440;
+    --palette-muted: #4c566a;
+}
+
+:root[data-theme="dark"][data-palette="nord"] {
+    --color-red-400: #ff8a8a;
+}
+
+:root[data-theme][data-palette="obsidian"],
+:root[data-theme][data-palette="dracula"],
+:root[data-theme][data-palette="nord"],
+.appearance-preview[data-theme][data-palette="obsidian"],
+.appearance-preview[data-theme][data-palette="dracula"],
+.appearance-preview[data-theme][data-palette="nord"] {
+    --color-canvas: var(--palette-canvas);
+    --color-bg: var(--palette-background);
+    --color-bg-raised: var(--palette-raised);
+    --color-bg-lowered: var(--palette-lowered);
+    --color-primary: var(--palette-foreground);
+    --color-secondary: var(--palette-muted);
+    --color-overlay: var(--palette-raised);
+    --color-accent: var(--palette-foreground);
+    --color-accent-foreground: var(--palette-background);
+    --color-cream-50: color-mix(in srgb, var(--palette-foreground) 72%, var(--palette-background));
+    --color-cream-100: color-mix(in srgb, var(--palette-foreground) 80%, var(--palette-background));
+    --color-cream-200: color-mix(in srgb, var(--palette-foreground) 88%, var(--palette-background));
+    --color-cream-300: color-mix(in srgb, var(--palette-foreground) 94%, var(--palette-background));
+    --color-cream-400: var(--palette-foreground);
+    --color-cream-500: var(--palette-foreground);
+    --color-mocha-50: color-mix(in srgb, var(--palette-foreground) 48%, var(--palette-background));
+    --color-mocha-100: color-mix(in srgb, var(--palette-foreground) 36%, var(--palette-background));
+    --color-mocha-200: color-mix(in srgb, var(--palette-foreground) 24%, var(--palette-background));
+    --color-mocha-300: color-mix(in srgb, var(--palette-foreground) 16%, var(--palette-background));
+    --color-mocha-400: var(--palette-raised);
+    --color-mocha-500: var(--palette-background);
+    --color-mocha-600: var(--palette-raised);
+    --color-mocha-700: var(--palette-canvas);
+}
+
+:root[data-theme="light"][data-palette="obsidian"],
+:root[data-theme="light"][data-palette="dracula"],
+:root[data-theme="light"][data-palette="nord"],
+.appearance-preview[data-theme="light"][data-palette="obsidian"],
+.appearance-preview[data-theme="light"][data-palette="dracula"],
+.appearance-preview[data-theme="light"][data-palette="nord"] {
+    --panel-ink-rgb: 29, 29, 31;
+    --color-mocha-50: color-mix(in srgb, var(--palette-foreground) 72%, var(--palette-background));
+    --color-mocha-100: color-mix(in srgb, var(--palette-foreground) 36%, var(--palette-background));
+    --color-mocha-200: color-mix(in srgb, var(--palette-foreground) 24%, var(--palette-background));
+    --color-mocha-300: color-mix(in srgb, var(--palette-foreground) 16%, var(--palette-background));
+    --color-mocha-400: var(--palette-lowered);
+    --color-mocha-500: var(--palette-background);
+    --color-mocha-600: var(--palette-raised);
+    --color-mocha-700: var(--palette-canvas);
+}
+
+:root[data-theme="dark"][data-palette="obsidian"],
+:root[data-theme="dark"][data-palette="dracula"],
+:root[data-theme="dark"][data-palette="nord"],
+.appearance-preview[data-theme="dark"][data-palette="obsidian"],
+.appearance-preview[data-theme="dark"][data-palette="dracula"],
+.appearance-preview[data-theme="dark"][data-palette="nord"] {
+    --panel-ink-rgb: 242, 240, 250;
+    --color-mocha-50: color-mix(in srgb, var(--palette-foreground) 48%, var(--palette-background));
+    --color-mocha-100: color-mix(in srgb, var(--palette-foreground) 36%, var(--palette-background));
+    --color-mocha-200: color-mix(in srgb, var(--palette-foreground) 24%, var(--palette-background));
+    --color-mocha-300: color-mix(in srgb, var(--palette-foreground) 16%, var(--palette-background));
+    --color-mocha-400: var(--palette-raised);
+    --color-mocha-500: var(--palette-lowered);
+    --color-mocha-600: var(--palette-raised);
+    --color-mocha-700: var(--palette-canvas);
+}

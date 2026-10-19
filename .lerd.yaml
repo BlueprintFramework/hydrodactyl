@@ -13,9 +13,8 @@ services:
   - postgresql-18:
       preset: postgres
       version: "18"
+  - redis
   - rustfs
-  - valkey:
-      preset: valkey
 workers:
   - queue
   - schedule

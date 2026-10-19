@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import AppearanceSettings from '@/components/dashboard/AppearanceSettings';
 import ConfigureTwoFactorForm from '@/components/dashboard/forms/ConfigureTwoFactorForm';
 import UpdateEmailAddressForm from '@/components/dashboard/forms/UpdateEmailAddressForm';
 import UpdatePasswordForm from '@/components/dashboard/forms/UpdatePasswordForm';
@@ -33,6 +34,7 @@ const AccountOverviewContainer = () => {
                 )}
 
                 <div className='flex flex-col w-full h-full gap-4 '>
+                    <AppearanceSettings />
                     <div
                         className='transform-gpu skeleton-anim-2'
                         style={{
@@ -79,7 +81,7 @@ const AccountOverviewContainer = () => {
                     </div>
 
                     <div
-                        className='transform-gpu skeleton-anim-2'
+                        className='transform-gpu skeleton-anim-2 pb-7'
                         style={{
                             animationDelay: '100ms',
                             animationTimingFunction:
