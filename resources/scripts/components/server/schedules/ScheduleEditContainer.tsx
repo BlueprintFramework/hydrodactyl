@@ -27,7 +27,7 @@ const ActivePill = ({ active }: { active: boolean }) => {
     const { t } = useTranslation();
 
     return (
-        <span className='flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-white'>
+        <span className='flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-primary'>
             {active ? t('common.active') : t('common.inactive')}
         </span>
     );
@@ -104,7 +104,7 @@ const ScheduleEditContainer = () => {
                                 {schedule.name}
                                 {schedule.isProcessing ? (
                                     <span
-                                        className={`flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-white`}
+                                        className={`flex items-center rounded-full px-2 py-px text-xs ml-4 uppercase bg-neutral-600 text-primary`}
                                     >
                                         {t('server.schedules.processing')}
                                     </span>

@@ -81,8 +81,8 @@ const Dropdown = ({
                     type='button'
                     disabled={disabled}
                     className={cn(
-                        'flex w-full items-center justify-between gap-2 rounded-lg bg-[#ffffff11] px-4 py-2 text-left text-sm text-cream-100 outline-none transition-colors',
-                        'hover:bg-[#ffffff17] focus-visible:ring-2 focus-visible:ring-hydro-500/40',
+                        'flex w-full items-center justify-between gap-2 rounded-lg bg-overlay/7 px-4 py-2 text-left text-sm text-cream-100 outline-none transition-colors',
+                        'hover:bg-overlay/9 focus-visible:ring-2 focus-visible:ring-hydro-500/40',
                         'disabled:cursor-not-allowed disabled:opacity-50',
                         triggerClassName,
                         className,
@@ -103,7 +103,7 @@ const Dropdown = ({
                 className='z-99999 max-h-72 w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto'
             >
                 {searchable && (
-                    <div className='sticky top-0 z-10 border-b border-[#ffffff11] bg-bg-lowered p-2'>
+                    <div className='sticky top-0 z-10 border-b border-overlay/7 bg-bg-lowered p-2'>
                         <div className='relative'>
                             <Magnifier
                                 width={16}
@@ -117,7 +117,7 @@ const Dropdown = ({
                                 value={query}
                                 onChange={(event) => setQuery(event.target.value)}
                                 placeholder={resolvedSearchPlaceholder}
-                                className='w-full rounded-lg bg-[#ffffff0a] py-1.5 pl-8 pr-8 text-sm text-cream-100 outline-none placeholder:text-cream-400/50 focus:ring-2 focus:ring-hydro-500/40'
+                                className='w-full rounded-lg bg-overlay/4 py-1.5 pl-8 pr-8 text-sm text-cream-100 outline-none placeholder:text-cream-400/50 focus:ring-2 focus:ring-hydro-500/40'
                             />
                             {query && (
                                 <button

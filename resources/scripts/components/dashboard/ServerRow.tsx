@@ -141,7 +141,7 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                         <div className={'status-bar'} />
                     </div>
                     <div className='flex items-center gap-2 min-w-0'>
-                        <p className={`text-sm text-[#ffffff66] truncate`}>
+                        <p className='text-sm text-secondary truncate'>
                             {server.allocations
                                 .filter((alloc) => alloc.isDefault)
                                 .map((allocation) => (
@@ -189,7 +189,7 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                     <Fragment>
                         <div className={`sm:flex hidden`}>
                             <div className={`flex justify-center gap-2 w-fit`}>
-                                <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>
+                                <p className='text-sm text-secondary font-bold w-fit whitespace-nowrap'>
                                     {t('dashboard.server_row.cpu')}
                                 </p>
                                 <p className='font-bold w-fit whitespace-nowrap'>
@@ -202,7 +202,7 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                         </div>
                         <div className={`sm:flex hidden`}>
                             <div className={`flex justify-center gap-2 w-fit`}>
-                                <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>
+                                <p className='text-sm text-secondary font-bold w-fit whitespace-nowrap'>
                                     {t('dashboard.server_row.ram')}
                                 </p>
                                 <p className='font-bold w-fit whitespace-nowrap'>
@@ -212,7 +212,7 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                         </div>
                         <div className={`sm:flex hidden`}>
                             <div className={`flex justify-center gap-2 w-fit`}>
-                                <p className='text-sm text-[#ffffff66] font-bold w-fit whitespace-nowrap'>
+                                <p className='text-sm text-secondary font-bold w-fit whitespace-nowrap'>
                                     {t('dashboard.server_row.storage')}
                                 </p>
                                 <p className='font-bold w-fit whitespace-nowrap'>

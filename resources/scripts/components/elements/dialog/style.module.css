@@ -5,8 +5,7 @@
 }
 
 .panel {
-    @apply relative mx-auto w-full max-w-xl rounded-2xl border-[1px] border-[#ffffff07] text-left shadow-2xl backdrop-blur-3xl;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), rgba(255, 255, 255, 0.12);
+    @apply relative mx-auto w-full max-w-xl rounded-2xl border-[1px] border-mocha-400 bg-bg-raised text-primary text-left shadow-2xl;
 }
 
 .title {

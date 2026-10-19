@@ -1,4 +1,47 @@
 {
+    "appearance": {
+        "title": "Aparença",
+        "description": "Aquestes preferències només s'apliquen a aquest navegador, inclòs el tauler d'administració. Els canvis es desen automàticament.",
+        "theme": "Tema",
+        "theme_description": "Tria una aparença clara o fosca.",
+        "light": "Clar",
+        "dark": "Fosc",
+        "system": "Utilitza la configuració del sistema",
+        "palette": "Paleta de l'aplicació",
+        "palette_description": "Fons, targetes, vores i text.",
+        "accent": "Color d'accent",
+        "accent_description": "Elements destacats i accions, independentment de la paleta.",
+        "storage_unavailable": "L'emmagatzematge del navegador no està disponible. La selecció es mantindrà fins que tornis a carregar aquesta pàgina.",
+        "switch_light": "Canvia al mode clar",
+        "switch_dark": "Canvia al mode fosc",
+        "palettes": {
+            "neutral": "Neutre",
+            "obsidian": "Obsidiana",
+            "dracula": "Dracula",
+            "nord": "Nord",
+            "red": "Vermell",
+            "blue": "Blau",
+            "yellow": "Groc",
+            "green": "Verd",
+            "violet": "Violeta",
+            "mocha": "Mocha original"
+        },
+        "accents": {
+            "panel": "Predeterminat del tauler",
+            "blue": "Blau",
+            "green": "Verd",
+            "violet": "Violeta",
+            "orange": "Taronja",
+            "rose": "Rosa"
+        },
+        "brand_current": "Color de marca actual {{color}}",
+        "brand_unavailable": "El color de marca no està disponible perquè ni el color desat ni el predeterminat del servidor són colors hexadecimals vàlids.",
+        "brand_picker": "Selector del color de marca",
+        "brand_help": "Utilitza #RGB o #RRGGBB.",
+        "brand_invalid": "Introdueix un color hexadecimal vàlid, com ara #RGB o #RRGGBB.",
+        "brand_saving": "S'està desant el color…",
+        "brand_resetting": "S'està restablint el color…"
+    },
     "activity": {
         "events": {
             "auth_checkpoint": "Repte de doble factor",

@@ -47,6 +47,7 @@ class ActivityLogController extends ClientApiController
         $this->authorize(Permission::ACTION_ACTIVITY_READ, $server);
 
         return $this->baseQuery($server)
+            ->select('activity_logs.event')
             ->distinct()
             ->pluck('event')
             ->sort()

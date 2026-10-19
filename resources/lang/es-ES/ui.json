@@ -1,4 +1,47 @@
 {
+    "appearance": {
+        "title": "Apariencia",
+        "description": "Estas preferencias solo se aplican a este navegador, incluido el panel de administración. Los cambios se guardan automáticamente.",
+        "theme": "Tema",
+        "theme_description": "Elige una apariencia clara u oscura.",
+        "light": "Claro",
+        "dark": "Oscuro",
+        "system": "Usar la configuración del sistema",
+        "palette": "Paleta de la aplicación",
+        "palette_description": "Fondos, tarjetas, bordes y texto.",
+        "accent": "Color de acento",
+        "accent_description": "Elementos destacados y acciones, independientemente de la paleta.",
+        "storage_unavailable": "El almacenamiento del navegador no está disponible. Tu selección se mantendrá hasta que recargues esta página.",
+        "switch_light": "Cambiar al modo claro",
+        "switch_dark": "Cambiar al modo oscuro",
+        "palettes": {
+            "neutral": "Neutro",
+            "obsidian": "Obsidiana",
+            "dracula": "Dracula",
+            "nord": "Nord",
+            "red": "Rojo",
+            "blue": "Azul",
+            "yellow": "Amarillo",
+            "green": "Verde",
+            "violet": "Violeta",
+            "mocha": "Mocha original"
+        },
+        "accents": {
+            "panel": "Predeterminado del panel",
+            "blue": "Azul",
+            "green": "Verde",
+            "violet": "Violeta",
+            "orange": "Naranja",
+            "rose": "Rosa"
+        },
+        "brand_current": "Color de marca actual {{color}}",
+        "brand_unavailable": "El color de marca no está disponible porque ni el color guardado ni el predeterminado del servidor son colores hexadecimales válidos.",
+        "brand_picker": "Selector del color de marca",
+        "brand_help": "Usa #RGB o #RRGGBB.",
+        "brand_invalid": "Introduce un color hexadecimal válido, como #RGB o #RRGGBB.",
+        "brand_saving": "Guardando el color…",
+        "brand_resetting": "Restableciendo el color…"
+    },
     "activity": {
         "events": {
             "auth_checkpoint": "Desafío de doble factor",

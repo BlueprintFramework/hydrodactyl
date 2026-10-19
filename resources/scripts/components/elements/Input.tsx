@@ -9,9 +9,9 @@ const checkboxStyle = css<Props>`
     appearance: none;
     width: 1rem;
     height: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(var(--panel-ink-rgb), 0.2);
     border-radius: 0.25rem;
-    background-color: rgba(255, 255, 255, 0.09);
+    background-color: rgba(var(--panel-ink-rgb), 0.09);
     color-adjust: exact;
     background-origin: border-box;
     transition:
@@ -28,7 +28,7 @@ const checkboxStyle = css<Props>`
     }
 
     &:hover {
-        border-color: rgba(255, 255, 255, 0.3);
+        border-color: rgba(var(--panel-ink-rgb), 0.3);
     }
 
     &:focus {
@@ -66,7 +66,8 @@ const inputStyle = css<Props>`
     padding-bottom: 0.5rem;
     border-radius: 0.5rem;
     outline: none;
-    background-color: rgba(255, 255, 255, 0.09); /* Converted the hex color with alpha to rgba */
+    background-color: rgba(var(--panel-ink-rgb), 0.09);
+    color: var(--color-primary);
     font-size: 1rem; /* 16px on mobile to prevent iOS Safari focus auto-zoom */
     @media (min-width: 640px) {
         font-size: 0.875rem;

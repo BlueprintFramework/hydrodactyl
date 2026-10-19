@@ -20,7 +20,7 @@ import { ServerContext } from '@/state/server';
 
 const Label = styled.label`
   display: inline-block;
-  color: #ffffff77;
+  color: var(--color-secondary);
   font-size: 0.875rem;
   padding-bottom: 0.5rem;
 `;

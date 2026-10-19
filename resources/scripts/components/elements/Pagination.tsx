@@ -56,7 +56,7 @@ function Pagination<T>({ data: { items, pagination }, onPageSelect, children }: 
                                 width={22}
                                 height={22}
                                 fill={'currentColor'}
-                                className={`${pagination.currentPage === 1 ? 'text-neutral-500 cursor-not-allowed' : 'text-white'}`}
+                                className={`${pagination.currentPage === 1 ? 'text-neutral-500 cursor-not-allowed' : 'text-primary'}`}
                             />
                         </Block>
                         {pages.map((i) => (
@@ -85,7 +85,7 @@ function Pagination<T>({ data: { items, pagination }, onPageSelect, children }: 
                                 width={22}
                                 height={22}
                                 fill={'currentColor'}
-                                className={`${pagination.currentPage === pagination.totalPages ? 'text-neutral-500 cursor-not-allowed' : 'text-white'}`}
+                                className={`${pagination.currentPage === pagination.totalPages ? 'text-neutral-500 cursor-not-allowed' : 'text-primary'}`}
                             />
                         </Block>
                     </div>

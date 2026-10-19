@@ -132,8 +132,14 @@ const OverviewContainer = () => {
     const chartConfigs = useMemo(
         () => ({
             used: {
-                used: { label: t('admin.overview.used'), colors: { light: ['#52a9ff'], dark: ['#52a9ff'] } },
-                free: { label: t('admin.overview.free'), colors: { light: ['#3a332c'], dark: ['#3a332c'] } },
+                used: {
+                    label: t('admin.overview.used'),
+                    colors: { light: ['var(--color-hydro-500)'], dark: ['var(--color-hydro-500)'] },
+                },
+                free: {
+                    label: t('admin.overview.free'),
+                    colors: { light: ['var(--color-mocha-300)'], dark: ['var(--color-mocha-300)'] },
+                },
             } satisfies ChartConfig,
             load: {
                 load: { label: t('admin.overview.load'), colors: { light: ['#f1995a'], dark: ['#f1995a'] } },

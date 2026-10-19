@@ -1,0 +1,53 @@
+<?php
+
+return [
+    'exceptions' => [
+        'user_has_servers' => 'Não é possível excluir um usuário com servidores ativos associados à conta. Exclua os servidores antes de continuar.',
+    ],
+    'index' => [
+        'can_access' => 'Pode acessar',
+        'can_access_tooltip' => 'Servidores que este usuário pode acessar por estar cadastrado como subusuário.',
+        'create_new' => 'Criar novo',
+        'list' => 'Lista de usuários',
+        'servers_owned' => 'Servidores próprios',
+        'servers_owned_tooltip' => 'Servidores dos quais este usuário é proprietário.',
+        'subtitle' => 'Todos os usuários cadastrados no sistema.',
+        'title' => 'Listar usuários',
+    ],
+    'new' => [
+        'administrator' => 'Administrador',
+        'administrator_help' => 'Selecionar "Sim" concede acesso administrativo completo ao usuário.',
+        'breadcrumb' => 'Criar',
+        'default_language' => 'Idioma padrão',
+        'default_language_help' => 'O idioma padrão usado ao exibir o painel para este usuário.',
+        'generated_password' => 'Senha gerada:',
+        'identity' => 'Identidade',
+        'name_first' => 'Nome do cliente',
+        'name_last' => 'Sobrenome do cliente',
+        'password_notice' => 'Informar uma senha é opcional. O e-mail de boas-vindas solicita que o usuário crie uma senha no primeiro acesso. Se informar uma senha aqui, você precisará enviá-la ao usuário por outro meio.',
+        'permissions' => 'Permissões',
+        'submit' => 'Criar usuário',
+        'subtitle' => 'Adicione um novo usuário ao sistema.',
+        'title' => 'Criar usuário',
+    ],
+    'notices' => [
+        'account_created' => 'A conta foi criada com sucesso.',
+        'account_updated' => 'A conta foi atualizada com sucesso.',
+    ],
+    'view' => [
+        'administrator' => 'Administrador',
+        'administrator_help' => 'Selecionar "Sim" concede acesso administrativo completo ao usuário.',
+        'default_language' => 'Idioma padrão',
+        'default_language_help' => 'O idioma padrão usado ao exibir o painel para este usuário.',
+        'delete_button' => 'Excluir usuário',
+        'delete_title' => 'Excluir usuário',
+        'delete_warning' => 'Não pode haver servidores associados a esta conta para que ela seja excluída.',
+        'identity' => 'Identidade',
+        'name_first' => 'Nome do cliente',
+        'name_last' => 'Sobrenome do cliente',
+        'password_help' => 'Deixe em branco para manter a senha atual deste usuário. O usuário não será notificado se a senha for alterada.',
+        'permissions' => 'Permissões',
+        'submit' => 'Atualizar usuário',
+        'title' => 'Gerenciar usuário: :username',
+    ],
+];
