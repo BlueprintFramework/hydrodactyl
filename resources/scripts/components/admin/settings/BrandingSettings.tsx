@@ -310,12 +310,11 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
                         className='h-8 w-8 rounded-md border border-mocha-300'
                         style={{ backgroundColor: lastValidBrandColor }}
                         role='img'
-                        aria-label={`Current brand color ${lastValidBrandColor}`}
+                        aria-label={t('appearance.brand_current', { color: lastValidBrandColor })}
                     />
                 ) : (
                     <p className='text-sm text-red-400' role='alert'>
-                        Brand color is unavailable because neither the saved color nor the server default is a valid hex
-                        color.
+                        {t('appearance.brand_unavailable')}
                     </p>
                 )}
                 <div className='flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end'>
@@ -331,7 +330,7 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
                                 setColorTouched(true);
                             }}
                             className='h-11 w-11 shrink-0 cursor-pointer rounded-lg border border-mocha-300 bg-transparent p-1'
-                            aria-label='Brand color picker'
+                            aria-label={t('appearance.brand_picker')}
                         />
                     )}
                     <div className='min-w-0 flex-1'>
@@ -354,11 +353,11 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
                             aria-describedby={`brand-color-help${colorTouched && invalidBrandColor ? ' brand-color-error' : ''}`}
                         />
                         <p id='brand-color-help' className='mt-1 text-xs text-cream-400/70'>
-                            Use #RGB or #RRGGBB.
+                            {t('appearance.brand_help')}
                         </p>
                         {colorTouched && invalidBrandColor && (
                             <p id='brand-color-error' className='mt-1 text-sm text-red-400' role='alert'>
-                                Enter a valid hex color, such as #RGB or #RRGGBB.
+                                {t('appearance.brand_invalid')}
                             </p>
                         )}
                     </div>
@@ -376,7 +375,7 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
                             {savingColor ? (
                                 <span role='status' className='inline-flex items-center gap-2'>
                                     <Spinner size={Spinner.Size.SMALL} />
-                                    <span>Saving color…</span>
+                                    <span>{t('appearance.brand_saving')}</span>
                                 </span>
                             ) : (
                                 t('admin.settings.save_color')
@@ -395,7 +394,7 @@ const BrandingForm = ({ logo, onSaved }: { logo: LogoResponse; onSaved: () => vo
                             {resettingColor ? (
                                 <span role='status' className='inline-flex items-center gap-2'>
                                     <Spinner size={Spinner.Size.SMALL} />
-                                    <span>Resetting color…</span>
+                                    <span>{t('appearance.brand_resetting')}</span>
                                 </span>
                             ) : (
                                 t('admin.settings.reset_to_default')

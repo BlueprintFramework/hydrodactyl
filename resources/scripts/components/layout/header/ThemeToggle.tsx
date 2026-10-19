@@ -4,18 +4,20 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAppearance } from '@/contexts/AppearanceContext';
+import { useTranslation } from '@/i18n/I18nProvider';
 
 export default function ThemeToggle(): React.JSX.Element {
+    const { t } = useTranslation();
     const { theme, persistent, updateAppearance } = useAppearance();
-    const label = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+    const label = t(theme === 'dark' ? 'appearance.switch_light' : 'appearance.switch_dark');
 
     useEffect(() => {
         if (!persistent) {
-            toast.error('Browser storage is unavailable. Your selection will last until you reload this page.', {
+            toast.error(t('appearance.storage_unavailable'), {
                 id: 'appearance-storage-unavailable',
             });
         }
-    }, [persistent]);
+    }, [persistent, t]);
 
     return (
         <TooltipProvider>

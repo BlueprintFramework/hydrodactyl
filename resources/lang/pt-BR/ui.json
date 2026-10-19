@@ -1,4 +1,47 @@
 {
+    "appearance": {
+        "title": "Aparência",
+        "description": "Estas preferências se aplicam apenas a este navegador, incluindo o painel administrativo. As alterações são salvas automaticamente.",
+        "theme": "Tema",
+        "theme_description": "Escolha uma aparência clara ou escura.",
+        "light": "Claro",
+        "dark": "Escuro",
+        "system": "Usar configuração do sistema",
+        "palette": "Paleta do aplicativo",
+        "palette_description": "Fundos, cartões, bordas e texto.",
+        "accent": "Cor de destaque",
+        "accent_description": "Destaques e ações, independentes da paleta.",
+        "storage_unavailable": "O armazenamento do navegador está indisponível. Sua seleção será mantida até você recarregar esta página.",
+        "switch_light": "Mudar para o modo claro",
+        "switch_dark": "Mudar para o modo escuro",
+        "palettes": {
+            "neutral": "Neutra",
+            "obsidian": "Obsidian",
+            "dracula": "Dracula",
+            "nord": "Nord",
+            "red": "Vermelha",
+            "blue": "Azul",
+            "yellow": "Amarela",
+            "green": "Verde",
+            "violet": "Violeta",
+            "mocha": "Mocha original"
+        },
+        "accents": {
+            "panel": "Padrão do painel",
+            "blue": "Azul",
+            "green": "Verde",
+            "violet": "Violeta",
+            "orange": "Laranja",
+            "rose": "Rosa"
+        },
+        "brand_current": "Cor atual da marca {{color}}",
+        "brand_unavailable": "A cor da marca está indisponível porque nem a cor salva nem o padrão do servidor são cores hexadecimais válidas.",
+        "brand_picker": "Seletor de cor da marca",
+        "brand_help": "Use #RGB ou #RRGGBB.",
+        "brand_invalid": "Insira uma cor hexadecimal válida, como #RGB ou #RRGGBB.",
+        "brand_saving": "Salvando cor…",
+        "brand_resetting": "Restaurando cor…"
+    },
     "activity": {
         "events": {
             "auth_checkpoint": "Verificação de dois fatores",

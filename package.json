@@ -1,7 +1,7 @@
 {
     "name": "hydrodactyl",
-    "version": "6.5.2",
-    "buildNumber": "31",
+    "version": "canary",
+    "buildNumber": "30",
     "engines": {
         "node": ">=22.13"
     },
@@ -109,7 +109,7 @@
         "test": "php vendor/bin/phpunit",
         "test:unit": "php vendor/bin/phpunit --testsuite=Unit",
         "test:integration": "php vendor/bin/phpunit --testsuite=Integration",
-        "test:appearance": "node --experimental-strip-types --test tests/Frontend/appearance.test.mjs"
+        "test:appearance": "node --experimental-strip-types --test tests/Frontend/appearance.test.mjs tests/Frontend/brand-color.test.mjs"
     },
     "browserslist": ["> 0.5%", "last 2 versions", "firefox esr", "not dead"],
     "packageManager": "pnpm@11.3.0"
