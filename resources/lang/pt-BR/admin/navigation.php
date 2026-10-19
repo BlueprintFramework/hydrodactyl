@@ -1,0 +1,37 @@
+<?php
+
+return [
+    'breadcrumb' => ['admin' => 'Administração', 'settings' => 'Configurações'],
+    'copyright' => 'Copyright &copy; 2015 - :year <a href="https://blueprint.zip/">BlueprintFramework</a> e <a href="https://hydrodactyl.dev">Hydrodactyl</a>.',
+    'exit_admin_control' => 'Sair da administração',
+    'logout' => 'Sair',
+    'logout_confirm_button' => 'Sair',
+    'logout_confirm_title' => 'Deseja sair?',
+    'settings_nav' => [
+        'advanced' => 'Avançado',
+        'branding' => 'Identidade visual',
+        'captcha' => 'Captcha',
+        'custom_navigation' => 'Navegação personalizada',
+        'domains' => 'Domínios',
+        'general' => 'Geral',
+        'mail' => 'E-mail',
+    ],
+    'sidebar' => [
+        'application_api' => 'API de aplicação',
+        'basic_administration' => 'ADMINISTRAÇÃO BÁSICA',
+        'databases' => 'Bancos de dados',
+        'locations' => 'Localizações',
+        'management' => 'GERENCIAMENTO',
+        'mounts' => 'Montagens',
+        'nests' => 'Nests',
+        'nodes' => 'Nós',
+        'overview' => 'Visão geral',
+        's3_buckets' => 'Buckets S3',
+        'servers' => 'Servidores',
+        'service_management' => 'GERENCIAMENTO DE SERVIÇOS',
+        'settings' => 'Configurações',
+        'toggle_navigation' => 'Exibir ou ocultar navegação',
+        'users' => 'Usuários',
+    ],
+    'validation_error' => 'Ocorreu um erro ao validar os dados informados.',
+];

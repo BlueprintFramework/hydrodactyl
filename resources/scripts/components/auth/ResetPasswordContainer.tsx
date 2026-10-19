@@ -164,7 +164,7 @@ function ResetPasswordContainer() {
                         >
                             <Link
                                 to={'/auth/login'}
-                                className={`text-sm text-white tracking-wide uppercase no-underline hover:text-neutral-700 border-color-[#ffffff33]`}
+                                className='text-sm text-primary tracking-wide uppercase no-underline hover:text-secondary border-overlay/20'
                             >
                                 {t('auth.reset_password.return_to_login')}
                             </Link>

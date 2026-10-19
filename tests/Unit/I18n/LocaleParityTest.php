@@ -39,8 +39,8 @@ class LocaleParityTest extends TestCase
             $actual = $this->flatten(json_decode(file_get_contents("{$directory}/ui.json"), true));
 
             $this->assertSame(
-                array_keys($expected),
-                array_keys($actual),
+                $expected,
+                $actual,
                 "The {$locale}/ui.json keys do not match {$canonical}."
             );
 
@@ -54,8 +54,8 @@ class LocaleParityTest extends TestCase
             );
 
             if (file_exists($canonicalJson)) {
-                $expected = array_keys($this->flatten(json_decode(file_get_contents($canonicalJson), true)));
-                $actual = array_keys($this->flatten(json_decode(file_get_contents($localeJson), true)));
+                $expected = $this->flatten(json_decode(file_get_contents($canonicalJson), true));
+                $actual = $this->flatten(json_decode(file_get_contents($localeJson), true));
 
                 $this->assertSame($expected, $actual, "The {$locale}.json keys do not match {$canonical}.json.");
             }

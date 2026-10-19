@@ -69,7 +69,7 @@ function LoginCheckpointForm() {
                         setIsMissingDevice((s) => !s);
                     }}
                     className={
-                        'block text-center w-full sm:w-auto py-2.5 px-4 text-xs font-medium tracking-wide uppercase text-white hover:text-white/80 transition-colors duration-200 border border-white/20 rounded-full hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/30'
+                        'block text-center w-full sm:w-auto py-2.5 px-4 text-xs font-medium tracking-wide uppercase text-primary hover:text-secondary transition-colors duration-200 border border-overlay/20 rounded-full hover:bg-overlay/10 focus:outline-none focus:ring-2 focus:ring-hydro-400'
                     }
                 >
                     {!isMissingDevice ? t('auth.two_factor.lost_device') : t('auth.two_factor.have_device')}

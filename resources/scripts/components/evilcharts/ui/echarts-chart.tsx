@@ -21,8 +21,7 @@ echarts.use([CanvasRenderer, SVGRenderer]);
 // chart and the tooltip/legend/brush ui modules.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Theme selectors mirror the repo's <ChartStyle>: light is the bare root, dark is `.dark`.
-export const THEMES = { light: '', dark: '' } as const;
+export const THEMES = { light: '[data-theme="light"]', dark: ':root:not([data-theme="light"])' } as const;
 export type ThemeKey = keyof typeof THEMES;
 export const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];
 

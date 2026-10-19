@@ -15,7 +15,7 @@ Container.displayName = 'MessageBox.Container';
 
 const MessageBox = ({ title, children, type }: Props) => (
     <Container
-        className='flex flex-col gap-2 bg-black border-[2px] border-brand/70 p-4 rounded-2xl mb-4'
+        className='flex flex-col gap-2 bg-bg-lowered text-primary border-[2px] border-brand/70 p-4 rounded-2xl mb-4'
         $type={type}
         role={'alert'}
     >

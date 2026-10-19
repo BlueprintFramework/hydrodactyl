@@ -8,7 +8,7 @@ import '@preact/signals-react';
 import { StoreProvider } from 'easy-peasy';
 import { lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Toaster } from 'sonner';
+import AppearanceToaster from '@/components/AppearanceToaster';
 
 import AuthenticatedRoute from '@/components/elements/AuthenticatedRoute';
 import { NotFound } from '@/components/elements/ScreenBlock';
@@ -40,15 +40,7 @@ const App = () => {
                             data-hydrodactyl-routerwrap=''
                             className='relative w-full h-full flex flex-row p-2 overflow-hidden rounded-lg'
                         >
-                            <Toaster
-                                theme='dark'
-                                toastOptions={{
-                                    unstyled: true,
-                                    classNames: {
-                                        toast: 'p-4 bg-[#ffffff09] border border-[#ffffff12] rounded-2xl shadow-lg backdrop-blur-2xl flex items-center w-full gap-2',
-                                    },
-                                }}
-                            />
+                            <AppearanceToaster />
                             <BrowserRouter>
                                 <Routes>
                                     <Route

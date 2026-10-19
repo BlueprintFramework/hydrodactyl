@@ -67,7 +67,7 @@ const NodeConfigurationContainer = () => {
                     <h2 className='text-sm font-semibold text-cream-50'>{t('admin.nodes.config_file')}</h2>
                     <CopyButton value={data.yaml} />
                 </div>
-                <pre className='mt-3 max-h-[70vh] overflow-auto rounded-lg bg-black/40 p-3 text-xs leading-relaxed text-cream-100'>
+                <pre className='mt-3 max-h-[70vh] overflow-auto rounded-lg bg-overlay/5 p-3 text-xs leading-relaxed text-cream-100'>
                     {data.yaml}
                 </pre>
                 <p className='mt-3 text-xs text-cream-400/60'>
@@ -91,7 +91,7 @@ const NodeConfigurationContainer = () => {
                             </span>
                             <CopyButton value={command} />
                         </div>
-                        <pre className='mt-2 overflow-auto rounded-lg bg-black/40 p-3 text-xs leading-relaxed text-cream-100'>
+                        <pre className='mt-2 overflow-auto rounded-lg bg-overlay/5 p-3 text-xs leading-relaxed text-cream-100'>
                             {command}
                         </pre>
                     </div>

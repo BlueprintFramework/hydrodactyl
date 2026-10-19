@@ -146,11 +146,11 @@ const FileEditContainer = () => {
                 <div className={`mb-4 p-4 border-l-4 bg-neutral-900 rounded-sm border-cyan-400`}>
                     <p className={`text-neutral-300 text-sm`}>
                         {t('server.files.ignore_notice_prefix')}{' '}
-                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>{filename}</code>{' '}
+                        <code className={`font-mono bg-bg-lowered rounded-sm py-px px-1`}>{filename}</code>{' '}
                         {t('server.files.ignore_notice_middle')}
-                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>*</code>
+                        <code className={`font-mono bg-bg-lowered rounded-sm py-px px-1`}>*</code>
                         {t('server.files.ignore_notice_after_asterisk')}
-                        <code className={`font-mono bg-black rounded-sm py-px px-1`}>!</code>
+                        <code className={`font-mono bg-bg-lowered rounded-sm py-px px-1`}>!</code>
                         {t('server.files.ignore_notice_suffix')}
                     </p>
                 </div>
