@@ -49,12 +49,13 @@ class FqdnTest extends TestCase
     }
 
     /**
-     * Test that a domain that resolves to an IP passes.
+     * Test that a locally resolvable domain passes.
+     *
+     * External DNS availability is not a prerequisite for running the test suite.
      */
-    public function testResolvableDomainPasses()
+    public function testLocallyResolvableDomainPasses()
     {
         $this->assertTrue($this->rule->passes('attribute', 'localhost'));
-        $this->assertTrue($this->rule->passes('attribute', 'google.com'));
     }
 
     /**

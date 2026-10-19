@@ -1,4 +1,47 @@
 {
+    "appearance": {
+        "title": "Appearance",
+        "description": "These preferences apply only to this browser, including the admin panel. Changes are saved automatically.",
+        "theme": "Theme",
+        "theme_description": "Choose a light or dark appearance.",
+        "light": "Light",
+        "dark": "Dark",
+        "system": "Use system setting",
+        "palette": "Application palette",
+        "palette_description": "Backgrounds, cards, borders and text.",
+        "accent": "Accent color",
+        "accent_description": "Highlights and actions, independent of the palette.",
+        "storage_unavailable": "Browser storage is unavailable. Your selection will last until you reload this page.",
+        "switch_light": "Switch to light mode",
+        "switch_dark": "Switch to dark mode",
+        "palettes": {
+            "neutral": "Neutral",
+            "obsidian": "Obsidian",
+            "dracula": "Dracula",
+            "nord": "Nord",
+            "red": "Red",
+            "blue": "Blue",
+            "yellow": "Yellow",
+            "green": "Green",
+            "violet": "Violet",
+            "mocha": "Original mocha"
+        },
+        "accents": {
+            "panel": "Panel default",
+            "blue": "Blue",
+            "green": "Green",
+            "violet": "Violet",
+            "orange": "Orange",
+            "rose": "Rose"
+        },
+        "brand_current": "Current brand color {{color}}",
+        "brand_unavailable": "Brand color is unavailable because neither the saved color nor the server default is a valid hex color.",
+        "brand_picker": "Brand color picker",
+        "brand_help": "Use #RGB or #RRGGBB.",
+        "brand_invalid": "Enter a valid hex color, such as #RGB or #RRGGBB.",
+        "brand_saving": "Saving color…",
+        "brand_resetting": "Resetting color…"
+    },
     "activity": {
         "events": {
             "auth_checkpoint": "Desafío de doble factor",
