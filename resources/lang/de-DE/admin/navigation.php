@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'breadcrumb' => [
+        'admin' => 'Admin',
+        'settings' => 'Einstellungen',
+    ],
+    'copyright' => 'Copyright &copy; 2015 - :year <a href="https://blueprint.zip/">BlueprintFramework</a> und <a href="https://hydrodactyl.dev">Hydrodactyl</a>.',
+    'exit_admin_control' => 'Admin-Bereich verlassen',
+    'logout' => 'Abmelden',
+    'logout_confirm_button' => 'Abmelden',
+    'logout_confirm_title' => 'Möchten Sie sich abmelden?',
+    'settings_nav' => [
+        'advanced' => 'Erweitert',
+        'branding' => 'Branding',
+        'captcha' => 'Captcha',
+        'custom_navigation' => 'Benutzerdefinierte Navigation',
+        'domains' => 'Domains',
+        'general' => 'Allgemein',
+        'mail' => 'E-Mail',
+    ],
+    'sidebar' => [
+        'application_api' => 'API für Anwendungen',
+        'basic_administration' => 'BASIS-ADMINISTRATION',
+        'databases' => 'Datenbanken',
+        'locations' => 'Standorte',
+        'management' => 'VERWALTUNG',
+        'mounts' => 'Mounts',
+        'nests' => 'Nests',
+        'nodes' => 'Knoten',
+        'overview' => 'Übersicht',
+        's3_buckets' => 'S3-Buckets',
+        'servers' => 'Server',
+        'service_management' => 'DIENSTVERWALTUNG',
+        'settings' => 'Einstellungen',
+        'toggle_navigation' => 'Navigation umschalten',
+        'users' => 'Benutzer',
+    ],
+    'validation_error' => 'Bei der Validierung der angegebenen Daten ist ein Fehler aufgetreten.',
+];
