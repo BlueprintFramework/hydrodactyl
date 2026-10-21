@@ -1548,8 +1548,8 @@
             "bulk_delete_confirm_other": "Eliminar {{count}} copias de seguridad",
             "bulk_delete_description_one": "Estás a punto de eliminar permanentemente {{count}} copia de seguridad. Esta acción no se puede deshacer.",
             "bulk_delete_description_other": "Estás a punto de eliminar permanentemente {{count}} copias de seguridad. Esta acción no se puede deshacer.",
-            "bulk_delete_success_one": "Se está eliminando {{count}} copia de seguridad.",
-            "bulk_delete_success_other": "Se están eliminando {{count}} copias de seguridad.",
+            "bulk_delete_success_one": "Se está eliminando {{count}} copia de seguridad y sus repositorios. Esto puede tardar unos minutos.",
+            "bulk_delete_success_other": "Se están eliminando {{count}} copias de seguridad y sus repositorios. Esto puede tardar unos minutos.",
             "bulk_delete_title": "Eliminar las copias de seguridad seleccionadas",
             "bulk_delete_warning": "Los archivos de copia de seguridad seleccionados y sus instantáneas se eliminarán permanentemente. No podrás restaurarlos.",
             "create_title": "Crear copia de seguridad del servidor",
@@ -1632,7 +1632,8 @@
             "unlock": "Desbloquear",
             "unlock_description": "Esta copia de seguridad dejará de estar protegida frente a eliminaciones automáticas o accidentales.",
             "unlock_title": "Desbloquear «{{name}}»",
-            "pending_name": "Pendiente..."
+            "pending_name": "Pendiente...",
+            "download_selected": "Descargar seleccionadas ({{count}})"
         },
         "conflict": {
             "installing_description": "Tu servidor estará listo pronto; para más detalles, visita la página de inicio.",

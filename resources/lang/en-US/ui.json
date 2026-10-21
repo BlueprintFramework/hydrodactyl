@@ -1548,8 +1548,8 @@
             "bulk_delete_confirm_other": "Delete {{count}} Backups",
             "bulk_delete_description_one": "You are about to permanently delete {{count}} backup. This action cannot be undone.",
             "bulk_delete_description_other": "You are about to permanently delete {{count}} backups. This action cannot be undone.",
-            "bulk_delete_success_one": "{{count}} backup is being deleted.",
-            "bulk_delete_success_other": "{{count}} backups are being deleted.",
+            "bulk_delete_success_one": "{{count}} backup and its repositories are being deleted. This may take a few minutes.",
+            "bulk_delete_success_other": "{{count}} backups and their repositories are being deleted. This may take a few minutes.",
             "bulk_delete_title": "Delete Selected Backups",
             "bulk_delete_warning": "The selected backup files and their snapshots will be permanently deleted. You will not be able to restore them.",
             "create_title": "Create server backup",
@@ -1632,7 +1632,8 @@
             "unlock": "Unlock",
             "unlock_description": "This backup will no longer be protected from automated or accidental deletions.",
             "unlock_title": "Unlock \"{{name}}\"",
-            "pending_name": "Pending..."
+            "pending_name": "Pending...",
+            "download_selected": "Download Selected ({{count}})"
         },
         "conflict": {
             "installing_description": "Your server should be ready soon, for more details visit the home page.",

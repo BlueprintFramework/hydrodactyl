@@ -1548,8 +1548,8 @@
             "bulk_delete_confirm_other": "Elimina {{count}} còpies de seguretat",
             "bulk_delete_description_one": "Estàs a punt d'eliminar permanentment {{count}} còpia de seguretat. Aquesta acció no es pot desfer.",
             "bulk_delete_description_other": "Estàs a punt d'eliminar permanentment {{count}} còpies de seguretat. Aquesta acció no es pot desfer.",
-            "bulk_delete_success_one": "S'està eliminant {{count}} còpia de seguretat.",
-            "bulk_delete_success_other": "S'estan eliminant {{count}} còpies de seguretat.",
+            "bulk_delete_success_one": "S'està eliminant {{count}} còpia de seguretat i els seus repositoris. Això pot trigar uns minuts.",
+            "bulk_delete_success_other": "S'estan eliminant {{count}} còpies de seguretat i els seus repositoris. Això pot trigar uns minuts.",
             "bulk_delete_title": "Elimina les còpies de seguretat seleccionades",
             "bulk_delete_warning": "Els fitxers de còpia de seguretat seleccionats i les seves instantànies s'eliminaran permanentment. No les podràs restaurar.",
             "create_title": "Crea una còpia de seguretat del servidor",
@@ -1632,7 +1632,8 @@
             "unlock": "Desbloqueja",
             "unlock_description": "Aquesta còpia de seguretat ja no estarà protegida contra eliminacions automàtiques o accidentals.",
             "unlock_title": "Desbloqueja «{{name}}»",
-            "pending_name": "Pendent..."
+            "pending_name": "Pendent...",
+            "download_selected": "Baixa les seleccionades ({{count}})"
         },
         "conflict": {
             "installing_description": "El teu servidor hauria d'estar llest aviat; per a més detalls, visita la pàgina d'inici.",
