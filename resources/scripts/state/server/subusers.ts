@@ -17,6 +17,8 @@ export type SubuserPermission =
     | 'file.archive'
     | 'file.sftp'
     | 'allocation.read'
+    | 'allocation.custom_domain_read'
+    | 'allocation.custom_domain_update'
     | 'allocation.update'
     | 'startup.read'
     | 'startup.update'

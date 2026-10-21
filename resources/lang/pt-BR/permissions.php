@@ -43,6 +43,8 @@ return [
         'create' => 'Permite atribuir alocações adicionais ao servidor.',
         'update' => 'Permite alterar a alocação principal do servidor e adicionar observações a cada alocação.',
         'delete' => 'Permite excluir uma alocação do servidor.',
+        'custom_domain_read' => 'Permite visualizar os domínios personalizados apontados para este servidor.',
+        'custom_domain_update' => 'Permite adicionar e remover domínios personalizados deste servidor.',
     ],
     'startup' => [
         'description' => 'Permissões para visualizar os parâmetros de inicialização deste servidor.',

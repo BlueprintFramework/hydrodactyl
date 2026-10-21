@@ -8,7 +8,7 @@ interface Props {
     name: string;
     children: React.ReactNode;
     className?: string;
-    label?: string;
+    label?: React.ReactNode;
     description?: string;
     validate?: (value: unknown) => undefined | string | Promise<unknown>;
 }
