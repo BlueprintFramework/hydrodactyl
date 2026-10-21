@@ -71,7 +71,9 @@ const BackupStats = ({ backupCount, backupLimit, storage, backupStorageLimit = n
     return (
         <div>
             {backupLimit === null && (
-                <p className='text-sm text-zinc-300'>{t('server.backups.backups_count', { count: backupCount })}</p>
+                <p className='text-sm text-zinc-300 whitespace-nowrap'>
+                    {t('server.backups.backups_count', { count: backupCount })}
+                </p>
             )}
             {backupLimit !== null && backupLimit > 0 && (
                 <p className='text-sm text-zinc-300'>

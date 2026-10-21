@@ -1589,7 +1589,8 @@
             "unlock": "Entsperren",
             "unlock_description": "Dieses Backup ist dann nicht mehr vor automatischem oder versehentlichem Löschen geschützt.",
             "unlock_title": "„{{name}}“ entsperren",
-            "pending_name": "Ausstehend…"
+            "pending_name": "Ausstehend…",
+            "download_selected": "Auswahl herunterladen ({{count}})"
         },
         "conflict": {
             "installing_description": "Ihr Server sollte in Kürze bereit sein. Weitere Details finden Sie auf der Startseite.",

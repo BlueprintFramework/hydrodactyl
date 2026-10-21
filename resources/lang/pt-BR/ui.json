@@ -1632,7 +1632,8 @@
             "unlock": "Desbloquear",
             "unlock_description": "Este backup deixará de ser protegido contra exclusões automáticas ou acidentais.",
             "unlock_title": "Desbloquear \"{{name}}\"",
-            "pending_name": "Pendente..."
+            "pending_name": "Pendente...",
+            "download_selected": "Baixar selecionados ({{count}})"
         },
         "conflict": {
             "installing_description": "Seu servidor deve ficar pronto em breve. Para mais detalhes, acesse a página inicial.",
