@@ -18,7 +18,6 @@ export interface SortPreset {
 
 interface SortDropdownProps {
     presets: SortPreset[];
-    // Sort field, prefixed with "-" when descending.
     value?: string;
     onSortChange: (value: string) => void;
 }
