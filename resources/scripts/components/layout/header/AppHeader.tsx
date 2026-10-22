@@ -137,7 +137,7 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
     // Dashboard Page
     if (hasSlottedLayout) {
         return (
-            <div className='min-h-16 w-full py-2 pr-2 flex flex-wrap items-center justify-between gap-y-2 md:h-16 md:flex-nowrap md:py-4 md:gap-y-0'>
+            <div className='h-16 w-full py-4 pr-2 flex items-center justify-between'>
                 <div className='flex min-w-0 items-center gap-2'>
                     <SidebarLogo admin={admin} />
                     <MobileSidebarToggle />
@@ -146,7 +146,7 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
                 <div className='flex min-w-0 flex-1 items-center justify-center px-2'>
                     <SlotActions actions={centerActions} />
                 </div>
-                <div className='ml-auto basis-full md:basis-auto flex flex-wrap items-center gap-1.5 sm:gap-2 justify-end min-w-0 overflow-visible md:shrink-0 md:flex-nowrap'>
+                <div className='ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 justify-end'>
                     <SlotActions actions={rightActions} />
                     <StaticButtons serverId={serverId} admin={admin} />
                 </div>
@@ -156,13 +156,13 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
 
     // Servers page
     return (
-        <div className='min-h-16 w-full py-2 pr-2 flex flex-wrap items-center md:h-16 md:flex-nowrap md:py-4 gap-3'>
+        <div className='h-16 w-full py-4 pr-2 flex items-center gap-3'>
             <div className='flex grow shrink-0 items-center gap-2'>
                 <MobileSidebarToggle />
                 <SidebarLogo admin={admin} />
             </div>
             <HeaderActions />
-            <div className='basis-full md:basis-auto flex items-center gap-1.5 sm:gap-2 justify-end min-w-0 overflow-visible md:grow md:shrink-0'>
+            <div className='flex grow shrink-0 items-center gap-1.5 sm:gap-2 justify-end'>
                 <SlotActions actions={rightActions} />
                 <StaticButtons serverId={serverId} admin={admin} />
             </div>
