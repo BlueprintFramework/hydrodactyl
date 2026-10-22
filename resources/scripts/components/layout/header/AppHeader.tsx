@@ -157,12 +157,12 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
     // Servers page
     return (
         <div className='h-16 w-full py-4 pr-2 flex items-center gap-3'>
-            <div className='flex grow shrink-0 items-center gap-2'>
+            <div className='flex grow shrink-0 basis-0 items-center gap-2'>
                 <MobileSidebarToggle />
                 <SidebarLogo admin={admin} />
             </div>
             <HeaderActions />
-            <div className='flex grow shrink-0 items-center gap-1.5 sm:gap-2 justify-end'>
+            <div className='flex grow shrink-0 basis-0 items-center gap-1.5 sm:gap-2 justify-end'>
                 <SlotActions actions={rightActions} />
                 <StaticButtons serverId={serverId} admin={admin} />
             </div>
