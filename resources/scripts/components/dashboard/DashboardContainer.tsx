@@ -209,11 +209,7 @@ const DashboardContainer = () => {
 
     const viewTabs = useMemo(
         () => (
-            <Tabs
-                value={dashboardMode}
-                onValueChange={(v) => setDashboardMode(v as DashboardMode)}
-                className='md:block hidden'
-            >
+            <Tabs value={dashboardMode} onValueChange={(v) => setDashboardMode(v as DashboardMode)} className='block'>
                 <TabsList>
                     <TabsTrigger aria-label={t('dashboard.view.list_aria')} value='list'>
                         <svg
@@ -232,7 +228,7 @@ const DashboardContainer = () => {
                             />
                         </svg>
                     </TabsTrigger>
-                    <TabsTrigger aria-label={t('dashboard.view.grid_aria')} value='grid'>
+                    <TabsTrigger aria-label={t('dashboard.view.grid_aria')} value='grid' className='max-md:hidden'>
                         <svg
                             width='13'
                             height='14'
