@@ -66,7 +66,7 @@ class SpigetSource extends AbstractMarketplaceSource
                 title: $name,
                 slug: (string) $id,
                 description: (string) (Arr::get($item, 'tag', '') ?: ''),
-                author: (string) Arr::get($item, 'author.name', ''),
+                author: (string) $this->getAuthorName(Arr::get($item, 'author.id', 1)),
                 icon: $this->absoluteIcon($this->nullableString(Arr::get($item, 'icon.url'))),
                 downloads: (int) (Arr::get($item, 'downloads', 0) ?: 0),
                 categories: array_values(array_filter(array_map('strval', Arr::wrap(Arr::get($item, 'category', []))))),
@@ -161,5 +161,17 @@ class SpigetSource extends AbstractMarketplaceSource
     private function nullableString(mixed $value): ?string
     {
         return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    private function getAuthorName(int $authorId): ?string
+    {
+        $path = '/authors/' . $authorId;
+
+        $items = $this->get($this->url($path));
+        if (!is_array($items)) {
+            return null;
+        }
+
+        return $items['name'] ?? null;
     }
 }
