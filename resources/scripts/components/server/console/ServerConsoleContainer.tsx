@@ -4,7 +4,6 @@ import isEqual from 'react-fast-compare';
 
 import { Alert } from '@/components/elements/alert';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
-import PageContentBlock from '@/components/elements/PageContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import Console from '@/components/server/console/Console';
 import StatGraphs from '@/components/server/console/StatGraphs';
@@ -12,6 +11,7 @@ import PowerButtons from '@/components/server/header/PowerButtons';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { ServerContext } from '@/state/server';
 import ServerHeader from '../header/ServerHeader';
+import ServerContentBlock from '@/components/elements/ServerContentBlock';
 
 export type PowerAction = 'start' | 'stop' | 'restart' | 'kill';
 
@@ -23,7 +23,7 @@ const ServerConsoleContainer = () => {
     const isNodeUnderMaintenance = ServerContext.useStoreState((state) => state.server.data?.isNodeUnderMaintenance);
 
     return (
-        <PageContentBlock title={t('server.console.title')} background={false}>
+        <ServerContentBlock title={t('server.console.title')} background={false}>
             <div className='w-full flex flex-col gap-4 lg:h-full lg:flex-row'>
                 <div className='flex flex-col gap-4 lg:flex-1 lg:min-h-0'>
                     <ServerHeader powerButtons={true} />
@@ -53,7 +53,7 @@ const ServerConsoleContainer = () => {
                     <Features enabled={eggFeatures} />
                 </ErrorBoundary>
             </div>
-        </PageContentBlock>
+        </ServerContentBlock>
     );
 };
 
