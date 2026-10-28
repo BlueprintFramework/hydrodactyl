@@ -17,6 +17,8 @@ interface Props {
     shouldBackup: boolean;
     shouldWipe: boolean;
     isLoading: boolean;
+    canApply: boolean;
+    blockedMessage: string;
     onBack: () => void;
     onApply: () => void;
 }
@@ -32,6 +34,8 @@ const ReviewChanges = ({
     shouldBackup,
     shouldWipe,
     isLoading,
+    canApply,
+    blockedMessage,
     onBack,
     onApply,
 }: Props) => {
@@ -208,11 +212,13 @@ const ReviewChanges = ({
                     </div>
                 )}
 
+                {!canApply && <p className='text-center text-sm text-brand-400'>{blockedMessage}</p>}
+
                 <div className='flex flex-col sm:flex-row justify-center gap-3 pt-4'>
                     <Button variant='secondary' onClick={onBack} className='w-full sm:w-auto'>
                         {t('server.software.review.back_to_configure')}
                     </Button>
-                    <Button onClick={onApply} disabled={isLoading} className='w-full sm:w-auto'>
+                    <Button onClick={onApply} disabled={isLoading || !canApply} className='w-full sm:w-auto'>
                         {isLoading && <Spinner size='small' />}
                         {t('server.software.review.apply_changes')}
                     </Button>

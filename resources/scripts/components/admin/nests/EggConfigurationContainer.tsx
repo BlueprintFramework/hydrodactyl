@@ -30,7 +30,15 @@ const splitFeatures = (value: string) =>
         .map((item) => item.trim())
         .filter(Boolean);
 
-const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOption[] }) => {
+const EggConfigurationForm = ({
+    egg,
+    options,
+    onImported,
+}: {
+    egg: AdminEgg;
+    options: EggOption[];
+    onImported: () => Promise<void>;
+}) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -97,6 +105,7 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
             formData.append('import_file', importFile);
             await importEggUpdate(egg.id, formData);
             toast.success(t('admin.nests.egg_imported'));
+            await onImported().catch(() => undefined);
         } catch (error) {
             toast.error(errorToMessage(error, t('admin.nests.egg_import_failed')));
         } finally {
@@ -286,7 +295,8 @@ const EggConfigurationForm = ({ egg, options }: { egg: AdminEgg; options: EggOpt
 
 const EggConfigurationContainer = () => {
     const { id } = useParams<'id'>();
-    const { data: response } = useEgg(id);
+    const { data: response, mutate } = useEgg(id);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     if (!response) {
         return (
@@ -296,7 +306,17 @@ const EggConfigurationContainer = () => {
         );
     }
 
-    return <EggConfigurationForm key={response.data.id} egg={response.data} options={response.config_from_options} />;
+    return (
+        <EggConfigurationForm
+            key={`${response.data.id}-${refreshKey}`}
+            egg={response.data}
+            options={response.config_from_options}
+            onImported={async () => {
+                await mutate();
+                setRefreshKey((current) => current + 1);
+            }}
+        />
+    );
 };
 
 export default EggConfigurationContainer;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useSWRConfig } from 'swr';
 import { errorToMessage, parseValidationErrors } from '@/api/admin/errors';
 import { type AdminNest, importEgg, importEggFromUrl } from '@/api/admin/nests';
 import { useNests } from '@/api/admin/useNests';
@@ -20,6 +21,7 @@ const nestOptions = (nests: AdminNest[]) =>
 const ImportEggDialog = ({ open, onClose, nests }: { open: boolean; onClose: () => void; nests: AdminNest[] }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { mutate } = useSWRConfig();
     const [file, setFile] = useState<File | null>(null);
     const [nestId, setNestId] = useState(nests[0] ? String(nests[0].id) : '');
     const [submitting, setSubmitting] = useState(false);
@@ -49,6 +51,7 @@ const ImportEggDialog = ({ open, onClose, nests }: { open: boolean; onClose: () 
             const egg = await importEgg(formData);
             toast.success(t('admin.nests.egg_imported'));
             onClose();
+            void mutate('admin:nests');
             navigate(`/eggs/${egg.id}`);
         } catch (error) {
             setErrors(parseValidationErrors(error));
@@ -114,6 +117,7 @@ const ImportEggFromUrlDialog = ({
 }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { mutate } = useSWRConfig();
     const [url, setUrl] = useState('');
     const [nestId, setNestId] = useState(nests[0] ? String(nests[0].id) : '');
     const [submitting, setSubmitting] = useState(false);
@@ -133,6 +137,7 @@ const ImportEggFromUrlDialog = ({
             const egg = await importEggFromUrl({ import_file_url: url, import_to_nest: Number(nestId) });
             toast.success(t('admin.nests.egg_imported'));
             onClose();
+            void mutate('admin:nests');
             navigate(`/eggs/${egg.id}`);
         } catch (error) {
             setErrors(parseValidationErrors(error));
