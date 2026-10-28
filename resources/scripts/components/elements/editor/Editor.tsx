@@ -24,7 +24,6 @@ import {
     highlightActiveLine,
     highlightActiveLineGutter,
     highlightSpecialChars,
-    highlightWhitespace,
     keymap,
     lineNumbers,
     rectangularSelection,
@@ -63,7 +62,6 @@ const defaultExtensions: Extension = [
     crosshairCursor(),
     highlightActiveLine(),
     highlightSelectionMatches(),
-    highlightWhitespace(),
     // Keymap alone does nothing visible until search state exists. Ctrl-F opens this panel.
     search({ top: true }),
     EditorView.lineWrapping,
