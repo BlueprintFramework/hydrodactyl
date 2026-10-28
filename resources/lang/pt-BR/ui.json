@@ -2247,7 +2247,7 @@
                 "safety_options": "Opções de segurança",
                 "select_image": "Selecione uma imagem...",
                 "startup_command": "Comando de inicialização",
-                "startup_command_forbidden": "Sua função não pode editar o comando de inicialização. Use o comando padrão do egg para continuar.",
+                "startup_command_forbidden": "Seu cargo não pode editar o comando de inicialização. Use o comando padrão do egg para continuar.",
                 "missing_permissions": "Faltam permissões para alterar o software.",
                 "missing_backup_permission": "Você precisa de permissão para criar backups para usar esta opção.",
                 "missing_file_permission": "Você precisa de permissões de arquivo para apagar arquivos.",
