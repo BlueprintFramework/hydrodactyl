@@ -62,18 +62,12 @@ const DashboardContainer = () => {
 
     const sortPresets = useMemo<SortPreset[]>(
         () => [
-            { value: 'name', label: t('dashboard.sort.name_asc') },
-            { value: '-name', label: t('dashboard.sort.name_desc') },
-            { value: 'created_at', label: t('dashboard.sort.oldest') },
-            { value: '-created_at', label: t('dashboard.sort.newest') },
-            { value: 'status', label: t('dashboard.sort.status_asc') },
-            { value: '-status', label: t('dashboard.sort.status_desc') },
-            { value: 'memory', label: t('dashboard.sort.memory_asc') },
-            { value: '-memory', label: t('dashboard.sort.memory_desc') },
-            { value: 'disk', label: t('dashboard.sort.disk_asc') },
-            { value: '-disk', label: t('dashboard.sort.disk_desc') },
-            { value: 'cpu', label: t('dashboard.sort.cpu_asc') },
-            { value: '-cpu', label: t('dashboard.sort.cpu_desc') },
+            { value: 'name', label: t('dashboard.sort.name') },
+            { value: 'created_at', label: t('dashboard.sort.created_at') },
+            { value: 'status', label: t('dashboard.sort.status') },
+            { value: 'memory', label: t('dashboard.sort.memory') },
+            { value: 'disk', label: t('dashboard.sort.disk') },
+            { value: 'cpu', label: t('dashboard.sort.cpu') },
         ],
         [t],
     );
