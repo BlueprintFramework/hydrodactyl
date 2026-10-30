@@ -10,7 +10,9 @@ use Pterodactyl\Facades\Activity;
 use Illuminate\Support\Facades\Log;
 use Pterodactyl\Repositories\Eloquent\ServerRepository;
 use Pterodactyl\Services\Servers\ReinstallServerService;
+use Pterodactyl\Services\Servers\EggAssignmentService;
 use Pterodactyl\Services\ServerOperations\EggChangeService;
+use Pterodactyl\Services\ServerOperations\ServerOperationService;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Settings\RenameServerRequest;
@@ -29,6 +31,8 @@ class SettingsController extends ClientApiController
         private ServerRepository $repository,
         private ReinstallServerService $reinstallServerService,
         private EggChangeService $eggChangeService,
+        private EggAssignmentService $eggAssignmentService,
+        private ServerOperationService $operationService,
     ) {
         parent::__construct();
     }
@@ -101,42 +105,29 @@ class SettingsController extends ClientApiController
     }
 
     /**
-     * Reset Startup Command
-     */
-    private function resetStartupCommand(Server $server): JsonResponse
-    {
-        $server->startup = $server->egg->startup;
-        $server->save();
-
-        return new JsonResponse([], Response::HTTP_NO_CONTENT);
-    }
-
-    /**
      * Change server egg
      *
      * @throws \Throwable
      */
     public function changeEgg(SetEggRequest $request, Server $server): JsonResponse
     {
-        $eggId = $request->input('egg_id');
-        $nestId = $request->input('nest_id');
-        $originalEggId = $server->egg_id;
-        $originalNestId = $server->nest_id;
+        $eggId = (int) $request->input('egg_id');
+        $nestId = (int) $request->input('nest_id');
 
-        // Check if the new Egg and Nest IDs are different from the current ones
-        if ($originalEggId !== $eggId || $originalNestId !== $nestId) {
-            // Update the server's Egg and Nest IDs
-            $server->egg_id = $eggId;
-            $server->nest_id = $nestId;
-            $server->save();
+        if ($server->egg_id !== $eggId || $server->nest_id !== $nestId) {
+            $originalEggId = $server->egg_id;
+            $originalNestId = $server->nest_id;
 
-            // Log an activity event for the Egg change
+            $this->eggAssignmentService->handle($server, $eggId, $nestId);
+
             Activity::event('server:settings.egg')
-                ->property(['original_egg_id' => $originalEggId, 'new_egg_id' => $eggId, 'original_nest_id' => $originalNestId, 'new_nest_id' => $nestId])
+                ->property([
+                    'original_egg_id' => $originalEggId,
+                    'new_egg_id' => $eggId,
+                    'original_nest_id' => $originalNestId,
+                    'new_nest_id' => $nestId,
+                ])
                 ->log();
-
-            // Reset the server's startup command
-            $this->resetStartupCommand($server);
         }
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
@@ -222,5 +213,25 @@ class SettingsController extends ClientApiController
 
             throw $e;
         }
+    }
+
+    /**
+     * Get operation status
+     */
+    public function getOperationStatus(Server $server, string $operationId): JsonResponse
+    {
+        $operation = $this->operationService->getOperation($server, $operationId);
+
+        return new JsonResponse($this->operationService->formatOperationResponse($operation));
+    }
+
+    /**
+     * List server operations
+     */
+    public function getServerOperations(Server $server): JsonResponse
+    {
+        $operations = $this->operationService->getServerOperations($server);
+
+        return new JsonResponse(['operations' => $operations]);
     }
 }

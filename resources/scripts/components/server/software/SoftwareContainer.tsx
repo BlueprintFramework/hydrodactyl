@@ -3,7 +3,6 @@ import isEqual from 'react-fast-compare';
 import { toast } from 'sonner';
 import { httpErrorToHuman } from '@/api/http';
 import applyEggChange from '@/api/server/applyEggChange';
-import applyEggChangeSync from '@/api/server/applyEggChangeSync';
 import { getGlobalDaemonType } from '@/api/server/getServer';
 import previewEggChange, { type EggPreview } from '@/api/server/previewEggChange';
 import type { ServerOperation } from '@/api/server/serverOperations';
@@ -17,6 +16,7 @@ import WingsOperationProgressModal from '@/components/server/operations/WingsOpe
 import { useTranslation } from '@/i18n/I18nProvider';
 import { useDeepCompareEffect } from '@/plugins/useDeepCompareEffect';
 import { useNests } from '@/plugins/useNests';
+import { usePermissions } from '@/plugins/usePermissions';
 import { ServerContext } from '@/state/server';
 import GameSelection from './GameSelection';
 import ReviewChanges from './ReviewChanges';
@@ -32,6 +32,31 @@ const SoftwareContainer = () => {
     const serverData = ServerContext.useStoreState((state) => state.server.data);
     const daemonType = getGlobalDaemonType();
     const uuid = serverData?.uuid;
+    const [
+        canEditStartupCommand = false,
+        canReadStartup = false,
+        canUpdateStartup = false,
+        canChangeDockerImage = false,
+        canReinstall = false,
+        canReadBackups = false,
+        canCreateBackups = false,
+        canReadFiles = false,
+        canDeleteFiles = false,
+    ] = usePermissions([
+        'startup.command',
+        'startup.read',
+        'startup.update',
+        'startup.docker-image',
+        'settings.reinstall',
+        'backup.read',
+        'backup.create',
+        'file.read',
+        'file.delete',
+    ]);
+    const canCustomizeStartup = canEditStartupCommand;
+    const canCreateBackupOption = canCreateBackups;
+    const canWipeFilesOption = canReadFiles && canDeleteFiles;
+    const missingBasePermissions = !canReadStartup || !canUpdateStartup || !canChangeDockerImage || !canReinstall;
     const { data: nests } = useNests();
     const currentEgg = serverData?.egg;
     const currentEggName = useMemo(() => {
@@ -46,7 +71,7 @@ const SoftwareContainer = () => {
     }, [nests, currentEgg]);
     const backupLimit = serverData?.featureLimits.backups;
 
-    const { data: backups } = getServerBackups();
+    const { data: backups } = getServerBackups(canReadBackups);
     const setServerFromState = ServerContext.useStoreActions((actions) => actions.server.setServerFromState);
 
     const [currentStep, setCurrentStep] = useState<FlowStep>('overview');
@@ -68,6 +93,13 @@ const SoftwareContainer = () => {
 
     const [customStartup, setCustomStartup] = useState('');
     const [selectedDockerImage, setSelectedDockerImage] = useState('');
+
+    const hasCustomStartup = !!eggPreview && !!customStartup && customStartup !== eggPreview.egg.startup;
+    const canApplyChanges =
+        !missingBasePermissions &&
+        !(shouldBackup && !canCreateBackups) &&
+        !(shouldWipe && !canWipeFilesOption) &&
+        !(hasCustomStartup && !canCustomizeStartup);
 
     const variables = ServerContext.useStoreState(
         ({ server }) => ({
@@ -94,10 +126,21 @@ const SoftwareContainer = () => {
     }, [data]);
 
     useEffect(() => {
+        if (!canCreateBackups) {
+            setShouldBackup(false);
+            return;
+        }
+
         if (backups) {
             setShouldBackup(backupLimit !== 0 && (backupLimit === null || backups.backupCount < backupLimit));
         }
-    }, [backups, backupLimit]);
+    }, [backups, backupLimit, canCreateBackups]);
+
+    useEffect(() => {
+        if (!canWipeFilesOption) {
+            setShouldWipe(false);
+        }
+    }, [canWipeFilesOption]);
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -247,6 +290,11 @@ const SoftwareContainer = () => {
     const applyChanges = async () => {
         if (!selectedEgg || !selectedNest || !eggPreview) return;
 
+        if (!canApplyChanges) {
+            toast.error(t('server.software.configuration.missing_permissions'));
+            return;
+        }
+
         if (shouldWipe && !shouldBackup) {
             setShowWipeConfirmation(true);
             return;
@@ -274,38 +322,50 @@ const SoftwareContainer = () => {
                       ? eggPreview.docker_images[eggPreview.default_docker_image]
                       : '';
 
+            const editableVariables = new Set(
+                eggPreview.variables
+                    .filter((variable) => variable.user_viewable && variable.user_editable)
+                    .map((variable) => variable.env_variable),
+            );
+
             const filteredEnvironment: Record<string, string> = {};
             Object.entries(pendingVariables).forEach(([key, value]) => {
-                if (value && value.trim() !== '') {
+                if (editableVariables.has(key) && value && value.trim() !== '') {
                     filteredEnvironment[key] = value;
                 }
             });
 
-            if (daemonType?.toLowerCase() === 'elytra') {
-                const response = await applyEggChange(uuid, {
-                    egg_id: selectedEgg.attributes.id,
-                    nest_id: selectedNest.attributes.id,
-                    docker_image: actualDockerImage,
-                    startup_command: customStartup,
-                    environment: filteredEnvironment,
-                    should_backup: shouldBackup,
-                    should_wipe: shouldWipe,
-                });
+            const startupCommand =
+                customStartup && customStartup !== eggPreview.egg.startup ? customStartup : undefined;
 
-                setCurrentOperationId(response.operation_id);
-                setShowOperationModal(true);
-            } else if (daemonType?.toLowerCase() === 'wings' || daemonType?.toLowerCase() === 'calagopus') {
-                await applyEggChangeSync(uuid, {
-                    egg_id: selectedEgg.attributes.id,
-                    nest_id: selectedNest.attributes.id,
-                    docker_image: actualDockerImage,
-                    startup_command: customStartup,
-                    environment: filteredEnvironment,
-                    should_backup: shouldBackup,
-                    should_wipe: shouldWipe,
-                    backup_name: t('server.software.backup_name'),
-                });
+            if (!canReadStartup || !canUpdateStartup || !canChangeDockerImage || !canReinstall) {
+                throw new Error(t('server.software.configuration.missing_permissions'));
             }
+
+            if (shouldBackup && !canCreateBackups) {
+                throw new Error(t('server.software.configuration.missing_backup_permission'));
+            }
+
+            if (shouldWipe && (!canReadFiles || !canDeleteFiles)) {
+                throw new Error(t('server.software.configuration.missing_file_permission'));
+            }
+
+            if (startupCommand && !canCustomizeStartup) {
+                throw new Error(t('server.software.configuration.startup_command_forbidden'));
+            }
+
+            const response = await applyEggChange(uuid, {
+                egg_id: selectedEgg.attributes.id,
+                nest_id: selectedNest.attributes.id,
+                docker_image: actualDockerImage,
+                startup_command: startupCommand,
+                environment: filteredEnvironment,
+                should_backup: shouldBackup,
+                should_wipe: shouldWipe,
+            });
+
+            setCurrentOperationId(response.operation_id);
+            setShowOperationModal(true);
 
             toast.success(t('server.software.operation_started'));
 
@@ -404,6 +464,9 @@ const SoftwareContainer = () => {
                                 selectedEgg={selectedEgg}
                                 eggPreview={eggPreview}
                                 customStartup={customStartup}
+                                canEditStartupCommand={canCustomizeStartup}
+                                canCreateBackups={canCreateBackupOption}
+                                canWipeFiles={canWipeFilesOption}
                                 selectedDockerImage={selectedDockerImage}
                                 pendingVariables={pendingVariables}
                                 variableErrors={variableErrors}
@@ -432,6 +495,8 @@ const SoftwareContainer = () => {
                                 shouldBackup={shouldBackup}
                                 shouldWipe={shouldWipe}
                                 isLoading={isLoading}
+                                canApply={canApplyChanges}
+                                blockedMessage={t('server.software.configuration.missing_permissions')}
                                 onBack={() => setCurrentStep('configure')}
                                 onApply={applyChanges}
                             />

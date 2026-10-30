@@ -57,13 +57,14 @@ class StartupController extends ClientApiController
     {
         /** @var \Pterodactyl\Models\EggVariable $variable */
         $variable = $server->variables()->where('env_variable', $request->input('key'))->first();
-        $original = $variable->server_value;
 
         if (is_null($variable) || !$variable->user_viewable) {
             throw new BadRequestHttpException(__('exceptions.client.startup.variable_missing'));
         } elseif (!$variable->user_editable) {
             throw new BadRequestHttpException(__('exceptions.client.startup.variable_read_only'));
         }
+
+        $original = $variable->server_value;
 
         // Revalidate the variable value using the egg variable specific validation rules for it.
         $this->validate($request, ['value' => $variable->rules]);
