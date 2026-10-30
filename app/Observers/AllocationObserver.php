@@ -3,13 +3,16 @@
 namespace Pterodactyl\Observers;
 
 use Pterodactyl\Models\Allocation;
+use Pterodactyl\Services\Subdomain\CustomDomainService;
 use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 use Illuminate\Support\Facades\Log;
 
 class AllocationObserver
 {
-    public function __construct(private SubdomainManagementService $subdomainService)
-    {
+    public function __construct(
+        private SubdomainManagementService $subdomainService,
+        private CustomDomainService $customDomainService
+    ) {
     }
 
     /**
@@ -17,9 +20,13 @@ class AllocationObserver
      */
     public function updated(Allocation $allocation): void
     {
-        // Check if IP or port changed
-        if ($allocation->isDirty(['ip', 'port'])) {
+        // Check if IP, alias or port changed
+        if ($allocation->isDirty(['ip', 'ip_alias', 'port'])) {
             $this->syncSubdomainForAllocation($allocation);
+
+            if ($allocation->server) {
+                $this->customDomainService->syncForServer($allocation->server, $allocation);
+            }
         }
     }
 

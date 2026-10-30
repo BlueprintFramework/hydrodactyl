@@ -36,6 +36,7 @@ use Pterodactyl\Notifications\SendPasswordReset as ResetPasswordNotification;
  * @property string|null $remember_token
  * @property string $language
  * @property bool $root_admin
+ * @property bool $custom_domains
  * @property bool $use_totp
  * @property string|null $totp_secret
  * @property \Illuminate\Support\Carbon|null $totp_authenticated_at
@@ -130,6 +131,7 @@ class User extends Model implements
         'totp_authenticated_at',
         'gravatar',
         'root_admin',
+        'custom_domains',
     ];
 
     /**
@@ -137,6 +139,7 @@ class User extends Model implements
      */
     protected $casts = [
         'root_admin' => 'boolean',
+        'custom_domains' => 'boolean',
         'use_totp' => 'boolean',
         'gravatar' => 'boolean',
         'totp_authenticated_at' => 'datetime',
@@ -153,6 +156,7 @@ class User extends Model implements
     protected $attributes = [
         'external_id' => null,
         'root_admin' => false,
+        'custom_domains' => false,
         'language' => 'en-US',
         'use_totp' => false,
         'totp_secret' => null,
@@ -170,6 +174,7 @@ class User extends Model implements
         'name_last' => 'sometimes|nullable|string|between:0,191',
         'password' => 'sometimes|nullable|string',
         'root_admin' => 'boolean',
+        'custom_domains' => 'boolean',
         'language' => 'string',
         'use_totp' => 'boolean',
         'totp_secret' => 'nullable|string',

@@ -43,6 +43,8 @@ return [
         'create' => 'Erlaubt Ihnen, dem Server weitere Belegungen zuzuweisen.',
         'update' => 'Erlaubt Ihnen, die primäre Server-Belegung zu ändern und jeder Belegung Notizen hinzuzufügen.',
         'delete' => 'Erlaubt Ihnen, eine Belegung vom Server zu löschen.',
+        'custom_domain_read' => 'Erlaubt Ihnen, die eigenen Domains anzuzeigen, die auf diesen Server zeigen.',
+        'custom_domain_update' => 'Erlaubt Ihnen, eigene Domains für diesen Server hinzuzufügen und zu entfernen.',
     ],
     'startup' => [
         'description' => 'Berechtigungen, die steuern, ob Sie die Startparameter dieses Servers ansehen können.',

@@ -136,6 +136,7 @@ export interface ServerBuildData {
     allocation_id: number;
     node_daemon_type: string | null;
     software_enabled: boolean;
+    custom_domains_enabled: boolean;
 }
 
 export interface ServerBuildResponse {
@@ -162,6 +163,7 @@ export interface ServerBuildValues {
     oom_disabled: boolean;
     exclude_from_resource_calculation: boolean;
     software_enabled: boolean;
+    custom_domains_enabled: boolean;
 }
 
 export const getServerBuild = (id: number | string): Promise<ServerBuildResponse> =>

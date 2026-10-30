@@ -64,6 +64,17 @@ class Egg extends Model
     public const EXPORT_VERSION = 'PTDL_v2';
 
     /**
+     * Egg feature that lets servers use domains their users added themselves.
+     */
+    public const FEATURE_USER_DOMAINS = 'user_domains';
+
+    /**
+     * Custom domains rely on the SRV record Minecraft clients look up, so they
+     * are only offered on eggs that use the Minecraft subdomain feature.
+     */
+    public const FEATURE_SUBDOMAIN_MINECRAFT = 'subdomain_minecraft';
+
+    /**
      * Different features that can be enabled on any given egg. These are used internally
      * to determine which types of frontend functionality should be shown to the user. Eggs
      * will automatically inherit features from a parent egg if they are already configured
