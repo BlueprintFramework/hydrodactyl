@@ -222,6 +222,14 @@
             "description": "Elige el idioma que se usa en todo el panel.",
             "update_failed": "No se pudo actualizar tu preferencia de idioma."
         },
+        "name": {
+            "title": "Perfil",
+            "first_name_label": "Nombre",
+            "last_name_label": "Apellidos",
+            "first_name_required": "El nombre es obligatorio.",
+            "submit": "Actualizar nombre",
+            "updated": "Tu nombre se ha actualizado."
+        },
         "overview": {
             "commit_label": "Commit:",
             "email_title": "Correo electrónico de la cuenta",

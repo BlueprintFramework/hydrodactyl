@@ -222,6 +222,14 @@
             "description": "Elige linguam per totum panel usam.",
             "update_failed": "Optionem linguae tuae instaurare non potuit."
         },
+        "name": {
+            "title": "Profilum",
+            "first_name_label": "Praenomen",
+            "last_name_label": "Cognomen",
+            "first_name_required": "Praenomen necessarium est.",
+            "submit": "Instaura nomen",
+            "updated": "Nomen tuum instauratum est."
+        },
         "overview": {
             "commit_label": "Commit:",
             "email_title": "Epistula rationis",

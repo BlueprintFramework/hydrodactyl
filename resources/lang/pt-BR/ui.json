@@ -222,6 +222,14 @@
             "description": "Escolha o idioma usado no painel.",
             "update_failed": "Não foi possível atualizar sua preferência de idioma."
         },
+        "name": {
+            "title": "Perfil",
+            "first_name_label": "Nome",
+            "last_name_label": "Sobrenome",
+            "first_name_required": "O nome é obrigatório.",
+            "submit": "Atualizar nome",
+            "updated": "Seu nome foi atualizado."
+        },
         "overview": {
             "commit_label": "Commit:",
             "email_title": "E-mail da conta",
