@@ -45,6 +45,7 @@ const DashboardContainer = () => {
     const defaultPage = Number(new URLSearchParams(search).get('page') || '1');
 
     const [page, setPage] = useState(!Number.isNaN(defaultPage) && defaultPage > 0 ? defaultPage : 1);
+    const pageScrollRef = useRef<HTMLDivElement>(null);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const uuid = useStoreState((state) => state.user.data?.uuid);
     const rootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
@@ -402,6 +403,7 @@ const DashboardContainer = () => {
 
     useEffect(() => {
         window.history.replaceState(null, document.title, `/${page <= 1 ? '' : `?page=${page}`}`);
+        pageScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     }, [page]);
 
     useEffect(() => {
@@ -410,7 +412,7 @@ const DashboardContainer = () => {
     }, [error, clearAndAddHttpError, clearFlashes]);
 
     return (
-        <PageContentBlock title={t('dashboard.title')} showFlashKey={'dashboard'}>
+        <PageContentBlock ref={pageScrollRef} title={t('dashboard.title')} showFlashKey={'dashboard'}>
             {!servers ? null : (
                 <Pagination data={servers} onPageSelect={setPage}>
                     {({ items }) => {
@@ -432,6 +434,7 @@ const DashboardContainer = () => {
                                 displayOption={dashboardMode === 'grid' ? 'grid' : 'list'}
                                 groupFilterId={groupFilterId}
                                 filterActive={filterActive}
+                                currentPage={servers.pagination.currentPage}
                             />
                         ) : sortedItems.length > 0 ? (
                             <div
