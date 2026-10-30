@@ -33,9 +33,17 @@ const UpdateNameForm = () => {
     );
 
     const submit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
+        const firstName = values.firstName.trim();
+        const lastName = values.lastName.trim();
+
+        if (firstName === (user?.firstName ?? '').trim() && lastName === (user?.lastName ?? '').trim()) {
+            setSubmitting(false);
+            return;
+        }
+
         clearFlashes('account:name');
 
-        updateName({ ...values })
+        updateName({ firstName, lastName })
             .then(() =>
                 addFlash({
                     type: 'success',
@@ -61,32 +69,38 @@ const UpdateNameForm = () => {
             initialValues={{ firstName: user?.firstName ?? '', lastName: user?.lastName ?? '' }}
             enableReinitialize
         >
-            {({ isSubmitting, isValid }) => (
-                <Fragment>
-                    <SpinnerOverlay size={'large'} visible={isSubmitting} />
-                    <Form className={'m-0'}>
-                        <div className={'grid grid-cols-1 gap-6 sm:grid-cols-2'}>
-                            <Field
-                                id={'first_name'}
-                                type={'text'}
-                                name={'firstName'}
-                                label={t('account.name.first_name_label')}
-                            />
-                            <Field
-                                id={'last_name'}
-                                type={'text'}
-                                name={'lastName'}
-                                label={t('account.name.last_name_label')}
-                            />
-                        </div>
-                        <div className={'mt-6'}>
-                            <Button variant='secondary' disabled={isSubmitting || !isValid}>
-                                {t('account.name.submit')}
-                            </Button>
-                        </div>
-                    </Form>
-                </Fragment>
-            )}
+            {({ isSubmitting, isValid, values }) => {
+                const isUnchanged =
+                    values.firstName.trim() === (user?.firstName ?? '').trim() &&
+                    values.lastName.trim() === (user?.lastName ?? '').trim();
+
+                return (
+                    <Fragment>
+                        <SpinnerOverlay size={'large'} visible={isSubmitting} />
+                        <Form className={'m-0'}>
+                            <div className={'grid grid-cols-1 gap-6 sm:grid-cols-2'}>
+                                <Field
+                                    id={'first_name'}
+                                    type={'text'}
+                                    name={'firstName'}
+                                    label={t('account.name.first_name_label')}
+                                />
+                                <Field
+                                    id={'last_name'}
+                                    type={'text'}
+                                    name={'lastName'}
+                                    label={t('account.name.last_name_label')}
+                                />
+                            </div>
+                            <div className={'mt-6'}>
+                                <Button variant='secondary' disabled={isSubmitting || !isValid || isUnchanged}>
+                                    {t('account.name.submit')}
+                                </Button>
+                            </div>
+                        </Form>
+                    </Fragment>
+                );
+            }}
         </Formik>
     );
 };
