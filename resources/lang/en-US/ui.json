@@ -222,6 +222,14 @@
             "description": "Choose the language used across the panel.",
             "update_failed": "Failed to update your language preference."
         },
+        "name": {
+            "title": "Profile",
+            "first_name_label": "First Name",
+            "last_name_label": "Last Name",
+            "first_name_required": "First name is required.",
+            "submit": "Update Name",
+            "updated": "Your name has been updated."
+        },
         "overview": {
             "commit_label": "Commit:",
             "email_title": "Account Email",

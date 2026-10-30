@@ -222,6 +222,14 @@
             "description": "Tria l'idioma que s'utilitza a tot el panell.",
             "update_failed": "No s'ha pogut actualitzar la teva preferència d'idioma."
         },
+        "name": {
+            "title": "Perfil",
+            "first_name_label": "Nom",
+            "last_name_label": "Cognoms",
+            "first_name_required": "El nom és obligatori.",
+            "submit": "Actualitza el nom",
+            "updated": "El teu nom s'ha actualitzat."
+        },
         "overview": {
             "commit_label": "Commit:",
             "email_title": "Correu electrònic del compte",
