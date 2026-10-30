@@ -24,6 +24,11 @@ return [
             'storage_class' => env('S3_BACKUP_STORAGE_CLASS'),
         ],
 
+        'rustic_local' => [
+            'adapter' => 'rustic_local',
+            'repository_base_path' => env('RUSTIC_REPOSITORY_BASE_PATH', '/var/lib/pterodactyl/rustic-repos'),
+        ],
+
         'rustic_s3' => [
             'adapter' => 'rustic_s3',
             'key' => env('RUSTIC_S3_ACCESS_KEY_ID'),
