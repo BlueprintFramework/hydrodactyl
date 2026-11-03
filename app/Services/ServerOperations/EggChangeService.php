@@ -3,11 +3,13 @@
 namespace Pterodactyl\Services\ServerOperations;
 
 use Exception;
-use Illuminate\Support\Facades\Log;
 use Pterodactyl\Models\Egg;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\User;
+use Pterodactyl\Models\Permission;
+use Illuminate\Support\Facades\Log;
 use Pterodactyl\Jobs\Server\ApplyEggChangeJob;
+use Illuminate\Auth\Access\AuthorizationException;
 use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -144,6 +146,17 @@ class EggChangeService
             $startupCommand
         );
 
+        $this->assertPermissions(
+            $server,
+            $user,
+            $validated['egg'],
+            $dockerImage,
+            $validated['startup_command'],
+            $environment,
+            $shouldBackup,
+            $shouldWipe
+        );
+
         $dockerImage = $validated['docker_image'];
         $startupCommand = $validated['startup_command'];
         
@@ -194,6 +207,43 @@ class EggChangeService
             'operation_id' => $operation->operation_id,
             'status' => 'pending',
         ];
+    }
+
+    private function assertPermissions(
+        Server $server,
+        User $user,
+        Egg $egg,
+        ?string $dockerImage,
+        ?string $startupCommand,
+        array $environment,
+        bool $shouldBackup,
+        bool $shouldWipe
+    ): void {
+        $deny = fn () => throw new AuthorizationException();
+
+        if (!is_null($dockerImage) && !$user->can(Permission::ACTION_STARTUP_DOCKER_IMAGE, $server)) {
+            $deny();
+        }
+
+        if (!empty($startupCommand) && trim($startupCommand) !== trim((string) $egg->startup) && !$user->can(Permission::ACTION_STARTUP_COMMAND, $server)) {
+            $deny();
+        }
+
+        if (!empty($environment) && !$user->can(Permission::ACTION_STARTUP_UPDATE, $server)) {
+            $deny();
+        }
+
+        if (!$user->can(Permission::ACTION_SETTINGS_REINSTALL, $server)) {
+            $deny();
+        }
+
+        if ($shouldBackup && !$user->can(Permission::ACTION_BACKUP_CREATE, $server)) {
+            $deny();
+        }
+
+        if ($shouldWipe && (!$user->can(Permission::ACTION_FILE_READ, $server) || !$user->can(Permission::ACTION_FILE_DELETE, $server))) {
+            $deny();
+        }
     }
 
     /**

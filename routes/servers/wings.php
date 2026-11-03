@@ -118,4 +118,9 @@ Route::group([
         Route::post('/egg/apply', [Wings\SettingsController::class, 'applyEggChange'])
             ->middleware('server.operation.rate-limit');
     });
+
+    Route::group(['prefix' => '/operations'], function () {
+        Route::get('/', [Wings\SettingsController::class, 'getServerOperations']);
+        Route::get('/{operationId}', [Wings\SettingsController::class, 'getOperationStatus']);
+    });
 });

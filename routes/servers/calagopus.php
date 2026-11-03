@@ -122,4 +122,9 @@ Route::group([
         Route::post('/egg/apply', [Calagopus\SettingsController::class, 'applyEggChange'])
             ->middleware('server.operation.rate-limit');
     });
+
+    Route::group(['prefix' => '/operations'], function () {
+        Route::get('/', [Calagopus\SettingsController::class, 'getServerOperations']);
+        Route::get('/{operationId}', [Calagopus\SettingsController::class, 'getOperationStatus']);
+    });
 });

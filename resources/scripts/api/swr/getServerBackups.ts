@@ -40,13 +40,13 @@ type BackupResponse = PaginatedResult<ServerBackup> & {
     };
 };
 
-export default () => {
+export default (enabled = true) => {
     const { page } = useContext(Context);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const daemonType = getGlobalDaemonType();
 
     return useSWR<BackupResponse>(
-        ['server:backups', uuid, page],
+        enabled ? ['server:backups', uuid, page] : null,
         async () => {
             const { data } = await http.get(`/api/client/servers/${daemonType}/${uuid}/backups`, { params: { page } });
 

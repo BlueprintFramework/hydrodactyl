@@ -10,6 +10,9 @@ interface Props {
     selectedEgg: Egg;
     eggPreview: EggPreview;
     customStartup: string;
+    canEditStartupCommand: boolean;
+    canCreateBackups: boolean;
+    canWipeFiles: boolean;
     selectedDockerImage: string;
     pendingVariables: Record<string, string>;
     variableErrors: Record<string, string>;
@@ -30,6 +33,9 @@ const SoftwareConfiguration = ({
     selectedEgg,
     eggPreview,
     customStartup,
+    canEditStartupCommand,
+    canCreateBackups,
+    canWipeFiles,
     selectedDockerImage,
     pendingVariables,
     variableErrors,
@@ -70,17 +76,24 @@ const SoftwareConfiguration = ({
                                         onChange={(e) => onStartupChange(e.target.value)}
                                         placeholder={t('server.software.configuration.startup_placeholder')}
                                         rows={3}
-                                        className='w-full px-3 py-2 bg-mocha-400/60 border border-mocha-300/60 rounded-lg text-sm text-cream-100 placeholder:text-cream-400/40 focus:outline-none focus:border-brand-400/60 transition-colors font-mono resize-none'
+                                        disabled={!canEditStartupCommand}
+                                        className='w-full px-3 py-2 bg-mocha-400/60 border border-mocha-300/60 rounded-lg text-sm text-cream-100 placeholder:text-cream-400/40 focus:outline-none focus:border-brand-400/60 transition-colors font-mono resize-none disabled:cursor-not-allowed disabled:opacity-60'
                                     />
-                                    <p className='text-xs text-cream-400/70 mt-1'>
-                                        {t('server.software.configuration.use_variables', {
-                                            variables: eggPreview.variables
-                                                .map((v) => `{{${v.env_variable}}}`)
-                                                .slice(0, 3)
-                                                .join(', '),
-                                        })}
-                                        {eggPreview.variables.length > 3 && t('server.software.configuration.etc')}
-                                    </p>
+                                    {canEditStartupCommand ? (
+                                        <p className='text-xs text-cream-400/70 mt-1'>
+                                            {t('server.software.configuration.use_variables', {
+                                                variables: eggPreview.variables
+                                                    .map((v) => `{{${v.env_variable}}}`)
+                                                    .slice(0, 3)
+                                                    .join(', '),
+                                            })}
+                                            {eggPreview.variables.length > 3 && t('server.software.configuration.etc')}
+                                        </p>
+                                    ) : (
+                                        <p className='text-xs text-brand-400 mt-1'>
+                                            {t('server.software.configuration.startup_command_forbidden')}
+                                        </p>
+                                    )}
                                 </div>
                                 <div>
                                     <label
@@ -215,12 +228,19 @@ const SoftwareConfiguration = ({
                                         >
                                             {t('server.software.configuration.create_backup')}
                                         </label>
-                                        <p className='text-xs text-cream-400/70 leading-relaxed'>
-                                            {backupLimit !== 0 && (backupLimit === null || backupCount < backupLimit)
-                                                ? t('server.software.configuration.backup_auto')
-                                                : backupLimit === 0
-                                                  ? t('server.software.configuration.backup_disabled')
-                                                  : t('server.software.configuration.backup_limit')}
+                                        <p
+                                            className={`text-xs leading-relaxed ${
+                                                canCreateBackups ? 'text-cream-400/70' : 'text-brand-400'
+                                            }`}
+                                        >
+                                            {!canCreateBackups
+                                                ? t('server.software.configuration.missing_backup_permission')
+                                                : backupLimit !== 0 &&
+                                                    (backupLimit === null || backupCount < backupLimit)
+                                                  ? t('server.software.configuration.backup_auto')
+                                                  : backupLimit === 0
+                                                    ? t('server.software.configuration.backup_disabled')
+                                                    : t('server.software.configuration.backup_limit')}
                                         </p>
                                     </div>
                                     <div className='flex-shrink-0'>
@@ -229,6 +249,7 @@ const SoftwareConfiguration = ({
                                             checked={shouldBackup}
                                             onCheckedChange={onBackupChange}
                                             disabled={
+                                                !canCreateBackups ||
                                                 backupLimit === 0 ||
                                                 (backupLimit !== null && backupCount >= backupLimit)
                                             }
@@ -244,8 +265,14 @@ const SoftwareConfiguration = ({
                                         >
                                             {t('server.software.configuration.wipe_files')}
                                         </label>
-                                        <p className='text-xs text-cream-400/70 leading-relaxed'>
-                                            {t('server.software.configuration.delete_files')}
+                                        <p
+                                            className={`text-xs leading-relaxed ${
+                                                canWipeFiles ? 'text-cream-400/70' : 'text-brand-400'
+                                            }`}
+                                        >
+                                            {canWipeFiles
+                                                ? t('server.software.configuration.delete_files')
+                                                : t('server.software.configuration.missing_file_permission')}
                                         </p>
                                     </div>
                                     <div className='flex-shrink-0'>
@@ -253,6 +280,7 @@ const SoftwareConfiguration = ({
                                             id='wipe-files-switch'
                                             checked={shouldWipe}
                                             onCheckedChange={onWipeChange}
+                                            disabled={!canWipeFiles}
                                         />
                                     </div>
                                 </div>

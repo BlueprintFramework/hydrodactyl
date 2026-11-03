@@ -6,7 +6,6 @@ export const useNests = () => useSWR('admin:nests', getNests, { revalidateOnFocu
 export const useNest = (id?: number | string) =>
     useSWR(id ? ['admin:nest', id] : null, () => getNest(id as number | string), {
         revalidateOnFocus: false,
-        revalidateIfStale: false,
     });
 
 export const useEgg = (id?: number | string) =>

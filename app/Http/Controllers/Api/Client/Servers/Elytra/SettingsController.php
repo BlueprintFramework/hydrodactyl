@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Repositories\Eloquent\ServerRepository;
 use Pterodactyl\Services\Servers\ReinstallServerService;
+use Pterodactyl\Services\Servers\EggAssignmentService;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
 use Pterodactyl\Services\ServerOperations\ServerOperationService;
 use Pterodactyl\Services\ServerOperations\ServerStateValidationService;
@@ -35,6 +36,7 @@ class SettingsController extends ClientApiController
         private ServerOperationService $operationService,
         private ServerStateValidationService $validationService,
         private EggChangeService $eggChangeService,
+        private EggAssignmentService $eggAssignmentService,
     ) {
         parent::__construct();
     }
@@ -124,33 +126,28 @@ class SettingsController extends ClientApiController
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
 
-    private function resetStartupCommand(Server $server): JsonResponse
-    {
-        $server->startup = $server->egg->startup;
-        $server->save();
-        return new JsonResponse([], Response::HTTP_NO_CONTENT);
-    }
-
     /**
      * Change server egg
      */
     public function changeEgg(SetEggRequest $request, Server $server): JsonResponse
     {
-        $eggId = $request->input('egg_id');
-        $nestId = $request->input('nest_id');
-        $originalEggId = $server->egg_id;
-        $originalNestId = $server->nest_id;
+        $eggId = (int) $request->input('egg_id');
+        $nestId = (int) $request->input('nest_id');
 
-        if ($originalEggId !== $eggId || $originalNestId !== $nestId) {
-            $server->egg_id = $eggId;
-            $server->nest_id = $nestId;
-            $server->save();
+        if ($server->egg_id !== $eggId || $server->nest_id !== $nestId) {
+            $originalEggId = $server->egg_id;
+            $originalNestId = $server->nest_id;
+
+            $this->eggAssignmentService->handle($server, $eggId, $nestId);
 
             Activity::event('server:settings.egg')
-                ->property(['original_egg_id' => $originalEggId, 'new_egg_id' => $eggId, 'original_nest_id' => $originalNestId, 'new_nest_id' => $nestId])
+                ->property([
+                    'original_egg_id' => $originalEggId,
+                    'new_egg_id' => $eggId,
+                    'original_nest_id' => $originalNestId,
+                    'new_nest_id' => $nestId,
+                ])
                 ->log();
-
-            $this->resetStartupCommand($server);
         }
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);

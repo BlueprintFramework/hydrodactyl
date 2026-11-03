@@ -4,6 +4,7 @@ import isEqual from 'react-fast-compare';
 
 import { Alert } from '@/components/elements/alert';
 import ErrorBoundary from '@/components/elements/ErrorBoundary';
+import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import Console from '@/components/server/console/Console';
 import StatGraphs from '@/components/server/console/StatGraphs';
@@ -11,7 +12,6 @@ import PowerButtons from '@/components/server/header/PowerButtons';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { ServerContext } from '@/state/server';
 import ServerHeader from '../header/ServerHeader';
-import ServerContentBlock from '@/components/elements/ServerContentBlock';
 
 export type PowerAction = 'start' | 'stop' | 'restart' | 'kill';
 
