@@ -47,6 +47,8 @@ class Permission extends Model
     public const ACTION_ALLOCATION_CREATE = 'allocation.create';
     public const ACTION_ALLOCATION_UPDATE = 'allocation.update';
     public const ACTION_ALLOCATION_DELETE = 'allocation.delete';
+    public const ACTION_ALLOCATION_CUSTOM_DOMAIN_READ = 'allocation.custom_domain_read';
+    public const ACTION_ALLOCATION_CUSTOM_DOMAIN_UPDATE = 'allocation.custom_domain_update';
 
     public const ACTION_FILE_READ = 'file.read';
     public const ACTION_FILE_READ_CONTENT = 'file.read-content';
@@ -163,6 +165,8 @@ class Permission extends Model
                     'create' => __('permissions.allocation.create'),
                     'update' => __('permissions.allocation.update'),
                     'delete' => __('permissions.allocation.delete'),
+                    'custom_domain_read' => __('permissions.allocation.custom_domain_read'),
+                    'custom_domain_update' => __('permissions.allocation.custom_domain_update'),
                 ],
             ],
 

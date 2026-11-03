@@ -627,7 +627,7 @@ class SubdomainManagementService
      * @param array $dnsRecords
      * @return array
      */
-    private function normalizeIpAddresses(array $dnsRecords, server $server): array
+    public function normalizeIpAddresses(array $dnsRecords, server $server): array
     {
         $useAlias = (bool) $server->node->trust_alias;
         $allocationIp = $server->allocation->ip;

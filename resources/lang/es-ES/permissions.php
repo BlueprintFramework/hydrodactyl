@@ -43,6 +43,8 @@ return [
         'create' => 'Permite a un usuario asignar asignaciones adicionales al servidor.',
         'update' => 'Permite a un usuario cambiar la asignación principal del servidor y adjuntar notas a cada asignación.',
         'delete' => 'Permite a un usuario eliminar una asignación del servidor.',
+        'custom_domain_read' => 'Permite a un usuario ver los dominios personalizados que apuntan a este servidor.',
+        'custom_domain_update' => 'Permite a un usuario añadir y eliminar dominios personalizados de este servidor.',
     ],
     'startup' => [
         'description' => 'Permisos que controlan la capacidad de un usuario de ver los parámetros de inicio de este servidor.',

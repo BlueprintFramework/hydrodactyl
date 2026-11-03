@@ -165,6 +165,7 @@ class ServerController extends Controller
                 'allocation_id' => $server->allocation_id,
                 'node_daemon_type' => $server->node?->daemonType,
                 'software_enabled' => is_null($server->software_enabled) ? true : (bool) $server->software_enabled,
+                'custom_domains_enabled' => is_null($server->custom_domains_enabled) ? true : (bool) $server->custom_domains_enabled,
             ],
             'assigned' => $assigned->map(fn (Allocation $allocation) => $this->allocationOption($allocation))->values(),
             'unassigned' => $unassigned->map(fn (Allocation $allocation) => $this->allocationOption($allocation))->values(),
@@ -181,7 +182,7 @@ class ServerController extends Controller
                 'allocation_id', 'add_allocations', 'remove_allocations',
                 'memory', 'overhead_memory', 'swap', 'io', 'cpu', 'threads', 'disk',
                 'database_limit', 'allocation_limit', 'backup_limit', 'backup_storage_limit', 'oom_disabled',
-                'exclude_from_resource_calculation', 'software_enabled',
+                'exclude_from_resource_calculation', 'software_enabled', 'custom_domains_enabled',
             ]));
         } catch (DataValidationException $exception) {
             throw new ValidationException($exception->getValidator());

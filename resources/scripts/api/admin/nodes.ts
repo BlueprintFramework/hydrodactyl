@@ -19,6 +19,7 @@ export interface AdminNode {
     behind_proxy: boolean;
     public: boolean;
     trust_alias: boolean;
+    custom_domains_enabled: boolean;
     maintenance_mode: boolean;
     memory: number;
     memory_overallocate: number;
@@ -55,6 +56,7 @@ export interface NodeValues {
     daemonType: string;
     public: boolean;
     trust_alias: boolean;
+    custom_domains_enabled: boolean;
     fqdn: string;
     internal_fqdn: string;
     scheme: string;

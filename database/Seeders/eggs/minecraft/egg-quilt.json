@@ -8,7 +8,7 @@
     "name": "Quilt",
     "author": "support@phosphor.host",
     "description": "Quilt Server. Quilt is a lightweight mod loader for Minecraft based on Fabric Loader, with support for snapshots and fast updates to new versions.",
-    "features": ["eula", "java_version", "pid_limit", "mod/quilt", "mclogs", "subdomain_minecraft"],
+    "features": ["eula", "java_version", "pid_limit", "mod/quilt", "mclogs", "subdomain_minecraft", "user_domains"],
     "docker_images": {
         "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
         "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",

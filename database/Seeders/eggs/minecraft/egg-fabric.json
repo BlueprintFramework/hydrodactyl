@@ -8,7 +8,7 @@
     "name": "Fabric",
     "author": "contact@awakenedredstone.com",
     "description": "Fabric Server. Fabric is a lightweight mod loader for Minecraft, with support for snapshots and fast updates to new versions.",
-    "features": ["eula", "java_version", "pid_limit", "mod/fabric", "mclogs", "subdomain_minecraft"],
+    "features": ["eula", "java_version", "pid_limit", "mod/fabric", "mclogs", "subdomain_minecraft", "user_domains"],
     "docker_images": {
         "Java 25": "ghcr.io/pyrodactyl-oss/images:java_25",
         "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",

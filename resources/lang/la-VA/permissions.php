@@ -43,6 +43,8 @@ return [
         'create' => 'Permitit usori attributiones additivas servero assignare.',
         'update' => 'Permitit usori attributionem primariam serveri mutare et adnotationes singulis attributionibus adiungere.',
         'delete' => 'Permitit usori attributionem e servero delere.',
+        'custom_domain_read' => 'Permitit usori dominia propria ad hunc serverum directa videre.',
+        'custom_domain_update' => 'Permitit usori dominia propria huic servero addere et removere.',
     ],
     'startup' => [
         'description' => 'Permissa quae facultatem usoris parametros incipiendi huius serveri videndi moderantur.',
