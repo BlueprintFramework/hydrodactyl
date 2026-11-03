@@ -8,6 +8,8 @@ export interface ExtendedWindow extends Window {
         uuid: string;
         username: string;
         email: string;
+        name_first?: string | null;
+        name_last?: string | null;
 
         root_admin: boolean;
         use_totp: boolean;
@@ -30,6 +32,8 @@ export function hydrateStore(): void {
             uuid: HydrodactylUser.uuid,
             username: HydrodactylUser.username,
             email: HydrodactylUser.email,
+            firstName: HydrodactylUser.name_first ?? '',
+            lastName: HydrodactylUser.name_last ?? '',
             language: HydrodactylUser.language,
             rootAdmin: HydrodactylUser.root_admin,
             useTotp: HydrodactylUser.use_totp,

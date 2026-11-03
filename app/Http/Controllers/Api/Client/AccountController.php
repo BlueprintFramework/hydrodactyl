@@ -11,6 +11,7 @@ use Pterodactyl\Services\Users\UserUpdateService;
 use Pterodactyl\Transformers\Api\Client\AccountTransformer;
 use Pterodactyl\Http\Requests\Api\Client\Account\UpdateEmailRequest;
 use Pterodactyl\Http\Requests\Api\Client\Account\UpdateLanguageRequest;
+use Pterodactyl\Http\Requests\Api\Client\Account\UpdateNameRequest;
 use Pterodactyl\Http\Requests\Api\Client\Account\UpdatePasswordRequest;
 
 class AccountController extends ClientApiController
@@ -46,6 +47,21 @@ class AccountController extends ClientApiController
                 ->property(['old' => $original, 'new' => $request->input('email')])
                 ->log();
         }
+
+        return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Update the account's first and last name.
+     */
+    public function updateName(UpdateNameRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+
+        $this->updateService->handle($request->user(), [
+            'name_first' => $data['first_name'],
+            'name_last' => $data['last_name'] ?? null,
+        ]);
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }

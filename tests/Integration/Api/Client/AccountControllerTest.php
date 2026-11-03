@@ -34,6 +34,45 @@ class AccountControllerTest extends ClientApiIntegrationTestCase
     }
 
     /**
+     * Test that the user's first and last name can be updated via the API.
+     */
+    public function testNameIsUpdated()
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->putJson('/api/client/account/name', [
+            'first_name' => 'New',
+            'last_name' => 'Name',
+        ]);
+
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name_first' => 'New',
+            'name_last' => 'Name',
+        ]);
+    }
+
+    /**
+     * Test that a first name is required when updating the name.
+     */
+    public function testNameIsNotUpdatedWhenFirstNameIsMissing()
+    {
+        /** @var User $user */
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->putJson('/api/client/account/name', [
+            'first_name' => '',
+            'last_name' => 'Name',
+        ]);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonPath('errors.0.meta.rule', 'required');
+    }
+
+    /**
      * Test that the user's email address can be updated via the API.
      */
     public function testEmailIsUpdated()

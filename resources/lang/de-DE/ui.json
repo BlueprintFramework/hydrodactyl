@@ -179,6 +179,14 @@
             "description": "Wählen Sie die Sprache, die im gesamten Panel verwendet wird.",
             "update_failed": "Ihre Spracheinstellung konnte nicht aktualisiert werden."
         },
+        "name": {
+            "title": "Profil",
+            "first_name_label": "Vorname",
+            "last_name_label": "Nachname",
+            "first_name_required": "Vorname ist erforderlich.",
+            "submit": "Namen aktualisieren",
+            "updated": "Ihr Name wurde aktualisiert."
+        },
         "overview": {
             "commit_label": "Commit:",
             "email_title": "Konto-E-Mail",
