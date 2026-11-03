@@ -198,6 +198,57 @@ class BackupController extends ClientApiController
     }
 
     /**
+     * Delete a specific set of backups belonging to the server.
+     *
+     * @throws \Throwable
+     * @throws AuthorizationException
+     */
+    public function bulkDelete(Request $request, Server $server): JsonResponse
+    {
+        if (!$request->user()->can(Permission::ACTION_BACKUP_DELETE, $server)) {
+            throw new AuthorizationException();
+        }
+
+        $this->confirmDestructiveAction($request);
+
+        $backupUuids = $request->input('backup_uuids', []);
+        if (empty($backupUuids) || !is_array($backupUuids)) {
+            throw new BadRequestHttpException(__('exceptions.client.backups.none_specified'));
+        }
+
+        if (count($backupUuids) > 50) {
+            throw new BadRequestHttpException(__('exceptions.client.backups.bulk_limit_exceeded'));
+        }
+
+        $backups = $server->backups()->whereIn('uuid', $backupUuids)->get();
+        if ($backups->count() !== count($backupUuids)) {
+            throw new BadRequestHttpException(__('exceptions.client.backups.not_found'));
+        }
+
+        $deleted = 0;
+        foreach ($backups as $backup) {
+            try {
+                // "Delete selected" is explicitly destructive: locked backups go too.
+                if ($backup->is_locked) {
+                    $backup->update(['is_locked' => false]);
+                }
+
+                $this->deleteBackupService->handle($backup);
+                ++$deleted;
+            } catch (\Exception $e) {
+                \Log::error("Failed to delete backup {$backup->uuid}", ['error' => $e->getMessage()]);
+            }
+        }
+
+        Activity::event('server:backup.bulk_delete')
+            ->subject($server)
+            ->property('count', $deleted)
+            ->log();
+
+        return new JsonResponse(['deleted' => $deleted]);
+    }
+
+    /**
      * Require password (and TOTP when enabled) for destructive actions made
      * through a browser session. API keys are exempt.
      */
