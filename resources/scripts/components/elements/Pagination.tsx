@@ -1,7 +1,5 @@
-import { ArrowLeft, ArrowRight } from '@gravity-ui/icons';
-import styled from 'styled-components';
 import type { PaginatedResult } from '@/api/http';
-import Button from '@/components/elements/Button';
+import PaginationFooter from '@/components/elements/table/PaginationFooter';
 
 interface RenderFuncProps<T> {
     items: T[];
@@ -17,80 +15,14 @@ interface Props<T> {
     children: (props: RenderFuncProps<T>) => React.ReactNode;
 }
 
-const Block = styled(Button)``;
-
 function Pagination<T>({ data: { items, pagination }, onPageSelect, children }: Props<T>) {
     const isFirstPage = pagination.currentPage === 1;
     const isLastPage = pagination.currentPage >= pagination.totalPages;
 
-    const pages = [];
-
-    // Start two spaces before the current page. If that puts us before the starting page default
-    // to the first page as the starting point.
-    const start = Math.max(pagination.currentPage - 2, 1);
-    const end = Math.min(pagination.totalPages, pagination.currentPage + 5);
-
-    for (let i = start; i <= end; i++) {
-        // @ts-expect-error - Type issue with array push
-        pages.push(i);
-    }
-
     return (
         <>
             {children({ items, isFirstPage, isLastPage })}
-            {pages.length > 1 && (
-                <div className={`flex justify-start mt-4 max-w-full overflow-x-auto`}>
-                    <div
-                        className={`flex justify-center gap-1.5 sm:gap-3 p-[4px] w-fit bg-linear-to-b from-[#ffffff10] to-[#ffffff09] border border-[#00000017] rounded-md shrink-0`}
-                    >
-                        <Block
-                            isSecondary
-                            color={'primary'}
-                            onClick={() =>
-                                pagination.currentPage > 1 &&
-                                pagination.totalPages > 1 &&
-                                onPageSelect(pagination.currentPage - 1)
-                            }
-                        >
-                            <ArrowLeft
-                                width={22}
-                                height={22}
-                                fill={'currentColor'}
-                                className={`${pagination.currentPage === 1 ? 'text-neutral-500 cursor-not-allowed' : 'text-primary'}`}
-                            />
-                        </Block>
-                        {pages.map((i) => (
-                            <Block
-                                isSecondary={pagination.currentPage !== i}
-                                color={'primary'}
-                                key={`block_page_${i}`}
-                                onClick={() => onPageSelect(i)}
-                            >
-                                {i === pagination.currentPage ? (
-                                    <span className='text-neutral-500 cursor-not-allowed'>{i}</span>
-                                ) : (
-                                    i
-                                )}
-                            </Block>
-                        ))}
-                        <Block
-                            isSecondary
-                            color={'primary'}
-                            onClick={() =>
-                                pagination.currentPage < pagination.totalPages &&
-                                onPageSelect(pagination.currentPage + 1)
-                            }
-                        >
-                            <ArrowRight
-                                width={22}
-                                height={22}
-                                fill={'currentColor'}
-                                className={`${pagination.currentPage === pagination.totalPages ? 'text-neutral-500 cursor-not-allowed' : 'text-primary'}`}
-                            />
-                        </Block>
-                    </div>
-                </div>
-            )}
+            <PaginationFooter pagination={pagination} onPageSelect={onPageSelect} className='mt-4 shrink-0' />
         </>
     );
 }

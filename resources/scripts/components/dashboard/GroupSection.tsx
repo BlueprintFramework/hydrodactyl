@@ -28,6 +28,7 @@ interface GroupSectionProps {
     displayOption: 'list' | 'grid';
     groupFilterId?: number;
     filterActive?: boolean;
+    currentPage?: number;
 }
 
 const serverRowClassName = (displayOption: 'list' | 'grid') =>
@@ -58,7 +59,7 @@ const DraggableServer = memo(
 );
 DraggableServer.displayName = 'DraggableServer';
 
-const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: GroupSectionProps) => {
+const GroupSection = ({ servers, displayOption, groupFilterId, filterActive, currentPage = 1 }: GroupSectionProps) => {
     const { t } = useTranslation();
     const { data: groups, mutate: mutateGroups } = useSWR('server-groups', () => getServerGroups());
     const { mutate } = useSWRConfig();
@@ -94,9 +95,12 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
     const visibleGroups = useMemo(() => {
         if (!groups) return [];
         if (groupFilterId != null) return groups.filter((g) => g.id === groupFilterId);
-        if (filterActive) return groups.filter((g) => (serversByGroup[g.id]?.length ?? 0) > 0);
+
+        const groupsWithServers = groups.filter((g) => (serversByGroup[g.id]?.length ?? 0) > 0);
+        if (currentPage > 1 || filterActive) return groupsWithServers;
+
         return groups;
-    }, [groups, groupFilterId, filterActive, serversByGroup]);
+    }, [groups, groupFilterId, filterActive, serversByGroup, currentPage]);
 
     const handleDragStart = useCallback((event: React.DragEvent, server: Server) => {
         event.dataTransfer.setData('text/plain', server.id);
@@ -254,22 +258,24 @@ const GroupSection = ({ servers, displayOption, groupFilterId, filterActive }: G
 
     return (
         <>
-            <div className='flex items-center justify-between gap-3 mb-6'>
-                <div className='flex items-center gap-2 min-w-0'>
-                    <h3 className='text-xs font-medium text-cream-200/50 uppercase tracking-wider shrink-0'>
-                        {t('dashboard.groups.title')}
-                    </h3>
-                    <span className='text-xs text-cream-200/40'>{groups.length}</span>
+            {visibleGroups.length > 0 && (
+                <div className='flex items-center justify-between gap-3 mb-6'>
+                    <div className='flex items-center gap-2 min-w-0'>
+                        <h3 className='text-xs font-medium text-cream-200/50 uppercase tracking-wider shrink-0'>
+                            {t('dashboard.groups.title')}
+                        </h3>
+                        <span className='text-xs text-cream-200/40'>{visibleGroups.length}</span>
+                    </div>
+                    <button
+                        type='button'
+                        onClick={() => setShowCreateModal(true)}
+                        className='flex items-center gap-1.5 px-3 py-1.5 bg-cream-400 text-mocha-500 hover:bg-cream-500/80 rounded-lg text-xs font-medium transition-colors shrink-0'
+                    >
+                        <Plus className='size-3.5' />
+                        {t('dashboard.groups.new')}
+                    </button>
                 </div>
-                <button
-                    type='button'
-                    onClick={() => setShowCreateModal(true)}
-                    className='flex items-center gap-1.5 px-3 py-1.5 bg-cream-400 text-mocha-500 hover:bg-cream-500/80 rounded-lg text-xs font-medium transition-colors shrink-0'
-                >
-                    <Plus className='size-3.5' />
-                    {t('dashboard.groups.new')}
-                </button>
-            </div>
+            )}
 
             <div className='flex flex-col gap-6 sm:gap-8'>
                 {visibleGroups.map((group, index) => {
