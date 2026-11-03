@@ -137,7 +137,7 @@ const AccountApiContainer = () => {
                                                 {key.description}
                                             </h4>
                                         </div>
-                                        <div className='flex items-center gap-4 text-xs font-large text-text/20'>
+                                        <div className='flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-large text-text/20'>
                                             <span>
                                                 {t('account.api_keys.last_used')}{' '}
                                                 {key.lastUsedAt
@@ -185,7 +185,7 @@ const AccountApiContainer = () => {
                                     <Button
                                         variant='attention'
                                         size='sm'
-                                        className='ml-4'
+                                        className='ml-4 shrink-0'
                                         onClick={() => setDeleteIdentifier(key.identifier)}
                                     >
                                         <TrashBin width={20} height={20} fill='currentColor' />
