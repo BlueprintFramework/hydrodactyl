@@ -65,6 +65,24 @@ trait AvailableLanguages
     }
 
     /**
+     * Optional per-language metadata from `resources/lang/<code>/meta.json`.
+     * A language may define a `short_identifier` (e.g. "de-de") that the panel
+     * uses to resolve its flag instead of the locale code itself.
+     */
+    public function getLanguageMeta(string $code): array
+    {
+        $path = resource_path("lang/{$code}/meta.json");
+
+        if (!is_file($path)) {
+            return [];
+        }
+
+        $meta = json_decode((string) file_get_contents($path), true);
+
+        return is_array($meta) ? $meta : [];
+    }
+
+    /**
      * Return an instance of the filesystem for getting a folder listing.
      */
     private function getFilesystemInstance(): Filesystem

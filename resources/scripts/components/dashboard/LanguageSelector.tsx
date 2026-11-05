@@ -9,6 +9,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Flag from '@/components/ui/Flag';
 import { useTranslation } from '@/i18n/I18nProvider';
 import type { LocaleCode } from '@/i18n/types';
 import { cn } from '@/lib/utils';
@@ -43,14 +44,13 @@ const LanguageSelector = () => {
                     size={'sm'}
                     variant={'secondary'}
                     aria-label={t('panel.language')}
-                    className='h-11 sm:h-8 justify-between gap-2 rounded-full px-3'
+                    className='h-11 sm:h-8 gap-2 rounded-full px-3'
                 >
-                    <span>
-                        {t('panel.language')}: {current?.label ?? locale}
-                    </span>
+                    <Flag identifier={current?.shortIdentifier ?? current?.code ?? locale} />
+                    <span className='text-right'>{current?.label ?? locale}</span>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className='z-99999' sideOffset={8}>
+            <DropdownMenuContent className='z-99999' sideOffset={8} align='start'>
                 {locales.map((definition) => (
                     <DropdownMenuItem
                         key={definition.code}
