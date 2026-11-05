@@ -137,16 +137,16 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
     // Dashboard Page
     if (hasSlottedLayout) {
         return (
-            <div className='h-16 w-full py-4 pr-2 flex items-center justify-between'>
+            <div className='grid h-16 w-full grid-cols-[1fr_auto_1fr] items-center px-2 py-4'>
                 <div className='flex min-w-0 items-center gap-2'>
                     <SidebarLogo admin={admin} />
                     <MobileSidebarToggle />
                     <SlotActions actions={leftActions} />
                 </div>
-                <div className='flex min-w-0 flex-1 items-center justify-center px-2'>
+                <div className='flex min-w-0 items-center justify-center px-2'>
                     <SlotActions actions={centerActions} />
                 </div>
-                <div className='ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 justify-end'>
+                <div className='flex min-w-0 items-center justify-end gap-1.5 sm:gap-2'>
                     <SlotActions actions={rightActions} />
                     <StaticButtons serverId={serverId} admin={admin} />
                 </div>
@@ -156,7 +156,7 @@ const AppHeader = ({ serverId, admin }: AppHeaderProps) => {
 
     // Servers page
     return (
-        <div className='h-16 w-full py-4 pr-2 flex items-center gap-3'>
+        <div className='flex h-16 w-full items-center gap-3 px-2 py-4'>
             <div className='flex grow shrink-0 basis-0 items-center gap-2'>
                 <MobileSidebarToggle />
                 <SidebarLogo admin={admin} />
