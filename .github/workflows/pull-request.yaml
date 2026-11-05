@@ -18,6 +18,9 @@ jobs:
       # pnpm-lock.yaml. "latest" drifts ahead of the checked-in biome.json schema
       # and starts formatting file types (YAML, Markdown) the repo does not yet
       # follow, which fails this job on untouched files.
+      #
+      # Upgrading Biome means bumping this pin together with package.json,
+      # pnpm-lock.yaml and biome.json's $schema, then running `biome migrate`.
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
         with:
