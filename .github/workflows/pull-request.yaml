@@ -14,10 +14,14 @@ jobs:
         with:
           persist-credentials: true
 
+      # Keep in sync with the @biomejs/biome version pinned in package.json /
+      # pnpm-lock.yaml. "latest" drifts ahead of the checked-in biome.json schema
+      # and starts formatting file types (YAML, Markdown) the repo does not yet
+      # follow, which fails this job on untouched files.
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
         with:
-          version: latest
+          version: 2.5.15
 
       - name: Run Biome
         run: biome check .
