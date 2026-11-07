@@ -237,7 +237,7 @@ class EggController extends Controller
             return null;
         }
 
-        $decoded = json_decode($value, true);
+        $decoded = json_decode($value);
 
         return is_null($decoded) ? $value : json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
