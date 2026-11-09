@@ -253,6 +253,15 @@
             "submit": "Atualizar senha",
             "updating": "Atualizando..."
         },
+        "servers": {
+            "chart_label": "{{owned}} servidores próprios e {{shared}} como subusuário.",
+            "description": "Servidores que você possui e servidores que outras pessoas compartilham com você.",
+            "empty": "Você ainda não tem acesso a nenhum servidor.",
+            "owned": "Próprios",
+            "shared": "Como subusuário",
+            "title": "Seus servidores",
+            "total": "Total"
+        },
         "ssh": {
             "add": "Adicionar chave SSH",
             "add_confirm": "Adicionar chave",

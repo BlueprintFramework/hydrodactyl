@@ -253,6 +253,15 @@
             "submit": "Instaura tesseram",
             "updating": "Instauratur..."
         },
+        "servers": {
+            "chart_label": "{{owned}} servitores proprii et {{shared}} ut subusor.",
+            "description": "Servitores quos possides et quos alii tecum communicant.",
+            "empty": "Nullos servitores adire adhuc potes.",
+            "owned": "Proprii",
+            "shared": "Ut subusor",
+            "title": "Servitores tui",
+            "total": "Summa"
+        },
         "ssh": {
             "add": "Adde clavem SSH",
             "add_confirm": "Adde clavem",
