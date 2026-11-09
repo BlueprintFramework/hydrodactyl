@@ -55,9 +55,10 @@ const LanguageSelector = () => {
                     <DropdownMenuItem
                         key={definition.code}
                         onSelect={() => onSelect(definition.code)}
-                        className={cn(definition.code === locale && 'bg-accent/20')}
+                        className={cn('gap-2', definition.code === locale && 'bg-accent/20')}
                     >
-                        {definition.label}
+                        <Flag identifier={definition.shortIdentifier ?? definition.code} />
+                        <span>{definition.label}</span>
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

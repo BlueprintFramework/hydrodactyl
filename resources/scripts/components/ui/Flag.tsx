@@ -47,7 +47,6 @@ export default function Flag({ identifier, label, className }: FlagProps) {
             height={15}
             alt={label ?? ''}
             aria-hidden={label ? undefined : true}
-            loading='lazy'
             decoding='async'
             referrerPolicy='no-referrer'
             onError={() => setFailed(true)}

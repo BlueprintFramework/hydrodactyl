@@ -5,6 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Flag from '@/components/ui/Flag';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +31,8 @@ const LocaleDropdown = ({ className }: LocaleDropdownProps) => {
                     aria-label={t('panel.language')}
                     className={cn('h-8 gap-2 rounded-full px-3', className)}
                 >
-                    {current?.label ?? locale}
+                    <Flag identifier={current?.shortIdentifier ?? current?.code ?? locale} />
+                    <span>{current?.label ?? locale}</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className='z-99999 max-h-80 overflow-y-auto' sideOffset={8}>
@@ -38,9 +40,10 @@ const LocaleDropdown = ({ className }: LocaleDropdownProps) => {
                     <DropdownMenuItem
                         key={definition.code}
                         onSelect={() => setLocale(definition.code)}
-                        className={cn(definition.code === locale && 'bg-accent/20')}
+                        className={cn('gap-2', definition.code === locale && 'bg-accent/20')}
                     >
-                        {definition.label}
+                        <Flag identifier={definition.shortIdentifier ?? definition.code} />
+                        <span>{definition.label}</span>
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>
