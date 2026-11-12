@@ -75,6 +75,8 @@ const FileManagerContainer = () => {
     );
 
     useEffect(() => {
+        // Reset the search box whenever the hash-driven directory changes.
+        void hash;
         setSearchTerm('');
 
         // Clean imput using a reference

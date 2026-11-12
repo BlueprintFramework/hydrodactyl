@@ -25,14 +25,14 @@ const ContextMenuSubTrigger = React.forwardRef<
     <ContextMenuPrimitive.SubTrigger
         ref={ref}
         className={cn(
-            'flex cursor-default select-none items-center rounded-xs px-2 py-1.5 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground',
+            'font-bold relative flex cursor-default select-none items-center rounded-lg px-2 py-1.5 text-sm outline-hidden transition focus:duration-0 focus:bg-[#ffffff33] data-[state=open]:bg-[#ffffff33] data-disabled:pointer-events-none data-disabled:opacity-50',
             inset && 'pl-8',
             className,
         )}
         {...props}
     >
         {children}
-        <ChevronsRight width={22} height={22} className='ml-auto' />
+        <ChevronsRight width={16} height={16} className='ml-auto h-4 w-4 shrink-0 opacity-70' />
     </ContextMenuPrimitive.SubTrigger>
 ));
 ContextMenuSubTrigger.displayName = ContextMenuPrimitive.SubTrigger.displayName;
@@ -40,15 +40,19 @@ ContextMenuSubTrigger.displayName = ContextMenuPrimitive.SubTrigger.displayName;
 const ContextMenuSubContent = React.forwardRef<
     React.ElementRef<typeof ContextMenuPrimitive.SubContent>,
     React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.SubContent>
->(({ className, ...props }, ref) => (
-    <ContextMenuPrimitive.SubContent
-        ref={ref}
-        className={cn(
-            'z-50 min-w-[14rem] overflow-hidden rounded-xl bg-[radial-gradient(124.75%_124.75%_at_50.01%_-10.55%,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0.02)_100%)] backdrop-blur-2xl p-2 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-            className,
-        )}
-        {...props}
-    />
+>(({ className, sideOffset = 4, alignOffset = -4, ...props }, ref) => (
+    <ContextMenuPrimitive.Portal>
+        <ContextMenuPrimitive.SubContent
+            ref={ref}
+            sideOffset={sideOffset}
+            alignOffset={alignOffset}
+            className={cn(
+                'z-[60] min-w-[14rem] overflow-hidden rounded-xl bg-[radial-gradient(124.75%_124.75%_at_50.01%_-10.55%,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0.02)_100%)] backdrop-blur-2xl p-2 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+                className,
+            )}
+            {...props}
+        />
+    </ContextMenuPrimitive.Portal>
 ));
 ContextMenuSubContent.displayName = ContextMenuPrimitive.SubContent.displayName;
 
@@ -94,7 +98,7 @@ const ContextMenuCheckboxItem = React.forwardRef<
     <ContextMenuPrimitive.CheckboxItem
         ref={ref}
         className={cn(
-            'relative flex cursor-default select-none items-center rounded-xs py-1.5 pl-8 pr-2 text-sm outline-hidden transition focus:duration-0 focus:bg-[#ffffff33] focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50',
+            'font-bold relative flex cursor-default select-none items-center rounded-lg py-1.5 pl-8 pr-2 text-sm outline-hidden transition focus:duration-0 focus:bg-[#ffffff33] data-disabled:pointer-events-none data-disabled:opacity-50',
             className,
         )}
         checked={checked}
@@ -102,7 +106,7 @@ const ContextMenuCheckboxItem = React.forwardRef<
     >
         <span className='absolute left-2 flex h-3.5 w-3.5 items-center justify-center'>
             <ContextMenuPrimitive.ItemIndicator>
-                <Check width={22} height={22} />
+                <Check width={16} height={16} className='h-4 w-4' />
             </ContextMenuPrimitive.ItemIndicator>
         </span>
         {children}

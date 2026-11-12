@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 servers:
   -
-    url: 'http://hydrodactyl.test'
+    url: 'http://panel.example.com'
 tags:
   -
     name: Endpoints
@@ -24,7 +24,7 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: "<!doctype html>\n<html>\n\n<head>\n    <title>Hydrodactyl API Reference</title>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <script id=\"browser-logger-active\">\n(function() {\n    const ENDPOINT = 'http://hydrodactyl.test/_boost/browser-logs';\n    const logQueue = [];\n    let flushTimeout = null;\n\n    console.log('🔍 Browser logger active (MCP server detected). Posting to: ' + ENDPOINT);\n\n    // Store original console methods\n    const originalConsole = {\n        log: console.log,\n        info: console.info,\n        error: console.error,\n        warn: console.warn,\n        table: console.table\n    };\n\n    // Helper to safely stringify values\n    function safeStringify(obj) {\n        const seen = new WeakSet();\n        return JSON.stringify(obj, (key, value) => {\n            if (typeof value === 'object' && value !== null) {\n                if (seen.has(value)) return '[Circular]';\n                seen.add(value);\n            }\n            if (value instanceof Error) {\n                return {\n                    name: value.name,\n                    message: value.message,\n                    stack: value.stack\n                };\n            }\n            return value;\n        });\n    }\n\n    // Batch and send logs\n    function flushLogs() {\n        if (logQueue.length === 0) return;\n\n        const batch = logQueue.splice(0, logQueue.length);\n\n        fetch(ENDPOINT, {\n            method: 'POST',\n            headers: {\n                'Content-Type': 'application/json',\n                'X-Requested-With': 'XMLHttpRequest'\n            },\n            body: JSON.stringify({ logs: batch })\n        }).catch(err => {\n            // Silently fail to avoid infinite loops\n            originalConsole.error('Failed to send logs:', err);\n        });\n    }\n\n    // Debounced flush (100ms)\n    function scheduleFlush() {\n        if (flushTimeout) clearTimeout(flushTimeout);\n        flushTimeout = setTimeout(flushLogs, 100);\n    }\n\n    // Intercept console methods\n    ['log', 'info', 'error', 'warn', 'table'].forEach(method => {\n        console[method] = function(...args) {\n            // Call original method\n            originalConsole[method].apply(console, args);\n\n            // Capture log data\n            try {\n                logQueue.push({\n                    type: method,\n                    timestamp: new Date().toISOString(),\n                    data: args.map(arg => {\n                        try {\n                            return typeof arg === 'object' ? JSON.parse(safeStringify(arg)) : arg;\n                        } catch (e) {\n                            return String(arg);\n                        }\n                    }),\n                    url: window.location.href,\n                    userAgent: navigator.userAgent\n                });\n\n                scheduleFlush();\n            } catch (e) {\n                // Fail silently\n            }\n        };\n    });\n\n    // Global error handlers for uncaught errors\n    const originalOnError = window.onerror;\n    window.onerror = function boostErrorHandler(errorMsg, url, lineNumber, colNumber, error) {\n        try {\n            logQueue.push({\n                type: 'uncaught_error',\n                timestamp: new Date().toISOString(),\n                data: [{\n                    message: errorMsg,\n                    filename: url,\n                    lineno: lineNumber,\n                    colno: colNumber,\n                    error: error ? {\n                        name: error.name,\n                        message: error.message,\n                        stack: error.stack\n                    } : null\n                }],\n                url: window.location.href,\n                userAgent: navigator.userAgent\n            });\n\n            scheduleFlush();\n        } catch (e) {\n            // Fail silently\n        }\n\n        // Call original handler if it exists\n        if (originalOnError && typeof originalOnError === 'function') {\n            return originalOnError(errorMsg, url, lineNumber, colNumber, error);\n        }\n\n        // Let the error continue to propagate\n        return false;\n    }\n    window.addEventListener('error', (event) => {\n        try {\n            logQueue.push({\n                type: 'window_error',\n                timestamp: new Date().toISOString(),\n                data: [{\n                    message: event.message,\n                    filename: event.filename,\n                    lineno: event.lineno,\n                    colno: event.colno,\n                    error: event.error ? {\n                        name: event.error.name,\n                        message: event.error.message,\n                        stack: event.error.stack\n                    } : null\n                }],\n                url: window.location.href,\n                userAgent: navigator.userAgent\n            });\n\n            scheduleFlush();\n        } catch (e) {\n            // Fail silently\n        }\n\n        // Let the error continue to propagate\n        return false;\n    });\n    window.addEventListener('unhandledrejection', (event) => {\n        try {\n            logQueue.push({\n                type: 'error',\n                timestamp: new Date().toISOString(),\n                data: [{\n                    message: 'Unhandled Promise Rejection',\n                    reason: event.reason instanceof Error ? {\n                        name: event.reason.name,\n                        message: event.reason.message,\n                        stack: event.reason.stack\n                    } : event.reason\n                }],\n                url: window.location.href,\n                userAgent: navigator.userAgent\n            });\n\n            scheduleFlush();\n        } catch (e) {\n            // Fail silently\n        }\n\n        // Let the rejection continue to propagate\n        return false;\n    });\n\n    // Flush on page unload\n    window.addEventListener('beforeunload', () => {\n        if (logQueue.length > 0) {\n            navigator.sendBeacon(ENDPOINT, JSON.stringify({ logs: logQueue }));\n        }\n    });\n})();\n</script>\n</head>\n\n<body>\n        <div id=\"app\"></div>\n\n    <script src=\"https://cdn.jsdelivr.net/npm/@scalar/api-reference\"></script>\n\n    <script>\n       Scalar.createApiReference('#app', {\"theme\":\"kepler\",\"layout\":\"modern\",\"proxyUrl\":\"https:\\/\\/proxy.scalar.com\",\"showSidebar\":true,\"hideModels\":false,\"hideDownloadButton\":false,\"hideTestRequestButton\":false,\"hideSearch\":false,\"darkMode\":true,\"forceDarkModeState\":\"dark\",\"hideDarkModeToggle\":true,\"searchHotKey\":\"k\",\"metaData\":{\"title\":\"Hydrodactyl API Reference\"},\"favicon\":\"\",\"hiddenClients\":[],\"defaultHttpClient\":{\"targetId\":\"shell\",\"clientKey\":\"curl\"},\"withDefaultFonts\":true,\"defaultOpenAllTags\":false,\"_integration\":\"laravel\",\"url\":\"\\/docs\\/openapi.yaml\"})\n    </script>\n</body>\n\n</html>\n"
+                example: "<!doctype html>\n<html>\n\n<head>\n    <title>Hydrodactyl API Reference</title>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <script id=\"browser-logger-active\">\n(function() {\n    const ENDPOINT = 'http://panel.example.com/_boost/browser-logs';\n    const logQueue = [];\n    let flushTimeout = null;\n\n    console.log('🔍 Browser logger active (MCP server detected). Posting to: ' + ENDPOINT);\n\n    // Store original console methods\n    const originalConsole = {\n        log: console.log,\n        info: console.info,\n        error: console.error,\n        warn: console.warn,\n        table: console.table\n    };\n\n    // Helper to safely stringify values\n    function safeStringify(obj) {\n        const seen = new WeakSet();\n        return JSON.stringify(obj, (key, value) => {\n            if (typeof value === 'object' && value !== null) {\n                if (seen.has(value)) return '[Circular]';\n                seen.add(value);\n            }\n            if (value instanceof Error) {\n                return {\n                    name: value.name,\n                    message: value.message,\n                    stack: value.stack\n                };\n            }\n            return value;\n        });\n    }\n\n    // Batch and send logs\n    function flushLogs() {\n        if (logQueue.length === 0) return;\n\n        const batch = logQueue.splice(0, logQueue.length);\n\n        fetch(ENDPOINT, {\n            method: 'POST',\n            headers: {\n                'Content-Type': 'application/json',\n                'X-Requested-With': 'XMLHttpRequest'\n            },\n            body: JSON.stringify({ logs: batch })\n        }).catch(err => {\n            // Silently fail to avoid infinite loops\n            originalConsole.error('Failed to send logs:', err);\n        });\n    }\n\n    // Debounced flush (100ms)\n    function scheduleFlush() {\n        if (flushTimeout) clearTimeout(flushTimeout);\n        flushTimeout = setTimeout(flushLogs, 100);\n    }\n\n    // Intercept console methods\n    ['log', 'info', 'error', 'warn', 'table'].forEach(method => {\n        console[method] = function(...args) {\n            // Call original method\n            originalConsole[method].apply(console, args);\n\n            // Capture log data\n            try {\n                logQueue.push({\n                    type: method,\n                    timestamp: new Date().toISOString(),\n                    data: args.map(arg => {\n                        try {\n                            return typeof arg === 'object' ? JSON.parse(safeStringify(arg)) : arg;\n                        } catch (e) {\n                            return String(arg);\n                        }\n                    }),\n                    url: window.location.href,\n                    userAgent: navigator.userAgent\n                });\n\n                scheduleFlush();\n            } catch (e) {\n                // Fail silently\n            }\n        };\n    });\n\n    // Global error handlers for uncaught errors\n    const originalOnError = window.onerror;\n    window.onerror = function boostErrorHandler(errorMsg, url, lineNumber, colNumber, error) {\n        try {\n            logQueue.push({\n                type: 'uncaught_error',\n                timestamp: new Date().toISOString(),\n                data: [{\n                    message: errorMsg,\n                    filename: url,\n                    lineno: lineNumber,\n                    colno: colNumber,\n                    error: error ? {\n                        name: error.name,\n                        message: error.message,\n                        stack: error.stack\n                    } : null\n                }],\n                url: window.location.href,\n                userAgent: navigator.userAgent\n            });\n\n            scheduleFlush();\n        } catch (e) {\n            // Fail silently\n        }\n\n        // Call original handler if it exists\n        if (originalOnError && typeof originalOnError === 'function') {\n            return originalOnError(errorMsg, url, lineNumber, colNumber, error);\n        }\n\n        // Let the error continue to propagate\n        return false;\n    }\n    window.addEventListener('error', (event) => {\n        try {\n            logQueue.push({\n                type: 'window_error',\n                timestamp: new Date().toISOString(),\n                data: [{\n                    message: event.message,\n                    filename: event.filename,\n                    lineno: event.lineno,\n                    colno: event.colno,\n                    error: event.error ? {\n                        name: event.error.name,\n                        message: event.error.message,\n                        stack: event.error.stack\n                    } : null\n                }],\n                url: window.location.href,\n                userAgent: navigator.userAgent\n            });\n\n            scheduleFlush();\n        } catch (e) {\n            // Fail silently\n        }\n\n        // Let the error continue to propagate\n        return false;\n    });\n    window.addEventListener('unhandledrejection', (event) => {\n        try {\n            logQueue.push({\n                type: 'error',\n                timestamp: new Date().toISOString(),\n                data: [{\n                    message: 'Unhandled Promise Rejection',\n                    reason: event.reason instanceof Error ? {\n                        name: event.reason.name,\n                        message: event.reason.message,\n                        stack: event.reason.stack\n                    } : event.reason\n                }],\n                url: window.location.href,\n                userAgent: navigator.userAgent\n            });\n\n            scheduleFlush();\n        } catch (e) {\n            // Fail silently\n        }\n\n        // Let the rejection continue to propagate\n        return false;\n    });\n\n    // Flush on page unload\n    window.addEventListener('beforeunload', () => {\n        if (logQueue.length > 0) {\n            navigator.sendBeacon(ENDPOINT, JSON.stringify({ logs: logQueue }));\n        }\n    });\n})();\n</script>\n</head>\n\n<body>\n        <div id=\"app\"></div>\n\n    <script src=\"https://cdn.jsdelivr.net/npm/@scalar/api-reference\"></script>\n\n    <script>\n       Scalar.createApiReference('#app', {\"theme\":\"kepler\",\"layout\":\"modern\",\"proxyUrl\":\"https:\\/\\/proxy.scalar.com\",\"showSidebar\":true,\"hideModels\":false,\"hideDownloadButton\":false,\"hideTestRequestButton\":false,\"hideSearch\":false,\"darkMode\":true,\"forceDarkModeState\":\"dark\",\"hideDarkModeToggle\":true,\"searchHotKey\":\"k\",\"metaData\":{\"title\":\"Hydrodactyl API Reference\"},\"favicon\":\"\",\"hiddenClients\":[],\"defaultHttpClient\":{\"targetId\":\"shell\",\"clientKey\":\"curl\"},\"withDefaultFonts\":true,\"defaultOpenAllTags\":false,\"_integration\":\"laravel\",\"url\":\"\\/docs\\/openapi.yaml\"})\n    </script>\n</body>\n\n</html>\n"
       tags:
         - Endpoints
       security: []
@@ -148,13 +148,18 @@ paths:
                 root_admin:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                 language:
                   type: string
                   description: ''
-                  example: en
+                  example: ca-ES
                   enum:
-                    - en
+                    - ca-ES
+                    - de-DE
+                    - en-US
+                    - es-ES
+                    - la-VA
+                    - pt-BR
                 first_name:
                   type: string
                   description: 'Must be between 1 and 191 characters.'
@@ -225,7 +230,7 @@ paths:
         in: path
         name: user_id
         description: 'The ID of the user.'
-        example: 53a19ab0-1df9-48f0-a70f-ee3cdcdb73db
+        example: architecto
         required: true
         schema:
           type: string
@@ -556,7 +561,7 @@ paths:
         in: path
         name: node_id
         description: 'The ID of the node.'
-        example: 04ab367f-0fd1-4290-9074-340adeae0e0e
+        example: architecto
         required: true
         schema:
           type: string
@@ -607,7 +612,7 @@ paths:
         in: path
         name: node_id
         description: 'The ID of the node.'
-        example: 04ab367f-0fd1-4290-9074-340adeae0e0e
+        example: architecto
         required: true
         schema:
           type: string
@@ -692,7 +697,7 @@ paths:
         in: path
         name: node_id
         description: 'The ID of the node.'
-        example: 04ab367f-0fd1-4290-9074-340adeae0e0e
+        example: architecto
         required: true
         schema:
           type: string
@@ -711,7 +716,7 @@ paths:
         in: path
         name: node_id
         description: 'The ID of the node.'
-        example: 04ab367f-0fd1-4290-9074-340adeae0e0e
+        example: architecto
         required: true
         schema:
           type: string
@@ -719,7 +724,7 @@ paths:
         in: path
         name: allocation_id
         description: 'The ID of the allocation.'
-        example: 1
+        example: 16
         required: true
         schema:
           type: integer
@@ -848,7 +853,7 @@ paths:
         in: path
         name: location_id
         description: 'The ID of the location.'
-        example: 1
+        example: 16
         required: true
         schema:
           type: integer
@@ -958,7 +963,7 @@ paths:
                 skip_scripts:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                 oom_disabled:
                   type: boolean
                   description: ''
@@ -1073,7 +1078,7 @@ paths:
                 start_on_completion:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
               required:
                 - name
                 - user
@@ -1139,7 +1144,7 @@ paths:
         in: path
         name: server_id
         description: 'The ID of the server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -1209,7 +1214,7 @@ paths:
         in: path
         name: server_id
         description: 'The ID of the server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -1228,7 +1233,7 @@ paths:
         in: path
         name: server_id
         description: 'The ID of the server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -1247,7 +1252,7 @@ paths:
         in: path
         name: server_id
         description: 'The ID of the server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -1266,7 +1271,7 @@ paths:
         in: path
         name: server_id
         description: 'The ID of the server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -1363,7 +1368,7 @@ paths:
         in: path
         name: server_id
         description: 'The ID of the server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -1423,7 +1428,7 @@ paths:
         in: path
         name: server_id
         description: 'The ID of the server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -1450,7 +1455,7 @@ paths:
         in: path
         name: server_id
         description: 'The ID of the server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -1551,7 +1556,7 @@ paths:
         in: path
         name: nest_id
         description: 'The ID of the nest.'
-        example: 784cda76-49c9-4d77-bea2-16da77475106
+        example: ae8655dd-db25-4686-9a09-ad441e309358
         required: true
         schema:
           type: string
@@ -1602,7 +1607,7 @@ paths:
         in: path
         name: nest_id
         description: 'The ID of the nest.'
-        example: 784cda76-49c9-4d77-bea2-16da77475106
+        example: ae8655dd-db25-4686-9a09-ad441e309358
         required: true
         schema:
           type: string
@@ -1653,7 +1658,7 @@ paths:
         in: path
         name: nest_id
         description: 'The ID of the nest.'
-        example: 784cda76-49c9-4d77-bea2-16da77475106
+        example: ae8655dd-db25-4686-9a09-ad441e309358
         required: true
         schema:
           type: string
@@ -1661,7 +1666,7 @@ paths:
         in: path
         name: egg_id
         description: 'The ID of the egg.'
-        example: 05d97f0d-093e-4b9e-8127-c5ff9a1c7188
+        example: a5327d55-2b03-4267-8deb-95abe58e48de
         required: true
         schema:
           type: string
@@ -1793,8 +1798,8 @@ paths:
       security: []
   /api/client/version:
     get:
-      summary: ''
-      operationId: getApiClientVersion
+      summary: 'Return the panel version.'
+      operationId: returnThePanelVersion
       description: ''
       parameters: []
       responses:
@@ -1832,6 +1837,214 @@ paths:
                           example: Unauthenticated.
       tags:
         - Endpoints
+      security: []
+  /api/client/server-groups:
+    get:
+      summary: 'List all groups for the authenticated user.'
+      operationId: listAllGroupsForTheAuthenticatedUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create a new server group.'
+      operationId: createANewServerGroup
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must be at least 1 character. Must not be greater than 191 characters.'
+                  example: b
+                description:
+                  type: string
+                  description: 'Must not be greater than 1000 characters.'
+                  example: 'Et animi quos velit et fugiat.'
+                  nullable: true
+                server_ids:
+                  type: array
+                  description: 'Must match an existing stored value.'
+                  example:
+                    - 16
+                  items:
+                    type: integer
+              required:
+                - name
+      security: []
+  '/api/client/server-groups/{serverGroup}':
+    put:
+      summary: 'Update a server group.'
+      operationId: updateAServerGroup
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must be at least 1 character. Must not be greater than 191 characters.'
+                  example: b
+                description:
+                  type: string
+                  description: 'Must not be greater than 1000 characters.'
+                  example: 'Et animi quos velit et fugiat.'
+                  nullable: true
+                sort_order:
+                  type: integer
+                  description: 'Must be at least 0.'
+                  example: 42
+                is_collapsed:
+                  type: boolean
+                  description: ''
+                  example: false
+      security: []
+    delete:
+      summary: 'Delete a server group. Servers are ungrouped, not deleted.'
+      operationId: deleteAServerGroupServersAreUngroupedNotDeleted
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: serverGroup
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/client/server-groups/{serverGroup}/servers':
+    post:
+      summary: 'Add servers to a group. Servers are moved from any previous group.'
+      operationId: addServersToAGroupServersAreMovedFromAnyPreviousGroup
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                server_ids:
+                  type: array
+                  description: 'Must match an existing stored value.'
+                  example:
+                    - 16
+                  items:
+                    type: integer
+      security: []
+    delete:
+      summary: 'Remove servers from a group.'
+      operationId: removeServersFromAGroup
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                server_ids:
+                  type: array
+                  description: 'Must match an existing stored value.'
+                  example:
+                    - 16
+                  items:
+                    type: integer
+      security: []
+    parameters:
+      -
+        in: path
+        name: serverGroup
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  /api/client/server-groups/reorder:
+    put:
+      summary: 'Reorder groups (update sort_order for multiple groups at once).'
+      operationId: reorderGroupsupdateSortOrderForMultipleGroupsAtOnce
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                group_ids:
+                  type: array
+                  description: 'Must match an existing stored value.'
+                  example:
+                    - 16
+                  items:
+                    type: integer
       security: []
   /api/client/nests:
     get:
@@ -1922,7 +2135,7 @@ paths:
         in: path
         name: nest_uuid
         description: ''
-        example: 784cda76-49c9-4d77-bea2-16da77475106
+        example: ae8655dd-db25-4686-9a09-ad441e309358
         required: true
         schema:
           type: string
@@ -2029,6 +2242,34 @@ paths:
       tags:
         - Endpoints
       security: []
+  /api/client/account/name:
+    put:
+      summary: "Update the account's first and last name."
+      operationId: updateTheAccountsFirstAndLastName
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  description: 'Must be between 1 and 191 characters.'
+                  example: bn
+                last_name:
+                  type: string
+                  description: 'Must be between 0 and 191 characters.'
+                  example: g
+                  nullable: true
+              required:
+                - first_name
+      security: []
   /api/client/account/email:
     put:
       summary: 'Update account email'
@@ -2075,10 +2316,82 @@ paths:
               required:
                 - password
       security: []
+  /api/client/account/language:
+    put:
+      summary: 'Update the account language preference.'
+      operationId: updateTheAccountLanguagePreference
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                language:
+                  type: string
+                  description: ''
+                  example: la-VA
+                  enum:
+                    - ca-ES
+                    - de-DE
+                    - en-US
+                    - es-ES
+                    - la-VA
+                    - pt-BR
+              required:
+                - language
+      security: []
   /api/client/account/activity:
     get:
-      summary: 'List account activity logs'
+      summary: 'List account activity logs.'
       operationId: listAccountActivityLogs
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  /api/client/account/activity/events:
+    get:
+      summary: "Returns the distinct events that exist in the account's activity log so\nthe frontend can offer a global event-type filter rather than one that is\nlimited to the currently visible page of results."
+      operationId: returnsTheDistinctEventsThatExistInTheAccountsActivityLogSoTheFrontendCanOfferAGlobalEventTypeFilterRatherThanOneThatIsLimitedToTheCurrentlyVisiblePageOfResults
       description: ''
       parameters: []
       responses:
@@ -2346,7 +2659,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -2397,7 +2710,58 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/{server_uuid}/resources/history':
+    get:
+      summary: "The recent resource samples for a server, oldest first, so the console\ngraphs can be drawn before the websocket sends anything."
+      operationId: theRecentResourceSamplesForAServerOldestFirstSoTheConsoleGraphsCanBeDrawnBeforeTheWebsocketSendsAnything
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -2484,7 +2848,7 @@ paths:
         in: path
         name: server
         description: 'The server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -2521,7 +2885,43 @@ paths:
         in: path
         name: server
         description: 'The server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/{server_uuid}/webhook':
+    post:
+      summary: 'Set the webhook type and URL for the server'
+      operationId: setTheWebhookTypeAndURLForTheServer
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                webhook_type:
+                  type: string
+                  description: 'This field is required when <code>webhook_url</code> is present. Must be at least 1 character. Must not be greater than 64 characters.'
+                  example: b
+                  nullable: true
+                webhook_url:
+                  type: string
+                  description: 'This field is required when <code>webhook_type</code> is present. Must be a valid URL. Must be at least 1 character. Must not be greater than 191 characters.'
+                  example: 'http://bailey.com/'
+                  nullable: true
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -2576,7 +2976,7 @@ paths:
                 type:
                   type: string
                   description: ''
-                  example: mod
+                  example: plugin
                   enum:
                     - mod
                     - plugin
@@ -2616,7 +3016,7 @@ paths:
         in: path
         name: server
         description: 'The server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -2703,7 +3103,7 @@ paths:
         in: path
         name: server
         description: 'The server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -2785,7 +3185,7 @@ paths:
         in: path
         name: server
         description: 'The server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -2849,7 +3249,7 @@ paths:
                 type:
                   type: string
                   description: ''
-                  example: plugin
+                  example: mod
                   enum:
                     - mod
                     - plugin
@@ -2926,7 +3326,7 @@ paths:
         in: path
         name: server
         description: 'The server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -2977,7 +3377,7 @@ paths:
         in: path
         name: server
         description: 'The server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -3028,7 +3428,7 @@ paths:
         in: path
         name: server
         description: 'The server.'
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: architecto
         required: true
         schema:
           type: string
@@ -3079,7 +3479,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3130,7 +3530,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3181,13 +3581,13 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
   '/api/client/servers/wings/{server_uuid}/activity':
     get:
-      summary: 'List server activity logs'
+      summary: 'List server activity logs.'
       operationId: listServerActivityLogs
       description: ''
       parameters: []
@@ -3232,7 +3632,58 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/wings/{server_uuid}/activity/events':
+    get:
+      summary: "Returns the distinct events that exist in the server's activity log so\nthe frontend can offer a global event-type filter. Honors the same\nvisibility rules as the main list (e.g. hidden admin activity)."
+      operationId: returnsTheDistinctEventsThatExistInTheServersActivityLogSoTheFrontendCanOfferAGlobalEventTypeFilterHonorsTheSameVisibilityRulesAsTheMainListegHiddenAdminActivity
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3264,7 +3715,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3287,7 +3738,7 @@ paths:
                 signal:
                   type: string
                   description: ''
-                  example: kill
+                  example: start
                   enum:
                     - start
                     - stop
@@ -3301,7 +3752,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3352,7 +3803,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3371,7 +3822,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3398,7 +3849,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3469,7 +3920,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3533,7 +3984,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3597,7 +4048,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3647,7 +4098,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3679,7 +4130,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3711,7 +4162,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3749,7 +4200,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3786,7 +4237,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3825,7 +4276,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3862,7 +4313,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3914,7 +4365,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -3951,11 +4402,11 @@ paths:
                 use_header:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                 foreground:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
               required:
                 - url
       security: []
@@ -3964,7 +4415,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4015,13 +4466,13 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
   '/api/client/servers/wings/{server_uuid}/schedules':
     get:
-      summary: 'List schedules'
+      summary: 'List schedules.'
       operationId: listSchedules
       description: ''
       parameters: []
@@ -4062,7 +4513,7 @@ paths:
         - Endpoints
       security: []
     post:
-      summary: 'Create a schedule'
+      summary: 'Create a schedule.'
       operationId: createASchedule
       description: ''
       parameters: []
@@ -4121,13 +4572,13 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
   '/api/client/servers/wings/{server_uuid}/schedules/{schedule_id}':
     get:
-      summary: 'View a schedule'
+      summary: 'View a schedule.'
       operationId: viewASchedule
       description: ''
       parameters: []
@@ -4168,7 +4619,7 @@ paths:
         - Endpoints
       security: []
     post:
-      summary: 'Update a schedule'
+      summary: 'Update a schedule.'
       operationId: updateASchedule
       description: ''
       parameters: []
@@ -4213,7 +4664,7 @@ paths:
                 only_when_online:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
               required:
                 - name
                 - minute
@@ -4223,7 +4674,7 @@ paths:
                 - day_of_week
       security: []
     delete:
-      summary: 'Delete a schedule'
+      summary: 'Delete a schedule.'
       operationId: deleteASchedule
       description: ''
       parameters: []
@@ -4236,7 +4687,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4244,13 +4695,13 @@ paths:
         in: path
         name: schedule_id
         description: 'The ID of the schedule.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
   '/api/client/servers/wings/{server_uuid}/schedules/{schedule_id}/execute':
     post:
-      summary: 'Execute a schedule'
+      summary: 'Execute a schedule.'
       operationId: executeASchedule
       description: ''
       parameters: []
@@ -4263,7 +4714,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4271,13 +4722,13 @@ paths:
         in: path
         name: schedule_id
         description: 'The ID of the schedule.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
   '/api/client/servers/wings/{server_uuid}/schedules/{schedule_id}/tasks':
     post:
-      summary: 'Create a schedule task'
+      summary: 'Create a schedule task.'
       operationId: createAScheduleTask
       description: ''
       parameters: []
@@ -4315,7 +4766,7 @@ paths:
                 continue_on_failure:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
               required:
                 - action
                 - time_offset
@@ -4325,7 +4776,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4333,13 +4784,13 @@ paths:
         in: path
         name: schedule_id
         description: 'The ID of the schedule.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
   '/api/client/servers/wings/{server_uuid}/schedules/{schedule_id}/tasks/{task_id}':
     post:
-      summary: 'Update a schedule task'
+      summary: 'Update a schedule task.'
       operationId: updateAScheduleTask
       description: ''
       parameters: []
@@ -4377,13 +4828,13 @@ paths:
                 continue_on_failure:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
               required:
                 - action
                 - time_offset
       security: []
     delete:
-      summary: 'Delete a schedule task'
+      summary: 'Delete a schedule task.'
       operationId: deleteAScheduleTask
       description: ''
       parameters: []
@@ -4396,7 +4847,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4404,7 +4855,7 @@ paths:
         in: path
         name: schedule_id
         description: 'The ID of the schedule.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
@@ -4412,7 +4863,7 @@ paths:
         in: path
         name: task_id
         description: 'The ID of the task.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
@@ -4472,7 +4923,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4512,7 +4963,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4520,7 +4971,7 @@ paths:
         in: path
         name: allocation_id
         description: 'The ID of the allocation.'
-        example: 1
+        example: 16
         required: true
         schema:
           type: integer
@@ -4539,7 +4990,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4547,7 +4998,7 @@ paths:
         in: path
         name: allocation_id
         description: 'The ID of the allocation.'
-        example: 1
+        example: 16
         required: true
         schema:
           type: integer
@@ -4610,7 +5061,7 @@ paths:
               properties:
                 email:
                   type: string
-                  description: 'Must be a valid email address. Must be between 1 and 191 characters.'
+                  description: 'Must be between 1 and 191 characters.'
                   example: gbailey@example.net
                 permissions:
                   type: array
@@ -4627,7 +5078,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4686,7 +5137,7 @@ paths:
         in: path
         name: user
         description: 'The user.'
-        example: 53a19ab0-1df9-48f0-a70f-ee3cdcdb73db
+        example: architecto
         required: true
         schema:
           type: string
@@ -4728,7 +5179,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4736,7 +5187,115 @@ paths:
         in: path
         name: user
         description: 'The user.'
-        example: 53a19ab0-1df9-48f0-a70f-ee3cdcdb73db
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/wings/{server_uuid}/file-blocks':
+    get:
+      summary: 'List file blocks for the server'
+      operationId: listFileBlocksForTheServer
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Replace blocked subusers for a file path'
+      operationId: replaceBlockedSubusersForAFilePath
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: 'Must not be greater than 768 characters.'
+                  example: b
+                user_uuids:
+                  type: array
+                  description: 'validation.uuid Must match an existing stored value.'
+                  example:
+                    - a4855dc5-0acb-33c3-b921-f4291f719ca0
+                  items:
+                    type: string
+              required:
+                - path
+                - user_uuids
+      security: []
+    delete:
+      summary: 'Delete file blocks for a path'
+      operationId: deleteFileBlocksForAPath
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: 'Must not be greater than 768 characters.'
+                  example: b
+                user_uuid:
+                  type: string
+                  description: 'validation.uuid Must match an existing stored value.'
+                  example: a4855dc5-0acb-33c3-b921-f4291f719ca0
+                  nullable: true
+              required:
+                - path
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4805,7 +5364,7 @@ paths:
                 is_locked:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                   nullable: true
                 ignored:
                   type: string
@@ -4818,7 +5377,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4878,7 +5437,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4886,7 +5445,7 @@ paths:
         in: path
         name: backup_uuid
         description: ''
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4937,7 +5496,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4945,7 +5504,7 @@ paths:
         in: path
         name: backup_uuid
         description: ''
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4964,7 +5523,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4972,7 +5531,7 @@ paths:
         in: path
         name: backup_uuid
         description: ''
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4991,7 +5550,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -4999,7 +5558,26 @@ paths:
         in: path
         name: backup_uuid
         description: ''
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/wings/{server_uuid}/backups/delete-all':
+    delete:
+      summary: 'Delete every backup that belongs to the server.'
+      operationId: deleteEveryBackupThatBelongsToTheServer
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5050,7 +5628,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5086,7 +5664,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5118,7 +5696,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5169,7 +5747,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5188,7 +5766,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5225,7 +5803,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5244,7 +5822,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5281,7 +5859,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5328,11 +5906,11 @@ paths:
                 should_backup:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                 should_wipe:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
               required:
                 - egg_id
                 - nest_id
@@ -5342,7 +5920,117 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/wings/{server_uuid}/operations':
+    get:
+      summary: 'List server operations'
+      operationId: listServerOperations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/wings/{server_uuid}/operations/{operationId}':
+    get:
+      summary: 'Get operation status'
+      operationId: getOperationStatus
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: operationId
+        description: ''
+        example: architecto
         required: true
         schema:
           type: string
@@ -5393,7 +6081,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5444,7 +6132,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5495,13 +6183,13 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
   '/api/client/servers/elytra/{server_uuid}/activity':
     get:
-      summary: 'List server activity logs'
+      summary: 'List server activity logs.'
       operationId: listServerActivityLogs
       description: ''
       parameters: []
@@ -5546,7 +6234,58 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/elytra/{server_uuid}/activity/events':
+    get:
+      summary: "Returns the distinct events that exist in the server's activity log so\nthe frontend can offer a global event-type filter. Honors the same\nvisibility rules as the main list (e.g. hidden admin activity)."
+      operationId: returnsTheDistinctEventsThatExistInTheServersActivityLogSoTheFrontendCanOfferAGlobalEventTypeFilterHonorsTheSameVisibilityRulesAsTheMainListegHiddenAdminActivity
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5578,7 +6317,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5601,7 +6340,7 @@ paths:
                 signal:
                   type: string
                   description: ''
-                  example: kill
+                  example: stop
                   enum:
                     - start
                     - stop
@@ -5615,7 +6354,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5666,7 +6405,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5685,7 +6424,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5712,7 +6451,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5783,7 +6522,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5847,7 +6586,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5911,7 +6650,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5961,7 +6700,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -5993,7 +6732,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6025,7 +6764,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6063,7 +6802,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6100,7 +6839,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6139,7 +6878,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6176,7 +6915,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6228,7 +6967,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6278,7 +7017,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6329,7 +7068,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6435,7 +7174,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6503,7 +7242,7 @@ paths:
                 is_active:
                   type: boolean
                   description: ''
-                  example: true
+                  example: false
                 minute:
                   type: string
                   description: ''
@@ -6550,7 +7289,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6558,7 +7297,7 @@ paths:
         in: path
         name: schedule_id
         description: 'The ID of the schedule.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
@@ -6577,7 +7316,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6585,13 +7324,13 @@ paths:
         in: path
         name: schedule_id
         description: 'The ID of the schedule.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
   '/api/client/servers/elytra/{server_uuid}/schedules/{schedule_id}/tasks':
     post:
-      summary: 'Create a schedule task'
+      summary: 'Create a schedule task.'
       operationId: createAScheduleTask
       description: ''
       parameters: []
@@ -6639,7 +7378,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6647,13 +7386,13 @@ paths:
         in: path
         name: schedule_id
         description: 'The ID of the schedule.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
   '/api/client/servers/elytra/{server_uuid}/schedules/{schedule_id}/tasks/{task_id}':
     post:
-      summary: 'Update a schedule task'
+      summary: 'Update a schedule task.'
       operationId: updateAScheduleTask
       description: ''
       parameters: []
@@ -6670,7 +7409,7 @@ paths:
                 action:
                   type: string
                   description: ''
-                  example: command
+                  example: power
                   enum:
                     - command
                     - power
@@ -6697,7 +7436,7 @@ paths:
                 - time_offset
       security: []
     delete:
-      summary: 'Delete a schedule task'
+      summary: 'Delete a schedule task.'
       operationId: deleteAScheduleTask
       description: ''
       parameters: []
@@ -6710,7 +7449,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6718,7 +7457,7 @@ paths:
         in: path
         name: schedule_id
         description: 'The ID of the schedule.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
@@ -6726,7 +7465,7 @@ paths:
         in: path
         name: task_id
         description: 'The ID of the task.'
-        example: 3
+        example: 16
         required: true
         schema:
           type: integer
@@ -6786,7 +7525,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6826,7 +7565,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6834,7 +7573,7 @@ paths:
         in: path
         name: allocation_id
         description: 'The ID of the allocation.'
-        example: 1
+        example: 16
         required: true
         schema:
           type: integer
@@ -6853,7 +7592,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -6861,7 +7600,7 @@ paths:
         in: path
         name: allocation_id
         description: 'The ID of the allocation.'
-        example: 1
+        example: 16
         required: true
         schema:
           type: integer
@@ -6924,7 +7663,7 @@ paths:
               properties:
                 email:
                   type: string
-                  description: 'Must be a valid email address. Must be between 1 and 191 characters.'
+                  description: 'Must be between 1 and 191 characters.'
                   example: gbailey@example.net
                 permissions:
                   type: array
@@ -6941,7 +7680,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7000,7 +7739,7 @@ paths:
         in: path
         name: user
         description: 'The user.'
-        example: 53a19ab0-1df9-48f0-a70f-ee3cdcdb73db
+        example: architecto
         required: true
         schema:
           type: string
@@ -7042,7 +7781,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7050,7 +7789,115 @@ paths:
         in: path
         name: user
         description: 'The user.'
-        example: 53a19ab0-1df9-48f0-a70f-ee3cdcdb73db
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/elytra/{server_uuid}/file-blocks':
+    get:
+      summary: 'List file blocks for the server'
+      operationId: listFileBlocksForTheServer
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Replace blocked subusers for a file path'
+      operationId: replaceBlockedSubusersForAFilePath
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: 'Must not be greater than 768 characters.'
+                  example: b
+                user_uuids:
+                  type: array
+                  description: 'validation.uuid Must match an existing stored value.'
+                  example:
+                    - a4855dc5-0acb-33c3-b921-f4291f719ca0
+                  items:
+                    type: string
+              required:
+                - path
+                - user_uuids
+      security: []
+    delete:
+      summary: 'Delete file blocks for a path'
+      operationId: deleteFileBlocksForAPath
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: 'Must not be greater than 768 characters.'
+                  example: b
+                user_uuid:
+                  type: string
+                  description: 'validation.uuid Must match an existing stored value.'
+                  example: a4855dc5-0acb-33c3-b921-f4291f719ca0
+                  nullable: true
+              required:
+                - path
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7110,7 +7957,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7170,7 +8017,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7260,7 +8107,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7279,7 +8126,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7298,7 +8145,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7358,7 +8205,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7366,7 +8213,7 @@ paths:
         in: path
         name: backup_uuid
         description: ''
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7417,7 +8264,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7425,7 +8272,7 @@ paths:
         in: path
         name: backup_uuid
         description: ''
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7444,7 +8291,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7452,7 +8299,7 @@ paths:
         in: path
         name: backup_uuid
         description: ''
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7484,7 +8331,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7492,7 +8339,7 @@ paths:
         in: path
         name: backup_uuid
         description: ''
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7511,7 +8358,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7519,7 +8366,7 @@ paths:
         in: path
         name: backup_uuid
         description: ''
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7570,7 +8417,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7606,7 +8453,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7638,7 +8485,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7689,7 +8536,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7708,7 +8555,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7745,7 +8592,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7764,7 +8611,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -7801,13 +8648,2634 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
   '/api/client/servers/elytra/{server_uuid}/settings/egg/apply':
     post:
       summary: 'Apply egg change'
+      operationId: applyEggChange
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                egg_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                nest_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                docker_image:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: 'n'
+                startup_command:
+                  type: string
+                  description: 'Must not be greater than 2048 characters.'
+                  example: g
+                environment:
+                  type: array
+                  description: 'Must not be greater than 1024 characters.'
+                  example:
+                    - z
+                  items:
+                    type: string
+                    nullable: true
+                should_backup:
+                  type: boolean
+                  description: ''
+                  example: true
+                should_wipe:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - egg_id
+                - nest_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/elytra/{server_uuid}/operations':
+    get:
+      summary: 'List server operations'
+      operationId: listServerOperations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/elytra/{server_uuid}/operations/{operationId}':
+    get:
+      summary: 'Get operation status'
+      operationId: getOperationStatus
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: operationId
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}':
+    get:
+      summary: 'Get server details.'
+      operationId: getServerDetails
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/websocket':
+    get:
+      summary: 'Get websocket token.'
+      operationId: getWebsocketToken
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/resources':
+    get:
+      summary: 'Get server resource usage.'
+      operationId: getServerResourceUsage
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/activity':
+    get:
+      summary: 'List server activity logs.'
+      operationId: listServerActivityLogs
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/activity/events':
+    get:
+      summary: "Returns the distinct events that exist in the server's activity log so\nthe frontend can offer a global event-type filter. Honors the same\nvisibility rules as the main list (e.g. hidden admin activity)."
+      operationId: returnsTheDistinctEventsThatExistInTheServersActivityLogSoTheFrontendCanOfferAGlobalEventTypeFilterHonorsTheSameVisibilityRulesAsTheMainListegHiddenAdminActivity
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/command':
+    post:
+      summary: 'Send server command.'
+      operationId: sendServerCommand
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                command:
+                  type: string
+                  description: 'Must be at least 1 character.'
+                  example: bngzmiyvdljnikhw
+              required:
+                - command
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/power':
+    post:
+      summary: 'Send power action.'
+      operationId: sendPowerAction
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signal:
+                  type: string
+                  description: ''
+                  example: stop
+                  enum:
+                    - start
+                    - stop
+                    - restart
+                    - kill
+              required:
+                - signal
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/databases':
+    get:
+      summary: 'List server databases.'
+      operationId: listServerDatabases
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/databases/{database_id}/rotate-password':
+    post:
+      summary: 'Rotate database password.'
+      operationId: rotateDatabasePassword
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: database_id
+        description: 'The ID of the database.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/client/servers/calagopus/{server_uuid}/databases/{database_id}':
+    delete:
+      summary: 'Delete server database.'
+      operationId: deleteServerDatabase
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: database_id
+        description: 'The ID of the database.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/client/servers/calagopus/{server_uuid}/files/list':
+    get:
+      summary: 'List files in directory'
+      operationId: listFilesInDirectory
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                directory:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/contents':
+    get:
+      summary: 'Get file contents'
+      operationId: getFileContents
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - file
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/download':
+    get:
+      summary: 'Download file'
+      operationId: downloadFile
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - file
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/rename':
+    put:
+      summary: 'Rename file'
+      operationId: renameFile
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                root:
+                  type: string
+                  description: ''
+                  example: architecto
+                files:
+                  type: array
+                  description: ''
+                  example: null
+                  items:
+                    type: object
+                    properties:
+                      to:
+                        type: string
+                        description: ''
+                        example: architecto
+                      from:
+                        type: string
+                        description: ''
+                        example: architecto
+                    required:
+                      - to
+                      - from
+              required:
+                - root
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/copy':
+    post:
+      summary: 'Copy file'
+      operationId: copyFile
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - location
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/write':
+    post:
+      summary: 'Write file contents'
+      operationId: writeFileContents
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - file
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/compress':
+    post:
+      summary: 'Compress files'
+      operationId: compressFiles
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                root:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                files:
+                  type: array
+                  description: ''
+                  example:
+                    - architecto
+                  items:
+                    type: string
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/decompress':
+    post:
+      summary: 'Decompress files'
+      operationId: decompressFiles
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                root:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                file:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - file
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/delete':
+    post:
+      summary: 'Delete files'
+      operationId: deleteFiles
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                root:
+                  type: string
+                  description: ''
+                  example: architecto
+                files:
+                  type: array
+                  description: ''
+                  example:
+                    - architecto
+                  items:
+                    type: string
+              required:
+                - root
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/create-folder':
+    post:
+      summary: 'Create folder'
+      operationId: createFolder
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                root:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                name:
+                  type: string
+                  description: ''
+                  example: architecto
+              required:
+                - name
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/chmod':
+    post:
+      summary: 'Update file permissions'
+      operationId: updateFilePermissions
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                root:
+                  type: string
+                  description: ''
+                  example: architecto
+                files:
+                  type: array
+                  description: ''
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      file:
+                        type: string
+                        description: ''
+                        example: architecto
+                      mode:
+                        type: number
+                        description: ''
+                        example: 4326.41688
+                    required:
+                      - file
+                      - mode
+              required:
+                - root
+                - files
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/pull':
+    post:
+      summary: 'Pull file from URL'
+      operationId: pullFileFromURL
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: 'Must be a valid URL.'
+                  example: 'http://www.bailey.biz/quos-velit-et-fugiat-sunt-nihil-accusantium-harum.html'
+                directory:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                filename:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+                use_header:
+                  type: boolean
+                  description: ''
+                  example: true
+                foreground:
+                  type: boolean
+                  description: ''
+                  example: false
+              required:
+                - url
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/files/upload':
+    get:
+      summary: 'Get upload URL.'
+      operationId: getUploadURL
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/schedules':
+    get:
+      summary: 'List schedules.'
+      operationId: listSchedules
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create a schedule.'
+      operationId: createASchedule
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 191 characters.'
+                  example: b
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: true
+                minute:
+                  type: string
+                  description: ''
+                  example: architecto
+                hour:
+                  type: string
+                  description: ''
+                  example: architecto
+                day_of_month:
+                  type: string
+                  description: ''
+                  example: architecto
+                month:
+                  type: string
+                  description: ''
+                  example: architecto
+                day_of_week:
+                  type: string
+                  description: ''
+                  example: architecto
+                only_when_online:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - name
+                - minute
+                - hour
+                - day_of_month
+                - month
+                - day_of_week
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/schedules/{schedule_id}':
+    get:
+      summary: 'View a schedule.'
+      operationId: viewASchedule
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Update a schedule.'
+      operationId: updateASchedule
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 191 characters.'
+                  example: b
+                is_active:
+                  type: boolean
+                  description: ''
+                  example: false
+                minute:
+                  type: string
+                  description: ''
+                  example: architecto
+                hour:
+                  type: string
+                  description: ''
+                  example: architecto
+                day_of_month:
+                  type: string
+                  description: ''
+                  example: architecto
+                month:
+                  type: string
+                  description: ''
+                  example: architecto
+                day_of_week:
+                  type: string
+                  description: ''
+                  example: architecto
+                only_when_online:
+                  type: boolean
+                  description: ''
+                  example: false
+              required:
+                - name
+                - minute
+                - hour
+                - day_of_month
+                - month
+                - day_of_week
+      security: []
+    delete:
+      summary: 'Delete a schedule.'
+      operationId: deleteASchedule
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: schedule_id
+        description: 'The ID of the schedule.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/client/servers/calagopus/{server_uuid}/schedules/{schedule_id}/execute':
+    post:
+      summary: 'Execute a schedule.'
+      operationId: executeASchedule
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: schedule_id
+        description: 'The ID of the schedule.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/client/servers/calagopus/{server_uuid}/schedules/{schedule_id}/tasks':
+    post:
+      summary: 'Create a schedule task.'
+      operationId: createAScheduleTask
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: ''
+                  example: backup
+                  enum:
+                    - command
+                    - power
+                    - backup
+                payload:
+                  type: string
+                  description: 'This field is required unless <code>action</code> is in <code>backup</code>.'
+                  example: architecto
+                  nullable: true
+                time_offset:
+                  type: number
+                  description: 'Must be at least 0. Must not be greater than 900.'
+                  example: 22
+                sequence_id:
+                  type: number
+                  description: 'Must be at least 1.'
+                  example: 67
+                continue_on_failure:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - action
+                - time_offset
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: schedule_id
+        description: 'The ID of the schedule.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/client/servers/calagopus/{server_uuid}/schedules/{schedule_id}/tasks/{task_id}':
+    post:
+      summary: 'Update a schedule task.'
+      operationId: updateAScheduleTask
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: ''
+                  example: command
+                  enum:
+                    - command
+                    - power
+                    - backup
+                payload:
+                  type: string
+                  description: 'This field is required unless <code>action</code> is in <code>backup</code>.'
+                  example: architecto
+                  nullable: true
+                time_offset:
+                  type: number
+                  description: 'Must be at least 0. Must not be greater than 900.'
+                  example: 22
+                sequence_id:
+                  type: number
+                  description: 'Must be at least 1.'
+                  example: 67
+                continue_on_failure:
+                  type: boolean
+                  description: ''
+                  example: true
+              required:
+                - action
+                - time_offset
+      security: []
+    delete:
+      summary: 'Delete a schedule task.'
+      operationId: deleteAScheduleTask
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: schedule_id
+        description: 'The ID of the schedule.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: task_id
+        description: 'The ID of the task.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/client/servers/calagopus/{server_uuid}/network/allocations':
+    get:
+      summary: 'List network allocations.'
+      operationId: listNetworkAllocations
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create allocation.'
+      operationId: createAllocation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/network/allocations/{allocation_id}':
+    post:
+      summary: 'Set allocation notes.'
+      operationId: setAllocationNotes
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                  description: 'Must not be greater than 256 characters.'
+                  example: b
+                  nullable: true
+      security: []
+    delete:
+      summary: 'Delete allocation.'
+      operationId: deleteAllocation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: allocation_id
+        description: 'The ID of the allocation.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/client/servers/calagopus/{server_uuid}/network/allocations/{allocation_id}/primary':
+    post:
+      summary: 'Set primary allocation.'
+      operationId: setPrimaryAllocation
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: allocation_id
+        description: 'The ID of the allocation.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/client/servers/calagopus/{server_uuid}/users':
+    get:
+      summary: 'List server subusers'
+      operationId: listServerSubusers
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create a subuser'
+      operationId: createASubuser
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be between 1 and 191 characters.'
+                  example: gbailey@example.net
+                permissions:
+                  type: array
+                  description: ''
+                  example:
+                    - architecto
+                  items:
+                    type: string
+              required:
+                - email
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server}/users/{user}':
+    get:
+      summary: 'View a single subuser'
+      operationId: viewASingleSubuser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server
+        description: ''
+        example: architecto
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: user
+        description: 'The user.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/users/{user}':
+    post:
+      summary: 'Update a subuser'
+      operationId: updateASubuser
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissions:
+                  type: array
+                  description: ''
+                  example:
+                    - architecto
+                  items:
+                    type: string
+      security: []
+    delete:
+      summary: 'Delete a subuser'
+      operationId: deleteASubuser
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: user
+        description: 'The user.'
+        example: architecto
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/file-blocks':
+    get:
+      summary: 'List file blocks for the server'
+      operationId: listFileBlocksForTheServer
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    put:
+      summary: 'Replace blocked subusers for a file path'
+      operationId: replaceBlockedSubusersForAFilePath
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: 'Must not be greater than 768 characters.'
+                  example: b
+                user_uuids:
+                  type: array
+                  description: 'validation.uuid Must match an existing stored value.'
+                  example:
+                    - a4855dc5-0acb-33c3-b921-f4291f719ca0
+                  items:
+                    type: string
+              required:
+                - path
+                - user_uuids
+      security: []
+    delete:
+      summary: 'Delete file blocks for a path'
+      operationId: deleteFileBlocksForAPath
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: 'Must not be greater than 768 characters.'
+                  example: b
+                user_uuid:
+                  type: string
+                  description: 'validation.uuid Must match an existing stored value.'
+                  example: a4855dc5-0acb-33c3-b921-f4291f719ca0
+                  nullable: true
+              required:
+                - path
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/backups':
+    get:
+      summary: 'List backups.'
+      operationId: listBackups
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: 'Create a backup.'
+      operationId: createABackup
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 191 characters.'
+                  example: b
+                  nullable: true
+                is_locked:
+                  type: boolean
+                  description: ''
+                  example: false
+                  nullable: true
+                ignored:
+                  type: string
+                  description: ''
+                  example: architecto
+                  nullable: true
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/backups/delete-all':
+    delete:
+      summary: 'Delete every backup that belongs to the server.'
+      operationId: deleteEveryBackupThatBelongsToTheServer
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/backups/bulk-delete':
+    post:
+      summary: 'Delete a specific set of backups belonging to the server.'
+      operationId: deleteASpecificSetOfBackupsBelongingToTheServer
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/backups/{backup_uuid}':
+    get:
+      summary: 'View a backup.'
+      operationId: viewABackup
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: 'Delete a backup.'
+      operationId: deleteABackup
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: backup_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/backups/{backup_uuid}/download':
+    get:
+      summary: 'Download a backup.'
+      operationId: downloadABackup
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: backup_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/backups/{backup_uuid}/lock':
+    post:
+      summary: 'Toggle backup lock.'
+      operationId: toggleBackupLock
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: backup_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/backups/{backup_uuid}/restore':
+    post:
+      summary: 'Restore a backup.'
+      operationId: restoreABackup
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: backup_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/startup':
+    get:
+      summary: 'Get server startup config.'
+      operationId: getServerStartupConfig
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/startup/variable':
+    put:
+      summary: 'Update startup variable.'
+      operationId: updateStartupVariable
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  description: ''
+                  example: architecto
+                value:
+                  type: string
+                  description: ''
+                  example: null
+              required:
+                - key
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/startup/command':
+    put:
+      summary: 'Update startup command.'
+      operationId: updateStartupCommand
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                startup:
+                  type: string
+                  description: 'Must be at least 1 character. Must not be greater than 10000 characters.'
+                  example: b
+              required:
+                - startup
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/startup/command/default':
+    get:
+      summary: 'Get default startup command.'
+      operationId: getDefaultStartupCommand
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  errors:
+                    -
+                      code: AuthenticationException
+                      status: '401'
+                      detail: Unauthenticated.
+                properties:
+                  errors:
+                    type: array
+                    example:
+                      -
+                        code: AuthenticationException
+                        status: '401'
+                        detail: Unauthenticated.
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          example: AuthenticationException
+                        status:
+                          type: string
+                          example: '401'
+                        detail:
+                          type: string
+                          example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/startup/command/process':
+    post:
+      summary: 'Preview startup command.'
+      operationId: previewStartupCommand
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/settings/rename':
+    post:
+      summary: 'Rename server.'
+      operationId: renameServer
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must be at least 1 character. Must not be greater than 191 characters.'
+                  example: b
+                description:
+                  type: string
+                  description: ''
+                  example: 'Eius et animi quos velit et.'
+                  nullable: true
+              required:
+                - name
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/settings/reinstall':
+    post:
+      summary: 'Reinstall server.'
+      operationId: reinstallServer
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/settings/egg/preview':
+    post:
+      summary: 'Preview egg change.'
+      operationId: previewEggChange
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                egg_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+                nest_id:
+                  type: integer
+                  description: 'Must match an existing stored value.'
+                  example: 16
+              required:
+                - egg_id
+                - nest_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: server_uuid
+        description: ''
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
+        required: true
+        schema:
+          type: string
+  '/api/client/servers/calagopus/{server_uuid}/settings/egg/apply':
+    post:
+      summary: 'Apply egg change.'
       operationId: applyEggChange
       description: ''
       parameters: []
@@ -7862,11 +11330,11 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
-  '/api/client/servers/elytra/{server_uuid}/operations':
+  '/api/client/servers/calagopus/{server_uuid}/operations':
     get:
       summary: 'List server operations'
       operationId: listServerOperations
@@ -7913,11 +11381,11 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
-  '/api/client/servers/elytra/{server_uuid}/operations/{operationId}':
+  '/api/client/servers/calagopus/{server_uuid}/operations/{operationId}':
     get:
       summary: 'Get operation status'
       operationId: getOperationStatus
@@ -7964,7 +11432,7 @@ paths:
         in: path
         name: server_uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -8014,7 +11482,7 @@ paths:
       security: []
   /api/remote/servers:
     get:
-      summary: 'List all servers for a node'
+      summary: 'List all servers for a node.'
       operationId: listAllServersForANode
       description: ''
       parameters: []
@@ -8056,7 +11524,7 @@ paths:
       security: []
   /api/remote/servers/reset:
     post:
-      summary: 'Reset all server states on node'
+      summary: 'Reset all server states on node.'
       operationId: resetAllServerStatesOnNode
       description: ''
       parameters: []
@@ -8089,12 +11557,12 @@ paths:
                     properties:
                       user:
                         type: string
-                        description: 'Must be a valid UUID.'
+                        description: validation.uuid.
                         example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
                         nullable: true
                       server:
                         type: string
-                        description: 'Must be a valid UUID.'
+                        description: validation.uuid.
                         example: 6b72fe4a-5b40-307c-bc24-f79acf9a1bb9
                       event:
                         type: string
@@ -8122,7 +11590,7 @@ paths:
       security: []
   '/api/remote/servers/{uuid}':
     get:
-      summary: 'Get server details for Wings'
+      summary: 'Get server details for Wings.'
       operationId: getServerDetailsForWings
       description: ''
       parameters: []
@@ -8167,13 +11635,13 @@ paths:
         in: path
         name: uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
   '/api/remote/servers/{uuid}/install':
     get:
-      summary: 'Get server install info'
+      summary: 'Get server install info.'
       operationId: getServerInstallInfo
       description: ''
       parameters: []
@@ -8214,7 +11682,7 @@ paths:
         - Endpoints
       security: []
     post:
-      summary: 'Report server install result'
+      summary: 'Report server install result.'
       operationId: reportServerInstallResult
       description: ''
       parameters: []
@@ -8231,7 +11699,7 @@ paths:
                 successful:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                 reinstall:
                   type: boolean
                   description: ''
@@ -8242,7 +11710,7 @@ paths:
         in: path
         name: uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -8293,7 +11761,7 @@ paths:
         in: path
         name: uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -8327,7 +11795,7 @@ paths:
                     properties:
                       backup_uuid:
                         type: string
-                        description: 'Must be a valid UUID.'
+                        description: validation.uuid.
                         example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
                       new_size:
                         type: integer
@@ -8345,7 +11813,7 @@ paths:
         in: path
         name: uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -8405,7 +11873,7 @@ paths:
         in: path
         name: uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -8465,7 +11933,7 @@ paths:
         in: path
         name: uuid
         description: ''
-        example: 98296a05-b75f-42ea-b206-9b7031d5547a
+        example: 6ff8f7f6-1eb3-3525-be4a-3932c805afed
         required: true
         schema:
           type: string
@@ -8538,7 +12006,7 @@ paths:
                 successful:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                 checksum:
                   type: string
                   description: 'This field is required when <code>successful</code> is <code>true</code>.'
@@ -8586,7 +12054,7 @@ paths:
         in: path
         name: backup
         description: 'The backup.'
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: architecto
         required: true
         schema:
           type: string
@@ -8605,7 +12073,7 @@ paths:
         in: path
         name: backup
         description: 'The backup.'
-        example: 42b7ae7d-5420-4ccb-bf36-fb8cff31cf80
+        example: architecto
         required: true
         schema:
           type: string
@@ -8628,7 +12096,7 @@ paths:
                 successful:
                   type: boolean
                   description: ''
-                  example: false
+                  example: true
                 job_type:
                   type: string
                   description: ''
@@ -8636,7 +12104,7 @@ paths:
                 status:
                   type: string
                   description: ''
-                  example: pending
+                  example: failed
                   enum:
                     - pending
                     - running
