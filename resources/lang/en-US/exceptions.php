@@ -317,6 +317,10 @@ return [
             'no_allocation_limit' => 'You cannot delete allocations for this server: no allocation limit is set.',
             'primary_allocation' => 'You cannot delete the primary allocation for this server.',
         ],
+        'files' => [
+            'blocked' => 'You do not have permission to access this file.',
+            'block_not_subuser' => 'One or more selected users are not subusers of this server.',
+        ],
         'websocket' => [
             'connect_forbidden' => 'You do not have permission to connect to this server\'s websocket.',
             'transfer_logs_forbidden' => 'You do not have permission to view server transfer logs.',

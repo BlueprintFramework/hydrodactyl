@@ -89,6 +89,12 @@ Route::group([
         Route::delete('/{user}', [Servers\SubuserController::class, 'delete']);
     });
 
+    Route::group(['prefix' => '/file-blocks'], function () {
+        Route::get('/', [Servers\FileBlockController::class, 'index']);
+        Route::put('/', [Servers\FileBlockController::class, 'update']);
+        Route::delete('/', [Servers\FileBlockController::class, 'delete']);
+    });
+
     Route::group(['prefix' => '/backups'], function () {
         Route::get('/', [Calagopus\BackupController::class, 'index']);
         Route::post('/', [Calagopus\BackupController::class, 'store']);

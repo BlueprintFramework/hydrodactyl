@@ -88,6 +88,12 @@ Route::group([
         Route::delete('/{user}', [Servers\SubuserController::class, 'delete']);
     });
 
+    Route::group(['prefix' => '/file-blocks'], function () {
+        Route::get('/', [Servers\FileBlockController::class, 'index']);
+        Route::put('/', [Servers\FileBlockController::class, 'update']);
+        Route::delete('/', [Servers\FileBlockController::class, 'delete']);
+    });
+
     // Elytra Jobs API
     Route::group(['prefix' => '/jobs'], function () {
         Route::get('/', [Elytra\ElytraJobsController::class, 'index']);
