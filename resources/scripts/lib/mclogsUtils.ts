@@ -27,13 +27,23 @@ export const CRASH_INDICATORS = [
     'aborted',
     'process crashed',
     'detected server process in a crashed state',
-    'server marked as offline',
-    'process marked as offline',
 
     // Generic
     'fatal error',
     'server crashed',
     'unexpected shutdown',
+];
+
+/** Graceful stop / panel state lines — offline, but not a crash worth analyzing. */
+export const BENIGN_OFFLINE_INDICATORS = [
+    'server marked as offline',
+    'process marked as offline',
+    'server marked as stopping',
+    'stopping server',
+    'server stopped',
+    'kill signal',
+    'received stop command',
+    'shutdown sequence',
 ];
 
 const CRASH_REGEX = [
@@ -42,8 +52,14 @@ const CRASH_REGEX = [
     /\boom-?killer?\b/i, // OOM killer
 ];
 
+export const isBenignOfflineLine = (line: string): boolean => {
+    const lower = line.toLowerCase();
+    return BENIGN_OFFLINE_INDICATORS.some((s) => lower.includes(s));
+};
+
 export const isCrashLine = (line: string): boolean => {
     const lower = line.toLowerCase();
+    if (isBenignOfflineLine(lower)) return false;
     if (CRASH_INDICATORS.some((s) => lower.includes(s))) return true;
     return CRASH_REGEX.some((r) => r.test(line));
 };

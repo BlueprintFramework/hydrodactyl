@@ -18,6 +18,10 @@ class DestinationResolver
      */
     public function directory(string $type): string
     {
+        if ($type === 'modpack') {
+            return (string) config('hydrodactyl.marketplace.destinations.modpack', '/');
+        }
+
         return (string) config('hydrodactyl.marketplace.destinations.' . $type, $type === 'plugin' ? 'plugins' : 'mods');
     }
 
@@ -29,6 +33,11 @@ class DestinationResolver
      */
     public function supportsType(array $eggFeatures, string $type): bool
     {
+        // Modpacks require a mod-loader egg (Fabric/Forge/NeoForge/Quilt/…).
+        if ($type === 'modpack') {
+            return $this->supportsType($eggFeatures, 'mod');
+        }
+
         foreach ($eggFeatures as $feature) {
             if (str_starts_with(strtolower((string) $feature), $type . '/')) {
                 return true;

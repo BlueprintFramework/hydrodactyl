@@ -6,9 +6,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\CategoriesRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\DestroyInstallRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\GameVersionsRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\GetProjectRequest;
+use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\InstallModpackRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\ListInstallsRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\LoadersRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Marketplace\ResolveInstallRequest;
@@ -19,6 +21,7 @@ use Pterodactyl\Services\Marketplace\DestinationResolver;
 use Pterodactyl\Services\Marketplace\MarketplaceException;
 use Pterodactyl\Services\Marketplace\MarketplaceSource;
 use Pterodactyl\Services\Marketplace\SourceRegistry;
+use Pterodactyl\Services\ServerOperations\ModpackInstallService;
 
 /**
  * Daemon-agnostic marketplace controller powering the plugin/mod installer.
@@ -32,6 +35,7 @@ class MarketplaceController extends ClientApiController
     public function __construct(
         private SourceRegistry $sources,
         private DestinationResolver $destinations,
+        private ModpackInstallService $modpackInstalls,
     ) {
         parent::__construct();
     }
@@ -44,21 +48,30 @@ class MarketplaceController extends ClientApiController
         $type = $request->input('type');
         $sourceKey = $request->input('source');
 
+        $limit = min(max((int) $request->input('limit', 20), 1), 50);
+        $offset = max((int) $request->input('offset', 0), 0);
+
         $filters = [
             'query' => $request->input('query'),
             'loader' => $request->input('loader'),
             'game_version' => $request->input('game_version'),
-            'limit' => (int) $request->input('limit', 20),
-            'offset' => (int) $request->input('offset', 0),
+            'category' => $request->input('category'),
+            'limit' => $limit,
+            'offset' => $offset,
         ];
 
-        // "all" (the default) fans the search out across every enabled source
-        // that serves the requested type, then merges + ranks the results.
+        // "all" fans the search out across every enabled source that serves the
+        // requested type, then merges + ranks the results. A specific provider
+        // queries just that one (Modrinth is the UI default).
         $combined = $sourceKey === null || $sourceKey === '' || $sourceKey === 'all';
 
-        return $this->guard(function () use ($type, $sourceKey, $filters, $combined): JsonResponse {
+        return $this->guard(function () use ($request, $type, $sourceKey, $filters, $combined, $limit, $offset): JsonResponse {
+            if ($denied = $this->denyUnsupportedEggType($request, (string) $type)) {
+                return $denied;
+            }
+
             $projects = $combined
-                ? $this->combinedSearch($type, $filters)
+                ? $this->combinedSearch($type, $filters, $limit, $offset)
                 : $this->singleSourceSearch((string) $sourceKey, $type, $filters);
 
             return response()->json([
@@ -87,22 +100,30 @@ class MarketplaceController extends ClientApiController
 
     /**
      * Query every enabled source for the type and merge the results, ranked by
-     * downloads. A single failing provider is skipped so one outage does not
-     * blank out the whole installer.
+     * downloads, then slice to the requested page. Providers are asked for a
+     * larger window so a global offset/limit still yields a full page after
+     * merge (per-source offset alone paginates incorrectly).
      *
      * @param array<string, mixed> $filters
      *
      * @return \Pterodactyl\Services\Marketplace\MarketplaceProject[]
      */
-    protected function combinedSearch(string $type, array $filters): array
+    protected function combinedSearch(string $type, array $filters, int $limit, int $offset): array
     {
+        // Over-fetch so ranking across providers still fills the requested page.
+        $perSource = [
+            ...$filters,
+            'limit' => min($limit + $offset, 50),
+            'offset' => 0,
+        ];
+
         $merged = [];
         foreach ($this->sources->all() as $source) {
             if (!$source->supports($type)) {
                 continue;
             }
             try {
-                $merged = array_merge($merged, $source->search($type, $filters));
+                $merged = array_merge($merged, $source->search($type, $perSource));
             } catch (MarketplaceException $e) {
                 // Skip a failing provider; surface results from the others.
             }
@@ -110,7 +131,7 @@ class MarketplaceController extends ClientApiController
 
         usort($merged, fn($a, $b) => $b->downloads <=> $a->downloads);
 
-        return $merged;
+        return array_slice($merged, $offset, $limit);
     }
 
     /**
@@ -123,6 +144,10 @@ class MarketplaceController extends ClientApiController
         $projectId = $request->input('project_id');
 
         return $this->guard(function () use ($type, $sourceKey, $projectId, $request): JsonResponse {
+            if ($denied = $this->denyUnsupportedEggType($request, (string) $type)) {
+                return $denied;
+            }
+
             $source = $this->sources->resolve((string) $sourceKey);
             if (!$source->supports($type)) {
                 return response()->json(['versions' => []]);
@@ -132,6 +157,8 @@ class MarketplaceController extends ClientApiController
                 'loader' => $request->input('loader'),
                 'game_version' => $request->input('game_version'),
             ]);
+
+            $versions = $this->sortVersionsNewestFirst($versions);
 
             return response()->json([
                 'versions' => collect($versions)->map(fn($v) => $v->toArray())->values()->all(),
@@ -149,7 +176,11 @@ class MarketplaceController extends ClientApiController
         $projectId = $request->input('project_id');
         $versionId = $request->input('version_id');
 
-        return $this->guard(function () use ($type, $sourceKey, $projectId, $versionId): JsonResponse {
+        return $this->guard(function () use ($request, $type, $sourceKey, $projectId, $versionId): JsonResponse {
+            if ($denied = $this->denyUnsupportedEggType($request, (string) $type)) {
+                return $denied;
+            }
+
             $source = $this->sources->resolve((string) $sourceKey);
             if (!$source->supports($type)) {
                 return response()->json(['error' => __('exceptions.client.marketplace.unsupported_content_type')], 422);
@@ -164,6 +195,58 @@ class MarketplaceController extends ClientApiController
                 'directory' => $this->destinations->directory($type),
             ]);
         });
+    }
+
+    /**
+     * Reject marketplace types the server's egg does not advertise (e.g. mods
+     * on a Paper-only egg). Mirrors the frontend nav gate.
+     */
+    protected function denyUnsupportedEggType(SearchMarketplaceRequest|GetProjectRequest|ResolveInstallRequest $request, string $type): ?JsonResponse
+    {
+        /** @var \Pterodactyl\Models\Server $server */
+        $server = $request->route()->parameter('server');
+        $features = $server->egg?->inherit_features ?? [];
+        if (!is_array($features)) {
+            $features = [];
+        }
+
+        if ($this->destinations->supportsType($features, $type)) {
+            return null;
+        }
+
+        return response()->json(['error' => __('exceptions.client.marketplace.egg_type_unsupported')], 422);
+    }
+
+    /**
+     * Normalize version order across providers: newest first by date; undated
+     * versions sink to the end while preserving relative order.
+     *
+     * @param \Pterodactyl\Services\Marketplace\MarketplaceVersion[] $versions
+     *
+     * @return \Pterodactyl\Services\Marketplace\MarketplaceVersion[]
+     */
+    protected function sortVersionsNewestFirst(array $versions): array
+    {
+        usort($versions, function ($a, $b) {
+            $aTime = $a->date !== null && $a->date !== '' ? strtotime($a->date) : false;
+            $bTime = $b->date !== null && $b->date !== '' ? strtotime($b->date) : false;
+            $aOk = $aTime !== false;
+            $bOk = $bTime !== false;
+
+            if ($aOk && $bOk) {
+                return $bTime <=> $aTime;
+            }
+            if ($aOk) {
+                return -1;
+            }
+            if ($bOk) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        return $versions;
     }
 
     /**
@@ -182,6 +265,28 @@ class MarketplaceController extends ClientApiController
         return response()->json([
             'installs' => $installs->map(fn(MarketplaceInstall $i) => $this->serializeInstall($i))->values()->all(),
         ]);
+    }
+
+    /**
+     * Queue an automatic Modrinth modpack install (backup / wipe / egg / materialize).
+     */
+    public function installModpack(InstallModpackRequest $request): JsonResponse
+    {
+        /** @var \Pterodactyl\Models\Server $server */
+        $server = $request->route()->parameter('server');
+
+        $result = $this->modpackInstalls->installAsync(
+            $server,
+            $request->user(),
+            (string) $request->input('project_id'),
+            (string) $request->input('version_id'),
+            $request->input('project_title'),
+            $request->input('version_name'),
+            $request->boolean('should_backup', true),
+            $request->boolean('should_wipe', true),
+        );
+
+        return response()->json($result);
     }
 
     /**
@@ -264,6 +369,25 @@ class MarketplaceController extends ClientApiController
         $versions = $this->sources->get('modrinth')?->gameVersions() ?? [];
 
         return response()->json(['game_versions' => $versions]);
+    }
+
+    /**
+     * Content categories for a specific marketplace source + type (Modrinth
+     * thematic tags, Hangar categories, Spigot resource categories).
+     */
+    public function categories(CategoriesRequest $request): JsonResponse
+    {
+        $type = (string) $request->input('type');
+        $sourceKey = (string) $request->input('source');
+
+        return $this->guard(function () use ($type, $sourceKey): JsonResponse {
+            $source = $this->sources->resolve($sourceKey);
+            if (!$source->supports($type)) {
+                return response()->json(['categories' => []]);
+            }
+
+            return response()->json(['categories' => $source->categories($type)]);
+        });
     }
 
     /**

@@ -16,11 +16,12 @@ class SearchMarketplaceRequest extends ClientApiRequest implements ClientPermiss
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'in:mod,plugin'],
+            'type' => ['required', 'string', 'in:mod,plugin,modpack'],
             'source' => ['sometimes', 'nullable', 'string', 'alpha_dash'],
             'query' => ['sometimes', 'nullable', 'string', 'max:120'],
             'loader' => ['sometimes', 'nullable', 'string', 'max:40'],
             'game_version' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'category' => ['sometimes', 'nullable', 'string', 'max:64'],
             'limit' => ['sometimes', 'integer', 'min:1', 'max:50'],
             'offset' => ['sometimes', 'integer', 'min:0'],
         ];

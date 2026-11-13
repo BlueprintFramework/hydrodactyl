@@ -37,7 +37,7 @@ class MarketplaceInstall extends Model
 
     public static array $validationRules = [
         'server_id' => 'bail|required|integer|exists:servers,id',
-        'type' => 'required|string|in:mod,plugin',
+        'type' => 'required|string|in:mod,plugin,modpack',
         'source' => 'required|string|max:32',
         'project_id' => 'required|string|max:128',
         'project_title' => 'required|string|max:255',

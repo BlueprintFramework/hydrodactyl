@@ -62,8 +62,11 @@ class ServerController extends ClientApiController
     {
         $server->loadMissing('node');
 
-        $server->webhook_type = $request->input('webhook_type');
-        $server->webhook_url = $request->input('webhook_url');
+        // Empty values disable the webhook (clear type + URL).
+        $type = $request->input('webhook_type');
+        $url = $request->input('webhook_url');
+        $server->webhook_type = ($type === null || $type === '') ? null : $type;
+        $server->webhook_url = ($url === null || $url === '') ? null : $url;
         $server->save();
 
         return response()->noContent();

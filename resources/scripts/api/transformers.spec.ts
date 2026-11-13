@@ -137,6 +137,7 @@ describe('@/api/transformers.ts', () => {
                 is_successful: true,
                 is_locked: false,
                 is_automatic: true,
+                is_software_change: true,
                 name: 'Daily Backup',
                 ignored_files: '*.log',
                 checksum: 'sha256:abc',
@@ -147,6 +148,7 @@ describe('@/api/transformers.ts', () => {
                 snapshot_id: null,
                 created_at: '2024-01-01T00:00:00Z',
                 completed_at: '2024-01-01T01:00:00Z',
+                expires_at: '2024-01-04T00:00:00Z',
                 job_id: null,
                 job_status: 'completed',
                 job_progress: 100,
@@ -162,6 +164,7 @@ describe('@/api/transformers.ts', () => {
             const result = rawDataToServerBackup(backupData);
             expect(result.uuid).toBe('abc-123');
             expect(result.isSuccessful).toBe(true);
+            expect(result.isSoftwareChange).toBe(true);
             expect(result.name).toBe('Daily Backup');
             expect(result.bytes).toBe(1048576);
             expect(result.adapter).toBe('s3');
@@ -171,6 +174,7 @@ describe('@/api/transformers.ts', () => {
             const result = rawDataToServerBackup(backupData);
             expect(result.createdAt).toEqual(new Date('2024-01-01T00:00:00Z'));
             expect(result.completedAt).toEqual(new Date('2024-01-01T01:00:00Z'));
+            expect(result.expiresAt).toEqual(new Date('2024-01-04T00:00:00Z'));
         });
 
         it('should handle null completed_at', () => {

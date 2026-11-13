@@ -14,6 +14,7 @@ import { SOURCE_LABELS } from './sources';
 interface InstallerCardProps {
     project: MarketplaceProject;
     installedEntry?: InstalledEntry;
+    updateAvailable?: boolean;
     onInstall: (project: MarketplaceProject) => void;
     installing?: boolean;
 }
@@ -30,7 +31,7 @@ const formatCount = (n: number, locale: string): string => {
     return String(n);
 };
 
-const InstallerCard = ({ project, installedEntry, onInstall, installing }: InstallerCardProps) => {
+const InstallerCard = ({ project, installedEntry, updateAvailable, onInstall, installing }: InstallerCardProps) => {
     const { t, locale } = useTranslation();
     const isInstalled = Boolean(installedEntry);
     // Some marketplace projects have no usable icon (Hangar projects without a
@@ -92,7 +93,20 @@ const InstallerCard = ({ project, installedEntry, onInstall, installing }: Insta
                         <span className='rounded-md bg-mocha-300/60 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-cream-400/70'>
                             {SOURCE_LABELS[project.source] ?? project.source}
                         </span>
-                        {isInstalled && (
+                        {project.externally_hosted && (
+                            <span
+                                title={t('server.installer.externally_hosted')}
+                                className='rounded-md bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-medium text-amber-400'
+                            >
+                                {t('server.installer.external')}
+                            </span>
+                        )}
+                        {updateAvailable && (
+                            <span className='rounded-md bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-medium text-amber-400'>
+                                {t('server.installer.update_available')}
+                            </span>
+                        )}
+                        {isInstalled && !updateAvailable && (
                             <span
                                 title={installedEntry?.version_name}
                                 className='flex items-center gap-1 rounded-md bg-brand-400/20 px-1.5 py-0.5 text-[10px] font-medium text-brand-400'
@@ -129,21 +143,24 @@ const InstallerCard = ({ project, installedEntry, onInstall, installing }: Insta
                 </span>
                 <Button
                     size='sm'
-                    variant={isInstalled ? 'attention' : 'secondary'}
-                    disabled={installing}
+                    variant={updateAvailable ? 'attention' : isInstalled ? 'attention' : 'secondary'}
+                    disabled={installing || project.externally_hosted}
                     onClick={() => onInstall(project)}
                     className='gap-1.5'
+                    title={project.externally_hosted ? t('server.installer.externally_hosted') : undefined}
                 >
-                    {isInstalled ? (
+                    {isInstalled && !updateAvailable ? (
                         <Check width={16} height={16} fill='currentColor' />
                     ) : (
                         <ArrowDownToLine width={16} height={16} fill='currentColor' />
                     )}
                     {installing
                         ? t('server.installer.installing_ellipsis')
-                        : isInstalled
-                          ? t('server.installer.manage')
-                          : t('server.installer.install')}
+                        : updateAvailable
+                          ? t('server.installer.update')
+                          : isInstalled
+                            ? t('server.installer.manage')
+                            : t('server.installer.install')}
                 </Button>
             </div>
         </div>

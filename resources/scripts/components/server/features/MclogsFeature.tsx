@@ -1,6 +1,7 @@
 import { Check, Link, TriangleExclamation } from '@gravity-ui/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { httpErrorToHuman } from '@/api/http';
 import { analyzeLogs, type MclogsInsight } from '@/api/mclo.gs/mclogsApi';
 import getFileContents from '@/api/server/files/getFileContents';
 import { Alert } from '@/components/elements/alert';
@@ -9,11 +10,11 @@ import Spinner from '@/components/elements/Spinner';
 import { SocketEvent } from '@/components/server/events';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
-import { debounce, isCrashLine } from '@/lib/mclogsUtils';
+import { debounce, isBenignOfflineLine, isCrashLine } from '@/lib/mclogsUtils';
 import useWebsocketEvent from '@/plugins/useWebsocketEvent';
 import { ServerContext } from '@/state/server';
 
-const CRASH_DETECTION_DEBOUNCE = 1500; // 1.5 seconds
+const CRASH_DETECTION_DEBOUNCE = 2500; // wait — short restarts / EULA stops often recover
 const MANUAL_ANALYZE_DEBOUNCE = 1000; // 1 second for manual clicks
 const LOG_FILE_PATH = '/logs/latest.log';
 const MAX_CONSOLE_BUFFER = 300;
@@ -28,10 +29,17 @@ const useLogAnalysis = () => {
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const status = ServerContext.useStoreState((state) => state.status.value);
+    const isInstalling = ServerContext.useStoreState((state) => state.server.isInstalling);
 
     const consoleBufferRef = useRef<string[]>([]);
     const previousStatusRef = useRef(status);
     const mountedRef = useRef(true);
+    const statusRef = useRef(status);
+    const analysisGenerationRef = useRef(0);
+
+    useEffect(() => {
+        statusRef.current = status;
+    }, [status]);
 
     // Keep console buffer trimmed and split chunks into lines
     useWebsocketEvent(SocketEvent.CONSOLE_OUTPUT, (data: string) => {
@@ -47,6 +55,13 @@ const useLogAnalysis = () => {
 
     const analyzeCrash = useCallback(
         async (showToast = false) => {
+            const generation = ++analysisGenerationRef.current;
+
+            // Server already recovered (or still installing) — skip auto false-positives.
+            if (!showToast && (statusRef.current === 'running' || statusRef.current === 'starting' || isInstalling)) {
+                return;
+            }
+
             setAnalyzing(true);
             setError(null);
 
@@ -58,58 +73,78 @@ const useLogAnalysis = () => {
                 }
 
                 const result = await analyzeLogs(logContent);
-                if (!mountedRef.current) return;
+                if (!mountedRef.current || generation !== analysisGenerationRef.current) return;
 
                 setAnalysis(result);
-                setShowCard(true);
 
-                // Show toast notifications for manual analysis
+                const problemCount = result.analysis?.problems?.length ?? 0;
+                const recovered = statusRef.current === 'running' || statusRef.current === 'starting';
+
+                // Auto-analysis: only surface the card when there are real issues and
+                // the server did not already come back online.
                 if (showToast) {
-                    if (result.analysis?.problems?.length > 0) {
+                    setShowCard(true);
+                    if (problemCount > 0) {
                         toast.success(
                             t('server.features.mclogs.analysis_complete_issues', {
-                                count: result.analysis.problems.length,
+                                count: problemCount,
                             }),
                         );
                     } else {
                         toast.info(t('server.features.mclogs.analysis_complete_none'));
                     }
+                } else if (problemCount > 0 && !recovered) {
+                    setShowCard(true);
+                } else {
+                    setShowCard(false);
                 }
             } catch (err) {
-                if (!mountedRef.current) return;
+                if (!mountedRef.current || generation !== analysisGenerationRef.current) return;
 
                 const rawMessage = err instanceof Error ? err.message : '';
+                const humanMessage = httpErrorToHuman(err);
+                const responseStatus = (err as { response?: { status?: number } })?.response?.status;
+                const combined = `${rawMessage} ${humanMessage}`;
                 const looksLikeMissingLog =
-                    /latest\.log/i.test(rawMessage) ||
-                    /not found/i.test(rawMessage) ||
-                    /no log content/i.test(rawMessage);
+                    responseStatus === 404 ||
+                    /latest\.log/i.test(combined) ||
+                    /not found/i.test(combined) ||
+                    /does not exist/i.test(combined) ||
+                    /no log content/i.test(combined) ||
+                    /no such file/i.test(combined);
 
-                let errorMessage = rawMessage || t('server.features.mclogs.analysis_failed');
+                let errorMessage = humanMessage || rawMessage || t('server.features.mclogs.analysis_failed');
 
                 // Map the known English fallbacks from the API layer to localized copy.
-                if (/latest\.log|no log content/i.test(rawMessage)) {
-                    errorMessage = t('server.features.mclogs.no_log_content');
-                } else if (/not found/i.test(rawMessage)) {
+                if (looksLikeMissingLog) {
                     errorMessage = t('server.features.mclogs.log_not_found');
-                } else if (/failed to analyze|HTTP error/i.test(rawMessage)) {
+                } else if (/failed to analyze|HTTP error/i.test(combined)) {
                     errorMessage = t('server.features.mclogs.analysis_failed');
                 }
 
                 setError(errorMessage);
                 console.error('Mclogs analysis failed:', err);
 
-                // Show card even on error for auto-analysis
-                setShowCard(true);
+                const recovered = statusRef.current === 'running' || statusRef.current === 'starting';
+
+                // Don't nag about missing logs after a successful restart / first boot.
+                if (showToast || (!looksLikeMissingLog && !recovered)) {
+                    setShowCard(true);
+                } else {
+                    setShowCard(false);
+                }
 
                 // Only show error toast for manual analysis and unexpected errors
                 if (!looksLikeMissingLog && showToast) {
                     toast.error(t('server.features.mclogs.analysis_failed'));
                 }
             } finally {
-                if (mountedRef.current) setAnalyzing(false);
+                if (mountedRef.current && generation === analysisGenerationRef.current) {
+                    setAnalyzing(false);
+                }
             }
         },
-        [uuid, t],
+        [uuid, t, isInstalling],
     );
 
     // Debounced auto-analysis used when we detect crash indicators
@@ -122,19 +157,44 @@ const useLogAnalysis = () => {
         return fn;
     }, [analyzeCrash]);
 
-    // Monitor server status changes to detect crashes
+    // Monitor server status changes to detect crashes / clear false positives
     useEffect(() => {
+        const previous = previousStatusRef.current;
+
         // If server just went offline, check recent console output for crash indicators
-        if (previousStatusRef.current !== 'offline' && status === 'offline') {
-            const hasCrashIndicators = consoleBufferRef.current.some((line) => isCrashLine(line));
-            if (hasCrashIndicators) {
+        if (previous !== 'offline' && status === 'offline' && !isInstalling) {
+            const recent = consoleBufferRef.current.slice(-80);
+            const benignOnly =
+                recent.some((line) => isBenignOfflineLine(line)) && !recent.some((line) => isCrashLine(line));
+            const hasCrashIndicators = recent.some((line) => isCrashLine(line));
+
+            if (hasCrashIndicators && !benignOnly) {
                 analyzeCrashDebounced();
             }
         }
 
-        // Update previous status
+        // Server recovered — drop empty / noise crash banners immediately.
+        if (status === 'running' || status === 'starting') {
+            analysisGenerationRef.current += 1;
+            try {
+                (analyzeCrashDebounced as { cancel?: () => void })?.cancel?.();
+            } catch {
+                // no-op
+            }
+            setAnalyzing(false);
+            setShowCard((visible) => {
+                if (!visible) return false;
+                const problems = analysis?.analysis?.problems?.length ?? 0;
+                // Keep the card only if we previously found real issues.
+                return problems > 0;
+            });
+            if ((analysis?.analysis?.problems?.length ?? 0) === 0) {
+                setError(null);
+            }
+        }
+
         previousStatusRef.current = status;
-    }, [status, analyzeCrashDebounced]);
+    }, [status, analyzeCrashDebounced, isInstalling, analysis]);
 
     // Manual analysis (debounced to prevent rapid clicking)
     const manualAnalyze = useMemo(() => {

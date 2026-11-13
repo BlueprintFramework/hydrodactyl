@@ -1466,6 +1466,8 @@
         "files": "Arquivos",
         "home": "Início",
         "installer": "Instalador",
+        "mods": "Mods",
+        "plugins": "Plugins",
         "network": "Rede",
         "networking": "Rede",
         "schedule": "Agendamento",
@@ -1476,7 +1478,8 @@
         "ssh_keys": "Chaves SSH",
         "ssh_short": "SSH",
         "startup": "Inicialização",
-        "users": "Usuários"
+        "users": "Usuários",
+        "modpacks": "Modpacks"
     },
     "panel": {
         "account_menu": "Menu da conta",
@@ -1640,6 +1643,8 @@
             "pending_name": "Pendente..."
         },
         "conflict": {
+            "install_failed_description": "A instalação do software falhou. Tente alterar o software novamente ou fale com o suporte se continuar falhando.",
+            "install_failed_title": "Falha na instalação",
             "installing_description": "Seu servidor deve ficar pronto em breve. Para mais detalhes, acesse a página inicial.",
             "installing_title": "Servidor em instalação",
             "maintenance_description": "O nó deste servidor está em manutenção.",
@@ -1649,7 +1654,8 @@
             "suspended_description": "Este servidor está suspenso e não pode ser acessado.",
             "suspended_title": "Servidor suspenso",
             "transferring_description": "Seu servidor está sendo transferido para um novo nó. Volte mais tarde.",
-            "transferring_title": "Transferindo"
+            "transferring_title": "Transferindo",
+            "installing_progress_hint": "Se uma troca de software ou modpack estiver em andamento, a janela de progresso deve reabrir automaticamente."
         },
         "console": {
             "command_input_aria": "Entrada de comandos do console.",
@@ -1690,6 +1696,7 @@
             "scroll_title": "Rolar até o final",
             "server_marked_as": "Servidor marcado como {{state}}...",
             "sidebar_label": "servidor",
+            "server_uuid": "ID do Servidor",
             "start": "Iniciar",
             "start_server": "Iniciar servidor",
             "stop_server": "Parar servidor",
@@ -1899,15 +1906,22 @@
             "any": "Qualquer",
             "browse": "Explorar",
             "by_author": "por {{author}}",
+            "category": "Categoria",
+            "category_any": "Qualquer categoria",
             "currently_installed": "Instalado atualmente:",
             "description": "Explore e instale plugins e mods diretamente no seu servidor. Os arquivos são baixados pelo daemon e colocados na pasta correta.",
+            "description_mods": "Explore e instale mods de servidor no Modrinth e em outros provedores. Os arquivos vão para /mods.",
+            "description_plugins": "Explore e instale plugins de servidor no Modrinth, Hangar e Spigot. Os arquivos vão para /plugins.",
             "downloads": "{{count}} downloads",
-            "empty_installed": "Você ainda não instalou plugins ou mods. Vá para Explorar para começar.",
+            "empty_installed": "Nada instalado aqui ainda. Vá para Explorar para começar.",
             "error_install": "Não foi possível instalar o arquivo.",
             "error_load_more": "Não foi possível carregar mais resultados.",
             "error_remove": "Não foi possível remover o arquivo.",
             "error_search": "Não foi possível pesquisar no marketplace.",
+            "external": "Externo",
+            "externally_hosted": "Este recurso está hospedado externamente e não pode ser instalado automaticamente. Baixe-o manualmente no provedor.",
             "filter_versions_placeholder": "Filtrar versões…",
+            "game_version": "Versão do jogo",
             "install": "Instalar",
             "install_complete": "{{filename}} instalado. Reinicie seu servidor para carregá-lo.",
             "install_success": "{{filename}} instalado em {{directory}}/",
@@ -1936,12 +1950,21 @@
             "tab_mods_hint": "Instalar mods em /mods",
             "tab_plugins_hint": "Instalar plugins do servidor em /plugins",
             "title": "Instalador",
+            "title_mods": "Mods",
+            "title_plugins": "Plugins",
             "title_plugins_mods": "Plugins e mods",
             "unknown_author": "Autor desconhecido",
+            "unsupported_type": "O software deste servidor não oferece este tipo de conteúdo.",
+            "update": "Atualizar",
+            "update_available": "Atualização disponível",
             "version_type_alpha": "Alpha",
             "version_type_beta": "Beta",
             "version_type_other": "Outra",
-            "version_type_release": "Estável"
+            "version_type_release": "Estável",
+            "page_prev": "Anterior",
+            "page_next": "Próxima",
+            "page_of": "Página {{page}} de {{total}}",
+            "page_label": "Página {{page}}"
         },
         "network": {
             "allocations_count": "{{count}} alocações",
@@ -2006,7 +2029,13 @@
             "status_pending": "Pendente",
             "status_running": "Executando",
             "timeout": "O tempo de consulta da operação se esgotou após 15 minutos",
-            "inactive": "A operação não está mais ativa"
+            "inactive": "A operação não está mais ativa",
+            "progress_label": "Progresso",
+            "files_progress": "{{done}} / {{total}} arquivos",
+            "current_file": "Instalando",
+            "recent_files": "Arquivos recentes",
+            "live_console": "Log da instalação",
+            "live_console_live": "Ao vivo"
         },
         "schedules": {
             "cheatsheet": {
@@ -2149,6 +2178,8 @@
                 "subtitle": "Envie atividades do servidor para um webhook externo.",
                 "updating": "Atualizando detalhes do servidor...",
                 "updated": "Detalhes do servidor atualizados!",
+                "disable": "Desativar",
+                "disabled": "Webhook desativado.",
                 "type_label": "Tipo de webhook",
                 "type_placeholder": "Selecione um tipo de webhook",
                 "url_label": "URL do webhook",
@@ -2226,7 +2257,10 @@
             "settings": "Configurações",
             "activity": "Atividades",
             "software": "Software",
-            "installer": "Instalador"
+            "installer": "Instalador",
+            "plugins": "Plugins",
+            "mods": "Mods",
+            "modpacks": "Modpacks"
         },
         "software": {
             "clear_search": "Limpar pesquisa",
@@ -2294,6 +2328,7 @@
                 "create_backup": "Criar backup",
                 "default": "Padrão",
                 "default_image": "Imagem padrão",
+                "defaults_notice": "Serão usados os parâmetros padrão do software. Você poderá alterá-los depois em Inicialização e Configurações.",
                 "docker_image": "Imagem Docker:",
                 "from": "De:",
                 "no_software": "Nenhum software",
@@ -2302,7 +2337,7 @@
                 "startup_command": "Comando de inicialização:",
                 "startup_configuration": "Configuração de inicialização",
                 "subdomain_deleted": "O subdomínio será excluído",
-                "title": "Revisar alterações",
+                "title": "Confirmar alteração",
                 "to": "Para:",
                 "variable_configuration": "Configuração de variáveis",
                 "warning_backup_notice": "Certifique-se de ter backups dos dados importantes antes de continuar.",
@@ -2315,13 +2350,23 @@
             "search_placeholder": "Pesquisar...",
             "selection": {
                 "back_to_games": "Voltar para os jogos",
-                "description": "Escolha a versão específica do software para seu servidor",
+                "description": "Escolha o software do seu servidor. Os favoritos são as opções mais recomendadas.",
+                "favorite_badge": "Top",
+                "favorites_hint": "As 5 opções mais recomendadas",
                 "loading": "Carregando opções de software...",
                 "no_results": "Nenhum software encontrado",
                 "no_results_empty": "Esta categoria não tem softwares disponíveis.",
                 "no_results_query": "Nenhum resultado nesta categoria para “{{query}}”.",
                 "search_placeholder": "Pesquisar software...",
-                "title": "Selecionar software - {{nest}}"
+                "section_established": "Estabelecidos",
+                "section_experimental": "Experimentais",
+                "section_favorites": "Favoritos",
+                "section_limbos": "Limbos",
+                "section_miscellaneous": "Outros populares",
+                "section_other": "Mais software",
+                "title": "Selecionar software - {{nest}}",
+                "title_flat": "Escolha o software Minecraft",
+                "back_to_overview": "Voltar ao resumo"
             },
             "show_less": "Mostrar menos",
             "show_more": "Mostrar mais",
@@ -2369,7 +2414,21 @@
                 "warning_suffix": "do seu servidor e não pode ser desfeita.",
                 "what_will_happen": "O que vai acontecer:"
             },
-            "backup_name": "Backup de alteração de software"
+            "backup_name": "Backup de alteração de software",
+            "versions": {
+                "title": "Escolha uma versão de {{software}}",
+                "back": "Voltar ao software",
+                "show_experimental": "Mostrar experimental",
+                "loading": "Carregando versões…",
+                "empty": "Nenhuma versão disponível para este software.",
+                "pick": "Selecione uma versão",
+                "java": "Java",
+                "build": "Build",
+                "size": "Tamanho",
+                "date": "Lançado",
+                "install": "Instalar esta versão",
+                "stable": "Estável"
+            }
         },
         "users": {
             "adding_existing": "Adicionando um nome de usuário existente",
@@ -2655,6 +2714,27 @@
             "title": "Usuários",
             "user_information": "Informações do usuário",
             "inviting_by_email": "Convidando por e-mail"
+        },
+        "modpacks": {
+            "title": "Modpacks",
+            "description": "Instale um modpack do Modrinth automaticamente: backup, wipe, troca de loader/Java, reinstalação e implantação de mods e configs.",
+            "search_placeholder": "Buscar modpacks…",
+            "install": "Instalar pack",
+            "continue": "Continuar",
+            "pick_version": "Escolha a versão do pack para instalar.",
+            "confirm_title": "Instalar modpack?",
+            "confirm_body": "Instalar {{pack}} ({{version}}). Isso alterará o software do servidor e pode apagar os arquivos atuais.",
+            "confirm_install": "Instalar modpack",
+            "installing": "Instalando…",
+            "option_backup": "Criar um backup temporário primeiro (mantido por 72 horas)",
+            "option_wipe": "Apagar todos os arquivos do servidor antes de instalar",
+            "wipe_warning": "Todos os arquivos atuais serão excluídos. O backup (se ativado) é seu único rollback.",
+            "queued": "Instalação do modpack enfileirada.",
+            "error_install": "Falha ao enfileirar a instalação do modpack.",
+            "missing_permissions": "Você não tem permissão para reinstalar este servidor.",
+            "operation_type": "Instalação de modpack",
+            "operation_success": "Modpack instalado com sucesso.",
+            "operation_failed": "A instalação do modpack falhou."
         }
     },
     "setup": {

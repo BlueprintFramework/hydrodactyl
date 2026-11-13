@@ -138,12 +138,8 @@ body[data-sidebar-minimized="false"] .nav-item .nav-text {
     display: none;
 }
 
-/* hover highlighting */
-.sidebar-container li:hover a {
-    @apply !text-cream-400 !fill-cream-400 opacity-100;
-}
-/* active tab highlighting - applies to the active tab when only when nothing's hovered */
-.sidebar-container:not(:has(li:hover)) li[data-active="true"] a {
+/* Active tab highlighting only (click/route) — no hover pill/text steal */
+.sidebar-container li[data-active="true"] a {
     @apply !text-cream-400 !fill-cream-400 opacity-100;
 }
 

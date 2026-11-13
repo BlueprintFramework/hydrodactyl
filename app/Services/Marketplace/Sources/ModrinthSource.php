@@ -30,7 +30,7 @@ class ModrinthSource extends AbstractMarketplaceSource
 
     public function supports(string $type): bool
     {
-        return $type === 'mod' || $type === 'plugin';
+        return $type === 'mod' || $type === 'plugin' || $type === 'modpack';
     }
 
     /**
@@ -76,6 +76,87 @@ class ModrinthSource extends AbstractMarketplaceSource
         }
 
         return $names;
+    }
+
+    /**
+     * Thematic Modrinth categories (adventure, economy, …), excluding loader
+     * tags which already have their own filter. Used for both mods and plugins
+     * — Modrinth accepts the same category facet on either project_type.
+     *
+     * @return array<int, array{id: string, label: string}>
+     */
+    public function categories(string $type): array
+    {
+        $cacheKey = 'marketplace:modrinth:content-categories:' . $type;
+
+        $cached = Cache::get($cacheKey);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        try {
+            $response = Http::withHeaders(['User-Agent' => $this->userAgent(), 'Accept' => 'application/json'])
+                ->timeout($this->timeout())
+                ->get($this->url('/tag/category'));
+        } catch (ConnectionException) {
+            return [];
+        }
+
+        if ($response->failed()) {
+            return [];
+        }
+
+        $loaders = array_fill_keys(array_map('strtolower', $this->loaders()), true);
+        $out = [];
+        $seen = [];
+        foreach (($response->json() ?? []) as $tag) {
+            if (!is_array($tag)) {
+                continue;
+            }
+            $name = $tag['name'] ?? null;
+            if (!is_string($name) || $name === '') {
+                continue;
+            }
+            // Prefer the "categories" header (thematic). Modrinth tags plugins
+            // under project_type "mod" as well; skip resource packs / shaders /
+            // server-listing taxonomies.
+            $projectType = (string) ($tag['project_type'] ?? '');
+            $header = (string) ($tag['header'] ?? '');
+            if ($header !== 'categories') {
+                continue;
+            }
+            if ($projectType !== '' && $projectType !== 'mod' && $projectType !== 'plugin' && $projectType !== 'modpack') {
+                continue;
+            }
+            // When browsing modpacks, prefer tags that declare project_type:modpack
+            // (or untyped thematic tags) over plugin/mod-only taxonomies.
+            if ($type === 'modpack' && $projectType !== '' && $projectType !== 'modpack') {
+                continue;
+            }
+            if (isset($loaders[strtolower($name)])) {
+                continue;
+            }
+            if (isset($seen[strtolower($name)])) {
+                continue;
+            }
+            $seen[strtolower($name)] = true;
+            $out[] = [
+                'id' => $name,
+                'label' => $this->humanizeCategory($name),
+            ];
+        }
+
+        usort($out, fn($a, $b) => strcasecmp($a['label'], $b['label']));
+        if ($out !== []) {
+            Cache::put($cacheKey, $out, 86400);
+        }
+
+        return $out;
+    }
+
+    private function humanizeCategory(string $slug): string
+    {
+        return ucwords(str_replace(['-', '_'], ' ', $slug));
     }
 
     public function gameVersions(): array
@@ -137,6 +218,28 @@ class ModrinthSource extends AbstractMarketplaceSource
             $facets[] = ['versions:' . $gameVersion];
         }
 
+        $category = trim((string) ($filters['category'] ?? ''));
+        if ($category !== '') {
+            // Thematic category (adventure, economy, …) — distinct from the
+            // loader facet above even though Modrinth stores both under
+            // "categories".
+            $facets[] = ['categories:' . $category];
+        }
+
+        // Dedicated/panel installs should surface server-capable mods/packs, not
+        // client-only ones. OR-group of environment facets (Modrinth facet
+        // arrays are AND between groups, OR within a group).
+        if ($type === 'mod' || $type === 'modpack') {
+            $facets[] = [
+                'environment:server_only',
+                'environment:server_only_client_optional',
+                'environment:dedicated_server_only',
+                'environment:client_and_server',
+                'environment:client_or_server',
+                'environment:client_or_server_prefers_both',
+            ];
+        }
+
         $query = [
             'limit' => min(max((int) ($filters['limit'] ?? 20), 1), 50),
             'offset' => max((int) ($filters['offset'] ?? 0), 0),
@@ -188,6 +291,7 @@ class ModrinthSource extends AbstractMarketplaceSource
                 categories: array_values(array_filter(array_map('strval', Arr::get($hit, 'categories', [])))),
                 url: $this->webUrl('/' . $projectType . '/' . $slug),
                 updatedAt: $this->nullableString(Arr::get($hit, 'date_modified')),
+                latestVersionId: $this->nullableString(Arr::get($hit, 'latest_version')),
             );
         }
 
@@ -228,7 +332,7 @@ class ModrinthSource extends AbstractMarketplaceSource
     public function resolve(string $type, string $projectId, string $versionId): array
     {
         $payload = $this->getShortLived($this->url('/version/' . urlencode($versionId)));
-        $file = $this->pickPrimaryFile(Arr::get($payload, 'files', []));
+        $file = $this->pickPrimaryFile(Arr::get($payload, 'files', []), $type === 'modpack');
 
         if ($file === null) {
             throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.no_downloadable_file'));
@@ -240,6 +344,10 @@ class ModrinthSource extends AbstractMarketplaceSource
             throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.missing_download_url'));
         }
 
+        if ($type === 'modpack' && !str_ends_with(strtolower($filename), '.mrpack')) {
+            throw MarketplaceException::upstream($this->key(), __('exceptions.client.marketplace.modpack_not_mrpack'));
+        }
+
         $this->assertSafeDownloadUrl($url, $this->downloadHosts());
 
         return [
@@ -247,6 +355,18 @@ class ModrinthSource extends AbstractMarketplaceSource
             'filename' => $filename,
             'size' => $this->nullableInt(Arr::get($file, 'size')),
         ];
+    }
+
+    /**
+     * Public wrapper used by the modpack install job when validating index URLs.
+     *
+     * @param string[] $allowedHosts
+     *
+     * @throws MarketplaceException
+     */
+    public function assertPublicDownloadUrl(string $url, array $allowedHosts): void
+    {
+        $this->assertSafeDownloadUrl($url, $allowedHosts);
     }
 
     /**
@@ -264,10 +384,27 @@ class ModrinthSource extends AbstractMarketplaceSource
      *
      * @return array<string, mixed>|null
      */
-    private function pickPrimaryFile(array $files): ?array
+    private function pickPrimaryFile(array $files, bool $preferMrpack = false): ?array
     {
         $files = array_values(array_filter($files, fn($f) => is_array($f)));
         if ($files === []) {
+            return null;
+        }
+
+        if ($preferMrpack) {
+            foreach ($files as $file) {
+                $name = strtolower((string) Arr::get($file, 'filename', ''));
+                if (str_ends_with($name, '.mrpack') && Arr::get($file, 'primary') === true) {
+                    return $file;
+                }
+            }
+            foreach ($files as $file) {
+                $name = strtolower((string) Arr::get($file, 'filename', ''));
+                if (str_ends_with($name, '.mrpack')) {
+                    return $file;
+                }
+            }
+
             return null;
         }
 

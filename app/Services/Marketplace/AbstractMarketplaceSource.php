@@ -307,6 +307,14 @@ abstract class AbstractMarketplaceSource implements MarketplaceSource
     }
 
     /**
+     * @return array<int, array{id: string, label: string}>
+     */
+    public function categories(string $type): array
+    {
+        return [];
+    }
+
+    /**
      * Normalize a loader identifier against the canonical marketplace names.
      */
     protected function normalizeLoader(?string $loader): ?string

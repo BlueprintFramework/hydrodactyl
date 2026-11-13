@@ -44,7 +44,7 @@ const MAX_DESCRIPTION_LENGTH = 150;
 const hidden_nest_prefix = '!';
 const blank_egg_prefix = '@';
 
-type FlowStep = 'overview' | 'select-game' | 'select-software' | 'configure' | 'review';
+type FlowStep = 'overview' | 'select-game' | 'select-software' | 'select-version' | 'configure' | 'review';
 
 const validateEnvironmentVariables = (
     variables: EggVariable[],

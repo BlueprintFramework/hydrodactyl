@@ -24,6 +24,7 @@ class BackupTransformer extends BaseClientTransformer
             'is_successful' => $backup->is_successful,
             'is_locked' => $backup->is_locked,
             'is_automatic' => $backup->is_automatic,
+            'is_software_change' => (bool) $backup->is_software_change,
             'name' => $backup->name,
             'ignored_files' => $backup->ignored_files,
             'checksum' => $backup->checksum,
@@ -34,6 +35,7 @@ class BackupTransformer extends BaseClientTransformer
             'snapshot_id' => $backup->snapshot_id,
             'created_at' => $backup->created_at->toAtomString(),
             'completed_at' => $backup->completed_at ? $backup->completed_at->toAtomString() : null,
+            'expires_at' => $backup->expires_at ? $backup->expires_at->toAtomString() : null,
         ];
 
         // Add server state information if available
