@@ -16,7 +16,7 @@ class DestroyInstallRequest extends ClientApiRequest implements ClientPermission
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'in:mod,plugin'],
+            'type' => ['required', 'string', 'in:mod,plugin,modpack'],
             'source' => ['required', 'string', 'max:32'],
             'project_id' => ['required', 'string', 'max:128'],
         ];

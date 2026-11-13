@@ -19,16 +19,19 @@ interface Props {
     isLoading: boolean;
     canApply: boolean;
     blockedMessage: string;
+    onBackupChange?: (value: boolean) => void;
+    onWipeChange?: (value: boolean) => void;
     onBack: () => void;
     onApply: () => void;
 }
+
+const HIGHLIGHT_VARS = ['MINECRAFT_VERSION', 'BUILD_NUMBER', 'SERVER_JARFILE'];
 
 const ReviewChanges = ({
     selectedEgg,
     selectedNest,
     eggPreview,
     currentEggName,
-    customStartup,
     selectedDockerImage,
     pendingVariables,
     shouldBackup,
@@ -36,10 +39,16 @@ const ReviewChanges = ({
     isLoading,
     canApply,
     blockedMessage,
+    onBackupChange,
+    onWipeChange,
     onBack,
     onApply,
 }: Props) => {
     const { t } = useTranslation();
+
+    const highlightVariables = eggPreview.variables.filter((variable) =>
+        HIGHLIGHT_VARS.includes(variable.env_variable),
+    );
 
     return (
         <div className='space-y-6'>
@@ -76,37 +85,13 @@ const ReviewChanges = ({
                             </div>
                         </div>
 
-                        <div className='p-4 bg-mocha-400/60 border border-mocha-300/60 rounded-lg'>
-                            <h3 className='text-lg font-semibold text-cream-100 mb-4'>
-                                {t('server.software.review.startup_configuration')}
-                            </h3>
-                            <div className='space-y-3'>
-                                <div>
-                                    <span className='text-cream-400/70 text-sm'>
-                                        {t('server.software.review.startup_command')}
-                                    </span>
-                                    <div className='mt-1 p-3 bg-mocha-600 border border-mocha-400 rounded-lg font-mono text-sm text-cream-100 whitespace-pre-wrap'>
-                                        {customStartup || eggPreview.egg.startup}
-                                    </div>
-                                </div>
-                                <div>
-                                    <span className='text-cream-400/70 text-sm'>
-                                        {t('server.software.review.docker_image')}
-                                    </span>
-                                    <div className='mt-1 p-3 bg-mocha-600 border border-mocha-400 rounded-lg text-sm text-cream-100'>
-                                        {selectedDockerImage || t('server.software.review.default_image')}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {eggPreview.variables.length > 0 && (
+                        {highlightVariables.length > 0 && (
                             <div className='p-4 bg-mocha-400/60 border border-mocha-300/60 rounded-lg'>
                                 <h3 className='text-lg font-semibold text-cream-100 mb-4'>
                                     {t('server.software.review.variable_configuration')}
                                 </h3>
                                 <div className='space-y-2'>
-                                    {eggPreview.variables.map((variable) => (
+                                    {highlightVariables.map((variable) => (
                                         <div
                                             key={variable.env_variable}
                                             className='flex justify-between items-center py-2 px-3 bg-mocha-600/70 rounded-lg'
@@ -135,15 +120,35 @@ const ReviewChanges = ({
                             <div className='space-y-2'>
                                 <div className='flex justify-between items-center py-2 px-3 bg-mocha-600/70 rounded-lg'>
                                     <span className='text-cream-100'>{t('server.software.review.create_backup')}</span>
-                                    <span className={shouldBackup ? 'text-green-400' : 'text-cream-400/70'}>
-                                        {shouldBackup ? t('common.yes') : t('common.no')}
-                                    </span>
+                                    {onBackupChange ? (
+                                        <input
+                                            type='checkbox'
+                                            aria-label={t('server.software.review.create_backup')}
+                                            checked={shouldBackup}
+                                            onChange={(e) => onBackupChange(e.target.checked)}
+                                            className='rounded border-mocha-300'
+                                        />
+                                    ) : (
+                                        <span className={shouldBackup ? 'text-green-400' : 'text-cream-400/70'}>
+                                            {shouldBackup ? t('common.yes') : t('common.no')}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className='flex justify-between items-center py-2 px-3 bg-mocha-600/70 rounded-lg'>
                                     <span className='text-cream-100'>{t('server.software.review.wipe_files')}</span>
-                                    <span className={shouldWipe ? 'text-amber-400' : 'text-cream-400/70'}>
-                                        {shouldWipe ? t('common.yes') : t('common.no')}
-                                    </span>
+                                    {onWipeChange ? (
+                                        <input
+                                            type='checkbox'
+                                            aria-label={t('server.software.review.wipe_files')}
+                                            checked={shouldWipe}
+                                            onChange={(e) => onWipeChange(e.target.checked)}
+                                            className='rounded border-mocha-300'
+                                        />
+                                    ) : (
+                                        <span className={shouldWipe ? 'text-amber-400' : 'text-cream-400/70'}>
+                                            {shouldWipe ? t('common.yes') : t('common.no')}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>

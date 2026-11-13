@@ -32,7 +32,9 @@ class ResourceUtilizationController extends ClientApiController
     public function __invoke(GetServerRequest $request, Server $server): array
     {
         $key = "resources:$server->uuid";
-        $stats = $this->cache->remember($key, Carbon::now()->addSeconds(20), function () use ($server) {
+        // Keep this short so the dashboard row can poll near real-time without
+        // hammering the daemon on every request.
+        $stats = $this->cache->remember($key, Carbon::now()->addSeconds(1), function () use ($server) {
             $details = $this->repository->setServer($server)->getDetails();
             $this->samples->handle($server, $details);
 

@@ -77,7 +77,7 @@ const PowerButtons = ({ className }: PowerButtonProps) => {
                 <Button
                     variant={'secondary'}
                     size={'sm'}
-                    className='px-3 gap-1 rounded-full'
+                    className='px-3 gap-1 rounded-full bg-emerald-500/20 text-emerald-400 border-emerald-500/40 enabled:hover:bg-emerald-500/30 enabled:hover:text-emerald-300'
                     disabled={status !== 'offline'}
                     onClick={onButtonClick.bind(this, 'start')}
                     aria-label={t('server.console.start_server')}
@@ -92,7 +92,7 @@ const PowerButtons = ({ className }: PowerButtonProps) => {
                 <Button
                     variant={'secondary'}
                     size={'sm'}
-                    className='p-1 gap-1 rounded-full size-8'
+                    className='p-1 gap-1 rounded-full size-8 bg-orange-500/20 text-orange-400 border-orange-500/40 enabled:hover:bg-orange-500/30 enabled:hover:text-orange-300'
                     disabled={!status}
                     onClick={onButtonClick.bind(this, 'restart')}
                     aria-label={t('server.console.restart_server')}
@@ -104,7 +104,7 @@ const PowerButtons = ({ className }: PowerButtonProps) => {
                 <Button
                     variant={'secondary'}
                     size={'sm'}
-                    className='p-1 gap-1 rounded-full size-8'
+                    className='p-1 gap-1 rounded-full size-8 bg-red-500/20 text-red-400 border-red-500/40 enabled:hover:bg-red-500/30 enabled:hover:text-red-300'
                     disabled={status === 'offline'}
                     onClick={onButtonClick.bind(this, killable ? 'kill' : 'stop')}
                     aria-label={killable ? t('server.console.kill_server') : t('server.console.stop_server')}

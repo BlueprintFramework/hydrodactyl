@@ -23,6 +23,15 @@ import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { useFlashKey } from '@/plugins/useFlash';
 import { ServerContext } from '@/state/server';
 import {
+    CHUNK_THRESHOLD_BYTES,
+    CHUNKS_PER_FILE,
+    ChunkedUploadUnsupportedError,
+    GLOBAL_CONNECTION_BUDGET,
+    MAX_CONCURRENT_LARGE_FILES,
+    uploadFileChunked,
+    uploadFileMultipart,
+} from './chunkedUpload';
+import {
     type CollectedUpload,
     collectFromEntries,
     collectFromFileList,
@@ -32,34 +41,10 @@ import {
     type UploadCandidate,
 } from './uploadDirectory';
 
-// Limit how many uploads run at once so a large folder does not open hundreds of
-// connections at the same time.
-const MAX_CONCURRENT_UPLOADS = 3;
+const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
-const runPool = async (tasks: (() => Promise<unknown>)[], limit: number): Promise<void> => {
-    const queue = [...tasks];
-    let failed = false;
-
-    const workers = Array.from({ length: Math.min(limit, queue.length) }, async () => {
-        while (!failed && queue.length > 0) {
-            const task = queue.shift();
-            if (!task) {
-                continue;
-            }
-
-            try {
-                await task();
-            } catch (error) {
-                // Stop the remaining uploads as soon as one of them fails.
-                failed = true;
-
-                throw error;
-            }
-        }
-    });
-
-    await Promise.all(workers);
-};
+const fileUploadShortcut = isMac ? '⌘O' : 'Ctrl+O';
+const folderUploadShortcut = isMac ? '⇧⌘O' : 'Ctrl+Shift+O';
 
 function isFileOrDirectory(event: DragEvent): boolean {
     if (!event.dataTransfer?.types) {
@@ -69,10 +54,89 @@ function isFileOrDirectory(event: DragEvent): boolean {
     return event.dataTransfer.types.some((value) => value.toLowerCase() === 'files');
 }
 
-const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
+/**
+ * Schedules uploads under a global HTTP connection budget:
+ * - small files: 1 connection each
+ * - large files: up to CHUNKS_PER_FILE connections, max MAX_CONCURRENT_LARGE_FILES at once
+ */
+const runUploadScheduler = async (
+    items: {
+        connections: number;
+        large: boolean;
+        run: (slots: number) => Promise<void>;
+    }[],
+): Promise<void> => {
+    let available = GLOBAL_CONNECTION_BUDGET;
+    let activeLarge = 0;
+    let failed: unknown;
+    let cursor = 0;
+    const waiters: Array<() => void> = [];
 
-const fileUploadShortcut = isMac ? '⌘O' : 'Ctrl+O';
-const folderUploadShortcut = isMac ? '⇧⌘O' : 'Ctrl+Shift+O';
+    const notify = () => {
+        const pending = waiters.splice(0);
+        for (const wake of pending) {
+            wake();
+        }
+    };
+
+    const acquire = async (want: number, large: boolean): Promise<number> => {
+        for (;;) {
+            if (failed) {
+                throw failed;
+            }
+            const largeOk = !large || activeLarge < MAX_CONCURRENT_LARGE_FILES;
+            const slots = Math.min(want, available);
+            if (largeOk && slots > 0) {
+                available -= slots;
+                if (large) {
+                    activeLarge += 1;
+                }
+                return slots;
+            }
+            await new Promise<void>((resolve) => waiters.push(resolve));
+        }
+    };
+
+    const release = (slots: number, large: boolean) => {
+        available += slots;
+        if (large) {
+            activeLarge -= 1;
+        }
+        notify();
+    };
+
+    const workers = Array.from({ length: Math.min(items.length, GLOBAL_CONNECTION_BUDGET) }, async () => {
+        while (!failed) {
+            const index = cursor++;
+            if (index >= items.length) {
+                return;
+            }
+            const item = items[index];
+            if (!item) {
+                return;
+            }
+
+            let slots = 0;
+            try {
+                slots = await acquire(item.connections, item.large);
+                await item.run(slots);
+            } catch (error) {
+                failed = error;
+                notify();
+                throw error;
+            } finally {
+                if (slots > 0) {
+                    release(slots, item.large);
+                }
+            }
+        }
+    });
+
+    await Promise.all(workers);
+    if (failed) {
+        throw failed;
+    }
+};
 
 const UploadButton = () => {
     const { t } = useTranslation();
@@ -89,8 +153,6 @@ const UploadButton = () => {
         (actions) => actions.files,
     );
 
-    // `webkitdirectory` is a non-standard attribute that TypeScript does not know about,
-    // so it is applied directly to the input.
     useEffect(() => {
         if (folderUploadInput.current) {
             folderUploadInput.current.setAttribute('webkitdirectory', '');
@@ -115,7 +177,6 @@ const UploadButton = () => {
     useEventListener('keydown', (e) => {
         const event = e as KeyboardEvent;
 
-        // Any key press dismisses the drag overlay.
         if (visible) {
             setVisible(false);
         }
@@ -124,7 +185,6 @@ const UploadButton = () => {
             return;
         }
 
-        // Don't hijack the shortcut while the user is typing in an input.
         const target = event.target as HTMLElement | null;
         if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) {
             return;
@@ -134,22 +194,44 @@ const UploadButton = () => {
         (event.shiftKey ? folderUploadInput : fileUploadInput).current?.click();
     });
 
-    const uploadCandidate = async (serverUuid: string, candidate: UploadCandidate, controller: AbortController) => {
-        // The daemon writes the file to `directory/<filename>`, creating parent folders as
-        // needed, so pointing `directory` at the file's relative folder preserves the tree.
+    const uploadCandidate = async (
+        serverUuid: string,
+        candidate: UploadCandidate,
+        controller: AbortController,
+        connectionSlots: number,
+    ) => {
         const targetDirectory = cleanDirectoryPath(join(directory, getRelativeDirectory(candidate.relativePath)));
+        const onProgress = (loaded: number) => setUploadProgress({ name: candidate.relativePath, loaded });
 
-        const url = await getFileUploadUrl(serverUuid);
-        await axios.post(
-            url,
-            { files: candidate.file },
-            {
-                signal: controller.signal,
-                headers: { 'Content-Type': 'multipart/form-data' },
-                params: { directory: targetDirectory },
-                onUploadProgress: (event) => setUploadProgress({ name: candidate.relativePath, loaded: event.loaded }),
-            },
-        );
+        const tryChunked = candidate.file.size >= CHUNK_THRESHOLD_BYTES;
+        if (tryChunked) {
+            const signedUrl = await getFileUploadUrl(serverUuid);
+            try {
+                await uploadFileChunked({
+                    signedUploadUrl: signedUrl,
+                    file: candidate.file,
+                    directory: targetDirectory,
+                    signal: controller.signal,
+                    onProgress,
+                    connectionSlots,
+                });
+                return;
+            } catch (error) {
+                if (!(error instanceof ChunkedUploadUnsupportedError)) {
+                    throw error;
+                }
+                // Fall through to multipart with a fresh signed URL.
+            }
+        }
+
+        const signedUrl = await getFileUploadUrl(serverUuid);
+        await uploadFileMultipart({
+            signedUploadUrl: signedUrl,
+            file: candidate.file,
+            directory: targetDirectory,
+            signal: controller.signal,
+            onProgress,
+        });
     };
 
     const onFileSubmission = (collected: CollectedUpload) => {
@@ -160,12 +242,20 @@ const UploadButton = () => {
         }
 
         const serverUuid = uuid;
-        const tasks: (() => Promise<unknown>)[] = [];
+        const items: {
+            connections: number;
+            large: boolean;
+            run: (slots: number) => Promise<void>;
+        }[] = [];
 
-        // Create empty folders explicitly. Folders that contain files are created by the
-        // daemon when the files inside them are written.
         for (const relativeDirectory of getEmptyDirectories(collected)) {
-            tasks.push(() => createDirectory(serverUuid, directory, relativeDirectory));
+            items.push({
+                connections: 1,
+                large: false,
+                run: async () => {
+                    await createDirectory(serverUuid, directory, relativeDirectory);
+                },
+            });
         }
 
         for (const candidate of collected.files) {
@@ -175,19 +265,22 @@ const UploadButton = () => {
                 data: { abort: controller, loaded: 0, total: candidate.file.size },
             });
 
-            tasks.push(async () => {
-                await uploadCandidate(serverUuid, candidate, controller);
-                removeFileUpload(candidate.relativePath);
+            const large = candidate.file.size >= CHUNK_THRESHOLD_BYTES;
+            items.push({
+                connections: large ? CHUNKS_PER_FILE : 1,
+                large,
+                run: async (slots) => {
+                    await uploadCandidate(serverUuid, candidate, controller, slots);
+                    removeFileUpload(candidate.relativePath);
+                },
             });
         }
 
-        void runPool(tasks, MAX_CONCURRENT_UPLOADS)
+        void runUploadScheduler(items)
             .then(() => mutate())
             .catch((error) => {
                 clearFileUploads();
 
-                // Aborting an upload (for example by cancelling it) is not an error worth
-                // surfacing to the user.
                 if (!axios.isCancel(error)) {
                     clearAndAddHttpError(error);
                 }
@@ -199,8 +292,6 @@ const UploadButton = () => {
         e.stopPropagation();
         setVisible(false);
 
-        // The data transfer items are only valid during this event, so the entries must be
-        // captured synchronously before any asynchronous reading takes place.
         const entries = e.dataTransfer?.items ? getFileSystemEntries(e.dataTransfer.items) : [];
         if (entries.length > 0) {
             void collectFromEntries(entries).then(onFileSubmission).catch(clearAndAddHttpError);
@@ -218,7 +309,6 @@ const UploadButton = () => {
             onFileSubmission(collectFromFileList(e.currentTarget.files));
         }
 
-        // Reset the input so the same files or folder can be selected again.
         e.currentTarget.value = '';
     };
 

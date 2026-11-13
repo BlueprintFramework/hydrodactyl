@@ -3,6 +3,7 @@
 namespace Pterodactyl\Services\ServerOperations;
 
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Pterodactyl\Models\Server;
@@ -20,24 +21,31 @@ class ServerOperationService
 {
     /**
      * Check if server can accept new operations.
+     *
+     * Fail-closed on DB errors so infra faults cannot authorize a second
+     * destructive operation (modpack install / egg change) in parallel.
      */
     public function canAcceptOperation(Server $server): bool
     {
         try {
             $activeOperations = ServerOperation::forServer($server)->active()->count();
+
             return $activeOperations === 0;
         } catch (Exception $e) {
             Log::warning('Failed to check server operation capacity', [
                 'server_id' => $server->id,
                 'error' => $e->getMessage(),
             ]);
-            
-            return true;
+
+            return false;
         }
     }
 
     /**
      * Create a new server operation.
+     *
+     * Serializes creation per server with a row lock so two concurrent
+     * requests cannot both pass an unlocked active-count check.
      */
     public function createOperation(
         Server $server,
@@ -46,21 +54,24 @@ class ServerOperationService
         array $parameters = [],
         ?string $message = null
     ): ServerOperation {
-        if (!$this->canAcceptOperation($server)) {
-            throw new ConflictHttpException(__('exceptions.server_operations.cannot_accept_operations'));
-        }
+        return DB::transaction(function () use ($server, $user, $type, $parameters, $message) {
+            Server::query()->whereKey($server->id)->lockForUpdate()->firstOrFail();
 
-        $operationId = Str::uuid()->toString();
+            $activeOperations = ServerOperation::forServer($server)->active()->count();
+            if ($activeOperations > 0) {
+                throw new ConflictHttpException(__('exceptions.server_operations.cannot_accept_operations'));
+            }
 
-        return ServerOperation::create([
-            'operation_id' => $operationId,
-            'server_id' => $server->id,
-            'user_id' => $user->id,
-            'type' => $type,
-            'status' => ServerOperation::STATUS_PENDING,
-            'message' => $message ?? __('exceptions.server_operations.operation_queued'),
-            'parameters' => $parameters,
-        ]);
+            return ServerOperation::create([
+                'operation_id' => Str::uuid()->toString(),
+                'server_id' => $server->id,
+                'user_id' => $user->id,
+                'type' => $type,
+                'status' => ServerOperation::STATUS_PENDING,
+                'message' => $message ?? __('exceptions.server_operations.operation_queued'),
+                'parameters' => $parameters,
+            ]);
+        });
     }
 
     /**
@@ -72,7 +83,9 @@ class ServerOperationService
             ->where('server_id', $server->id)
             ->firstOrFail();
 
-        if ($operation->hasTimedOut()) {
+        $timeoutSeconds = (int) config('server_operations.timeouts.' . $operation->type, config('server_operations.timeouts.default', 900));
+        $timeoutMinutes = max(1, (int) ceil($timeoutSeconds / 60));
+        if ($operation->hasTimedOut($timeoutMinutes)) {
             $operation->markAsFailed(__('exceptions.server_operations.operation_timed_out'));
         }
 

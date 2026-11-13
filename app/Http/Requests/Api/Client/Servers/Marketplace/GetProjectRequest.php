@@ -16,7 +16,7 @@ class GetProjectRequest extends ClientApiRequest implements ClientPermissionsReq
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'in:mod,plugin'],
+            'type' => ['required', 'string', 'in:mod,plugin,modpack'],
             'source' => ['required', 'string', 'alpha_dash'],
             'project_id' => ['required', 'string', 'max:120'],
             'loader' => ['sometimes', 'nullable', 'string', 'max:40'],

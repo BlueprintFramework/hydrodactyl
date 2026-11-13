@@ -26,7 +26,7 @@ interface MarketplaceSource
     /**
      * Search the source.
      *
-     * @param array{query?: string, loader?: ?string, game_version?: ?string, limit?: int, offset?: int} $filters
+     * @param array{query?: string, loader?: ?string, game_version?: ?string, category?: ?string, limit?: int, offset?: int} $filters
      *
      * @return MarketplaceProject[]
      */
@@ -64,4 +64,13 @@ interface MarketplaceSource
      * @return array<string, string[]>
      */
     public function gameVersions(): array;
+
+    /**
+     * Content categories this source can filter by for the given type
+     * (Hangar/Spigot categories, Modrinth thematic tags). Empty when the
+     * source has no category filter.
+     *
+     * @return array<int, array{id: string, label: string}>
+     */
+    public function categories(string $type): array;
 }

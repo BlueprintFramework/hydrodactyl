@@ -1,6 +1,6 @@
 import http from '@/api/http';
 
-export type MarketplaceType = 'mod' | 'plugin';
+export type MarketplaceType = 'mod' | 'plugin' | 'modpack';
 
 export interface MarketplaceProject {
     source: string;
@@ -14,6 +14,10 @@ export interface MarketplaceProject {
     categories: string[];
     url: string | null;
     updated_at: string | null;
+    /** Newest known version id from the provider (Modrinth search), when available. */
+    latest_version_id?: string | null;
+    /** Spiget (and similar) resources that only offer an external HTML download. */
+    externally_hosted?: boolean;
 }
 
 export interface MarketplaceVersion {
@@ -58,8 +62,14 @@ interface SearchParams {
     query?: string;
     loader?: string | null;
     game_version?: string | null;
+    category?: string | null;
     limit?: number;
     offset?: number;
+}
+
+export interface MarketplaceCategory {
+    id: string;
+    label: string;
 }
 
 /**
@@ -77,6 +87,7 @@ export const searchMarketplace = async (
             query: params.query,
             loader: params.loader,
             game_version: params.game_version,
+            category: params.category,
             limit: params.limit ?? 20,
             offset: params.offset ?? 0,
         }),
@@ -86,6 +97,18 @@ export const searchMarketplace = async (
         results: (data?.results as MarketplaceProject[] | undefined) ?? [],
         sources: (data?.sources as MarketplaceSourceMeta[] | undefined) ?? [],
     };
+};
+
+export const getMarketplaceCategories = async (
+    uuid: string,
+    type: MarketplaceType,
+    source: string,
+): Promise<MarketplaceCategory[]> => {
+    const { data } = await http.get(`/api/client/servers/${uuid}/marketplace/categories`, {
+        params: cleanParams({ type, source }),
+    });
+
+    return Array.isArray((data as { categories?: MarketplaceCategory[] })?.categories) ? data.categories : [];
 };
 
 export const getMarketplaceProject = async (
@@ -157,4 +180,43 @@ export const getMarketplaceGameVersions = async (uuid: string): Promise<GameVers
     const { data } = await http.get(`/api/client/servers/${uuid}/marketplace/game-versions`);
 
     return (data as { game_versions?: GameVersions })?.game_versions ?? {};
+};
+
+export interface ModpackInstallResult {
+    message: string;
+    operation_id: string;
+    status: string;
+}
+
+/**
+ * Queue an automatic Modrinth .mrpack install (backup → wipe → egg → materialize).
+ */
+export const installModpack = async (
+    uuid: string,
+    {
+        projectId,
+        versionId,
+        projectTitle,
+        versionName,
+        shouldBackup = true,
+        shouldWipe = true,
+    }: {
+        projectId: string;
+        versionId: string;
+        projectTitle?: string;
+        versionName?: string;
+        shouldBackup?: boolean;
+        shouldWipe?: boolean;
+    },
+): Promise<ModpackInstallResult> => {
+    const { data } = await http.post(`/api/client/servers/${uuid}/marketplace/modpack/install`, {
+        project_id: projectId,
+        version_id: versionId,
+        project_title: projectTitle,
+        version_name: versionName,
+        should_backup: shouldBackup,
+        should_wipe: shouldWipe,
+    });
+
+    return data as ModpackInstallResult;
 };

@@ -30,6 +30,33 @@ class HangarSource extends AbstractMarketplaceSource
         return $type === 'plugin';
     }
 
+    /**
+     * Hangar content categories (UI "Categories" sidebar). Platforms map to
+     * the existing loader filter; tags (Addon/Library/Folia) are out of scope
+     * for this pass.
+     *
+     * @return array<int, array{id: string, label: string}>
+     */
+    public function categories(string $type): array
+    {
+        if ($type !== 'plugin') {
+            return [];
+        }
+
+        return [
+            ['id' => 'admin_tools', 'label' => 'Admin Tools'],
+            ['id' => 'chat', 'label' => 'Chat'],
+            ['id' => 'dev_tools', 'label' => 'Developer Tools'],
+            ['id' => 'economy', 'label' => 'Economy'],
+            ['id' => 'gameplay', 'label' => 'Gameplay'],
+            ['id' => 'games', 'label' => 'Games'],
+            ['id' => 'protection', 'label' => 'Protection'],
+            ['id' => 'role_playing', 'label' => 'Role Playing'],
+            ['id' => 'world_management', 'label' => 'World Management'],
+            ['id' => 'misc', 'label' => 'Miscellaneous'],
+        ];
+    }
+
     public function search(string $type, array $filters): array
     {
         $limit = min(max((int) ($filters['limit'] ?? 20), 1), 50);
@@ -43,6 +70,23 @@ class HangarSource extends AbstractMarketplaceSource
         if ($query !== '') {
             // Hangar filters by query string.
             $request['q'] = $query;
+        }
+
+        $category = trim((string) ($filters['category'] ?? ''));
+        if ($category !== '') {
+            $request['category'] = $category;
+        }
+
+        // Map egg loader → Hangar platform (Paper / Waterfall / Velocity).
+        $loader = $this->normalizeLoader($filters['loader'] ?? null);
+        if ($loader !== null && $loader !== '') {
+            $platform = match ($loader) {
+                'paper', 'purpur', 'folia' => 'PAPER',
+                'waterfall', 'bungee', 'bungeecord' => 'WATERFALL',
+                'velocity' => 'VELOCITY',
+                default => strtoupper($loader),
+            };
+            $request['platform'] = $platform;
         }
 
         $payload = $this->get($this->url('/projects'), $request);
@@ -63,6 +107,11 @@ class HangarSource extends AbstractMarketplaceSource
                 continue;
             }
 
+            $categoryValue = Arr::get($item, 'category');
+            $categoryLabels = is_string($categoryValue) && $categoryValue !== ''
+                ? [$this->humanizeCategory($categoryValue)]
+                : [];
+
             $projects[] = new MarketplaceProject(
                 source: $this->key(),
                 id: $owner . '/' . $slug,
@@ -72,13 +121,18 @@ class HangarSource extends AbstractMarketplaceSource
                 author: (string) $owner,
                 icon: $this->iconUrl(Arr::get($item, 'id')),
                 downloads: (int) Arr::get($item, 'stats.downloads', 0),
-                categories: array_values(array_filter(array_map('strval', Arr::wrap(Arr::get($item, 'category', []))))),
+                categories: $categoryLabels,
                 url: $this->webUrl($owner . '/' . $slug),
                 updatedAt: $this->nullableString(Arr::get($item, 'lastUpdated')),
             );
         }
 
         return $projects;
+    }
+
+    private function humanizeCategory(string $slug): string
+    {
+        return ucwords(str_replace(['-', '_'], ' ', $slug));
     }
 
     public function versions(string $type, string $projectId, array $filters): array

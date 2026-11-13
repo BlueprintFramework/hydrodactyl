@@ -132,6 +132,20 @@ const BackupItem = ({ backup, isSelected = false, onToggleSelect, isSelectable =
                             {t('server.backups.automatic')}
                         </span>
                     )}
+                    {backup.isSoftwareChange && (
+                        <span
+                            className='text-xs text-amber-400 font-medium bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded'
+                            title={
+                                backup.expiresAt
+                                    ? t('server.backups.software_change_expires', {
+                                          date: backup.expiresAt.toLocaleString(),
+                                      })
+                                    : t('server.backups.software_change')
+                            }
+                        >
+                            {t('server.backups.software_change')}
+                        </span>
+                    )}
                     {backup.isLocked && (
                         <span className='text-xs text-red-400 font-medium bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded'>
                             {t('server.backups.locked')}

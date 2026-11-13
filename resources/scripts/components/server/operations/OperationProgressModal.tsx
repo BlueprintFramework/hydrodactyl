@@ -1,6 +1,6 @@
 import { TriangleExclamation } from '@gravity-ui/icons';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type OperationStatus, type ServerOperation, useOperationPolling } from '@/api/server/serverOperations';
 import { Dialog } from '@/components/elements/dialog';
 import Spinner from '@/components/elements/Spinner';
@@ -12,13 +12,13 @@ import {
     formatOperationId,
     getStatusIconType,
     getStatusStyling,
-    isActiveStatus,
     isCompletedStatus,
     isFailedStatus,
     UI_CONFIG,
 } from '@/lib/server-operations';
 
 import { ServerContext } from '@/state/server';
+import OperationProgressBody from './OperationProgressBody';
 
 const STATUS_LABEL_KEYS: Record<OperationStatus, TranslationKey> = {
     pending: 'server.operations.status_pending',
@@ -53,18 +53,33 @@ const OperationProgressModal: React.FC<Props> = ({
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
     const [operation, setOperation] = useState<ServerOperation | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const [autoCloseTimer, setAutoCloseTimer] = useState<NodeJS.Timeout | null>(null);
+    const [autoCloseArmed, setAutoCloseArmed] = useState(false);
+    const autoCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const onCompleteRef = useRef(onComplete);
+    const onErrorRef = useRef(onError);
+    const onCloseRef = useRef(onClose);
     const { startPolling, stopPolling } = useOperationPolling();
 
     useEffect(() => {
-        if (!visible || !operationId) {
+        onCompleteRef.current = onComplete;
+        onErrorRef.current = onError;
+        onCloseRef.current = onClose;
+    }, [onComplete, onError, onClose]);
+
+    useEffect(() => {
+        const clearAutoClose = () => {
+            if (autoCloseTimerRef.current) {
+                clearTimeout(autoCloseTimerRef.current);
+                autoCloseTimerRef.current = null;
+            }
+            setAutoCloseArmed(false);
+        };
+
+        if (!visible || !operationId || !uuid) {
             stopPolling(operationId || '');
             setOperation(null);
             setError(null);
-            if (autoCloseTimer) {
-                clearTimeout(autoCloseTimer);
-                setAutoCloseTimer(null);
-            }
+            clearAutoClose();
             return;
         }
 
@@ -75,37 +90,32 @@ const OperationProgressModal: React.FC<Props> = ({
         const handleComplete = (op: ServerOperation) => {
             setOperation(op);
             stopPolling(operationId);
-
-            if (onComplete) {
-                onComplete(op);
-            }
+            onCompleteRef.current?.(op);
 
             if (op.is_completed) {
-                const timer = setTimeout(() => {
-                    onClose();
+                clearAutoClose();
+                setAutoCloseArmed(true);
+                autoCloseTimerRef.current = setTimeout(() => {
+                    autoCloseTimerRef.current = null;
+                    setAutoCloseArmed(false);
+                    onCloseRef.current();
                 }, UI_CONFIG.AUTO_CLOSE_DELAY);
-                setAutoCloseTimer(timer);
             }
         };
 
         const handleError = (err: Error) => {
             setError(err.message);
             stopPolling(operationId);
-
-            if (onError) {
-                onError(err);
-            }
+            onErrorRef.current?.(err);
         };
 
         startPolling(uuid, operationId, handleUpdate, handleComplete, handleError);
 
         return () => {
             stopPolling(operationId);
-            if (autoCloseTimer) {
-                clearTimeout(autoCloseTimer);
-            }
+            clearAutoClose();
         };
-    }, [visible, operationId, uuid, startPolling, stopPolling, onComplete, onError, onClose, autoCloseTimer]);
+    }, [visible, operationId, uuid, startPolling, stopPolling]);
 
     const renderStatusIcon = (status: string) => {
         const iconType = getStatusIconType(status as OperationStatus);
@@ -132,10 +142,11 @@ const OperationProgressModal: React.FC<Props> = ({
     const statusStyling = operation ? getStatusStyling(operation.status) : null;
 
     const handleClose = () => {
-        if (autoCloseTimer) {
-            clearTimeout(autoCloseTimer);
-            setAutoCloseTimer(null);
+        if (autoCloseTimerRef.current) {
+            clearTimeout(autoCloseTimerRef.current);
+            autoCloseTimerRef.current = null;
         }
+        setAutoCloseArmed(false);
         onClose();
     };
 
@@ -193,20 +204,7 @@ const OperationProgressModal: React.FC<Props> = ({
                             </p>
                         </div>
 
-                        {/* Progress Bar for Active Operations */}
-                        {isActiveStatus(operation.status) && (
-                            <div className='space-y-3'>
-                                <div className='w-full bg-[#ffffff11] rounded-full h-2 border border-[#ffffff12]'>
-                                    <div
-                                        className='bg-brand h-2 rounded-full animate-pulse transition-all duration-500 ease-out'
-                                        style={{ width: `${UI_CONFIG.ESTIMATED_PROGRESS_WIDTH}%` }}
-                                    />
-                                </div>
-                                <p className='text-xs text-zinc-500 text-center'>
-                                    {t('server.operations.auto_close_notice')}
-                                </p>
-                            </div>
-                        )}
+                        <OperationProgressBody operation={operation} />
 
                         {/* Success State */}
                         {isCompletedStatus(operation.status) && (
@@ -219,7 +217,7 @@ const OperationProgressModal: React.FC<Props> = ({
                                         {t('server.operations.completed')}
                                     </p>
                                 </div>
-                                {autoCloseTimer && (
+                                {autoCloseArmed && (
                                     <p className='text-xs text-green-200 text-center'>
                                         {t('server.operations.closing_automatically')}
                                     </p>

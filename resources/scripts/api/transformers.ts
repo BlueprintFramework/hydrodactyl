@@ -59,6 +59,7 @@ export const rawDataToServerBackup = ({ attributes }: FractalResponseData): Serv
     isSuccessful: attributes.is_successful,
     isLocked: attributes.is_locked,
     isAutomatic: attributes.is_automatic || false,
+    isSoftwareChange: attributes.is_software_change || false,
     name: attributes.name,
     ignoredFiles: attributes.ignored_files,
     checksum: attributes.checksum,
@@ -69,6 +70,7 @@ export const rawDataToServerBackup = ({ attributes }: FractalResponseData): Serv
     snapshotId: attributes.snapshot_id,
     createdAt: new Date(attributes.created_at),
     completedAt: attributes.completed_at ? new Date(attributes.completed_at) : null,
+    expiresAt: attributes.expires_at ? new Date(attributes.expires_at) : null,
     // Async job fields
     jobId: attributes.job_id || null,
     jobStatus: attributes.job_status || 'completed',

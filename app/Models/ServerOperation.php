@@ -21,6 +21,7 @@ class ServerOperation extends Model
     public const STATUS_CANCELLED = 'cancelled';
 
     public const TYPE_EGG_CHANGE = 'egg_change';
+    public const TYPE_MODPACK_INSTALL = 'modpack_install';
     public const TYPE_REINSTALL = 'reinstall';
     public const TYPE_BACKUP_RESTORE = 'backup_restore';
 
@@ -144,11 +145,60 @@ class ServerOperation extends Model
     }
 
     /**
-     * Update operation progress message.
+     * Update operation progress message, optionally with structured progress
+     * metadata (percent, current file, recent log) stored in parameters.
+     *
+     * @param array{
+     *     percent?: int|float,
+     *     current?: string|null,
+     *     done?: int,
+     *     total?: int,
+     *     stage?: string,
+     *     log_line?: string,
+     * }|null $progress
      */
-    public function updateProgress(string $message): bool
+    public function updateProgress(string $message, ?array $progress = null): bool
     {
-        return $this->update(['message' => $message]);
+        $data = ['message' => $message];
+
+        if ($progress !== null) {
+            $params = is_array($this->parameters) ? $this->parameters : [];
+            $existing = is_array($params['progress'] ?? null) ? $params['progress'] : [];
+            // Keep rolling log/recent across updates; scalar keys from $progress still win.
+            $preservedLog = is_array($existing['log'] ?? null) ? $existing['log'] : [];
+            $preservedRecent = is_array($existing['recent'] ?? null) ? $existing['recent'] : [];
+            $merged = array_merge($existing, $progress);
+            $merged['log'] = $preservedLog;
+            $merged['recent'] = $preservedRecent;
+
+            if (isset($progress['percent'])) {
+                $merged['percent'] = max(0, min(100, (int) round((float) $progress['percent'])));
+            }
+
+            $current = $progress['current'] ?? null;
+            if (is_string($current) && $current !== '') {
+                array_unshift($merged['recent'], $current);
+                $merged['recent'] = array_values(array_slice(array_unique($merged['recent']), 0, 24));
+            }
+
+            $logLine = $progress['log_line'] ?? $message;
+            if (is_string($logLine) && $logLine !== '') {
+                $last = $merged['log'][0]['text'] ?? null;
+                if ($last !== $logLine) {
+                    array_unshift($merged['log'], [
+                        'at' => now()->toIso8601String(),
+                        'text' => $logLine,
+                    ]);
+                    $merged['log'] = array_values(array_slice($merged['log'], 0, 50));
+                }
+            }
+            unset($merged['log_line']);
+
+            $params['progress'] = $merged;
+            $data['parameters'] = $params;
+        }
+
+        return $this->update($data);
     }
 
     /**
