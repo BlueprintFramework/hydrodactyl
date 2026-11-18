@@ -6,6 +6,10 @@ on:
       version:
         required: true
         type: string
+      ref:
+        required: false
+        type: string
+        default: main
       release_type:
         required: true
         type: string
@@ -17,21 +21,52 @@ permissions:
 jobs:
   create-release:
     runs-on: blacksmith-2vcpu-ubuntu-2404
+    env:
+      VERSION: ${{ inputs.version }}
+      SOURCE_REF: ${{ inputs.ref }}
+      RELEASE_TYPE: ${{ inputs.release_type }}
     steps:
-      - name: Checkout code
+      - name: Validate inputs
+        run: |
+          case "$RELEASE_TYPE" in
+            release|prerelease) ;;
+            *) echo "::error::Invalid release_type '$RELEASE_TYPE'"; exit 1 ;;
+          esac
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Version '$VERSION' must look like 1.2.3 or 1.2.3-hotfix (no leading v)"
+            exit 1
+          fi
+
+      - name: Checkout ${{ inputs.ref }}
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
 
-      - name: Update version in config/app.php
+      - name: Ensure tag does not already exist
         run: |
-          sed -i "s/'version' => '[^']*'/'version' => 'v${{ inputs.version }}'/" config/app.php
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null; then
+            echo "::error::Tag v$VERSION already exists. To rebuild its Docker image, run the 'Build & Push Version' workflow with tag v$VERSION instead."
+            exit 1
+          fi
 
-      - name: Commit version bump
+      # The version bump is committed on a detached HEAD and only reachable
+      # through the tag, so main keeps reporting 'canary'.
+      - name: Bump version in config/app.php
         run: |
+          sed -i "s/'version' => '[^']*'/'version' => 'v$VERSION'/" config/app.php
+          grep -q "'version' => 'v$VERSION'" config/app.php
+
+      - name: Commit and tag release
+        id: tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add config/app.php
-          git commit -m "ci: bump v${{ inputs.version }}" || echo "No changes to commit"
-
+          git commit -m "ci: bump v$VERSION" || echo "No changes to commit"
+          git tag -a "v$VERSION" -m "Release v$VERSION (from $SOURCE_REF)"
+          git push origin "refs/tags/v$VERSION"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       # ---- Build tarball -------------------------------------------------
       - name: Create release archive
@@ -50,18 +85,11 @@ jobs:
           echo "checksum=$(echo $SUM | cut -d' ' -f1)" >> $GITHUB_OUTPUT
 
       # ---- GitHub Release ------------------------------------------------
-      - name: Validate release type
-        run: |
-          case "${{ inputs.release_type }}" in
-            release|prerelease) ;;
-            *) echo "Invalid release_type"; exit 1 ;;
-          esac
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ inputs.version }}
-          target_commitish: main
+          target_commitish: ${{ steps.tag.outputs.sha }}
           name: Release v${{ inputs.version }}
           generate_release_notes: true
           draft: true
