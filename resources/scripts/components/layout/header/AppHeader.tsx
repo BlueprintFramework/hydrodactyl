@@ -93,7 +93,7 @@ ToggleButton.displayName = 'ToggleButton';
 
 const SidebarLogo = memo(({ admin }: { admin?: boolean }) => {
     return (
-        <div className='sidebar-logo-container hidden lg:flex h-12 items-center flex-none relative'>
+        <div className='sidebar-logo-container hidden lg:flex h-12 items-center flex-none relative -ml-2'>
             <LogoSection admin={admin} />
             <ToggleButton />
         </div>
