@@ -317,6 +317,10 @@ return [
             'no_allocation_limit' => 'Você não pode excluir alocações deste servidor: nenhum limite de alocações foi definido.',
             'primary_allocation' => 'Você não pode excluir a alocação principal deste servidor.',
         ],
+        'files' => [
+            'blocked' => 'Você não tem permissão para acessar este arquivo.',
+            'block_not_subuser' => 'Um ou mais usuários selecionados não são subusuários deste servidor.',
+        ],
         'websocket' => [
             'connect_forbidden' => 'Você não tem permissão para conectar ao WebSocket deste servidor.',
             'transfer_logs_forbidden' => 'Você não tem permissão para visualizar os registros de transferência do servidor.',

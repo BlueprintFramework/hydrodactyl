@@ -1,4 +1,4 @@
-import { BarsPlay, Copy, FileArrowDown, FileZipper, PencilToLine, Shield, TrashBin } from '@gravity-ui/icons';
+import { BarsPlay, Copy, FileArrowDown, FileZipper, Lock, PencilToLine, Shield, TrashBin } from '@gravity-ui/icons';
 import { join } from 'pathe';
 import { memo, useState } from 'react';
 import isEqual from 'react-fast-compare';
@@ -9,14 +9,25 @@ import decompressFiles from '@/api/server/files/decompressFiles';
 import deleteFiles from '@/api/server/files/deleteFiles';
 import getFileDownloadUrl from '@/api/server/files/getFileDownloadUrl';
 import type { FileObject } from '@/api/server/files/loadDirectory';
+import updateFileBlocks from '@/api/server/files/updateFileBlocks';
 import Can from '@/components/elements/Can';
-import { ContextMenuContent, ContextMenuItem } from '@/components/elements/ContextMenu';
+import {
+    ContextMenuCheckboxItem,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuSeparator,
+    ContextMenuSub,
+    ContextMenuSubContent,
+    ContextMenuSubTrigger,
+} from '@/components/elements/ContextMenu';
 import { Dialog } from '@/components/elements/dialog';
 import ChmodFileModal from '@/components/server/files/ChmodFileModal';
 import RenameFileModal from '@/components/server/files/RenameFileModal';
 import { useTranslation } from '@/i18n/I18nProvider';
+import useFileBlocksSwr from '@/plugins/useFileBlocksSwr';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import useFlash from '@/plugins/useFlash';
+import useServerSubusersSwr from '@/plugins/useServerSubusersSwr';
 import { ServerContext } from '@/state/server';
 
 type ModalType = 'rename' | 'move' | 'chmod';
@@ -25,11 +36,29 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
     const { t } = useTranslation();
     const [modal, setModal] = useState<ModalType | null>(null);
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [savingBlocks, setSavingBlocks] = useState(false);
+    const [blocksMenuOpen, setBlocksMenuOpen] = useState(false);
 
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
+    const permissions = ServerContext.useStoreState((state) => state.server.permissions);
+    const canManageBlocks = permissions.includes('*');
     const { mutate } = useFileManagerSwr();
+    const { data: subusers, isLoading: loadingSubusers } = useServerSubusersSwr(canManageBlocks && blocksMenuOpen);
+    const {
+        data: fileBlocks,
+        isLoading: loadingBlocks,
+        mutate: mutateFileBlocks,
+    } = useFileBlocksSwr(canManageBlocks && blocksMenuOpen);
     const { clearAndAddHttpError, clearFlashes } = useFlash();
     const directory = ServerContext.useStoreState((state) => state.files.directory);
+
+    const resolvedSubusers = subusers ?? [];
+    const resolvedBlocks = fileBlocks ?? [];
+    const blocksLoading = loadingSubusers || loadingBlocks;
+    const filePath = join(directory, file.name);
+    const blockedUserUuids = resolvedBlocks.filter((block) => block.path === filePath).map((block) => block.userUuid);
+    const allBlocked =
+        resolvedSubusers.length > 0 && resolvedSubusers.every((subuser) => blockedUserUuids.includes(subuser.uuid));
 
     const doDeletion = async () => {
         clearFlashes('files');
@@ -93,6 +122,38 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                     error: error?.code === 'ECONNABORTED' ? new Error(t('server.files.unarchive_timeout')) : error,
                 });
             });
+    };
+
+    const setBlockedUsers = (userUuids: string[]) => {
+        if (!uuid || savingBlocks) {
+            return;
+        }
+
+        setSavingBlocks(true);
+        clearFlashes('files');
+
+        updateFileBlocks(uuid, filePath, userUuids)
+            .then((blocks) => {
+                mutateFileBlocks(
+                    (current) => [...(current ?? []).filter((block) => block.path !== filePath), ...blocks],
+                    false,
+                );
+                toast.success(t('server.files.block_updated'));
+            })
+            .catch((error) => clearAndAddHttpError({ key: 'files', error }))
+            .finally(() => setSavingBlocks(false));
+    };
+
+    const toggleUserBlock = (userUuid: string, checked: boolean) => {
+        const next = checked
+            ? [...new Set([...blockedUserUuids, userUuid])]
+            : blockedUserUuids.filter((id) => id !== userUuid);
+
+        setBlockedUsers(next);
+    };
+
+    const toggleAllBlocks = (checked: boolean) => {
+        setBlockedUsers(checked ? resolvedSubusers.map((subuser) => subuser.uuid) : []);
     };
 
     return (
@@ -175,6 +236,53 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                         <FileArrowDown className='h-4! w-4!' fill='currentColor' />
                         <span>{t('common.download')}</span>
                     </ContextMenuItem>
+                )}
+                {canManageBlocks && (
+                    <>
+                        <ContextMenuSeparator />
+                        <ContextMenuSub onOpenChange={setBlocksMenuOpen}>
+                            <ContextMenuSubTrigger className='flex gap-2'>
+                                <Lock className='h-4! w-4!' fill='currentColor' />
+                                <span>{t('server.files.block_for')}</span>
+                            </ContextMenuSubTrigger>
+                            <ContextMenuSubContent className='flex flex-col gap-1 min-w-[16rem]'>
+                                {blocksLoading ? (
+                                    <div className='px-2 py-1.5 text-sm font-medium text-zinc-300'>
+                                        {t('common.loading')}
+                                    </div>
+                                ) : resolvedSubusers.length === 0 ? (
+                                    <div className='px-2 py-1.5 text-sm font-medium text-zinc-300'>
+                                        {t('server.files.block_no_subusers')}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <ContextMenuCheckboxItem
+                                            checked={allBlocked}
+                                            disabled={savingBlocks}
+                                            onCheckedChange={(checked) => toggleAllBlocks(checked === true)}
+                                            onSelect={(event) => event.preventDefault()}
+                                        >
+                                            {t('server.files.block_all_subusers')}
+                                        </ContextMenuCheckboxItem>
+                                        <ContextMenuSeparator />
+                                        {resolvedSubusers.map((subuser) => (
+                                            <ContextMenuCheckboxItem
+                                                key={subuser.uuid}
+                                                checked={blockedUserUuids.includes(subuser.uuid)}
+                                                disabled={savingBlocks}
+                                                onCheckedChange={(checked) =>
+                                                    toggleUserBlock(subuser.uuid, checked === true)
+                                                }
+                                                onSelect={(event) => event.preventDefault()}
+                                            >
+                                                {subuser.username}
+                                            </ContextMenuCheckboxItem>
+                                        ))}
+                                    </>
+                                )}
+                            </ContextMenuSubContent>
+                        </ContextMenuSub>
+                    </>
                 )}
                 <Can action={'file.delete'}>
                     <ContextMenuItem className='flex gap-2' onSelect={() => setShowConfirmation(true)}>

@@ -6,12 +6,14 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
-use Pterodactyl\Facades\Activity;
 use Pterodactyl\Enums\Daemon\JwtScope;
+use Pterodactyl\Facades\Activity;
 use Pterodactyl\Services\Nodes\NodeJWTService;
+use Pterodactyl\Services\Files\FileBlockService;
 use Pterodactyl\Repositories\Calagopus\DaemonFileRepository;
 use Pterodactyl\Transformers\Api\Client\FileObjectTransformer;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
+use Pterodactyl\Http\Controllers\Api\Client\Servers\Concerns\EnforcesFileBlocks;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\CopyFileRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\PullFileRequest;
 use Pterodactyl\Http\Requests\Api\Client\Servers\Files\ListFilesRequest;
@@ -26,26 +28,44 @@ use Pterodactyl\Http\Requests\Api\Client\Servers\Files\WriteFileContentRequest;
 
 class FileController extends ClientApiController
 {
+    use EnforcesFileBlocks;
+
     /**
      * FileController constructor.
      */
     public function __construct(
         private NodeJWTService $jwtService,
         private DaemonFileRepository $fileRepository,
+        private FileBlockService $fileBlockService,
     ) {
         parent::__construct();
     }
 
+    protected function getFileBlockService(): FileBlockService
+    {
+        return $this->fileBlockService;
+    }
+
     /**
-     * List files in directory.
+     * List files in directory
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
     public function directory(ListFilesRequest $request, Server $server): array
     {
+        $directory = $request->get('directory') ?? '/';
+        $this->assertPathNotBlocked($server, $request->user(), $directory);
+
         $contents = $this->fileRepository
             ->setServer($server)
-            ->getDirectory($request->get('directory') ?? '/');
+            ->getDirectory($directory);
+
+        $contents = $this->fileBlockService->filterListing(
+            $server,
+            $request->user(),
+            $directory,
+            $contents
+        );
 
         return $this->fractal->collection($contents)
             ->transformWith($this->getTransformer(FileObjectTransformer::class))
@@ -53,12 +73,14 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Get file contents.
+     * Get file contents
      *
      * @throws \Throwable
      */
     public function contents(GetFileContentsRequest $request, Server $server): Response
     {
+        $this->assertPathNotBlocked($server, $request->user(), $request->get('file'));
+
         $response = $this->fileRepository->setServer($server)->getContent(
             $request->get('file'),
             config('pterodactyl.files.max_edit_size')
@@ -70,12 +92,14 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Download file.
+     * Download file
      *
      * @throws \Throwable
      */
     public function download(GetFileContentsRequest $request, Server $server): array
     {
+        $this->assertPathNotBlocked($server, $request->user(), $request->get('file'));
+
         $token = $this->jwtService
             ->setExpiresAt(CarbonImmutable::now()->addMinutes(15))
             ->setUser($request->user())
@@ -101,12 +125,14 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Write file contents.
+     * Write file contents
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
     public function write(WriteFileContentRequest $request, Server $server): JsonResponse
     {
+        $this->assertPathNotBlocked($server, $request->user(), $request->get('file'));
+
         $this->fileRepository->setServer($server)->putContent($request->get('file'), $request->getContent());
 
         Activity::event('server:file.write')->property('file', $request->get('file'))->log();
@@ -115,15 +141,19 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Create folder.
+     * Create folder
      *
      * @throws \Throwable
      */
     public function create(CreateFolderRequest $request, Server $server): JsonResponse
     {
+        $root = $request->input('root', '/');
+        $path = $this->fileBlockService->join($root, $request->input('name'));
+        $this->assertPathNotBlocked($server, $request->user(), $path);
+
         $this->fileRepository
             ->setServer($server)
-            ->createDirectory($request->input('name'), $request->input('root', '/'));
+            ->createDirectory($request->input('name'), $root);
 
         Activity::event('server:file.create-directory')
             ->property('name', $request->input('name'))
@@ -134,31 +164,41 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Rename file.
+     * Rename file
      *
      * @throws \Throwable
      */
     public function rename(RenameFileRequest $request, Server $server): JsonResponse
     {
+        $root = $request->input('root');
+        $files = $request->input('files', []);
+
+        foreach ($files as $file) {
+            $this->assertPathNotBlocked($server, $request->user(), $this->fileBlockService->join($root, $file['from']));
+            $this->assertPathNotBlocked($server, $request->user(), $this->fileBlockService->join($root, $file['to']));
+        }
+
         $this->fileRepository
             ->setServer($server)
-            ->renameFiles($request->input('root'), $request->input('files'));
+            ->renameFiles($root, $files);
 
         Activity::event('server:file.rename')
-            ->property('directory', $request->input('root'))
-            ->property('files', $request->input('files'))
+            ->property('directory', $root)
+            ->property('files', $files)
             ->log();
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
     }
 
     /**
-     * Copy file.
+     * Copy file
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
     public function copy(CopyFileRequest $request, Server $server): JsonResponse
     {
+        $this->assertPathNotBlocked($server, $request->user(), $request->input('location'));
+
         $this->fileRepository
             ->setServer($server)
             ->copyFile($request->input('location'));
@@ -169,19 +209,22 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Compress files.
+     * Compress files
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
     public function compress(CompressFilesRequest $request, Server $server): array
     {
+        $root = $request->input('root');
+        $this->assertNamesNotBlocked($server, $request->user(), $root, $request->input('files', []));
+
         $file = $this->fileRepository->setServer($server)->compressFiles(
-            $request->input('root'),
+            $root,
             $request->input('files')
         );
 
         Activity::event('server:file.compress')
-            ->property('directory', $request->input('root'))
+            ->property('directory', $root)
             ->property('files', $request->input('files'))
             ->log();
 
@@ -191,7 +234,7 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Decompress files.
+     * Decompress files
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
@@ -199,13 +242,20 @@ class FileController extends ClientApiController
     {
         set_time_limit(300);
 
+        $root = $request->input('root');
+        $this->assertPathNotBlocked(
+            $server,
+            $request->user(),
+            $this->fileBlockService->join($root, $request->input('file'))
+        );
+
         $this->fileRepository->setServer($server)->decompressFile(
-            $request->input('root'),
+            $root,
             $request->input('file')
         );
 
         Activity::event('server:file.decompress')
-            ->property('directory', $request->input('root'))
+            ->property('directory', $root)
             ->property('files', $request->input('file'))
             ->log();
 
@@ -213,19 +263,22 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Delete files.
+     * Delete files
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
     public function delete(DeleteFileRequest $request, Server $server): JsonResponse
     {
+        $root = $request->input('root');
+        $this->assertNamesNotBlocked($server, $request->user(), $root, $request->input('files', []));
+
         $this->fileRepository->setServer($server)->deleteFiles(
-            $request->input('root'),
+            $root,
             $request->input('files')
         );
 
         Activity::event('server:file.delete')
-            ->property('directory', $request->input('root'))
+            ->property('directory', $root)
             ->property('files', $request->input('files'))
             ->log();
 
@@ -233,14 +286,21 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Update file permissions.
+     * Update file permissions
      *
      * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
     public function chmod(ChmodFilesRequest $request, Server $server): JsonResponse
     {
+        $root = $request->input('root');
+        $names = array_map(
+            static fn (array $file) => $file['file'] ?? '',
+            $request->input('files', [])
+        );
+        $this->assertNamesNotBlocked($server, $request->user(), $root, array_filter($names));
+
         $this->fileRepository->setServer($server)->chmodFiles(
-            $request->input('root'),
+            $root,
             $request->input('files')
         );
 
@@ -248,20 +308,27 @@ class FileController extends ClientApiController
     }
 
     /**
-     * Pull file from URL.
+     * Pull file from URL
      *
      * @throws \Throwable
      */
     public function pull(PullFileRequest $request, Server $server): JsonResponse
     {
+        $directory = $request->input('directory') ?? '/';
+        $filename = $request->input('filename');
+        $target = $filename
+            ? $this->fileBlockService->join($directory, $filename)
+            : $this->fileBlockService->normalize($directory);
+        $this->assertPathNotBlocked($server, $request->user(), $target);
+
         $this->fileRepository->setServer($server)->pull(
             $request->input('url'),
-            $request->input('directory'),
+            $directory,
             $request->safe(['filename', 'use_header', 'foreground'])
         );
 
         Activity::event('server:file.pull')
-            ->property('directory', $request->input('directory'))
+            ->property('directory', $directory)
             ->property('url', $request->input('url'))
             ->log();
 
