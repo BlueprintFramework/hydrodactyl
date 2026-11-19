@@ -16,6 +16,9 @@ export const SOURCE_LABELS: Record<string, string> = {
  */
 export const sourceLabel = (key: string): string => SOURCE_LABELS[key] ?? key;
 
+/** Default marketplace provider for browse (always Modrinth when available). */
+export const DEFAULT_SOURCE = 'modrinth';
+
 /**
  * Default source for a tab when the user hasn't picked one yet. Prefers
  * Modrinth (which serves both mods and plugins) and otherwise falls back to the
@@ -23,9 +26,9 @@ export const sourceLabel = (key: string): string => SOURCE_LABELS[key] ?? key;
  * the active content type by the backend.
  */
 export const defaultSource = (available: string[]): string | null => {
-    if (available.length === 0) return null;
+    if (available.length === 0) return DEFAULT_SOURCE;
     if (available.includes('modrinth')) return 'modrinth';
-    return available[0] ?? null;
+    return available[0] ?? DEFAULT_SOURCE;
 };
 
 export type { MarketplaceType };

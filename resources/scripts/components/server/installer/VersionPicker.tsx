@@ -2,6 +2,7 @@ import { ArrowDownToLine, Check } from '@gravity-ui/icons';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { httpErrorToHuman } from '@/api/http';
+import deleteFiles from '@/api/server/files/deleteFiles';
 import pullFile from '@/api/server/files/pullFile';
 import {
     getMarketplaceProject,
@@ -28,10 +29,13 @@ interface VersionPickerProps {
     type: 'mod' | 'plugin';
     source: string;
     loader: string | null;
+    gameVersion?: string | null;
     directory: string;
     project: MarketplaceProject | null;
     /** Currently-installed record for this project (if any), so we can mark it. */
     installedEntry?: InstalledEntry;
+    /** When updating, prefer highlighting/selecting this version id first. */
+    preferredVersionId?: string | null;
     /** Called after a file is successfully pulled so the UI can react. */
     onInstalled?: (filename: string, directory: string) => void;
 }
@@ -67,9 +71,11 @@ const VersionPicker = ({
     type,
     source,
     loader,
+    gameVersion,
     directory,
     project,
     installedEntry,
+    preferredVersionId,
     onInstalled,
 }: VersionPickerProps) => {
     const { t, locale } = useTranslation();
@@ -91,9 +97,18 @@ const VersionPicker = ({
             source,
             projectId: project.id,
             loader,
+            gameVersion,
         })
             .then((data) => {
-                if (!cancelled) setVersions(data);
+                if (cancelled) return;
+                // Keep preferred/update target at the top when present.
+                if (preferredVersionId) {
+                    const preferred = data.find((v) => v.id === preferredVersionId);
+                    const rest = data.filter((v) => v.id !== preferredVersionId);
+                    setVersions(preferred ? [preferred, ...rest] : data);
+                } else {
+                    setVersions(data);
+                }
             })
             .catch((err) => {
                 if (!cancelled) setError(httpErrorToHuman(err));
@@ -105,7 +120,7 @@ const VersionPicker = ({
         return () => {
             cancelled = true;
         };
-    }, [open, project, uuid, type, source, loader]);
+    }, [open, project, uuid, type, source, loader, gameVersion, preferredVersionId]);
 
     const install = async (version: MarketplaceVersion) => {
         if (!project) return;
@@ -119,12 +134,23 @@ const VersionPicker = ({
             });
 
             const targetDirectory = resolved.directory || directory || destinationFolder(type);
+            const previousFilename = installedEntry?.filename;
 
             await pullFile(uuid, {
                 url: resolved.url,
                 directory: targetDirectory,
                 filename: resolved.filename,
             });
+
+            // Drop the previous jar when reinstall/update uses a different
+            // filename so we do not leave orphan jars in plugins/ or mods/.
+            if (previousFilename && previousFilename !== resolved.filename) {
+                try {
+                    await deleteFiles(uuid, targetDirectory, [previousFilename]);
+                } catch {
+                    // Non-fatal: new jar is already on disk.
+                }
+            }
 
             // Persist the install in the folder manifest so cards reflect state
             // across reloads, then bubble up so the parent can refresh.
@@ -142,12 +168,17 @@ const VersionPicker = ({
             }
 
             toast.success(
-                t('server.installer.install_success', { filename: resolved.filename, directory: targetDirectory }),
+                t('server.installer.install_success_restart', {
+                    filename: resolved.filename,
+                }),
             );
             onInstalled?.(resolved.filename, targetDirectory);
             onClose();
         } catch (err) {
-            toast.error(httpErrorToHuman(err) || t('server.installer.error_install'));
+            toast.error(
+                httpErrorToHuman(err as { response?: { data?: unknown }; message?: string }) ||
+                    t('server.installer.error_install'),
+            );
         } finally {
             setInstallingId(null);
         }
@@ -173,6 +204,12 @@ const VersionPicker = ({
                     </div>
                 )}
 
+                {project.externally_hosted && (
+                    <p className='rounded-lg bg-amber-500/10 p-3 text-sm text-amber-400'>
+                        {t('server.installer.externally_hosted')}
+                    </p>
+                )}
+
                 {loading && (
                     <div className='flex items-center justify-center gap-2 py-10 text-cream-400/70'>
                         <Spinner size='small' />
@@ -196,12 +233,17 @@ const VersionPicker = ({
                             const badge = TYPE_BADGE[version.type] ?? BADGE_FALLBACK;
                             const installing = installingId === version.id;
                             const isInstalledVersion = installedEntry?.version_id === version.id;
+                            const isPreferred = preferredVersionId === version.id;
                             return (
                                 <div
                                     key={version.id}
                                     className={cn(
                                         'flex items-center justify-between gap-3 rounded-xl border bg-mocha-400/50 p-3',
-                                        isInstalledVersion ? 'border-brand-400/50' : 'border-mocha-300/50',
+                                        isInstalledVersion
+                                            ? 'border-brand-400/50'
+                                            : isPreferred
+                                              ? 'border-amber-400/50'
+                                              : 'border-mocha-300/50',
                                     )}
                                 >
                                     <div className='min-w-0'>
@@ -218,6 +260,11 @@ const VersionPicker = ({
                                                     {t('server.installer.installed')}
                                                 </span>
                                             )}
+                                            {isPreferred && !isInstalledVersion && (
+                                                <span className='rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-medium text-amber-400'>
+                                                    {t('server.installer.update_available')}
+                                                </span>
+                                            )}
                                         </div>
                                         <div className='mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-cream-400/50'>
                                             {version.game_versions.length > 0 && (
@@ -232,8 +279,10 @@ const VersionPicker = ({
                                     </div>
                                     <Button
                                         size='sm'
-                                        variant={isInstalledVersion ? 'secondary' : 'attention'}
-                                        disabled={installing}
+                                        variant={
+                                            isInstalledVersion ? 'secondary' : isPreferred ? 'attention' : 'attention'
+                                        }
+                                        disabled={installing || Boolean(project.externally_hosted)}
                                         onClick={() => install(version)}
                                         className='flex-shrink-0 gap-1.5'
                                     >
@@ -248,7 +297,9 @@ const VersionPicker = ({
                                             ? t('server.installer.installing')
                                             : isInstalledVersion
                                               ? t('server.installer.reinstall')
-                                              : t('server.installer.install')}
+                                              : isPreferred
+                                                ? t('server.installer.update')
+                                                : t('server.installer.install')}
                                     </Button>
                                 </div>
                             );

@@ -19,9 +19,16 @@ return [
     */
     'timeouts' => [
         'egg_change' => 1800,      // 30 minutes
+        'modpack_install' => 3600, // 60 minutes (many daemon pulls)
         'reinstall' => 1200,       // 20 minutes
         'backup_restore' => 2400,  // 40 minutes
         'default' => 900,          // 15 minutes
+        // How long ApplyEggChangeJob waits for Wings to leave "installing"
+        // after reinstall() before marking the operation failed.
+        'install_wait' => 1800,    // 30 minutes
+        // Safety net: stuck "installing" servers older than this (minutes)
+        // are flipped to reinstall_failed by the scheduled sweeper.
+        'stuck_installing_minutes' => 45,
     ],
 
     /*

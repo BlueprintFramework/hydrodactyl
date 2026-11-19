@@ -45,7 +45,15 @@ return [
                 // Anything else (loopback, RFC1918, metadata endpoints, etc.) is
                 // rejected before the URL ever reaches the daemon — see
                 // AbstractMarketplaceSource::assertSafeDownloadUrl().
-                'download_hosts' => ['cdn.modrinth.com', 'cdn-raw.modrinth.com', 'github.com', 'raw.githubusercontent.com'],
+                // mrpack index files may also point at GitLab raw artifacts.
+                'download_hosts' => [
+                    'cdn.modrinth.com',
+                    'cdn-raw.modrinth.com',
+                    'github.com',
+                    'raw.githubusercontent.com',
+                    'gitlab.com',
+                    'objects.githubusercontent.com',
+                ],
             ],
 
             // Plugin-only sources.
@@ -79,6 +87,24 @@ return [
         'destinations' => [
             'mod' => 'mods',
             'plugin' => 'plugins',
+            // Modpack materialization writes relative to the server root.
+            'modpack' => '/',
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | MCJars (versions.mcjars.app)
+    |--------------------------------------------------------------------------
+    |
+    | Proxied by the Software change UI so the browser never talks to MCJars
+    | directly (UA + cache + no CORS). Install scripts still hit MCJars from
+    | the daemon install container.
+    |
+    */
+
+    'mcjars' => [
+        'base_url' => env('MCJARS_BASE_URL', 'https://versions.mcjars.app'),
+        'timeout' => (int) env('MCJARS_TIMEOUT', 20),
     ],
 ];

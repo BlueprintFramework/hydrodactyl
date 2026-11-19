@@ -16,9 +16,12 @@ class SetWebhookRequest extends ClientApiRequest
                 'nullable',
                 'required_with:webhook_url',
                 'string',
-                'min:1',
                 'max:64',
                 function ($attribute, $value, $fail) {
+                    // Empty clears/disables the webhook.
+                    if ($value === null || $value === '') {
+                        return;
+                    }
                     if (!array_key_exists($value, config('webhook.allowed_webhook_types', []))) {
                         $fail(__('validation.webhook.type_not_allowed'));
                         return;
@@ -28,17 +31,21 @@ class SetWebhookRequest extends ClientApiRequest
             'webhook_url' => [
                 'nullable',
                 'required_with:webhook_type',
-                'url',
-                'min:1',
+                'string',
                 'max:191',
                 function ($attribute, $value, $fail) {
-                    if (filter_var($value, FILTER_VALIDATE_URL)) {
-                        $scheme = parse_url($value, PHP_URL_SCHEME);
-
-                        if ($scheme !== 'http' && $scheme !== 'https') {
-                            $fail(__('validation.webhook.invalid_protocol'));
-                            return;
-                        }
+                    // Empty clears/disables the webhook.
+                    if ($value === null || $value === '') {
+                        return;
+                    }
+                    if (!filter_var($value, FILTER_VALIDATE_URL)) {
+                        $fail(__('validation.webhook.invalid_protocol'));
+                        return;
+                    }
+                    $scheme = parse_url($value, PHP_URL_SCHEME);
+                    if ($scheme !== 'http' && $scheme !== 'https') {
+                        $fail(__('validation.webhook.invalid_protocol'));
+                        return;
                     }
                 },
             ],

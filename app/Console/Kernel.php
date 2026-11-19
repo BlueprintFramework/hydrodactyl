@@ -12,6 +12,8 @@ use Pterodactyl\Console\Commands\Schedule\ProcessRunnableCommand;
 use Pterodactyl\Console\Commands\Server\RecordResourceUsageCommand;
 use Pterodactyl\Console\Commands\Maintenance\PruneOrphanedBackupsCommand;
 use Pterodactyl\Console\Commands\Maintenance\CleanServiceBackupFilesCommand;
+use Pterodactyl\Console\Commands\Maintenance\ClearStuckInstallingServersCommand;
+use Pterodactyl\Console\Commands\Maintenance\PruneSoftwareChangeBackupsCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -41,6 +43,12 @@ class Kernel extends ConsoleKernel
         if (config('backups.prune_age')) {
             $schedule->command(PruneOrphanedBackupsCommand::class)->everyThirtyMinutes();
         }
+
+        // Flip servers left in "installing" after a missed Wings callback.
+        $schedule->command(ClearStuckInstallingServersCommand::class)->everyFiveMinutes();
+
+        // Drop expired software-change temporary backups (72h TTL).
+        $schedule->command(PruneSoftwareChangeBackupsCommand::class)->hourly();
 
         if (config('activity.prune_days')) {
             $schedule->command(PruneCommand::class, ['--model' => [ActivityLog::class]])->daily();

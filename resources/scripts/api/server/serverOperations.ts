@@ -21,12 +21,14 @@ export type OperationStatus = (typeof OPERATION_STATUS)[keyof typeof OPERATION_S
  * Polling configuration for operation status updates.
  */
 export const POLLING_CONFIG = {
-    INITIAL_INTERVAL: 2000,
-    MAX_INTERVAL: 8000,
-    MAX_ATTEMPTS: 90,
-    JITTER_RANGE: 500,
-    BACKOFF_MULTIPLIER: 1.05,
-    BACKOFF_THRESHOLD: 5,
+    // Keep polling snappy so modpack file-level progress updates feel live.
+    INITIAL_INTERVAL: 1500,
+    MAX_INTERVAL: 3000,
+    // Long enough for egg reinstall + large modpack materialization (~45–60m).
+    MAX_ATTEMPTS: 1200,
+    JITTER_RANGE: 250,
+    BACKOFF_MULTIPLIER: 1.02,
+    BACKOFF_THRESHOLD: 20,
 };
 
 export interface ServerOperation {

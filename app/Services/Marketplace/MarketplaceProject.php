@@ -24,6 +24,8 @@ final class MarketplaceProject
         public array $categories = [],
         public ?string $url = null,
         public ?string $updatedAt = null,
+        public ?string $latestVersionId = null,
+        public bool $externallyHosted = false,
     ) {
     }
 
@@ -44,6 +46,8 @@ final class MarketplaceProject
             'categories' => $this->categories,
             'url' => $this->url,
             'updated_at' => $this->updatedAt,
+            'latest_version_id' => $this->latestVersionId,
+            'externally_hosted' => $this->externallyHosted,
         ];
     }
 }

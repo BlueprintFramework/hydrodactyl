@@ -8,14 +8,21 @@
     "name": "Quilt",
     "author": "support@phosphor.host",
     "description": "Quilt Server. Quilt is a lightweight mod loader for Minecraft based on Fabric Loader, with support for snapshots and fast updates to new versions.",
-    "features": ["eula", "java_version", "pid_limit", "mod/quilt", "mclogs", "subdomain_minecraft"],
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit",
+        "mod/quilt",
+        "mclogs",
+        "subdomain_minecraft"
+    ],
     "docker_images": {
-        "Java 25": "ghcr.io\/pterodactyl\/yolks:java_25",
-        "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",
-        "Java 17": "ghcr.io\/pterodactyl\/yolks:java_17",
-        "Java 16": "ghcr.io\/pterodactyl\/yolks:java_16",
-        "Java 11": "ghcr.io\/pterodactyl\/yolks:java_11",
-        "Java 8": "ghcr.io\/pterodactyl\/yolks:java_8"
+        "Java 25": "ghcr.io/pterodactyl/yolks:java_25",
+        "Java 21": "ghcr.io/pterodactyl/yolks:java_21",
+        "Java 17": "ghcr.io/pterodactyl/yolks:java_17",
+        "Java 16": "ghcr.io/pterodactyl/yolks:java_16",
+        "Java 11": "ghcr.io/pterodactyl/yolks:java_11",
+        "Java 8": "ghcr.io/pterodactyl/yolks:java_8"
     },
     "file_denylist": [],
     "startup": "java -Xms128M -XX:MaxRAMPercentage=95.0 -jar {{SERVER_JARFILE}}",
@@ -27,9 +34,9 @@
     },
     "scripts": {
         "installation": {
-            "script": "#!/bin/bash\r\n# Quilt Installation Script\r\n#\r\n# Server Files: /mnt/server\r\napt update\r\napt install -y curl jq\r\n\r\nmkdir -p /mnt/server\r\ncd /mnt/server\r\n\r\n# The Quilt game endpoint DOES expose a \"stable\" flag, so we can filter on it.\r\nLATEST_MC_VERSION=$(curl -sSL https://meta.quiltmc.org/v3/versions/game | jq -r 'map(select(.stable == true)) | first.version')\r\nLATEST_MC_SNAPSHOT_VERSION=$(curl -sSL https://meta.quiltmc.org/v3/versions/game | jq -r '.[0].version')\r\n\r\n# NOTE: Quilt's loader/installer entries do NOT carry a \"stable\" field\r\n# (every loader is published as a \"-beta.N\" build), so filtering on\r\n# `.stable == true` returns null. Take the newest entry (index 0) instead.\r\nLATEST_LOADER_VERSION=$(curl -sSL https://meta.quiltmc.org/v3/versions/loader | jq -r '.[0].version')\r\nLATEST_INSTALLER=$(curl -sSL https://meta.quiltmc.org/v3/versions/installer | jq -r '.[0]')\r\nLATEST_INSTALLER_VERSION=$(echo \"$LATEST_INSTALLER\" | jq -r '.version')\r\nLATEST_INSTALLER_URL=$(echo \"$LATEST_INSTALLER\" | jq -r '.url')\r\n\r\necho -e \"Latest MC version is $LATEST_MC_VERSION\"\r\necho -e \"Latest MC snapshot is $LATEST_MC_SNAPSHOT_VERSION\"\r\necho -e \"Latest loader version is $LATEST_LOADER_VERSION\"\r\necho -e \"Latest installer version is $LATEST_INSTALLER_VERSION\"\r\n\r\nif [ -z \"$MINECRAFT_VERSION\" ] || [ \"$MINECRAFT_VERSION\" == \"latest\" ]; then\r\n  MC_VERSION=$LATEST_MC_VERSION\r\nelif [ \"$MINECRAFT_VERSION\" == \"snapshot\" ]; then\r\n  MC_VERSION=$LATEST_MC_SNAPSHOT_VERSION\r\nelse\r\n  MC_VERSION=$MINECRAFT_VERSION\r\nfi\r\n\r\nif [ -z \"$QUILT_VERSION\" ] || [ \"$QUILT_VERSION\" == \"latest\" ]; then\r\n  LOADER_VERSION=$LATEST_LOADER_VERSION\r\nelse\r\n  LOADER_VERSION=$QUILT_VERSION\r\nfi\r\n\r\nif [ -z \"$QUILT_INSTALLER_VERSION\" ] || [ \"$QUILT_INSTALLER_VERSION\" == \"latest\" ]; then\r\n  INSTALLER_VERSION=$LATEST_INSTALLER_VERSION\r\n  INSTALLER_URL=$LATEST_INSTALLER_URL\r\nelse\r\n  INSTALLER_VERSION=$QUILT_INSTALLER_VERSION\r\n  INSTALLER_URL=\"https://maven.quiltmc.org/repository/release/org/quiltmc/quilt-installer/${INSTALLER_VERSION}/quilt-installer-${INSTALLER_VERSION}.jar\"\r\nfi\r\n\r\necho -e \"Installing Minecraft $MC_VERSION with Quilt loader $LOADER_VERSION (installer $INSTALLER_VERSION)\"\r\n\r\n# Unlike Fabric, the Quilt meta server does NOT provide a prebuilt\r\n# /server/jar. We download the Quilt installer and run it to generate\r\n# quilt-server-launch.jar plus the vanilla server.jar in /mnt/server.\r\necho -e \"Downloading Quilt installer from $INSTALLER_URL\"\r\ncurl -sSL -o quilt-installer.jar \"$INSTALLER_URL\"\r\n\r\n# The installer's --install-dir value must be wrapped in literal quotes.\r\necho -e \"running: java -jar quilt-installer.jar install server $MC_VERSION $LOADER_VERSION --install-dir=$(pwd) --download-server\"\r\njava -jar quilt-installer.jar install server \"$MC_VERSION\" \"$LOADER_VERSION\" --install-dir=\"\\\"$(pwd)\\\"\" --download-server\r\n\r\nrm -f quilt-installer.jar\r\n\r\nif [ ! -f quilt-server-launch.jar ]; then\r\n  echo -e \"ERROR: quilt-server-launch.jar was not created. Check that Minecraft version '$MC_VERSION' and loader '$LOADER_VERSION' are valid.\"\r\n  exit 1\r\nfi\r\n\r\necho -e \"Install Complete\"\r",
-            "container": "eclipse-temurin:21-jdk",
-            "entrypoint": "bash"
+            "script": "#!/bin/ash\n# Minecraft Installation Script (MCJars)\n# https://mcjars.app — Server Files: /mnt/server\nTYPE=QUILT\nAPI_BASE=\"${MCJARS_API_BASE:-https://versions.mcjars.app}\"\nUSER_AGENT=\"${MCJARS_USER_AGENT:-EnderHosting-Hydrodactyl/1.0 (https://enderhosting.pro)}\"\nSERVER_JARFILE=\"${SERVER_JARFILE:-server.jar}\"\n\nset -e\n\nresolve_version() {\n\tif [ -n \"${MINECRAFT_VERSION}\" ] && [ \"${MINECRAFT_VERSION}\" != \"latest\" ]; then\n\t\techo \"${MINECRAFT_VERSION}\"\n\t\treturn\n\tfi\n\tif [ -n \"${VELOCITY_VERSION}\" ] && [ \"${VELOCITY_VERSION}\" != \"latest\" ]; then\n\t\techo \"${VELOCITY_VERSION}\"\n\t\treturn\n\tfi\n\techo \"latest\"\n}\n\npick_build() {\n\t# Prints JSON object for the selected build from .builds array\n\tlocal json=\"$1\"\n\tlocal build=\"${BUILD_NUMBER:-latest}\"\n\n\tif [ -z \"$json\" ] || [ \"$json\" = \"null\" ]; then\n\t\techo \"\"\n\t\treturn\n\tfi\n\n\tif [ -z \"$build\" ] || [ \"$build\" = \"latest\" ]; then\n\t\techo \"$json\" | jq -c '(.builds // []) | .[0] // empty'\n\t\treturn\n\tfi\n\n\techo \"$json\" | jq -c --arg b \"$build\" '\n\t\t(.builds // [])\n\t\t| map(select(\n\t\t\t(.buildNumber|tostring) == $b\n\t\t\tor (.name|tostring) == $b\n\t\t\tor (.name|tostring) == (\"#\" + $b)\n\t\t))\n\t\t| .[0] // empty\n\t'\n}\n\nrun_installation_steps() {\n\tlocal build_json=\"$1\"\n\t# Flatten installation: array of step-groups → each group is array of actions\n\techo \"$build_json\" | jq -c '\n\t\t[.installation // [] | .[] | .[]]\n\t\t| .[]\n\t' | while IFS= read -r step; do\n\t\tstype=$(echo \"$step\" | jq -r '.type // empty')\n\t\tcase \"$stype\" in\n\t\t\tdownload)\n\t\t\t\turl=$(echo \"$step\" | jq -r '.url')\n\t\t\t\tfile=$(echo \"$step\" | jq -r '.file // \"server.jar\"')\n\t\t\t\techo \"Downloading ${file}\"\n\t\t\t\tcurl -fL -A \"${USER_AGENT}\" -o \"${file}\" \"${url}\"\n\t\t\t\t;;\n\t\t\tunzip)\n\t\t\t\tfile=$(echo \"$step\" | jq -r '.file')\n\t\t\t\tloc=$(echo \"$step\" | jq -r '.location // \".\"')\n\t\t\t\techo \"Unzipping ${file} → ${loc}\"\n\t\t\t\tunzip -o \"${file}\" -d \"${loc}\"\n\t\t\t\t;;\n\t\t\tremove)\n\t\t\t\tloc=$(echo \"$step\" | jq -r '.location // empty')\n\t\t\t\tif [ -n \"$loc\" ]; then\n\t\t\t\t\techo \"Removing ${loc}\"\n\t\t\t\t\trm -rf \"${loc}\"\n\t\t\t\tfi\n\t\t\t\t;;\n\t\t\t*)\n\t\t\t\techo \"WARN: unknown installation step type: ${stype}\"\n\t\t\t\t;;\n\t\tesac\n\tdone\n}\n\ncd /mnt/server\napk add --no-cache curl jq unzip >/dev/null 2>&1 || true\n\nif [ -n \"${DL_PATH}\" ]; then\n\techo -e \"Using supplied download url: ${DL_PATH}\"\n\tDOWNLOAD_URL=`eval echo $(echo ${DL_PATH} | sed -e 's/{{/${/g' -e 's/}}/}/g')`\n\tcurl -fL -A \"${USER_AGENT}\" -o \"${SERVER_JARFILE}\" \"${DOWNLOAD_URL}\"\nelse\n\tVERSION=\"$(resolve_version)\"\n\techo -e \"Resolving ${TYPE} via MCJars (version=${VERSION}, build=${BUILD_NUMBER:-latest})\"\n\n\tif [ \"$VERSION\" = \"latest\" ]; then\n\t\tPAYLOAD=$(curl -fsSL -A \"${USER_AGENT}\" \"${API_BASE}/api/v2/builds/${TYPE}/latest\") || {\n\t\t\techo \"ERROR: failed to query MCJars latest builds for ${TYPE}\"\n\t\t\texit 1\n\t\t}\n\t\tVERSION=$(echo \"$PAYLOAD\" | jq -r '.builds[0].versionId // .builds[0].projectVersionId // \"latest\"')\n\telse\n\t\tPAYLOAD=$(curl -fsSL -A \"${USER_AGENT}\" \"${API_BASE}/api/v2/builds/${TYPE}/${VERSION}\") || {\n\t\t\techo \"WARN: version ${VERSION} not found for ${TYPE}, falling back to latest\"\n\t\t\tPAYLOAD=$(curl -fsSL -A \"${USER_AGENT}\" \"${API_BASE}/api/v2/builds/${TYPE}/latest\") || {\n\t\t\t\techo \"ERROR: failed to query MCJars latest builds for ${TYPE}\"\n\t\t\t\texit 1\n\t\t\t}\n\t\t\tVERSION=$(echo \"$PAYLOAD\" | jq -r '.builds[0].versionId // .builds[0].projectVersionId // \"latest\"')\n\t\t}\n\tfi\n\n\tBUILD_JSON=$(pick_build \"$PAYLOAD\")\n\tif [ -z \"$BUILD_JSON\" ] || [ \"$BUILD_JSON\" = \"null\" ]; then\n\t\techo \"ERROR: no matching build for ${TYPE} ${VERSION}\"\n\t\texit 1\n\tfi\n\n\tJAR_URL=$(echo \"$BUILD_JSON\" | jq -r '.jarUrl // empty')\n\tHAS_INSTALL=$(echo \"$BUILD_JSON\" | jq -r '(.installation | length) // 0')\n\n\tif [ -n \"$JAR_URL\" ] && [ \"$JAR_URL\" != \"null\" ]; then\n\t\techo -e \"Downloading ${TYPE}\"\n\t\techo -e \"Version: ${VERSION:-unknown}\"\n\t\techo -e \"URL: ${JAR_URL}\"\n\t\tif [ -f \"${SERVER_JARFILE}\" ]; then\n\t\t\tmv \"${SERVER_JARFILE}\" \"${SERVER_JARFILE}.old\"\n\t\tfi\n\t\tcurl -fL -A \"${USER_AGENT}\" -o \"${SERVER_JARFILE}\" \"${JAR_URL}\"\n\t\tSIZE=$(wc -c < \"${SERVER_JARFILE}\" | tr -d ' ')\n\t\tif [ \"${SIZE}\" -lt 50000 ]; then\n\t\t\techo \"ERROR: downloaded file is too small (${SIZE} bytes).\"\n\t\t\thead -c 200 \"${SERVER_JARFILE}\" || true\n\t\t\techo\n\t\t\texit 1\n\t\tfi\n\telif [ \"$HAS_INSTALL\" != \"0\" ]; then\n\t\techo -e \"Running MCJars installation steps for ${TYPE} ${VERSION}\"\n\t\trun_installation_steps \"$BUILD_JSON\"\n\t\t# Prefer a produced server jar if present\n\t\tif [ ! -f \"${SERVER_JARFILE}\" ]; then\n\t\t\tif [ -f server.jar ]; then\n\t\t\t\t:\n\t\t\telif ls *.jar >/dev/null 2>&1; then\n\t\t\t\tFIRST=$(ls *.jar | head -n1)\n\t\t\t\tcp \"$FIRST\" \"${SERVER_JARFILE}\"\n\t\t\tfi\n\t\tfi\n\telse\n\t\techo \"ERROR: could not resolve download for ${TYPE}\"\n\t\texit 1\n\tfi\nfi\n\nif [ ! -f server.properties ]; then\n\techo -e \"Downloading MC server.properties\"\n\tcurl -fsSL -A \"${USER_AGENT}\" -o server.properties https://raw.githubusercontent.com/pterodactyl/game-eggs/main/minecraft/java/server.properties || true\nfi\n\necho -e \"Installation complete\"\n",
+            "container": "ghcr.io/ptero-eggs/installers:alpine",
+            "entrypoint": "ash"
         }
     },
     "variables": [
@@ -67,6 +74,16 @@
             "name": "Quilt Installer Version",
             "description": "The version of the Quilt Installer to use. Leave at latest to always use the newest installer.",
             "env_variable": "QUILT_INSTALLER_VERSION",
+            "default_value": "latest",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        },
+        {
+            "name": "Build Number",
+            "description": "MCJars build number or latest.",
+            "env_variable": "BUILD_NUMBER",
             "default_value": "latest",
             "user_viewable": true,
             "user_editable": true,

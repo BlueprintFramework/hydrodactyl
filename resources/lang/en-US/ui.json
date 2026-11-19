@@ -1466,6 +1466,8 @@
         "files": "Files",
         "home": "Home",
         "installer": "Installer",
+        "mods": "Mods",
+        "plugins": "Plugins",
         "network": "Network",
         "networking": "Networking",
         "schedule": "Schedule",
@@ -1476,7 +1478,8 @@
         "ssh_keys": "SSH Keys",
         "ssh_short": "SSH",
         "startup": "Startup",
-        "users": "Users"
+        "users": "Users",
+        "modpacks": "Modpacks"
     },
     "panel": {
         "account_menu": "Account menu",
@@ -1544,6 +1547,8 @@
         },
         "backups": {
             "automatic": "Automatic",
+            "software_change": "Temporary",
+            "software_change_expires": "Software-change rollback slot — expires {{date}}",
             "backup_name_description": "If provided, the name that should be used to reference this backup.",
             "backup_name_label": "Backup name",
             "backup_name_placeholder": "Enter backup name...",
@@ -1640,6 +1645,8 @@
             "pending_name": "Pending..."
         },
         "conflict": {
+            "install_failed_description": "The software installation failed. Try changing software again, or contact support if it keeps failing.",
+            "install_failed_title": "Installation Failed",
             "installing_description": "Your server should be ready soon, for more details visit the home page.",
             "installing_title": "Server is Installing",
             "maintenance_description": "The node of this server is currently under maintenance.",
@@ -1649,7 +1656,8 @@
             "suspended_description": "This server is suspended and cannot be accessed.",
             "suspended_title": "Server Suspended",
             "transferring_description": "Your server is being transferred to a new node, please check back later.",
-            "transferring_title": "Transferring"
+            "transferring_title": "Transferring",
+            "installing_progress_hint": "If a software or modpack change is running, the progress window should reopen automatically."
         },
         "console": {
             "command_input_aria": "Console command input.",
@@ -1690,6 +1698,7 @@
             "scroll_title": "Scroll to bottom",
             "server_marked_as": "Server marked as {{state}}...",
             "sidebar_label": "server",
+            "server_uuid": "Server ID",
             "start": "Start",
             "start_server": "Start Server",
             "stop_server": "Stop Server",
@@ -1899,15 +1908,22 @@
             "any": "Any",
             "browse": "Browse",
             "by_author": "by {{author}}",
+            "category": "Category",
+            "category_any": "Any category",
             "currently_installed": "Currently installed:",
             "description": "Browse and install plugins and mods straight onto your server. Files are downloaded directly on the daemon and placed into the correct folder.",
+            "description_mods": "Browse and install server mods from Modrinth and other providers. Files land in /mods.",
+            "description_plugins": "Browse and install server plugins from Modrinth, Hangar, and Spigot. Files land in /plugins.",
             "downloads": "{{count}} downloads",
-            "empty_installed": "You have not installed any plugins or mods yet. Switch to Browse to get started.",
+            "empty_installed": "Nothing installed here yet. Switch to Browse to get started.",
             "error_install": "Failed to install the file.",
             "error_load_more": "Failed to load more results.",
             "error_remove": "Failed to remove the file.",
             "error_search": "Failed to search the marketplace.",
+            "external": "External",
+            "externally_hosted": "This resource is hosted externally and cannot be auto-installed. Download it manually from the provider.",
             "filter_versions_placeholder": "Filter versions…",
+            "game_version": "Game version",
             "install": "Install",
             "install_complete": "{{filename}} installed. Restart your server to load it.",
             "install_success": "Installed {{filename}} into {{directory}}/",
@@ -1936,12 +1952,21 @@
             "tab_mods_hint": "Install mods into /mods",
             "tab_plugins_hint": "Install server plugins into /plugins",
             "title": "Installer",
+            "title_mods": "Mods",
+            "title_plugins": "Plugins",
             "title_plugins_mods": "Plugins & Mods",
             "unknown_author": "Unknown author",
+            "unsupported_type": "This server's software does not support this content type.",
+            "update": "Update",
+            "update_available": "Update available",
             "version_type_alpha": "Alpha",
             "version_type_beta": "Beta",
             "version_type_other": "Other",
-            "version_type_release": "Release"
+            "version_type_release": "Release",
+            "page_prev": "Previous",
+            "page_next": "Next",
+            "page_of": "Page {{page}} of {{total}}",
+            "page_label": "Page {{page}}"
         },
         "network": {
             "allocations_count": "{{count}} allocations",
@@ -2006,7 +2031,13 @@
             "status_pending": "Pending",
             "status_running": "Running",
             "timeout": "Operation polling timed out after 15 minutes",
-            "inactive": "Operation is no longer active"
+            "inactive": "Operation is no longer active",
+            "progress_label": "Progress",
+            "files_progress": "{{done}} / {{total}} files",
+            "current_file": "Installing",
+            "recent_files": "Recent files",
+            "live_console": "Install log",
+            "live_console_live": "Live"
         },
         "schedules": {
             "cheatsheet": {
@@ -2149,6 +2180,8 @@
                 "subtitle": "Send server activity to an external webhook.",
                 "updating": "Updating server details...",
                 "updated": "Server details updated!",
+                "disable": "Disable",
+                "disabled": "Webhook disabled.",
                 "type_label": "Webhook Type",
                 "type_placeholder": "Select a webhook type",
                 "url_label": "Webhook URL",
@@ -2223,6 +2256,7 @@
                 "create_backup": "Create Backup",
                 "default": "Default",
                 "default_image": "Default Image",
+                "defaults_notice": "Default software settings will be used. You can change them later from Startup and Settings.",
                 "docker_image": "Docker Image:",
                 "from": "From:",
                 "no_software": "No software",
@@ -2231,7 +2265,7 @@
                 "startup_command": "Startup Command:",
                 "startup_configuration": "Startup Configuration",
                 "subdomain_deleted": "Subdomain Will Be Deleted",
-                "title": "Review Changes",
+                "title": "Confirm Change",
                 "to": "To:",
                 "variable_configuration": "Variable Configuration",
                 "warning_backup_notice": "Please ensure you have backups of important data before proceeding.",
@@ -2244,13 +2278,23 @@
             "search_placeholder": "Search...",
             "selection": {
                 "back_to_games": "Back to Games",
-                "description": "Choose the specific software version for your server",
+                "description": "Choose software for your server. Favorites are the most recommended options.",
+                "favorite_badge": "Top",
+                "favorites_hint": "The 5 most recommended options",
                 "loading": "Loading software options...",
                 "no_results": "No software found",
                 "no_results_empty": "This category does not have any software available.",
                 "no_results_query": "Nothing in this category matched “{{query}}”.",
                 "search_placeholder": "Search software...",
-                "title": "Select Software - {{nest}}"
+                "section_established": "Established",
+                "section_experimental": "Experimental",
+                "section_favorites": "Favorites",
+                "section_limbos": "Limbos",
+                "section_miscellaneous": "Other popular",
+                "section_other": "More software",
+                "title": "Select Software - {{nest}}",
+                "title_flat": "Choose Minecraft software",
+                "back_to_overview": "Back to overview"
             },
             "show_less": "Show less",
             "show_more": "Show more",
@@ -2260,7 +2304,8 @@
                 "overview": "Overview",
                 "review": "Review",
                 "select_game": "Select Game",
-                "select_software": "Select Software"
+                "select_software": "Select Software",
+                "select_version": "Select Version"
             },
             "title": "Software Management",
             "validation": {
@@ -2298,7 +2343,21 @@
                 "warning_suffix": "on your server and cannot be undone.",
                 "what_will_happen": "What will happen:"
             },
-            "backup_name": "Software Change Backup"
+            "backup_name": "Software Change Backup",
+            "versions": {
+                "title": "Choose a {{software}} version",
+                "back": "Back to software",
+                "show_experimental": "Show experimental",
+                "loading": "Loading versions…",
+                "empty": "No versions available for this software.",
+                "pick": "Select a version",
+                "java": "Java",
+                "build": "Build",
+                "size": "Size",
+                "date": "Released",
+                "install": "Install this version",
+                "stable": "Stable"
+            }
         },
         "startup": {
             "command": {
@@ -2654,7 +2713,31 @@
             "settings": "Settings",
             "activity": "Activity",
             "software": "Software",
-            "installer": "Installer"
+            "installer": "Installer",
+            "plugins": "Plugins",
+            "mods": "Mods",
+            "modpacks": "Modpacks"
+        },
+        "modpacks": {
+            "title": "Modpacks",
+            "description": "Install a Modrinth modpack automatically: backup, wipe, switch loader/Java, reinstall, then deploy mods and configs.",
+            "search_placeholder": "Search modpacks…",
+            "install": "Install pack",
+            "continue": "Continue",
+            "pick_version": "Choose which pack version to install.",
+            "confirm_title": "Install modpack?",
+            "confirm_body": "Install {{pack}} ({{version}}). This will change the server software and can wipe existing files.",
+            "confirm_install": "Install modpack",
+            "installing": "Installing…",
+            "option_backup": "Create a temporary backup first (kept 72 hours)",
+            "option_wipe": "Wipe all server files before installing",
+            "wipe_warning": "All current server files will be deleted. A backup (if enabled) is your only rollback.",
+            "queued": "Modpack install queued.",
+            "error_install": "Failed to queue the modpack install.",
+            "missing_permissions": "You do not have permission to reinstall this server.",
+            "operation_type": "Modpack install",
+            "operation_success": "Modpack installed successfully.",
+            "operation_failed": "Modpack install failed."
         }
     },
     "setup": {

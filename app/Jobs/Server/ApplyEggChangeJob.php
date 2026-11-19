@@ -23,7 +23,9 @@ use Pterodactyl\Services\Servers\StartupModificationService;
 use Pterodactyl\Services\Servers\EggVariableSyncService;
 use Pterodactyl\Services\Backups\Wings\InitiateBackupService;
 use Pterodactyl\Exceptions\Service\Backup\BackupFailedException;
+use Pterodactyl\Services\ServerOperations\EnsureServerStoppedService;
 use Pterodactyl\Services\ServerOperations\ServerOperationService;
+use Pterodactyl\Services\ServerOperations\SoftwareChangeBackupService;
 use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository as WingsFileRepository;
 use Pterodactyl\Repositories\Elytra\DaemonFileRepository as ElytraFileRepository;
@@ -72,7 +74,8 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
         WingsFileRepository $wingsFileRepository,
         ElytraFileRepository $elytraFileRepository,
         ServerOperationService $operationService,
-        SubdomainManagementService $subdomainService
+        SubdomainManagementService $subdomainService,
+        EnsureServerStoppedService $ensureServerStopped,
     ): void {
         $operation = null;
 
@@ -94,18 +97,32 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
                 ->with(['variables', 'nest'])
                 ->findOrFail($this->eggId);
 
+            // Stop first so worlds/saves flush before backup or wipe.
+            $ensureServerStopped->handle(
+                $this->server,
+                fn (string $message) => $operation->updateProgress($message),
+            );
+
             $backupJobId = null;
             $wingsBackup = null;
+            $softwareChangeBackupName = null;
+            $softwareChangeBackups = app(SoftwareChangeBackupService::class);
             if ($this->shouldBackup) {
+                // Always free the previous software-change temp slot first so
+                // a full backup_limit cannot strand the change.
+                $softwareChangeBackups->purgePrior($this->server, $this->user);
+
                 if ($this->isElytraServer()) {
-                    $backupJobId = $this->createBackup($elytraJobService, $operation);
+                    $softwareChangeBackupName = $this->backupName();
+                    $backupJobId = $this->createBackup($elytraJobService, $operation, $softwareChangeBackupName);
                 } else {
-                    $wingsBackup = $this->createWingsBackup($initiateBackupService, $operation);
+                    $wingsBackup = $this->createWingsBackup($initiateBackupService, $operation, $softwareChangeBackups);
                 }
             }
 
-            if ($backupJobId) {
+            if ($backupJobId && $softwareChangeBackupName) {
                 $this->waitForJobCompletion($elytraJobService, $backupJobId, $operation);
+                $softwareChangeBackups->markByName($this->server, $softwareChangeBackupName);
             }
 
             if ($wingsBackup) {
@@ -118,6 +135,10 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
 
             $this->applyServerChanges($egg, $startupModificationService, $variableSyncService, $reinstallServerService, $operation, $subdomainService);
 
+            // Reinstall flips the server to "installing"; wait for Wings to
+            // report success/failure so we never leave the UI stuck forever.
+            $this->waitForInstallCompletion($operation);
+
             $this->logSuccessfulChange();
 
             $operation->markAsCompleted(__('exceptions.server_operations.completed'));
@@ -128,13 +149,61 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
     }
 
     /**
+     * Poll until the daemon clears "installing", or fail the operation.
+     */
+    private function waitForInstallCompletion(ServerOperation $operation): void
+    {
+        $timeoutMinutes = (int) ceil(config('server_operations.timeouts.install_wait', 1800) / 60);
+        $timeout = Carbon::now()->addMinutes(max($timeoutMinutes, 1));
+        $lastProgressUpdate = 0;
+        $startTime = Carbon::now();
+
+        $operation->updateProgress(__('exceptions.server_operations.progress_waiting_for_install'));
+
+        while (Carbon::now()->lt($timeout)) {
+            $this->server->refresh();
+            $status = $this->server->status;
+
+            if ($status === null || $status === '') {
+                $operation->updateProgress(__('exceptions.server_operations.progress_install_completed'));
+
+                return;
+            }
+
+            if (in_array($status, [Server::STATUS_INSTALL_FAILED, Server::STATUS_REINSTALL_FAILED], true)) {
+                throw new \RuntimeException(__('exceptions.server_operations.install_reported_failed', [
+                    'status' => $status,
+                ]));
+            }
+
+            // Still installing (or another transient status) — keep waiting.
+            $elapsed = Carbon::now()->diffInSeconds($startTime);
+            if ($elapsed - $lastProgressUpdate >= 30) {
+                $operation->updateProgress(__('exceptions.server_operations.progress_waiting_for_install'));
+                $lastProgressUpdate = $elapsed;
+            }
+
+            sleep(5);
+        }
+
+        // Timed out while still installing — flip to a terminal failed status
+        // so ConflictStateRenderer stops showing a perpetual spinner.
+        $this->server->refresh();
+        if ($this->server->status === Server::STATUS_INSTALLING) {
+            $this->server->update(['status' => Server::STATUS_REINSTALL_FAILED]);
+        }
+
+        throw new \RuntimeException(__('exceptions.server_operations.install_timed_out', [
+            'minutes' => $timeoutMinutes,
+        ]));
+    }
+
+    /**
      * Create backup before proceeding with changes.
      */
-    private function createBackup(ElytraJobService $elytraJobService, ServerOperation $operation): string
+    private function createBackup(ElytraJobService $elytraJobService, ServerOperation $operation, string $backupName): string
     {
         $operation->updateProgress(__('exceptions.server_operations.progress_creating_backup'));
-
-        $backupName = $this->backupName();
 
         try {
             $result = $elytraJobService->submitJob(
@@ -190,14 +259,20 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
         return strtolower((string) $this->server->node->daemonType) === 'elytra';
     }
 
-    private function createWingsBackup(InitiateBackupService $initiateBackupService, ServerOperation $operation): Backup
-    {
+    private function createWingsBackup(
+        InitiateBackupService $initiateBackupService,
+        ServerOperation $operation,
+        SoftwareChangeBackupService $softwareChangeBackups,
+    ): Backup {
         $operation->updateProgress(__('exceptions.server_operations.progress_creating_backup'));
 
         $backupName = $this->backupName();
 
         try {
-            $backup = $initiateBackupService->setIgnoredFiles([])->handle($this->server, $backupName);
+            // override=true evicts the oldest unlocked backup if at the slot limit.
+            $backup = $initiateBackupService->setIgnoredFiles([])->handle($this->server, $backupName, true);
+            $softwareChangeBackups->markBackup($backup);
+            $backup->refresh();
 
             Activity::actor($this->user)->event('server:backup.software-change')
                 ->property([
@@ -206,6 +281,7 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
                     'operation_id' => $this->operationId,
                     'from_egg' => $this->server->egg_id,
                     'to_egg' => $this->eggId,
+                    'expires_at' => $backup->expires_at?->toIso8601String(),
                 ])
                 ->log();
 
@@ -484,6 +560,18 @@ class ApplyEggChangeJob extends Job implements ShouldQueue
             'server_id' => $this->server->id,
             'user_id' => $this->user->id,
         ]);
+
+        try {
+            $this->server->refresh();
+            if ($this->server->status === Server::STATUS_INSTALLING) {
+                $this->server->update(['status' => Server::STATUS_REINSTALL_FAILED]);
+            }
+        } catch (\Throwable $statusError) {
+            Log::warning('Failed to clear installing status after egg change failure', [
+                'server_id' => $this->server->id,
+                'error' => $statusError->getMessage(),
+            ]);
+        }
 
         if ($operation) {
             $operation->markAsFailed(__('exceptions.server_operations.operation_failed', ['error' => $exception->getMessage()]));

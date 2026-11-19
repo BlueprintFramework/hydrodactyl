@@ -42,6 +42,8 @@ import MobileSidebar from '@/components/layout/sidebar/MobileSidebar';
 import Sidebar from '@/components/layout/sidebar/Sidebar';
 import ConflictStateRenderer from '@/components/server/ConflictStateRenderer';
 import InstallListener from '@/components/server/InstallListener';
+import { mergeEggMarketplaceFeatures } from '@/components/server/installer/hybridEggFeatures';
+import ActiveServerOperationModal from '@/components/server/operations/ActiveServerOperationModal';
 import TransferListener from '@/components/server/TransferListener';
 import WebsocketHandler from '@/components/server/WebsocketHandler';
 import { HeaderProvider } from '@/contexts/HeaderContext';
@@ -93,13 +95,8 @@ const UnifiedRouter = () => {
     const getServer = ServerContext.useStoreActions((actions) => actions.server.getServer);
     const clearServerState = ServerContext.useStoreActions((actions) => actions.clearServerState);
     const egg_id = ServerContext.useStoreState((state) => state.server.data?.egg);
-    const eggFeatures = ServerContext.useStoreState((state) => state.server.data?.eggFeatures) ?? [];
+    const rawEggFeatures = ServerContext.useStoreState((state) => state.server.data?.eggFeatures) ?? [];
     const softwareEnabled = ServerContext.useStoreState((state) => state.server.data?.softwareEnabled);
-
-    // The plugin/mod installer is only relevant for Minecraft servers whose egg
-    // advertises a mod or plugin loader (e.g. "mod/fabric", "plugin/paper").
-    const showInstaller = eggFeatures.some((feature) => /^mod\//i.test(feature) || /^plugin\//i.test(feature));
-
     // console.log('Current server state:', {
     //     id,
     //     uuid,
@@ -116,6 +113,15 @@ const UnifiedRouter = () => {
                 ?.attributes.relationships.eggs.data.find((egg) => egg.attributes.uuid === egg_id)?.attributes.name,
         [nests, egg_id],
     );
+
+    // Hybrids (Arclight/Mohist/…) may need multi loader tags even when the egg
+    // row in DB still only has eula/java_version — merge known MCJars compat.
+    const eggFeatures = useMemo(
+        () => mergeEggMarketplaceFeatures(rawEggFeatures, egg_name),
+        [rawEggFeatures, egg_name],
+    );
+    const showPlugins = eggFeatures.some((feature) => /^plugin\//i.test(feature));
+    const showMods = eggFeatures.some((feature) => /^mod\//i.test(feature));
 
     // handle server loading when navigating to server routes
     useEffect(() => {
@@ -163,7 +169,9 @@ const UnifiedRouter = () => {
     const NavigationServerSettings = useRef(null);
     const NavigationActivity = useRef(null);
     const NavigationShell = useRef(null);
-    const NavigationInstaller = useRef(null);
+    const NavigationPlugins = useRef(null);
+    const NavigationMods = useRef(null);
+    const NavigationModpacks = useRef(null);
     const CustomNavigationOne = useRef<HTMLAnchorElement>(null);
     const CustomNavigationTwo = useRef<HTMLAnchorElement>(null);
     const CustomNavigationThree = useRef<HTMLAnchorElement>(null);
@@ -211,14 +219,36 @@ const UnifiedRouter = () => {
                                         end: false,
                                         permission: 'file.*',
                                     },
-                                    ...(showInstaller
+                                    ...(showPlugins
                                         ? [
                                               {
-                                                  to: `/server/${id}/installer`,
+                                                  to: `/server/${id}/installer/plugins`,
                                                   icon: Download04Icon,
-                                                  text: t('navigation.installer'),
-                                                  tabName: 'installer',
-                                                  ref: NavigationInstaller,
+                                                  text: t('navigation.plugins'),
+                                                  tabName: 'plugins',
+                                                  ref: NavigationPlugins,
+                                                  end: false,
+                                                  permission: 'mod.download',
+                                              },
+                                          ]
+                                        : []),
+                                    ...(showMods
+                                        ? [
+                                              {
+                                                  to: `/server/${id}/installer/mods`,
+                                                  icon: Store01Icon,
+                                                  text: t('navigation.mods'),
+                                                  tabName: 'mods',
+                                                  ref: NavigationMods,
+                                                  end: false,
+                                                  permission: 'mod.download',
+                                              },
+                                              {
+                                                  to: `/server/${id}/installer/modpacks`,
+                                                  icon: RocketIcon,
+                                                  text: t('navigation.modpacks'),
+                                                  tabName: 'modpacks',
+                                                  ref: NavigationModpacks,
                                                   end: false,
                                                   permission: 'mod.download',
                                               },
@@ -351,7 +381,7 @@ const UnifiedRouter = () => {
                           end: true,
                       },
                   ],
-        [isServerRoute, id, egg_name, showInstaller, softwareEnabled, t],
+        [isServerRoute, id, egg_name, showPlugins, showMods, softwareEnabled, t],
     );
     const bottomNavItems = customNavItems;
 
@@ -374,6 +404,7 @@ const UnifiedRouter = () => {
                                     <InstallListener />
                                     <TransferListener />
                                     <WebsocketHandler />
+                                    <ActiveServerOperationModal />
                                 </>
                             )}
 

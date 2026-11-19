@@ -31,7 +31,7 @@ export default memo(function Sidebar({ navItems, bottomNavItems = [], className,
     const location = useLocation();
     const allNavItems = useMemo(() => [...navItems, ...bottomNavItems], [navItems, bottomNavItems]);
 
-    // dynamic CSS for hover and active states on mount
+    // Indicator follows the active (clicked/routed) tab only — not hover.
     useEffect(() => {
         const styleId = 'sidebar-dynamic-styles';
 
@@ -43,33 +43,20 @@ export default memo(function Sidebar({ navItems, bottomNavItems = [], className,
         const maxItems = navItems.length;
         let css = '';
 
-        // hover effects for indicator positioning
         for (let i = 1; i <= maxItems; i++) {
             css += `
-                .sidebar-container:has(.sidebar-nav-main > li:nth-child(${i}):hover) .sidebar-indicator {
+                .sidebar-container:has(.sidebar-nav-main > li[data-active='true']:nth-child(${i})) .sidebar-indicator {
                     opacity: 1;
                     top: calc(var(--sidebar-initial-top) + (var(--nav-item-height) + var(--nav-item-spacing)) * ${i - 1}) !important;
                 }
             `;
         }
 
-        // active indicator positions
-        for (let i = 1; i <= maxItems; i++) {
-            css += `
-                .sidebar-container:not(:has(li:hover)):has(.sidebar-nav-main > li[data-active='true']:nth-child(${i})) .sidebar-indicator {
-                    opacity: 1;
-                    top: calc(var(--sidebar-initial-top) + (var(--nav-item-height) + var(--nav-item-spacing)) * ${i - 1}) !important;
-                }
-            `;
-        }
-
-        // inject
         const styleElement = document.createElement('style');
         styleElement.id = styleId;
         styleElement.textContent = css;
         document.head.appendChild(styleElement);
 
-        // cleanup
         return () => {
             const style = document.getElementById(styleId);
             if (style) {

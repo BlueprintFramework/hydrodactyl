@@ -16,7 +16,7 @@ class StoreInstallRequest extends ClientApiRequest implements ClientPermissionsR
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', 'in:mod,plugin'],
+            'type' => ['required', 'string', 'in:mod,plugin,modpack'],
             'source' => ['required', 'string', 'max:32'],
             'project_id' => ['required', 'string', 'max:128'],
             'project_title' => ['required', 'string', 'max:255'],

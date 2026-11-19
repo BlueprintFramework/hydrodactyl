@@ -5,11 +5,33 @@ import styled from 'styled-components';
 import type { Server } from '@/api/server/getServer';
 import getServerResourceUsage, { type ServerPowerState, type ServerStats } from '@/api/server/getServerResourceUsage';
 import { useTranslation } from '@/i18n/I18nProvider';
-import { bytesToString, formatNumber, ip } from '@/lib/formatters';
+import { bytesToString, formatNumber, ip, mbToBytes } from '@/lib/formatters';
 
 // Determines if the current value is in an alarm threshold so we can show it in red rather
 // than the more faded default style.
 const isAlarmState = (current: number, limit: number): boolean => limit > 0 && current / (limit * 1024 * 1024) >= 0.9;
+
+/** Match the API resource cache TTL so each poll can return a fresh sample. */
+const STATS_POLL_MS = 1000;
+
+const formatCpuUsage = (usedPercent: number, limitPercent: number, locale: string): string => {
+    const used = `${formatNumber(usedPercent, locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })}%`;
+
+    if (limitPercent <= 0) return used;
+
+    return `${used} / ${formatNumber(limitPercent, locale)}%`;
+};
+
+const formatByteUsage = (usedBytes: number, limitMb: number, locale: string): string => {
+    const used = bytesToString(usedBytes, 0, locale);
+
+    if (limitMb <= 0) return used;
+
+    return `${used} / ${bytesToString(mbToBytes(limitMb), 0, locale)}`;
+};
 
 const StatusIndicatorBox = styled.div<{ $status: ServerPowerState }>`
 transition: all 250ms ease-in-out;
@@ -106,7 +128,7 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
             if (document.visibilityState === 'visible') {
                 getStats();
             }
-        }, 30000);
+        }, STATS_POLL_MS);
 
         return () => clearInterval(interval);
     }, [isSuspended, getStats]);
@@ -192,11 +214,8 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                                 <p className='text-sm text-secondary font-bold w-fit whitespace-nowrap'>
                                     {t('dashboard.server_row.cpu')}
                                 </p>
-                                <p className='font-bold w-fit whitespace-nowrap'>
-                                    {`${formatNumber(stats.cpuUsagePercent, locale, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2,
-                                    })}%`}
+                                <p className={`font-bold w-fit whitespace-nowrap ${alarms.cpu ? 'text-red-400' : ''}`}>
+                                    {formatCpuUsage(stats.cpuUsagePercent, server.limits.cpu, locale)}
                                 </p>
                             </div>
                         </div>
@@ -205,8 +224,10 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                                 <p className='text-sm text-secondary font-bold w-fit whitespace-nowrap'>
                                     {t('dashboard.server_row.ram')}
                                 </p>
-                                <p className='font-bold w-fit whitespace-nowrap'>
-                                    {bytesToString(stats.memoryUsageInBytes, 0, locale)}
+                                <p
+                                    className={`font-bold w-fit whitespace-nowrap ${alarms.memory ? 'text-red-400' : ''}`}
+                                >
+                                    {formatByteUsage(stats.memoryUsageInBytes, server.limits.memory, locale)}
                                 </p>
                             </div>
                         </div>
@@ -215,8 +236,8 @@ const ServerRow = ({ server, className, hideGroup, dragHandleProps }: ServerRowP
                                 <p className='text-sm text-secondary font-bold w-fit whitespace-nowrap'>
                                     {t('dashboard.server_row.storage')}
                                 </p>
-                                <p className='font-bold w-fit whitespace-nowrap'>
-                                    {bytesToString(stats.diskUsageInBytes, 0, locale)}
+                                <p className={`font-bold w-fit whitespace-nowrap ${alarms.disk ? 'text-red-400' : ''}`}>
+                                    {formatByteUsage(stats.diskUsageInBytes, server.limits.disk, locale)}
                                 </p>
                             </div>
                         </div>

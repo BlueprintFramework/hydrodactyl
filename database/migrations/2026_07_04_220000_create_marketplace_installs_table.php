@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Schema;
 | Marketplace install history
 |--------------------------------------------------------------------------
 |
-| Tracks plugins/mods installed through the native installer. This lives in
-| the panel database — NOT on the daemon filesystem — so the install history
-| is private to the panel: it never appears in the file manager and is never
-| bundled into a server backup/archive.
+| Tracks plugins/mods/modpacks installed through the native installer. This
+| lives in the panel database — NOT on the daemon filesystem — so the install
+| history is private to the panel: it never appears in the file manager and is
+| never bundled into a server backup/archive.
 |
 */
 return new class extends Migration
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedInteger('server_id');
-            $table->string('type', 16); // 'mod' | 'plugin'
+            $table->string('type', 16); // 'mod' | 'plugin' | 'modpack'
             $table->string('source', 32);
             $table->string('project_id', 128);
             $table->string('project_title', 255);

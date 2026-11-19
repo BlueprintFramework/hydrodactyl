@@ -1,156 +1,49 @@
-import { ChevronDown, Magnifier, TrashBin } from '@gravity-ui/icons';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { Magnifier, TrashBin } from '@gravity-ui/icons';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { httpErrorToHuman } from '@/api/http';
 import deleteFiles from '@/api/server/files/deleteFiles';
 import type {
     GameVersions,
+    MarketplaceCategory,
     MarketplaceProject,
     MarketplaceSourceMeta,
     MarketplaceType,
 } from '@/api/server/marketplace';
-import { getMarketplaceGameVersions, getMarketplaceLoaders, searchMarketplace } from '@/api/server/marketplace';
+import {
+    getMarketplaceCategories,
+    getMarketplaceGameVersions,
+    getMarketplaceLoaders,
+    getMarketplaceProject,
+    searchMarketplace,
+} from '@/api/server/marketplace';
 import Dropdown from '@/components/elements/Dropdown';
 import { MainPageHeader } from '@/components/elements/MainPageHeader';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Spinner from '@/components/elements/Spinner';
 import ServerHeader from '@/components/server/header/ServerHeader';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useTranslation } from '@/i18n/I18nProvider';
-import type { Translate, TranslationKey } from '@/i18n/types';
 import { cn } from '@/lib/utils';
+import { useNests } from '@/plugins/useNests';
 import { ServerContext } from '@/state/server';
-import { destinationFolder, isMinecraftCapable, loadersFor } from './eggFeatures';
+import { destinationFolder, loadersFor, supportsType } from './eggFeatures';
+import FilterSidebar from './FilterSidebar';
+import { mergeEggMarketplaceFeatures } from './hybridEggFeatures';
 import InstallerCard from './InstallerCard';
 import { type InstalledEntry, type InstalledItem, readAllInstalled, removeInstall } from './installedState';
-import { sourceLabel } from './sources';
+import { DEFAULT_SOURCE, sourceLabel } from './sources';
 import VersionPicker from './VersionPicker';
-
-const TABS: { key: MarketplaceType; label: TranslationKey; hint: TranslationKey }[] = [
-    { key: 'plugin', label: 'server.installer.plugins', hint: 'server.installer.tab_plugins_hint' },
-    { key: 'mod', label: 'server.installer.mods', hint: 'server.installer.tab_mods_hint' },
-];
-
-const versionTypeLabel = (t: Translate, type: string) => {
-    const key = `server.installer.version_type_${type}`;
-    const translated = t(key as TranslationKey);
-
-    return translated === key ? type.charAt(0).toUpperCase() + type.slice(1) : translated;
-};
 
 const PAGE_SIZE = 24;
 /** Combined search across every enabled provider. */
 const ALL_PROVIDERS = 'all';
 
-/** localStorage key for the user's last-opened section (plugin/mod). */
-const TAB_STORAGE_KEY = 'hydrodactyl:installer:tab';
-
-/**
- * Read the user's last-used section from localStorage so they don't have to
- * re-pick "Plugins" vs "Mods" on every visit. Returns null when storage is
- * unavailable (private mode / quota) or the saved value isn't a valid section.
- */
-const readSavedTab = (): MarketplaceType | null => {
-    try {
-        const saved = window.localStorage.getItem(TAB_STORAGE_KEY);
-        if (saved === 'plugin' || saved === 'mod') return saved;
-    } catch {
-        // localStorage may be unavailable — fall through to the default.
-    }
-
-    return null;
-};
-
-const VersionDropdown = ({
-    versions,
-    value,
-    onChange,
-}: {
-    versions: string[];
-    value: string | null;
-    onChange: (v: string | null) => void;
-}) => {
-    const { t } = useTranslation();
-    const [open, setOpen] = useState(false);
-    const [filter, setFilter] = useState('');
-    const parentRef = useRef<HTMLDivElement>(null);
-
-    const filtered = filter ? versions.filter((v) => v.toLowerCase().includes(filter.toLowerCase())) : versions;
-
-    const virtualizer = useVirtualizer({
-        count: filtered.length,
-        getScrollElement: () => parentRef.current,
-        estimateSize: () => 36,
-        overscan: 15,
-    });
-
-    useEffect(() => {
-        if (open) requestAnimationFrame(() => virtualizer.measure());
-    }, [open, virtualizer]);
-
-    return (
-        <DropdownMenu
-            open={open}
-            onOpenChange={(next) => {
-                setOpen(next);
-                if (!next) setFilter('');
-            }}
-        >
-            <DropdownMenuTrigger asChild>
-                <button
-                    type='button'
-                    className='inline-flex items-center gap-2 rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 text-sm text-cream-400 focus:border-brand-400/60 focus:outline-none'
-                >
-                    {value ?? t('server.installer.any')}
-                    <ChevronDown width={14} height={14} fill='currentColor' className='text-cream-400/40' />
-                </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end' className='flex flex-col p-0'>
-                <div className='shrink-0 border-b border-mocha-400 p-2'>
-                    <input
-                        type='text'
-                        placeholder={t('server.installer.filter_versions_placeholder')}
-                        className='w-full rounded-lg border border-mocha-400 bg-mocha-500 px-2 py-1 text-xs text-cream-400 placeholder:text-cream-400/40 focus:outline-none'
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                        onMouseDown={(e) => e.stopPropagation()}
-                    />
-                </div>
-                <div ref={parentRef} className='max-h-60 overflow-y-auto p-1'>
-                    <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
-                        {virtualizer.getVirtualItems().map((virtualRow) => {
-                            const v = filtered[virtualRow.index];
-                            return (
-                                <div
-                                    key={v}
-                                    style={{
-                                        height: virtualRow.size,
-                                        transform: `translateY(${virtualRow.start}px)`,
-                                        position: 'absolute',
-                                        insetInline: 0,
-                                    }}
-                                    className='flex cursor-pointer items-center rounded-xl px-2 py-1.5 text-sm outline-none select-none hover:bg-mocha-400 data-[selected=true]:bg-mocha-400'
-                                    data-selected={v === value}
-                                    role='option'
-                                    aria-selected={v === value}
-                                    tabIndex={-1}
-                                    onMouseDown={() => {
-                                        onChange(v);
-                                        setOpen(false);
-                                        setFilter('');
-                                    }}
-                                >
-                                    {v}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    );
+const typeFromPath = (pathname: string): MarketplaceType => {
+    if (pathname.includes('/installer/mods')) return 'mod';
+    if (pathname.includes('/installer/modpacks')) return 'mod'; // dedicated ModpackContainer owns this route
+    return 'plugin';
 };
 
 interface PickerCtx {
@@ -159,38 +52,43 @@ interface PickerCtx {
     source: string;
     directory: string;
     loader: string | null;
+    preferredVersionId?: string | null;
 }
 
 const InstallerContainer = () => {
     const { t } = useTranslation();
+    const location = useLocation();
+    const tab = typeFromPath(location.pathname);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
-    const eggFeatures = ServerContext.useStoreState((state) => state.server.data?.eggFeatures ?? []);
+    const eggId = ServerContext.useStoreState((state) => state.server.data?.egg);
+    const rawEggFeatures = ServerContext.useStoreState((state) => state.server.data?.eggFeatures ?? []);
     const variables = ServerContext.useStoreState((state) => state.server.data?.variables ?? []);
+    const { data: nests } = useNests();
+    const eggName = useMemo(
+        () =>
+            nests
+                ?.find((nest) => nest.attributes.relationships.eggs.data.find((egg) => egg.attributes.uuid === eggId))
+                ?.attributes.relationships.eggs.data.find((egg) => egg.attributes.uuid === eggId)?.attributes.name,
+        [nests, eggId],
+    );
+    const eggFeatures = useMemo(() => mergeEggMarketplaceFeatures(rawEggFeatures, eggName), [rawEggFeatures, eggName]);
 
     const [view, setView] = useState<'browse' | 'installed'>('browse');
-    const [tab, setTabState] = useState<MarketplaceType>(() => readSavedTab() ?? 'plugin');
-
-    /** Switch section and remember the choice for the next visit. */
-    const setTab = useCallback((next: MarketplaceType) => {
-        setTabState(next);
-        try {
-            window.localStorage.setItem(TAB_STORAGE_KEY, next);
-        } catch {
-            // ignore write failures — the preference just won't persist.
-        }
-    }, []);
     const [sources, setSources] = useState<MarketplaceSourceMeta[]>([]);
-    const [source, setSource] = useState<string>(ALL_PROVIDERS);
+    const [source, setSource] = useState<string>(DEFAULT_SOURCE);
     const [query, setQuery] = useState('');
     const [loader, setLoader] = useState<string | null>(null);
     const [results, setResults] = useState<MarketplaceProject[]>([]);
     const [loading, setLoading] = useState(false);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [hasMore, setHasMore] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasNextPage, setHasNextPage] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const resultsTopRef = useRef<HTMLDivElement>(null);
     const [picker, setPicker] = useState<PickerCtx | null>(null);
     const [installedItems, setInstalledItems] = useState<InstalledItem[]>([]);
     const [removingKey, setRemovingKey] = useState<string | null>(null);
+    // latest_version_id keyed by source:projectId for Installed-view update badges
+    const [latestByKey, setLatestByKey] = useState<Record<string, string>>({});
     // Live Modrinth loader-tag list, used to validate the loader extracted from
     // the server's egg features (so new loaders Modrinth adds are supported
     // without a code change). Empty until the fetch resolves.
@@ -201,8 +99,15 @@ const InstallerContainer = () => {
     const [gameVersions, setGameVersions] = useState<GameVersions>({});
     const [releaseType, setReleaseType] = useState<string>('');
     const [gameVersion, setGameVersion] = useState<string | null>(null);
+    const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
+    const [category, setCategory] = useState<string | null>(null);
 
     const directory = destinationFolder(tab);
+    const typeSupported = supportsType(eggFeatures, tab);
+    // Hangar/Spigot have no game-version search — only Modrinth (and "all").
+    const showGameVersionFilter = source === DEFAULT_SOURCE || source === ALL_PROVIDERS;
+
+    const installedForTab = useMemo(() => installedItems.filter((item) => item.type === tab), [installedItems, tab]);
 
     const refreshInstalled = useCallback(() => {
         if (!uuid) return;
@@ -249,8 +154,9 @@ const InstallerContainer = () => {
                 const raw = eggVar.serverValue || eggVar.defaultValue || '';
                 if (raw === 'latest') {
                     const releases = versions.release;
-                    if (releases && releases.length > 0) {
-                        return { version: releases[0], type: 'release' };
+                    const latestRelease = releases?.[0];
+                    if (latestRelease) {
+                        return { version: latestRelease, type: 'release' };
                     }
                     continue;
                 }
@@ -272,14 +178,15 @@ const InstallerContainer = () => {
             .then((versions) => {
                 setGameVersions(versions);
                 const types = Object.keys(versions);
-                if (types.length > 0) {
+                const firstType = types[0];
+                if (firstType) {
                     const egg = findEggVersion(versions);
                     if (egg) {
                         setReleaseType(egg.type);
                         setGameVersion(egg.version);
                     } else {
-                        setReleaseType(types[0]);
-                        setGameVersion(versions[types[0]][0] ?? null);
+                        setReleaseType(firstType);
+                        setGameVersion(versions[firstType]?.[0] ?? null);
                     }
                 }
             })
@@ -292,33 +199,69 @@ const InstallerContainer = () => {
         [installedItems],
     );
 
-    // Reset browse selections when switching tabs. Source defaults to "all"
-    // (combined providers) each time.
+    // Reset browse selections when switching Plugins/Mods route. Source always
+    // defaults to Modrinth (not combined "all").
     useEffect(() => {
         setLoader(loadersFor(eggFeatures, tab, knownLoadersRef.current)[0] ?? null);
         setQuery('');
-        setSource(ALL_PROVIDERS);
+        setSource(DEFAULT_SOURCE);
         setSources([]);
         setResults([]);
         setError(null);
+        setCategory(null);
+        setView('browse');
         const types = Object.keys(gameVersions);
-        if (types.length > 0) {
+        const firstType = types[0];
+        if (firstType) {
             const egg = findEggVersion(gameVersions);
             if (egg) {
                 setReleaseType(egg.type);
                 setGameVersion(egg.version);
             } else {
-                setReleaseType(types[0]);
-                setGameVersion(gameVersions[types[0]][0] ?? null);
+                setReleaseType(firstType);
+                setGameVersion(gameVersions[firstType]?.[0] ?? null);
             }
         }
     }, [tab, eggFeatures, findEggVersion, gameVersions]);
 
-    // Debounced, cancellable search. "all" fans out across every enabled
-    // provider on the backend; a specific provider queries just that one.
+    // Re-apply egg loader once the live Modrinth loader list arrives, so a
+    // pending knownLoaders fetch still ends up selecting the egg's loader.
+    useEffect(() => {
+        if (knownLoaders.length === 0) return;
+        const next = loadersFor(eggFeatures, tab, knownLoaders)[0] ?? null;
+        setLoader((prev) => (prev === next ? prev : next));
+    }, [knownLoaders, eggFeatures, tab]);
+
+    // Categories are per-provider — hide/clear when browsing "all".
+    useEffect(() => {
+        setCategory(null);
+        setCategories([]);
+        if (!uuid || !typeSupported || source === ALL_PROVIDERS) return;
+
+        let cancelled = false;
+        getMarketplaceCategories(uuid, tab, source)
+            .then((rows) => {
+                if (!cancelled) setCategories(rows);
+            })
+            .catch(() => {
+                if (!cancelled) setCategories([]);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [uuid, tab, source, typeSupported]);
+
+    // Filters / query / tab / source → back to page 1.
+    useEffect(() => {
+        setPage(1);
+    }, [tab, source, query, loader, gameVersion, category, showGameVersionFilter]);
+
+    // Debounced, cancellable search. Default source is Modrinth; "all" fans out
+    // across every enabled provider on the backend.
     const requestId = useRef(0);
     useEffect(() => {
-        if (!uuid) return;
+        if (!uuid || !typeSupported) return;
 
         const id = ++requestId.current;
         const handle = setTimeout(() => {
@@ -329,20 +272,22 @@ const InstallerContainer = () => {
                 source,
                 query: query.trim() || undefined,
                 loader,
-                game_version: gameVersion,
+                game_version: showGameVersionFilter ? gameVersion : null,
+                category,
                 limit: PAGE_SIZE,
+                offset: (page - 1) * PAGE_SIZE,
             })
                 .then((data) => {
                     if (id !== requestId.current) return;
                     if (data.sources.length > 0) setSources(data.sources);
                     setResults(data.results);
-                    setHasMore(data.results.length >= PAGE_SIZE);
+                    setHasNextPage(data.results.length >= PAGE_SIZE);
                 })
                 .catch((err) => {
                     if (id !== requestId.current) return;
                     setError(httpErrorToHuman(err) || t('server.installer.error_search'));
                     setResults([]);
-                    setHasMore(false);
+                    setHasNextPage(false);
                 })
                 .finally(() => {
                     if (id === requestId.current) setLoading(false);
@@ -350,47 +295,72 @@ const InstallerContainer = () => {
         }, 350);
 
         return () => clearTimeout(handle);
-    }, [uuid, tab, source, query, loader, gameVersion, t]);
+    }, [uuid, tab, source, query, loader, gameVersion, category, showGameVersionFilter, typeSupported, page, t]);
 
-    const loadMore = useCallback(() => {
-        if (!uuid || loadingMore || !hasMore) return;
-        const nextOffset = results.length;
-        setLoadingMore(true);
-        searchMarketplace(uuid, {
-            type: tab,
-            source,
-            query: query.trim() || undefined,
-            loader,
-            game_version: gameVersion,
-            limit: PAGE_SIZE,
-            offset: nextOffset,
-        })
-            .then((data) => {
-                if (data.sources.length > 0) setSources(data.sources);
-                const seen = new Set(results.map((r) => `${r.source}:${r.id}`));
-                const fresh = data.results.filter((r) => !seen.has(`${r.source}:${r.id}`));
-                setResults((prev) => [...prev, ...fresh]);
-                setHasMore(fresh.length >= PAGE_SIZE);
-            })
-            .catch((err) => toast.error(httpErrorToHuman(err) || t('server.installer.error_load_more')))
-            .finally(() => setLoadingMore(false));
-    }, [uuid, loadingMore, hasMore, results, tab, source, query, loader, gameVersion, t]);
+    const goToPage = useCallback((next: number) => {
+        setPage(Math.max(1, next));
+        resultsTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, []);
+
+    // Resolve latest version ids for installed items so we can show update badges.
+    // Pass egg loader + game version so Modrinth/Hangar don't pick an
+    // incompatible "latest" (wrong loader / wrong MC).
+    useEffect(() => {
+        if (!uuid || view !== 'installed' || installedForTab.length === 0) {
+            setLatestByKey({});
+            return;
+        }
+
+        const eggLoader = loadersFor(eggFeatures, tab, knownLoaders)[0] ?? null;
+        let cancelled = false;
+        Promise.all(
+            installedForTab.map(async (item) => {
+                try {
+                    const versions = await getMarketplaceProject(uuid, {
+                        type: item.type,
+                        source: item.source,
+                        projectId: item.projectId,
+                        loader: eggLoader,
+                        gameVersion,
+                    });
+                    const latest = versions[0]?.id;
+                    return latest ? { key: `${item.source}:${item.projectId}`, latest } : null;
+                } catch {
+                    return null;
+                }
+            }),
+        ).then((rows) => {
+            if (cancelled) return;
+            const next: Record<string, string> = {};
+            for (const row of rows) {
+                if (row) next[row.key] = row.latest;
+            }
+            setLatestByKey(next);
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [uuid, view, installedForTab, eggFeatures, tab, knownLoaders, gameVersion]);
 
     const tabLoaders = useMemo(() => loadersFor(eggFeatures, tab, knownLoaders), [eggFeatures, tab, knownLoaders]);
 
     const openPicker = useCallback(
-        (project: MarketplaceProject, type: MarketplaceType, src: string, dir: string, ld: string | null) =>
-            setPicker({ project, type, source: src, directory: dir, loader: ld }),
+        (
+            project: MarketplaceProject,
+            type: MarketplaceType,
+            src: string,
+            dir: string,
+            ld: string | null,
+            preferredVersionId?: string | null,
+        ) => setPicker({ project, type, source: src, directory: dir, loader: ld, preferredVersionId }),
         [],
     );
 
-    const onInstalled = useCallback(
-        (filename: string) => {
-            toast.success(t('server.installer.install_success_restart', { filename }));
-            refreshInstalled();
-        },
-        [refreshInstalled, t],
-    );
+    const onInstalled = useCallback(() => {
+        // VersionPicker already toasts success; only refresh install state here.
+        refreshInstalled();
+    }, [refreshInstalled]);
 
     const uninstall = useCallback(
         async (item: InstalledItem) => {
@@ -404,7 +374,10 @@ const InstallerContainer = () => {
                 toast.success(t('server.installer.remove_success', { filename: item.entry.filename }));
                 refreshInstalled();
             } catch (err) {
-                toast.error(httpErrorToHuman(err) || t('server.installer.error_remove'));
+                toast.error(
+                    httpErrorToHuman(err as { response?: { data?: unknown }; message?: string }) ||
+                        t('server.installer.error_remove'),
+                );
             } finally {
                 setRemovingKey(null);
             }
@@ -418,16 +391,30 @@ const InstallerContainer = () => {
             ?.entry;
     }, [picker, installedItems]);
 
-    if (!isMinecraftCapable(eggFeatures)) {
-        return null;
+    if (!typeSupported) {
+        return (
+            <ServerContentBlock
+                title={t(tab === 'plugin' ? 'server.installer.title_plugins' : 'server.installer.title_mods')}
+            >
+                <ServerHeader />
+                <div className='rounded-2xl border border-mocha-300/50 bg-mocha-400/50 py-16 text-center text-cream-400/60'>
+                    {t('server.installer.unsupported_type')}
+                </div>
+            </ServerContentBlock>
+        );
     }
 
+    const pageTitle = t(tab === 'plugin' ? 'server.installer.title_plugins' : 'server.installer.title_mods');
+    const pageDescription = t(
+        tab === 'plugin' ? 'server.installer.description_plugins' : 'server.installer.description_mods',
+    );
+
     return (
-        <ServerContentBlock title={t('server.installer.title')}>
+        <ServerContentBlock title={pageTitle}>
             <ServerHeader />
             <div className='space-y-6'>
-                <MainPageHeader direction='column' title={t('server.installer.title_plugins_mods')}>
-                    <p className='text-cream-400/60'>{t('server.installer.description')}</p>
+                <MainPageHeader direction='column' title={pageTitle}>
+                    <p className='text-cream-400/60'>{pageDescription}</p>
                 </MainPageHeader>
 
                 <div className='inline-flex mr-3 rounded-xl border border-mocha-300/50 bg-mocha-400/50 p-1'>
@@ -444,7 +431,7 @@ const InstallerContainer = () => {
                             )}
                         >
                             {v === 'installed'
-                                ? t('server.installer.installed_count', { count: installedItems.length })
+                                ? t('server.installer.installed_count', { count: installedForTab.length })
                                 : t('server.installer.browse')}
                         </button>
                     ))}
@@ -452,25 +439,6 @@ const InstallerContainer = () => {
 
                 {view === 'browse' && (
                     <>
-                        <div className='inline-flex rounded-xl border border-mocha-300/50 bg-mocha-400/50 p-1'>
-                            {TABS.map((entry) => (
-                                <button
-                                    key={entry.key}
-                                    type='button'
-                                    title={t(entry.hint)}
-                                    onClick={() => setTab(entry.key)}
-                                    className={cn(
-                                        'rounded-lg px-4 py-2 text-sm font-medium transition cursor-pointer',
-                                        tab === entry.key
-                                            ? 'bg-brand-400/70 text-mocha-500'
-                                            : 'text-cream-400/70 hover:bg-mocha-300/40',
-                                    )}
-                                >
-                                    {t(entry.label)}
-                                </button>
-                            ))}
-                        </div>
-
                         <div className='flex flex-col gap-3 lg:flex-row lg:items-center'>
                             <div className='relative flex-1'>
                                 <Magnifier
@@ -498,113 +466,121 @@ const InstallerContainer = () => {
                                 triggerClassName='w-auto rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 hover:bg-mocha-400/50'
                                 options={[
                                     { value: ALL_PROVIDERS, label: t('server.installer.all_providers') },
-                                    ...sources.map((s) => ({ value: s.key, label: sourceLabel(s.key) })),
+                                    ...(sources.length > 0
+                                        ? sources.map((s) => ({ value: s.key, label: sourceLabel(s.key) }))
+                                        : [{ value: DEFAULT_SOURCE, label: sourceLabel(DEFAULT_SOURCE) }]),
                                 ]}
                             />
-
-                            {tabLoaders.length > 1 && (
-                                <Dropdown
-                                    value={loader ?? ''}
-                                    onChange={(value) => setLoader(value || null)}
-                                    triggerClassName='w-auto rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 hover:bg-mocha-400/50'
-                                    options={tabLoaders.map((l) => ({ value: l, label: l }))}
-                                />
-                            )}
-
-                            {Object.keys(gameVersions).length > 0 && (
-                                <>
-                                    <Dropdown
-                                        value={releaseType}
-                                        onChange={(type) => {
-                                            setReleaseType(type);
-                                            setGameVersion((gameVersions[type] ?? [])[0] ?? null);
-                                        }}
-                                        triggerClassName='w-auto rounded-xl border border-mocha-300/50 bg-mocha-400/50 px-3 py-3 hover:bg-mocha-400/50'
-                                        options={['release', 'snapshot', 'beta', 'alpha']
-                                            .filter((type) => gameVersions[type])
-                                            .concat(
-                                                Object.keys(gameVersions)
-                                                    .filter(
-                                                        (type) =>
-                                                            !['release', 'snapshot', 'beta', 'alpha'].includes(type),
-                                                    )
-                                                    .sort(),
-                                            )
-                                            .map((type) => ({
-                                                value: type,
-                                                label: versionTypeLabel(t, type),
-                                            }))}
-                                    />
-
-                                    <VersionDropdown
-                                        versions={gameVersions[releaseType] ?? []}
-                                        value={gameVersion}
-                                        onChange={setGameVersion}
-                                    />
-                                </>
-                            )}
                         </div>
 
-                        {error && (
-                            <div className='rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400'>
-                                {error}
-                            </div>
-                        )}
-
-                        {loading && results.length === 0 ? (
-                            <div className='flex items-center justify-center gap-2 py-20 text-cream-400/60'>
-                                <Spinner size='small' />
-                                <span className='text-sm'>{t('server.installer.loading')}</span>
-                            </div>
-                        ) : results.length === 0 && !error ? (
-                            <div className='rounded-2xl border border-mocha-300/50 bg-mocha-400/50 py-20 text-center text-cream-400/60'>
-                                {query.trim()
-                                    ? t('server.installer.no_results')
-                                    : t('server.installer.nothing_to_show')}
-                            </div>
-                        ) : (
-                            <>
-                                <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-                                    {results.map((project) => (
-                                        <InstallerCard
-                                            key={`${project.source}:${project.id}`}
-                                            project={project}
-                                            installedEntry={installedEntryFor(project)}
-                                            onInstall={(p) => openPicker(p, tab, p.source, directory, loader)}
-                                        />
-                                    ))}
-                                </div>
-
-                                {hasMore && (
-                                    <div className='flex justify-center pt-2'>
-                                        <Button
-                                            variant='secondary'
-                                            onClick={loadMore}
-                                            disabled={loadingMore}
-                                            className='gap-2'
-                                        >
-                                            {loadingMore && <Spinner size='small' />}
-                                            {loadingMore
-                                                ? t('server.installer.loading')
-                                                : t('server.installer.load_more')}
-                                        </Button>
+                        <div className='flex flex-col gap-4 md:flex-row md:items-start'>
+                            <div ref={resultsTopRef} className='min-w-0 flex-1 scroll-mt-4 space-y-4'>
+                                {error && (
+                                    <div className='rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400'>
+                                        {error}
                                     </div>
                                 )}
-                            </>
-                        )}
+
+                                {loading ? (
+                                    <div className='flex items-center justify-center gap-2 py-20 text-cream-400/60'>
+                                        <Spinner size='small' />
+                                        <span className='text-sm'>{t('server.installer.loading')}</span>
+                                    </div>
+                                ) : results.length === 0 && !error ? (
+                                    <div className='rounded-2xl border border-mocha-300/50 bg-mocha-400/50 py-20 text-center text-cream-400/60'>
+                                        {query.trim()
+                                            ? t('server.installer.no_results')
+                                            : t('server.installer.nothing_to_show')}
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-3'>
+                                            {results.map((project) => {
+                                                const entry = installedEntryFor(project);
+                                                const updateAvailable = Boolean(
+                                                    entry &&
+                                                        project.latest_version_id &&
+                                                        project.latest_version_id !== entry.version_id,
+                                                );
+                                                return (
+                                                    <InstallerCard
+                                                        key={`${project.source}:${project.id}`}
+                                                        project={project}
+                                                        installedEntry={entry}
+                                                        updateAvailable={updateAvailable}
+                                                        onInstall={(p) =>
+                                                            openPicker(
+                                                                p,
+                                                                tab,
+                                                                p.source,
+                                                                directory,
+                                                                loader,
+                                                                updateAvailable ? p.latest_version_id : null,
+                                                            )
+                                                        }
+                                                    />
+                                                );
+                                            })}
+                                        </div>
+
+                                        {(page > 1 || hasNextPage) && (
+                                            <div className='flex flex-wrap items-center justify-center gap-3 pt-2'>
+                                                <Button
+                                                    variant='secondary'
+                                                    onClick={() => goToPage(page - 1)}
+                                                    disabled={page <= 1 || loading}
+                                                    className='min-w-28'
+                                                >
+                                                    {t('server.installer.page_prev')}
+                                                </Button>
+                                                <span className='text-sm text-cream-400/70'>
+                                                    {t('server.installer.page_label', { page })}
+                                                </span>
+                                                <Button
+                                                    variant='secondary'
+                                                    onClick={() => goToPage(page + 1)}
+                                                    disabled={!hasNextPage || loading}
+                                                    className='min-w-28'
+                                                >
+                                                    {t('server.installer.page_next')}
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+
+                            <FilterSidebar
+                                showGameVersion={showGameVersionFilter}
+                                gameVersions={gameVersions}
+                                releaseType={releaseType}
+                                onReleaseTypeChange={setReleaseType}
+                                gameVersion={gameVersion}
+                                onGameVersionChange={setGameVersion}
+                                loaders={tabLoaders}
+                                loader={loader}
+                                onLoaderChange={setLoader}
+                                categories={categories}
+                                category={category}
+                                onCategoryChange={setCategory}
+                                className='md:self-start'
+                            />
+                        </div>
                     </>
                 )}
 
                 {view === 'installed' && (
                     <div className='space-y-3'>
-                        {installedItems.length === 0 ? (
+                        {installedForTab.length === 0 ? (
                             <div className='rounded-2xl border border-mocha-300/50 bg-mocha-400/50 py-16 text-center text-cream-400/60'>
                                 {t('server.installer.empty_installed')}
                             </div>
                         ) : (
-                            installedItems.map((item) => {
+                            installedForTab.map((item) => {
                                 const key = `${item.type}:${item.source}:${item.projectId}`;
                                 const removing = removingKey === key;
+                                const latestId = latestByKey[`${item.source}:${item.projectId}`];
+                                const updateAvailable = Boolean(latestId && latestId !== item.entry.version_id);
                                 return (
                                     <div
                                         key={key}
@@ -615,21 +591,14 @@ const InstallerContainer = () => {
                                                 <span className='truncate text-sm font-medium text-cream-400'>
                                                     {item.entry.project_title}
                                                 </span>
-                                                <span
-                                                    className={cn(
-                                                        'rounded px-1.5 py-0.5 text-[10px] font-medium uppercase',
-                                                        item.type === 'mod'
-                                                            ? 'bg-brand-400/20 text-brand-400'
-                                                            : 'bg-amber-500/20 text-amber-400',
-                                                    )}
-                                                >
-                                                    {item.type === 'mod'
-                                                        ? t('server.installer.mods')
-                                                        : t('server.installer.plugins')}
-                                                </span>
                                                 <span className='rounded bg-mocha-300/60 px-1.5 py-0.5 text-[10px] uppercase text-cream-400/70'>
                                                     {sourceLabel(item.source)}
                                                 </span>
+                                                {updateAvailable && (
+                                                    <span className='rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-medium uppercase text-amber-400'>
+                                                        {t('server.installer.update_available')}
+                                                    </span>
+                                                )}
                                             </div>
                                             <div className='mt-1 truncate text-[11px] text-cream-400/50'>
                                                 {item.entry.version_name} · {item.entry.filename}
@@ -638,7 +607,7 @@ const InstallerContainer = () => {
                                         <div className='flex flex-shrink-0 items-center gap-2'>
                                             <Button
                                                 size='sm'
-                                                variant='secondary'
+                                                variant={updateAvailable ? 'attention' : 'secondary'}
                                                 onClick={() =>
                                                     openPicker(
                                                         {
@@ -653,15 +622,20 @@ const InstallerContainer = () => {
                                                             categories: [],
                                                             url: null,
                                                             updated_at: null,
+                                                            latest_version_id: latestId ?? null,
+                                                            externally_hosted: false,
                                                         },
                                                         item.type,
                                                         item.source,
                                                         destinationFolder(item.type),
                                                         null,
+                                                        updateAvailable ? latestId : null,
                                                     )
                                                 }
                                             >
-                                                {t('server.installer.manage')}
+                                                {updateAvailable
+                                                    ? t('server.installer.update')
+                                                    : t('server.installer.manage')}
                                             </Button>
                                             <Button
                                                 size='sm'
@@ -690,11 +664,13 @@ const InstallerContainer = () => {
                 onClose={() => setPicker(null)}
                 uuid={uuid ?? ''}
                 type={picker?.type ?? tab}
-                source={picker?.source ?? 'modrinth'}
+                source={picker?.source ?? DEFAULT_SOURCE}
                 loader={picker?.loader ?? null}
+                gameVersion={gameVersion}
                 directory={picker?.directory ?? directory}
                 project={picker?.project ?? null}
                 installedEntry={pickerInstalledEntry}
+                preferredVersionId={picker?.preferredVersionId}
                 onInstalled={onInstalled}
             />
         </ServerContentBlock>

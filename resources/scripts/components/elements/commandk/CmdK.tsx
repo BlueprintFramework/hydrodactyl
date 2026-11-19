@@ -129,9 +129,13 @@ const CommandMenu = () => {
                         </Command.Item>
                     </Can>
                     <Can action={['mod.download']} matchAny>
-                        <Command.Item onSelect={() => cmdkNavigate('/installer')}>
+                        <Command.Item onSelect={() => cmdkNavigate('/installer/plugins')}>
                             <ArrowDownToLine fill='currentColor' />
-                            {t('navigation.installer')}
+                            {t('navigation.plugins')}
+                        </Command.Item>
+                        <Command.Item onSelect={() => cmdkNavigate('/installer/mods')}>
+                            <Box fill='currentColor' />
+                            {t('navigation.mods')}
                         </Command.Item>
                     </Can>
                     <Can action={['software.*']} matchAny>

@@ -11,6 +11,7 @@ export interface ServerBackup {
     isSuccessful: boolean;
     isLocked: boolean;
     isAutomatic: boolean;
+    isSoftwareChange: boolean;
     name: string;
     ignoredFiles: string;
     checksum: string;
@@ -21,6 +22,7 @@ export interface ServerBackup {
     snapshotId: string | null;
     createdAt: Date;
     completedAt: Date | null;
+    expiresAt: Date | null;
     // Async job fields
     jobId: string | null;
     jobStatus: 'pending' | 'running' | 'completed' | 'failed';

@@ -1,5 +1,5 @@
 import { type Actions, useStoreActions } from 'easy-peasy';
-import { Form, Formik } from 'formik';
+import { Form, Formik, type FormikHelpers } from 'formik';
 import { toast } from 'sonner';
 import { object, string } from 'yup';
 import { httpErrorToHuman } from '@/api/http';
@@ -23,21 +23,49 @@ const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<s
     const setServer = ServerContext.useStoreActions((actions) => actions.server.setServer);
     const { addError, clearFlashes } = useStoreActions((actions: Actions<ApplicationStore>) => actions.flashes);
 
-    const submit = ({ webhook_type, webhook_url }: Values) => {
+    const isEnabled = Boolean(server?.webhookType && server?.webhookUrl);
+
+    const persist = (
+        webhook_type: string,
+        webhook_url: string,
+        helpers?: FormikHelpers<Values>,
+        successKey = 'server.settings.webhook.updated',
+    ) => {
         clearFlashes('settings');
         toast(t('server.settings.webhook.updating'));
         if (!server) return;
+
         editWebhookInfo(server.uuid, webhook_type, webhook_url)
-            .then(() => setServer({ ...server, webhookType: webhook_type, webhookUrl: webhook_url }))
+            .then(() =>
+                setServer({
+                    ...server,
+                    webhookType: webhook_type || null,
+                    webhookUrl: webhook_url || null,
+                }),
+            )
+            .then(() => {
+                helpers?.resetForm({
+                    values: { webhook_type, webhook_url },
+                });
+                toast.success(t(successKey));
+            })
             .catch((error) => {
                 console.error(error);
                 addError({ key: 'settings', message: httpErrorToHuman(error) });
-            })
-            .then(() => toast.success(t('server.settings.webhook.updated')));
+            });
+    };
+
+    const submit = (values: Values, helpers: FormikHelpers<Values>) => {
+        persist(values.webhook_type, values.webhook_url, helpers);
+    };
+
+    const disable = (helpers: FormikHelpers<Values>) => {
+        persist('', '', helpers, 'server.settings.webhook.disabled');
     };
 
     return (
         <Formik
+            enableReinitialize
             onSubmit={submit}
             initialValues={{
                 webhook_type: server?.webhookType || '',
@@ -62,7 +90,7 @@ const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<s
                     ),
             })}
         >
-            {({ values, setFieldValue }) => (
+            {(formik) => (
                 <Form className='flex flex-col gap-4'>
                     <div className='flex max-w-lg flex-col gap-4'>
                         <FormikFieldWrapper
@@ -72,8 +100,8 @@ const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<s
                         >
                             <Dropdown
                                 id={'webhook_type'}
-                                value={values.webhook_type}
-                                onChange={(value) => setFieldValue('webhook_type', value)}
+                                value={formik.values.webhook_type}
+                                onChange={(value) => formik.setFieldValue('webhook_type', value)}
                                 placeholder={t('server.settings.webhook.type_placeholder')}
                                 options={Object.entries(allowedWebhookTypes).map(([value, label]) => ({
                                     value,
@@ -88,10 +116,15 @@ const EditWebhookBox = ({ allowedWebhookTypes }: { allowedWebhookTypes: Record<s
                             type={'url'}
                         />
                     </div>
-                    <div>
+                    <div className='flex flex-wrap items-center gap-2'>
                         <Button variant='secondary' type={'submit'}>
                             {t('common.save')}
                         </Button>
+                        {isEnabled && (
+                            <Button variant='destructive' type='button' onClick={() => disable(formik)}>
+                                {t('server.settings.webhook.disable')}
+                            </Button>
+                        )}
                     </div>
                 </Form>
             )}

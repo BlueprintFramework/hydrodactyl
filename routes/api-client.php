@@ -7,6 +7,7 @@ use Pterodactyl\Http\Middleware\Activity\AccountSubject;
 use Pterodactyl\Http\Controllers\Api\Client\Servers\Elytra;
 use Pterodactyl\Http\Middleware\RequireTwoFactorAuthentication;
 use Pterodactyl\Http\Controllers\Api\Client\Servers\MarketplaceController;
+use Pterodactyl\Http\Controllers\Api\Client\Servers\McjarsController;
 use Pterodactyl\Http\Middleware\Api\Client\Server\ResourceBelongsToServer;
 use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
 
@@ -102,28 +103,50 @@ Route::group([
 
     // Native plugin/mod installer (Minecraft). Browse/search are cached and
     // throttled; the actual file transfer happens via the per-daemon pull.
-    Route::group(['prefix' => '/marketplace', 'middleware' => ['throttle:30,1']], function () {
-        Route::get('/search', [MarketplaceController::class, 'search'])->name('api.client.servers.marketplace.search');
-        Route::get('/project', [MarketplaceController::class, 'project'])->name('api.client.servers.marketplace.project');
-        // Resolve yields a daemon-pulled download URL, so it gets a tighter
-        // limiter than browse (caps upstream amplification per user).
-        Route::get('/resolve', [MarketplaceController::class, 'resolve'])
-            ->name('api.client.servers.marketplace.resolve');
+    // Install must NOT share the browse bucket — paging/search would otherwise
+    // 429 the confirm button ("Too Many Attempts") after normal browsing.
+    Route::group(['prefix' => '/marketplace'], function () {
+        Route::group(['middleware' => ['throttle:180,1']], function () {
+            Route::get('/search', [MarketplaceController::class, 'search'])->name('api.client.servers.marketplace.search');
+            Route::get('/project', [MarketplaceController::class, 'project'])->name('api.client.servers.marketplace.project');
+            // Resolve yields a daemon-pulled download URL, so it gets a tighter
+            // limiter than browse (caps upstream amplification per user).
+            Route::get('/resolve', [MarketplaceController::class, 'resolve'])
+                ->middleware('throttle:30,1')
+                ->name('api.client.servers.marketplace.resolve');
 
-        // Install history. Stored in the panel database (not on the daemon) so
-        // it stays private — invisible in the file manager and out of backups.
-        Route::get('/installed', [MarketplaceController::class, 'installed'])
-            ->name('api.client.servers.marketplace.installed');
-        Route::post('/installed', [MarketplaceController::class, 'store']);
-        Route::delete('/installed', [MarketplaceController::class, 'destroy']);
+            // Install history. Stored in the panel database (not on the daemon) so
+            // it stays private — invisible in the file manager and out of backups.
+            Route::get('/installed', [MarketplaceController::class, 'installed'])
+                ->name('api.client.servers.marketplace.installed');
+            Route::post('/installed', [MarketplaceController::class, 'store']);
+            Route::delete('/installed', [MarketplaceController::class, 'destroy']);
 
-        // Cached Modrinth loader-tag list, so egg-feature loaders are validated
-        // against the live set instead of a hard-coded list.
-        Route::get('/loaders', [MarketplaceController::class, 'loaders'])
-            ->name('api.client.servers.marketplace.loaders');
+            // Cached Modrinth loader-tag list, so egg-feature loaders are validated
+            // against the live set instead of a hard-coded list.
+            Route::get('/loaders', [MarketplaceController::class, 'loaders'])
+                ->name('api.client.servers.marketplace.loaders');
 
-        Route::get('/game-versions', [MarketplaceController::class, 'gameVersions'])
-            ->name('api.client.servers.marketplace.game-versions');
+            Route::get('/game-versions', [MarketplaceController::class, 'gameVersions'])
+                ->name('api.client.servers.marketplace.game-versions');
+
+            Route::get('/categories', [MarketplaceController::class, 'categories'])
+                ->name('api.client.servers.marketplace.categories');
+        });
+
+        // Automatic Modrinth .mrpack install (backup → wipe → egg → materialize).
+        // Own limiter so browse traffic cannot block the confirm action.
+        Route::post('/modpack/install', [MarketplaceController::class, 'installModpack'])
+            ->middleware('throttle:20,1')
+            ->name('api.client.servers.marketplace.modpack.install');
+    });
+
+    // MCJars version/build proxy for the Software change wizard.
+    Route::group(['prefix' => '/mcjars', 'middleware' => ['throttle:60,1']], function () {
+        Route::get('/versions', [McjarsController::class, 'versions'])
+            ->name('api.client.servers.mcjars.versions');
+        Route::get('/builds', [McjarsController::class, 'builds'])
+            ->name('api.client.servers.mcjars.builds');
     });
 });
 

@@ -48,8 +48,12 @@ export const loadersFor = (features: string[], type: MarketplaceType, knownLoade
 
 /**
  * Whether the server's egg can install the given content type.
+ * Modpacks require any mod-loader egg (Fabric/Forge/NeoForge/Quilt/…).
  */
 export const supportsType = (features: string[], type: MarketplaceType): boolean => {
+    if (type === 'modpack') {
+        return supportsType(features, 'mod');
+    }
     const prefix = `${type}/`;
     return features.some((feature) => normalize(feature).startsWith(prefix));
 };
@@ -63,4 +67,8 @@ export const isMinecraftCapable = (features: string[]): boolean =>
 /**
  * Container-relative folder a content type installs into.
  */
-export const destinationFolder = (type: MarketplaceType): string => (type === 'plugin' ? 'plugins' : 'mods');
+export const destinationFolder = (type: MarketplaceType): string => {
+    if (type === 'plugin') return 'plugins';
+    if (type === 'modpack') return '/';
+    return 'mods';
+};

@@ -17,6 +17,7 @@ use Pterodactyl\Enums\BackupAdapter;
  * @property bool $is_successful
  * @property bool $is_locked
  * @property bool $is_automatic
+ * @property bool $is_software_change
  * @property string $name
  * @property string[] $ignored_files
  * @property array|null $server_state
@@ -26,6 +27,7 @@ use Pterodactyl\Enums\BackupAdapter;
  * @property string|null $upload_id
  * @property string|null $snapshot_id
  * @property \Carbon\CarbonImmutable|null $completed_at
+ * @property \Carbon\CarbonImmutable|null $expires_at
  * @property \Carbon\CarbonImmutable $created_at
  * @property \Carbon\CarbonImmutable $updated_at
  * @property \Carbon\CarbonImmutable|null $deleted_at
@@ -50,22 +52,26 @@ class Backup extends Model
         'is_successful' => 'bool',
         'is_locked' => 'bool',
         'is_automatic' => 'bool',
+        'is_software_change' => 'bool',
         'ignored_files' => 'array',
         'server_state' => 'array',
         'bytes' => 'int',
         'disk' => BackupAdapter::class,
         'completed_at' => 'datetime',
+        'expires_at' => 'datetime',
     ];
 
     protected $attributes = [
         'is_successful' => false,
         'is_locked' => false,
         'is_automatic' => false,
+        'is_software_change' => false,
         'ignored_files' => '[]',
         'checksum' => null,
         'bytes' => 0,
         'upload_id' => null,
         'snapshot_id' => null,
+        'expires_at' => null,
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at', 'deleted_at'];
@@ -117,6 +123,7 @@ class Backup extends Model
         'is_successful' => 'boolean',
         'is_locked' => 'boolean',
         'is_automatic' => 'boolean',
+        'is_software_change' => 'boolean',
         'name' => 'required|string',
         'ignored_files' => 'array',
         'server_state' => 'nullable|array',
@@ -125,6 +132,7 @@ class Backup extends Model
         'snapshot_id' => 'nullable|string|max:64',
         'bytes' => 'numeric',
         'upload_id' => 'nullable|string',
+        'expires_at' => 'nullable|date',
     ];
 
     public function server(): BelongsTo

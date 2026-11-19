@@ -26,6 +26,7 @@ const ServerConsoleContainer = lazy(() => import('@/components/server/console/Se
 const DatabasesContainer = lazy(() => import('@/components/server/databases/DatabasesContainer'));
 const FileManagerContainer = lazy(() => import('@/components/server/files/FileManagerContainer'));
 const InstallerContainer = lazy(() => import('@/components/server/installer/InstallerContainer'));
+const ModpackContainer = lazy(() => import('@/components/server/installer/ModpackContainer'));
 const NetworkContainer = lazy(() => import('@/components/server/network/NetworkContainer'));
 const ServerActivityLogContainer = lazy(() => import('@/components/server/ServerActivityLogContainer'));
 const ScheduleContainer = lazy(() => import('@/components/server/schedules/ScheduleContainer'));
@@ -267,16 +268,43 @@ const routes: Routes = {
             requiresSoftware: true,
         },
         {
-            route: 'installer/*',
-            path: 'installer',
+            // Legacy path: redirect to plugins or mods based on egg features.
+            route: 'installer',
+            path: undefined,
             permission: 'mod.download',
-            name: 'server.nav.installer',
+            name: undefined,
+            component: lazy(() => import('@/components/server/installer/InstallerRedirect')),
+            isSubRoute: true,
+        },
+        {
+            route: 'installer/plugins/*',
+            path: 'installer/plugins',
+            permission: 'mod.download',
+            name: 'server.nav.plugins',
             component: InstallerContainer,
             icon: ArrowDownToLine,
             end: true,
-            // Only show for Minecraft servers whose egg advertises a mod or
-            // plugin loader (e.g. "mod/fabric", "plugin/paper").
-            eggFeature: /(?:^|\s)(?:mod|plugin)\/[a-z]+/i,
+            eggFeature: /^plugin\//i,
+        },
+        {
+            route: 'installer/mods/*',
+            path: 'installer/mods',
+            permission: 'mod.download',
+            name: 'server.nav.mods',
+            component: InstallerContainer,
+            icon: Box,
+            end: true,
+            eggFeature: /^mod\//i,
+        },
+        {
+            route: 'installer/modpacks/*',
+            path: 'installer/modpacks',
+            permission: 'mod.download',
+            name: 'server.nav.modpacks',
+            component: ModpackContainer,
+            icon: ArrowDownToLine,
+            end: true,
+            eggFeature: /^mod\//i,
         },
     ],
 };
