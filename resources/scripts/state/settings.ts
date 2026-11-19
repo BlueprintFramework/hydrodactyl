@@ -8,6 +8,7 @@ export interface SiteSettings {
     locales?: {
         code: string;
         name: string;
+        shortIdentifier?: string | null;
     }[];
     customNavItems?: {
         label: string;

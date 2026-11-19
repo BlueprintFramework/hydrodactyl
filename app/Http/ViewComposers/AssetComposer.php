@@ -48,7 +48,11 @@ class AssetComposer
             'logo' => $logoUrl,
             'customNavItems' => $this->getCustomNavItems(),
             'locales' => collect($this->getAvailableLanguages(true))
-                ->map(fn ($name, $code) => ['code' => $code, 'name' => $name])
+                ->map(fn ($name, $code) => array_filter([
+                    'code' => $code,
+                    'name' => $name,
+                    'shortIdentifier' => $this->getLanguageMeta($code)['short_identifier'] ?? null,
+                ], fn ($value) => !is_null($value)))
                 ->values()
                 ->all(),
             'captcha' => [

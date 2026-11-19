@@ -76,10 +76,15 @@ const I18nProvider = ({ children }: I18nProviderProps) => {
         const definitions = (configuredLocales ?? []).map((entry) => ({
             code: entry.code,
             label: entry.name || localeLabel(entry.code),
+            shortIdentifier: entry.shortIdentifier || entry.code.toLowerCase(),
         }));
 
         if (!definitions.some((entry) => entry.code === DEFAULT_LOCALE)) {
-            definitions.unshift({ code: DEFAULT_LOCALE, label: localeLabel(DEFAULT_LOCALE) });
+            definitions.unshift({
+                code: DEFAULT_LOCALE,
+                label: localeLabel(DEFAULT_LOCALE),
+                shortIdentifier: DEFAULT_LOCALE.toLowerCase(),
+            });
         }
 
         return definitions;

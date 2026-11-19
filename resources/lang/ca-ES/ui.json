@@ -253,6 +253,15 @@
             "submit": "Actualitza la contrasenya",
             "updating": "S'està actualitzant..."
         },
+        "servers": {
+            "chart_label": "{{owned}} servidors propis i {{shared}} com a subusuari.",
+            "description": "Servidors que et pertanyen i servidors que altres persones comparteixen amb tu.",
+            "empty": "Encara no tens accés a cap servidor.",
+            "owned": "Propis",
+            "shared": "Com a subusuari",
+            "title": "Els teus servidors",
+            "total": "Total"
+        },
         "ssh": {
             "add": "Afegeix una clau SSH",
             "add_confirm": "Afegeix la clau",
