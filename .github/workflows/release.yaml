@@ -3,9 +3,14 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to create (e.g., 1.0.0)'
+        description: 'Version to create, without the leading v (e.g. 1.0.0 or 1.0.1-hotfix)'
         required: true
         type: string
+      ref:
+        description: 'Branch, tag, or commit SHA to release from (e.g. main, hotfix/6.4.1, v6.4.1)'
+        required: true
+        type: string
+        default: main
       release_type:
         description: 'Type of release'
         required: true
@@ -13,7 +18,7 @@ on:
         options:
           - release
           - prerelease
-        default: stable
+        default: release
 
 permissions:
   contents: write
@@ -26,5 +31,5 @@ jobs:
     uses: ./.github/workflows/release-action.yaml
     with:
       version: ${{ inputs.version }}
+      ref: ${{ inputs.ref }}
       release_type: ${{ inputs.release_type }}
-
