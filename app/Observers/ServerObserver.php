@@ -5,6 +5,7 @@ namespace Pterodactyl\Observers;
 use Pterodactyl\Models\Domain;
 use Pterodactyl\Models\Server;
 use Pterodactyl\Models\ServerSubdomain;
+use Pterodactyl\Services\Subdomain\CustomDomainService;
 use Pterodactyl\Services\Subdomain\SubdomainManagementService;
 use Pterodactyl\Services\Subdomain\SubdomainGeneratorService;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +14,8 @@ class ServerObserver
 {
     public function __construct(
         private SubdomainManagementService $subdomainService,
-        private SubdomainGeneratorService $subdomainGenerator
+        private SubdomainGeneratorService $subdomainGenerator,
+        private CustomDomainService $customDomainService
     ) {
     }
 
@@ -72,6 +74,10 @@ class ServerObserver
         if ($server->isDirty('egg_id')) {
             $this->handleServerSoftwareChange($server);
         }
+
+        if ($server->isDirty(['allocation_id', 'egg_id'])) {
+            $this->syncCustomDomains($server);
+        }
     }
 
     /**
@@ -88,6 +94,31 @@ class ServerObserver
             } catch (\Exception $e) {
                 Log::warning("Failed to delete subdomain {$subdomain->full_domain} for server {$server->id}: {$e->getMessage()}");
             }
+        }
+
+        foreach ($server->customDomains as $customDomain) {
+            $this->customDomainService->delete($customDomain);
+        }
+    }
+
+    /**
+     * Sync custom domain DNS records when the server's allocation or software
+     * changes. Domains are removed if the new software isn't Minecraft.
+     */
+    private function syncCustomDomains(Server $server): void
+    {
+        // Work from a fresh copy so the new allocation and egg are picked up
+        // rather than relations loaded before the change.
+        $server = $server->fresh();
+
+        if ($this->customDomainService->supports($server)) {
+            $this->customDomainService->syncForServer($server);
+
+            return;
+        }
+
+        foreach ($server->customDomains as $customDomain) {
+            $this->customDomainService->delete($customDomain);
         }
     }
 

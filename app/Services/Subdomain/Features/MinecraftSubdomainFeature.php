@@ -35,24 +35,22 @@ class MinecraftSubdomainFeature implements SubdomainFeatureInterface
             'ttl' => 300,
         ];
 
-        // SRV record for Minecraft (only if not using default port)
-        if ($port != 25565) {
-            $records[] = [
-                'name' => '_minecraft._tcp.' . $subdomain,
-                'type' => 'SRV',
-                'content' => [
-                    'service' => '_minecraft',
-                    'proto' => '_tcp',
-                    'name' => $subdomain,
-                    'priority' => 0,
-                    'weight' => 5,
-                    'port' => $port,
-                    'target' => $fullDomain,
-                    'content' => "SRV 0 5 {$port} {$fullDomain}",
-                ],
-                'ttl' => 300,
-            ];
-        }
+        // SRV record for Minecraft
+        $records[] = [
+            'name' => '_minecraft._tcp.' . $subdomain,
+            'type' => 'SRV',
+            'content' => [
+                'service' => '_minecraft',
+                'proto' => '_tcp',
+                'name' => $subdomain,
+                'priority' => 0,
+                'weight' => 5,
+                'port' => $port,
+                'target' => $fullDomain,
+                'content' => "SRV 0 5 {$port} {$fullDomain}",
+            ],
+            'ttl' => 300,
+        ];
 
         return $records;
     }

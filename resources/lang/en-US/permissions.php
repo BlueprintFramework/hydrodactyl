@@ -43,6 +43,8 @@ return [
         'create' => 'Allows a user to assign additional allocations to the server.',
         'update' => 'Allows a user to change the primary server allocation and attach notes to each allocation.',
         'delete' => 'Allows a user to delete an allocation from the server.',
+        'custom_domain_read' => 'Allows a user to view the custom domains pointed at this server.',
+        'custom_domain_update' => 'Allows a user to add and remove custom domains for this server.',
     ],
     'startup' => [
         'description' => 'Permissions that control a user\'s ability to view this server\'s startup parameters.',

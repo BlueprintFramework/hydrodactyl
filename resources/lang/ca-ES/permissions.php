@@ -43,6 +43,8 @@ return [
         'create' => 'Permet a un usuari assignar assignacions addicionals al servidor.',
         'update' => 'Permet a un usuari canviar l\'assignació principal del servidor i adjuntar notes a cada assignació.',
         'delete' => 'Permet a un usuari eliminar una assignació del servidor.',
+        'custom_domain_read' => 'Permet a un usuari veure els dominis personalitzats que apunten a aquest servidor.',
+        'custom_domain_update' => 'Permet a un usuari afegir i eliminar dominis personalitzats d\'aquest servidor.',
     ],
     'startup' => [
         'description' => 'Permisos que controlen la capacitat d\'un usuari de veure els paràmetres d\'arrencada d\'aquest servidor.',

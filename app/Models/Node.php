@@ -20,6 +20,7 @@ use Pterodactyl\Http\Controllers\Admin\NodeAutoDeployController;
  * @property string $uuid
  * @property bool $public
  * @property bool $trust_alias
+ * @property bool $custom_domains_enabled
  * @property string $name
  * @property string|null $description
  * @property int $location_id
@@ -87,6 +88,7 @@ class Node extends Model
         'behind_proxy' => 'boolean',
         'public' => 'boolean',
         'trust_alias' => 'boolean',
+        'custom_domains_enabled' => 'boolean',
         'maintenance_mode' => 'boolean',
         'use_separate_fqdns' => 'boolean',
         'bucket' => 'integer',
@@ -99,6 +101,7 @@ class Node extends Model
         'uuid',
         'public',
         'trust_alias',
+        'custom_domains_enabled',
         'name',
         'location_id',
         'fqdn',
@@ -129,6 +132,7 @@ class Node extends Model
         'location_id' => 'required|exists:locations,id',
         'public' => 'boolean',
         'trust_alias' => 'boolean',
+        'custom_domains_enabled' => 'boolean',
         'fqdn' => 'required|string',
         'internal_fqdn' => 'nullable|string',
         'use_separate_fqdns' => 'sometimes|boolean',
@@ -154,6 +158,7 @@ class Node extends Model
     protected $attributes = [
         'public' => true,
         'trust_alias' => false,
+        'custom_domains_enabled' => true,
         'behind_proxy' => false,
         'memory_overallocate' => 0,
         'disk_overallocate' => 0,
