@@ -4,6 +4,7 @@ import type { FormikHelpers } from 'formik';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { httpErrorToHuman } from '@/api/http';
+import { getServerBackupDownloadUrl } from '@/api/server/backups';
 import deleteAllServerBackups from '@/api/server/backups/deleteAllServerBackups';
 import getServerBackups, { Context as ServerBackupContext } from '@/api/swr/getServerBackups';
 import Can from '@/components/elements/Can';
@@ -21,7 +22,7 @@ import type { ApplicationStore } from '@/state';
 import { ServerContext } from '@/state/server';
 import BackupItem from './BackupItem';
 import BackupStats from './components/BackupStats';
-// import BulkActionBar from './components/BulkActionBar';
+import BulkActionBar from './components/BulkActionBar';
 import ConfirmPasswordModal from './components/ConfirmPasswordModal';
 import CreateBackupModal from './components/CreateBackupModal';
 import { useUnifiedBackups } from './useUnifiedBackups';
@@ -52,7 +53,7 @@ interface BackupValues {
 const BackupContainer = () => {
     const { t } = useTranslation();
     const { setPage } = useContext(ServerBackupContext);
-    const { clearFlashes, clearAndAddHttpError, addFlash } = useFlash();
+    const { clearFlashes, clearAndAddHttpError } = useFlash();
     const liveProgress = useContext(LiveProgressContext);
     const [createModalVisible, setCreateModalVisible] = useState(false);
     const [deleteAllModalVisible, setDeleteAllModalVisible] = useState(false);
@@ -99,9 +100,33 @@ const BackupContainer = () => {
             setDeleteAllModalVisible(false);
             await refresh();
         } catch (error) {
-            toast.error(httpErrorToHuman(error) || t('server.backups.delete_failed'));
+            toast.error(error instanceof Error ? httpErrorToHuman(error) : t('server.backups.delete_failed'));
         } finally {
             setIsDeleting(false);
+        }
+    };
+
+    const handleDownloadSelected = async () => {
+        if (!uuid) return;
+
+        clearFlashes('backups');
+
+        for (const backupUuid of Array.from(selectedBackups)) {
+            try {
+                const url = await getServerBackupDownloadUrl(uuid, backupUuid);
+                const link = document.createElement('a');
+                link.href = url;
+                link.rel = 'noopener';
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                // Give the browser a beat between downloads so it does not
+                // treat them as a popup burst.
+                await new Promise((resolve) => setTimeout(resolve, 700));
+            } catch (error) {
+                clearAndAddHttpError({ key: 'backups', error });
+            }
         }
     };
 
@@ -118,14 +143,11 @@ const BackupContainer = () => {
                 ...(hasTwoFactor && totpCode ? { totp_code: totpCode } : {}),
             });
 
-            addFlash({
-                key: 'backups',
-                type: 'success',
-                message:
-                    selectedBackups.size > 1
-                        ? t('server.backups.bulk_delete_success_other', { count: selectedBackups.size })
-                        : t('server.backups.bulk_delete_success_one', { count: selectedBackups.size }),
-            });
+            toast.success(
+                selectedBackups.size > 1
+                    ? t('server.backups.bulk_delete_success_other', { count: selectedBackups.size })
+                    : t('server.backups.bulk_delete_success_one', { count: selectedBackups.size }),
+            );
 
             setBulkDeleteModalVisible(false);
             setSelectedBackups(new Set());
@@ -150,7 +172,7 @@ const BackupContainer = () => {
         });
     };
 
-    const _toggleSelectAll = () => {
+    const toggleSelectAll = () => {
         const selectableBackups = backups.filter((b) => b.status === 'completed' && b.isSuccessful && !b.isLiveOnly);
         if (selectedBackups.size === selectableBackups.length) {
             setSelectedBackups(new Set());
@@ -231,6 +253,13 @@ const BackupContainer = () => {
                                 backupLimit={backupLimit}
                                 storage={storage}
                                 backupStorageLimit={backupStorageLimit}
+                            />
+                            <BulkActionBar
+                                selectableBackups={selectableBackups}
+                                selectedBackups={selectedBackups}
+                                onSelectAll={toggleSelectAll}
+                                onDownloadSelected={handleDownloadSelected}
+                                onDeleteSelected={() => setBulkDeleteModalVisible(true)}
                             />
                         </div>
                     </Can>

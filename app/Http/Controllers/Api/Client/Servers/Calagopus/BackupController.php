@@ -319,6 +319,11 @@ class BackupController extends ClientApiController
         $deleted = 0;
         foreach ($backups as $backup) {
             try {
+                // "Delete selected" is explicitly destructive: locked backups go too.
+                if ($backup->is_locked) {
+                    $backup->update(['is_locked' => false]);
+                }
+
                 $this->deleteBackupService->handle($backup);
                 ++$deleted;
             } catch (\Exception $e) {
