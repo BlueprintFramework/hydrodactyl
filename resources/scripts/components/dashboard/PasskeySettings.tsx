@@ -5,6 +5,7 @@ import http, { httpErrorToHuman } from '@/api/http';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { formatDateTime } from '@/lib/formatters';
+import { passkeyErrorMessage } from '@/lib/passkeys';
 import { useFlashKey } from '@/plugins/useFlash';
 
 interface Passkey {
@@ -41,7 +42,7 @@ const PasskeySettings = () => {
             loadPasskeys();
         },
         onError: (error) => {
-            clearAndAddHttpError(new Error(error.message));
+            clearAndAddHttpError(new Error(passkeyErrorMessage(error, t)));
         },
     });
 

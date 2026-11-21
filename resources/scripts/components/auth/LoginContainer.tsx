@@ -12,6 +12,7 @@ import Field from '@/components/elements/Field';
 import { useTranslation } from '@/i18n/I18nProvider';
 
 import CaptchaManager from '@/lib/captcha';
+import { passkeyErrorMessage } from '@/lib/passkeys';
 
 import useFlash from '@/plugins/useFlash';
 
@@ -69,7 +70,7 @@ function LoginContainer() {
         },
         onError: (error) => {
             clearAndAddHttpError({
-                error: new Error(error.message || t('auth.login.passkey_failed')),
+                error: new Error(passkeyErrorMessage(error, t)),
             });
         },
     });

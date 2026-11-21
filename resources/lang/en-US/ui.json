@@ -302,6 +302,20 @@
             "delete_confirm": "Remove this passkey?"
         }
     },
+    "passkeys": {
+        "errors": {
+            "cancelled": "The passkey operation was cancelled.",
+            "not_supported": "This browser does not support passkeys.",
+            "exists": "This device is already registered as a passkey.",
+            "invalid_domain": "Passkeys can't be used on this domain. For local development, use localhost.",
+            "unexpected_response": "The passkey request did not return a valid response.",
+            "security": "The panel origin does not match the configured passkey domain.",
+            "timeout": "The passkey operation timed out. Please try again.",
+            "constraint": "The authenticator does not meet the required conditions.",
+            "unavailable": "The authenticator is not available.",
+            "unknown": "The passkey operation could not be completed. Please try again."
+        }
+    },
     "admin": {
         "load": {
             "axis_label": "{{count}}m",

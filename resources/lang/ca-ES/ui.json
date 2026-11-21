@@ -302,6 +302,20 @@
             "delete_confirm": "Vols eliminar aquesta clau d'accés?"
         }
     },
+    "passkeys": {
+        "errors": {
+            "cancelled": "L'operació amb la clau d'accés s'ha cancel·lat.",
+            "not_supported": "Aquest navegador no admet claus d'accés.",
+            "exists": "Aquest dispositiu ja està registrat com a clau d'accés.",
+            "invalid_domain": "Les claus d'accés no es poden usar en aquest domini. Per a desenvolupament local, usa localhost.",
+            "unexpected_response": "La sol·licitud de la clau d'accés no va retornar una resposta vàlida.",
+            "security": "L'origen del panell no coincideix amb el domini configurat per a les claus d'accés.",
+            "timeout": "L'operació amb la clau d'accés ha caducat. Torna-ho a provar.",
+            "constraint": "L'autenticador no compleix els requisits necessaris.",
+            "unavailable": "L'autenticador no està disponible.",
+            "unknown": "No s'ha pogut completar l'operació amb la clau d'accés. Torna-ho a provar."
+        }
+    },
     "admin": {
         "load": {
             "axis_label": "{{count}}m",

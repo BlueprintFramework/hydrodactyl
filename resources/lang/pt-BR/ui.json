@@ -302,6 +302,20 @@
             "delete_confirm": "Remover esta chave de acesso?"
         }
     },
+    "passkeys": {
+        "errors": {
+            "cancelled": "A operação com a chave de acesso foi cancelada.",
+            "not_supported": "Este navegador não oferece suporte a chaves de acesso.",
+            "exists": "Este dispositivo já está registrado como chave de acesso.",
+            "invalid_domain": "As chaves de acesso não podem ser usadas neste domínio. Para desenvolvimento local, use localhost.",
+            "unexpected_response": "A solicitação da chave de acesso não retornou uma resposta válida.",
+            "security": "A origem do painel não corresponde ao domínio configurado para as chaves de acesso.",
+            "timeout": "A operação com a chave de acesso expirou. Tente novamente.",
+            "constraint": "O autenticador não atende aos requisitos necessários.",
+            "unavailable": "O autenticador não está disponível.",
+            "unknown": "Não foi possível concluir a operação com a chave de acesso. Tente novamente."
+        }
+    },
     "admin": {
         "load": {
             "axis_label": "{{count}}m",

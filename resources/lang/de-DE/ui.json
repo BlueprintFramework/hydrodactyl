@@ -259,6 +259,20 @@
             "delete_confirm": "Diesen Passkey entfernen?"
         }
     },
+    "passkeys": {
+        "errors": {
+            "cancelled": "Der Passkey-Vorgang wurde abgebrochen.",
+            "not_supported": "Dieser Browser unterstützt keine Passkeys.",
+            "exists": "Dieses Gerät ist bereits als Passkey registriert.",
+            "invalid_domain": "Passkeys können in dieser Domain nicht verwendet werden. Verwende für die lokale Entwicklung localhost.",
+            "unexpected_response": "Die Passkey-Anfrage hat keine gültige Antwort zurückgegeben.",
+            "security": "Der Ursprung des Panels stimmt nicht mit der konfigurierten Passkey-Domain überein.",
+            "timeout": "Der Passkey-Vorgang ist abgelaufen. Bitte versuche es erneut.",
+            "constraint": "Der Authenticator erfüllt nicht die erforderlichen Bedingungen.",
+            "unavailable": "Der Authenticator ist nicht verfügbar.",
+            "unknown": "Der Passkey-Vorgang konnte nicht abgeschlossen werden. Bitte versuche es erneut."
+        }
+    },
     "admin": {
         "load": {
             "axis_label": "{{count}}m",

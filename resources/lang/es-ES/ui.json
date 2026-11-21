@@ -302,6 +302,20 @@
             "delete_confirm": "¿Eliminar esta clave de acceso?"
         }
     },
+    "passkeys": {
+        "errors": {
+            "cancelled": "La operación con la clave de acceso se ha cancelado.",
+            "not_supported": "Este navegador no admite claves de acceso.",
+            "exists": "Este dispositivo ya está registrado como clave de acceso.",
+            "invalid_domain": "Las claves de acceso no se pueden usar en este dominio. Para desarrollo local, usa localhost.",
+            "unexpected_response": "La solicitud de la clave de acceso no devolvió una respuesta válida.",
+            "security": "El origen del panel no coincide con el dominio configurado para las claves de acceso.",
+            "timeout": "La operación con la clave de acceso ha caducado. Inténtalo de nuevo.",
+            "constraint": "El autenticador no cumple los requisitos necesarios.",
+            "unavailable": "El autenticador no está disponible.",
+            "unknown": "No se pudo completar la operación con la clave de acceso. Inténtalo de nuevo."
+        }
+    },
     "admin": {
         "load": {
             "axis_label": "{{count}} min",

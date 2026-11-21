@@ -302,6 +302,20 @@
             "delete_confirm": "Hanc clavem accessus removere vis?"
         }
     },
+    "passkeys": {
+        "errors": {
+            "cancelled": "Operatio clavis accessus abolita est.",
+            "not_supported": "Hic navigator claves accessus non sustinet.",
+            "exists": "Hoc instrumentum iam ut clavis accessus registratum est.",
+            "invalid_domain": "Claves accessus in hoc dominio adhiberi non possunt. Pro evolutione locali, localhost utere.",
+            "unexpected_response": "Petitio clavis accessus responsum validum non reddidit.",
+            "security": "Origo panel cum dominio clavis accessus constituto non congruit.",
+            "timeout": "Operatio clavis accessus exspiravit. Conare iterum quaeso.",
+            "constraint": "Authenticator condiciones necessarias non implet.",
+            "unavailable": "Authenticator praesto non est.",
+            "unknown": "Operatio clavis accessus perfici non potuit. Conare iterum quaeso."
+        }
+    },
     "admin": {
         "load": {
             "axis_label": "{{count}} min",
