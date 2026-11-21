@@ -41,6 +41,8 @@ $app->singleton(
     Pterodactyl\Exceptions\Handler::class
 );
 
+$app->register(Pterodactyl\Providers\PasskeysServiceProvider::class);
+
 /*
 |--------------------------------------------------------------------------
 | Return The Application
