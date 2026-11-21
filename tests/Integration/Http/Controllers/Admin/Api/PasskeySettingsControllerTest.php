@@ -73,4 +73,22 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
             ])
             ->assertStatus(422);
     }
+
+    public function testPasskeyOriginValidationMessagesAreLocalized(): void
+    {
+        $user = User::factory()->create(['root_admin' => true, 'language' => 'es-ES']);
+
+        $this->actingAs($user)
+            ->patchJson('/admin/api/settings/passkeys', [
+                'passkeys:enabled' => true,
+                'passkeys:relying_party_id' => 'panel.example.com',
+                'passkeys:allowed_origins' => 'https://attacker.example.net',
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('errors.0.meta.source_field', 'passkeys:allowed_origins')
+            ->assertJsonPath(
+                'errors.0.detail',
+                'Los orígenes de las claves de acceso deben pertenecer al dominio del Relying Party.',
+            );
+    }
 }

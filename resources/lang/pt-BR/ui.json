@@ -290,16 +290,16 @@
             "scan_description": "Escaneie o QR code acima com um aplicativo autenticador ou informe o código secreto acima. Depois, digite abaixo o código de 6 dígitos gerado pelo aplicativo."
         },
         "passkeys": {
-            "title": "Passkeys",
-            "description": "Use uma passkey armazenada no seu dispositivo para entrar sem digitar a senha.",
-            "create": "Adicionar passkey",
-            "name_placeholder": "Nome da passkey, por exemplo MacBook",
-            "empty": "Você ainda não tem nenhuma passkey.",
-            "unsupported": "Este navegador não oferece suporte a passkeys.",
+            "title": "Chaves de acesso",
+            "description": "Use uma chave de acesso armazenada no seu dispositivo para entrar sem digitar a senha.",
+            "create": "Adicionar chave de acesso",
+            "name_placeholder": "Nome da chave de acesso, por exemplo MacBook",
+            "empty": "Você ainda não tem nenhuma chave de acesso.",
+            "unsupported": "Este navegador não oferece suporte a chaves de acesso.",
             "last_used": "Último uso",
             "never_used": "Nunca usada",
             "help": "Sua senha continua disponível como alternativa.",
-            "delete_confirm": "Remover esta passkey?"
+            "delete_confirm": "Remover esta chave de acesso?"
         }
     },
     "admin": {
@@ -1222,13 +1222,13 @@
             "brand_color_update_failed": "Não foi possível salvar a cor da marca.",
             "brand_color_reset": "Cor da marca restaurada para o padrão.",
             "brand_color_reset_failed": "Não foi possível restaurar a cor da marca.",
-            "tab_passkeys": "Passkeys",
-            "passkeys_enabled": "Ativar passkeys",
-            "passkeys_enabled_hint": "Permite que os usuários registrem passkeys e entrem sem digitar a senha. O TOTP continua obrigatório quando ativado.",
+            "tab_passkeys": "Chaves de acesso",
+            "passkeys_enabled": "Ativar chaves de acesso",
+            "passkeys_enabled_hint": "Permite que os usuários registrem chaves de acesso e entrem sem digitar a senha. O TOTP continua obrigatório quando ativado.",
             "passkeys_relying_party_id": "Relying Party ID",
-            "passkeys_relying_party_id_hint": "O domínio do painel ao qual as passkeys estão vinculadas, sem https://. Alterar isso invalida as passkeys existentes.",
+            "passkeys_relying_party_id_hint": "O domínio do painel ao qual as chaves de acesso estão vinculadas, sem https://. Alterar isso invalida as chaves de acesso existentes.",
             "passkeys_allowed_origins": "Origens permitidas",
-            "passkeys_allowed_origins_hint": "Origens HTTPS separadas por vírgulas onde o diálogo de passkey pode aparecer, por exemplo https://panel.example.com."
+            "passkeys_allowed_origins_hint": "Origens HTTPS separadas por vírgulas onde o diálogo de chave de acesso pode aparecer, por exemplo https://panel.example.com."
         },
         "system_info": {
             "cpu_cores": "Núcleos de CPU",
@@ -1266,8 +1266,8 @@
             "title": "Login",
             "username_label": "Usuário ou e-mail",
             "username_required": "Informe um usuário ou e-mail.",
-            "passkey": "Entrar com passkey",
-            "passkey_failed": "Não foi possível entrar com a passkey. Tente novamente."
+            "passkey": "Entrar com chave de acesso",
+            "passkey_failed": "Não foi possível entrar com a chave de acesso. Tente novamente."
         },
         "reset_password": {
             "confirm_password_label": "Confirmar nova senha",

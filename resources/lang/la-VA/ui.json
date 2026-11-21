@@ -290,16 +290,16 @@
             "scan_description": "Scopito codicem QR supra applicatione authentificandi, vel inscribe codicem secretum supra. Deinde inscribe codicem 6 numerorum quem generat infra."
         },
         "passkeys": {
-            "title": "Passkeys",
-            "description": "Use a passkey stored on your device to sign in without entering your password.",
-            "create": "Add passkey",
-            "name_placeholder": "Passkey name, for example MacBook",
-            "empty": "You don't have any passkeys yet.",
-            "unsupported": "This browser does not support passkeys.",
-            "last_used": "Last used",
-            "never_used": "Never used",
-            "help": "Your password remains available as a fallback.",
-            "delete_confirm": "Remove this passkey?"
+            "title": "Claves accessus",
+            "description": "Utere clave accessus in instrumento tuo servata ut sine tessera intres.",
+            "create": "Adde clavem accessus",
+            "name_placeholder": "Nomen clavis accessus, exempli gratia MacBook",
+            "empty": "Nondum ullam clavem accessus habes.",
+            "unsupported": "Hic navigator claves accessus non sustinet.",
+            "last_used": "Ultimus usus",
+            "never_used": "Numquam adhibita",
+            "help": "Tessera tua ut alternativa manet.",
+            "delete_confirm": "Hanc clavem accessus removere vis?"
         }
     },
     "admin": {
@@ -1222,13 +1222,13 @@
             "brand_color_update_failed": "Colorem nominis servare non potuit.",
             "brand_color_reset": "Color nominis in pristinum restitutus.",
             "brand_color_reset_failed": "Colorem nominis restituere non potuit.",
-            "tab_passkeys": "Passkeys",
-            "passkeys_enabled": "Enable passkeys",
-            "passkeys_enabled_hint": "Allow users to register passkeys and sign in without entering their password. TOTP is still required when enabled.",
+            "tab_passkeys": "Claves accessus",
+            "passkeys_enabled": "Claves accessus activare",
+            "passkeys_enabled_hint": "Permittit ut usores claves accessus registrent et sine tessera intrent. TOTP tamen necessarium est cum activum est.",
             "passkeys_relying_party_id": "Relying Party ID",
-            "passkeys_relying_party_id_hint": "The panel domain passkeys are bound to, without https://. Changing this invalidates existing passkeys.",
-            "passkeys_allowed_origins": "Allowed origins",
-            "passkeys_allowed_origins_hint": "Comma-separated HTTPS origins where passkey prompts may open, for example https://panel.example.com."
+            "passkeys_relying_party_id_hint": "Dominium panel cui claves accessus alligantur, sine https://. Id mutare claves accessus existentes irritas facit.",
+            "passkeys_allowed_origins": "Origines permissae",
+            "passkeys_allowed_origins_hint": "Origines HTTPS virgulis separatae ubi dialogus clavis accessus aperiri potest, exempli gratia https://panel.example.com."
         },
         "system_info": {
             "cpu_cores": "Nuclei CPU",
@@ -1266,8 +1266,8 @@
             "title": "Ingressus",
             "username_label": "Nomen usoris vel epistula",
             "username_required": "Nomen usoris vel epistula electronica praebenda est.",
-            "passkey": "Sign in with a passkey",
-            "passkey_failed": "Passkey sign-in failed. Please try again."
+            "passkey": "Per clavem accessus ingredere",
+            "passkey_failed": "Ingressus per clavem accessus defecit. Conare iterum quaeso."
         },
         "reset_password": {
             "confirm_password_label": "Confirma tesseram novam",

@@ -290,16 +290,16 @@
             "scan_description": "Escanea el código QR de arriba con una aplicación de autenticación, o introduce el código secreto de arriba. Después, introduce abajo el código de 6 dígitos que genere."
         },
         "passkeys": {
-            "title": "Passkeys",
-            "description": "Usa una passkey guardada en tu dispositivo para iniciar sesión sin introducir la contraseña.",
-            "create": "Añadir passkey",
-            "name_placeholder": "Nombre de la passkey, por ejemplo MacBook",
-            "empty": "Todavía no tienes ninguna passkey.",
-            "unsupported": "Este navegador no admite passkeys.",
+            "title": "Claves de acceso",
+            "description": "Usa una clave de acceso guardada en tu dispositivo para iniciar sesión sin introducir la contraseña.",
+            "create": "Añadir clave de acceso",
+            "name_placeholder": "Nombre de la clave de acceso, por ejemplo MacBook",
+            "empty": "Todavía no tienes ninguna clave de acceso.",
+            "unsupported": "Este navegador no admite claves de acceso.",
             "last_used": "Último uso",
             "never_used": "Nunca usada",
             "help": "La contraseña sigue disponible como método alternativo.",
-            "delete_confirm": "¿Eliminar esta passkey?"
+            "delete_confirm": "¿Eliminar esta clave de acceso?"
         }
     },
     "admin": {
@@ -1222,13 +1222,13 @@
             "brand_color_update_failed": "No se pudo guardar el color de marca.",
             "brand_color_reset": "Color de marca restablecido al valor predeterminado.",
             "brand_color_reset_failed": "No se pudo restablecer el color de marca.",
-            "tab_passkeys": "Passkeys",
-            "passkeys_enabled": "Activar passkeys",
-            "passkeys_enabled_hint": "Permite a los usuarios registrar passkeys e iniciar sesión sin introducir la contraseña. El TOTP sigue siendo obligatorio cuando está activo.",
+            "tab_passkeys": "Claves de acceso",
+            "passkeys_enabled": "Activar claves de acceso",
+            "passkeys_enabled_hint": "Permite a los usuarios registrar claves de acceso e iniciar sesión sin introducir la contraseña. El TOTP sigue siendo obligatorio cuando está activo.",
             "passkeys_relying_party_id": "Relying Party ID",
-            "passkeys_relying_party_id_hint": "El dominio del panel al que se vinculan las passkeys, sin https://. Cambiarlo invalida las passkeys existentes.",
+            "passkeys_relying_party_id_hint": "El dominio del panel al que se vinculan las claves de acceso, sin https://. Cambiarlo invalida las claves de acceso existentes.",
             "passkeys_allowed_origins": "Orígenes permitidos",
-            "passkeys_allowed_origins_hint": "Orígenes HTTPS separados por comas donde puede abrirse el diálogo de passkey, por ejemplo https://panel.example.com."
+            "passkeys_allowed_origins_hint": "Orígenes HTTPS separados por comas donde puede abrirse el diálogo de clave de acceso, por ejemplo https://panel.example.com."
         },
         "system_info": {
             "cpu_cores": "Núcleos de CPU",
@@ -1266,8 +1266,8 @@
             "title": "Iniciar sesión",
             "username_label": "Nombre de usuario o correo electrónico",
             "username_required": "Debes indicar un nombre de usuario o un correo electrónico.",
-            "passkey": "Iniciar sesión con passkey",
-            "passkey_failed": "No se pudo iniciar sesión con passkey. Inténtalo de nuevo."
+            "passkey": "Iniciar sesión con clave de acceso",
+            "passkey_failed": "No se pudo iniciar sesión con la clave de acceso. Inténtalo de nuevo."
         },
         "reset_password": {
             "confirm_password_label": "Confirmar nueva contraseña",

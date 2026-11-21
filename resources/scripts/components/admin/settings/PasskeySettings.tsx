@@ -4,10 +4,26 @@ import { errorToMessage, parseValidationErrors } from '@/api/admin/errors';
 import { type PasskeySettings as PasskeyValues, updateSettings } from '@/api/admin/settings';
 import { useSettings } from '@/api/admin/useSettings';
 import { Field } from '@/components/admin/Field';
+import Dropdown from '@/components/elements/Dropdown';
 import { Input } from '@/components/elements/inputs';
 import Spinner from '@/components/elements/Spinner';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
+
+const Toggle = ({ value, onChange }: { value: boolean; onChange: (value: boolean) => void }) => {
+    const { t } = useTranslation();
+
+    return (
+        <Dropdown
+            value={value ? 'true' : 'false'}
+            onChange={(next) => onChange(next === 'true')}
+            options={[
+                { value: 'false', label: t('common.disabled') },
+                { value: 'true', label: t('common.enabled') },
+            ]}
+        />
+    );
+};
 
 const PasskeyForm = ({ settings, onSaved }: { settings: PasskeyValues; onSaved: () => void }) => {
     const { t } = useTranslation();
@@ -45,17 +61,13 @@ const PasskeyForm = ({ settings, onSaved }: { settings: PasskeyValues; onSaved: 
             }}
             className='space-y-4 rounded-xl border border-mocha-400 bg-mocha-500 p-4'
         >
-            <div className='flex items-center justify-between gap-4 rounded-lg border border-mocha-400/70 p-4'>
-                <div>
-                    <p className='text-sm font-medium text-cream-50'>{t('admin.settings.passkeys_enabled')}</p>
-                    <p className='mt-1 text-xs text-neutral-400'>{t('admin.settings.passkeys_enabled_hint')}</p>
-                </div>
-                <Input.Checkbox
-                    checked={enabled}
-                    onChange={(event) => setEnabled(event.target.checked)}
-                    aria-label={t('admin.settings.passkeys_enabled')}
-                />
-            </div>
+            <Field
+                label={t('admin.common.status')}
+                error={errors['passkeys:enabled']}
+                hint={t('admin.settings.passkeys_enabled_hint')}
+            >
+                <Toggle value={enabled} onChange={setEnabled} />
+            </Field>
 
             <Field
                 label={t('admin.settings.passkeys_relying_party_id')}

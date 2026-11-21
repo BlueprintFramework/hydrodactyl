@@ -290,16 +290,16 @@
             "scan_description": "Escaneja el codi QR de dalt amb una aplicació d'autenticació o introdueix el codi secret de dalt. Després, introdueix a baix el codi de 6 dígits que generi."
         },
         "passkeys": {
-            "title": "Passkeys",
-            "description": "Utilitza una passkey del teu dispositiu per iniciar sessió sense introduir la contrasenya.",
-            "create": "Afegeix passkey",
-            "name_placeholder": "Nom de la passkey, per exemple MacBook",
-            "empty": "Encara no tens cap passkey.",
-            "unsupported": "Aquest navegador no admet passkeys.",
+            "title": "Claus d'accés",
+            "description": "Utilitza una clau d'accés del teu dispositiu per iniciar sessió sense introduir la contrasenya.",
+            "create": "Afegeix una clau d'accés",
+            "name_placeholder": "Nom de la clau d'accés, per exemple MacBook",
+            "empty": "Encara no tens cap clau d'accés.",
+            "unsupported": "Aquest navegador no admet claus d'accés.",
             "last_used": "Darrer ús",
             "never_used": "Mai utilitzada",
             "help": "La contrasenya continua disponible com a alternativa.",
-            "delete_confirm": "Vols eliminar aquesta passkey?"
+            "delete_confirm": "Vols eliminar aquesta clau d'accés?"
         }
     },
     "admin": {
@@ -1222,13 +1222,13 @@
             "brand_color_update_failed": "No s'ha pogut desar el color de marca.",
             "brand_color_reset": "Color de marca restablert al valor per defecte.",
             "brand_color_reset_failed": "No s'ha pogut restablir el color de marca.",
-            "tab_passkeys": "Passkeys",
-            "passkeys_enabled": "Activa les passkeys",
-            "passkeys_enabled_hint": "Permet als usuaris registrar passkeys i iniciar sessió sense introduir la contrasenya. El TOTP continua sent obligatori quan està actiu.",
+            "tab_passkeys": "Claus d'accés",
+            "passkeys_enabled": "Activa les claus d'accés",
+            "passkeys_enabled_hint": "Permet als usuaris registrar claus d'accés i iniciar sessió sense introduir la contrasenya. El TOTP continua sent obligatori quan està actiu.",
             "passkeys_relying_party_id": "Relying Party ID",
-            "passkeys_relying_party_id_hint": "El domini del panell al qual s'enllacen les passkeys, sense https://. Canviar-lo invalida les passkeys existents.",
+            "passkeys_relying_party_id_hint": "El domini del panell al qual s'enllacen les claus d'accés, sense https://. Canviar-lo invalida les claus d'accés existents.",
             "passkeys_allowed_origins": "Orígens permesos",
-            "passkeys_allowed_origins_hint": "Orígens HTTPS separats per comes on es pot obrir el diàleg de passkey, per exemple https://panel.example.com."
+            "passkeys_allowed_origins_hint": "Orígens HTTPS separats per comes on es pot obrir el diàleg de clau d'accés, per exemple https://panel.example.com."
         },
         "system_info": {
             "cpu_cores": "Nuclis de CPU",
@@ -1266,8 +1266,8 @@
             "title": "Inici de sessió",
             "username_label": "Nom d'usuari o correu electrònic",
             "username_required": "Cal proporcionar un nom d'usuari o un correu electrònic.",
-            "passkey": "Inicia sessió amb passkey",
-            "passkey_failed": "No s'ha pogut iniciar sessió amb passkey. Torna-ho a provar."
+            "passkey": "Inicia sessió amb una clau d'accés",
+            "passkey_failed": "No s'ha pogut iniciar sessió amb la clau d'accés. Torna-ho a provar."
         },
         "reset_password": {
             "confirm_password_label": "Confirma la contrasenya nova",

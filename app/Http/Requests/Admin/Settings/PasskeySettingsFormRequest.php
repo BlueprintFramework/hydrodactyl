@@ -49,14 +49,14 @@ class PasskeySettingsFormRequest extends AdminFormRequest
                             || isset($parts['query'])
                             || isset($parts['fragment'])
                         ) {
-                            $fail(__('Passkey origins must be absolute HTTP(S) origins without a path.'));
+                            $fail(__('validation.json_api.passkey_origin_invalid'));
 
                             return;
                         }
 
                         $host = strtolower($parts['host']);
                         if ($host !== $relyingPartyId && !str_ends_with($host, '.' . $relyingPartyId)) {
-                            $fail(__('Passkey origins must belong to the relying party domain.'));
+                            $fail(__('validation.json_api.passkey_origin_not_in_relying_party'));
                         }
                     }
                 },
