@@ -58,6 +58,9 @@ class AssetComposer
                 'serverUrl' => !is_null($driver) && method_exists($driver, 'getServerUrl') ? $driver->getServerUrl() : '',
                 'scriptIncludes' => $this->captcha->getScriptIncludes(),
             ],
+            'passkeys' => [
+                'enabled' => (bool) config('passkeys.enabled', true),
+            ],
         ]);
     }
 

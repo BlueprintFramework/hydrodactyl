@@ -36,4 +36,22 @@ class PasskeyLoginControllerTest extends IntegrationTestCase
             ->assertOk()
             ->assertExactJson(['passkeys' => []]);
     }
+
+    public function testLoginOptionsAreUnavailableWhenPasskeysAreDisabled(): void
+    {
+        config(['passkeys.enabled' => false]);
+
+        $this->getJson('/auth/passkeys/login/options')->assertNotFound();
+    }
+
+    public function testPasskeyManagementIsUnavailableWhenPasskeysAreDisabled(): void
+    {
+        config(['passkeys.enabled' => false]);
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->getJson('/user/passkeys')
+            ->assertNotFound();
+    }
 }

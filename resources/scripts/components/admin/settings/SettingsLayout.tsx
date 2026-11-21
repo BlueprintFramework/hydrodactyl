@@ -13,6 +13,7 @@ const SettingsLayout = () => {
         { label: t('admin.settings.tab_general'), to: '/settings', end: true },
         { label: t('admin.settings.tab_mail'), to: '/settings/mail' },
         { label: t('admin.settings.tab_captcha'), to: '/settings/captcha' },
+        { label: t('admin.settings.tab_passkeys'), to: '/settings/passkeys' },
         { label: t('admin.settings.tab_domains'), to: '/settings/domains' },
         { label: t('admin.settings.tab_custom_nav'), to: '/settings/custom-navigation' },
         { label: t('admin.settings.tab_branding'), to: '/settings/logo' },

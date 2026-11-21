@@ -1221,7 +1221,14 @@
             "brand_color_updated": "Brand color updated.",
             "brand_color_update_failed": "Failed to save brand color.",
             "brand_color_reset": "Brand color reset to default.",
-            "brand_color_reset_failed": "Failed to reset brand color."
+            "brand_color_reset_failed": "Failed to reset brand color.",
+            "tab_passkeys": "Passkeys",
+            "passkeys_enabled": "Enable passkeys",
+            "passkeys_enabled_hint": "Allow users to register passkeys and sign in without entering their password. TOTP is still required when enabled.",
+            "passkeys_relying_party_id": "Relying Party ID",
+            "passkeys_relying_party_id_hint": "The panel domain passkeys are bound to, without https://. Changing this invalidates existing passkeys.",
+            "passkeys_allowed_origins": "Allowed origins",
+            "passkeys_allowed_origins_hint": "Comma-separated HTTPS origins where passkey prompts may open, for example https://panel.example.com."
         },
         "system_info": {
             "cpu_cores": "CPU Cores",

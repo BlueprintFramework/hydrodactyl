@@ -33,6 +33,9 @@ function LoginContainer() {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const passkeysEnabled =
+        (window as { SiteConfiguration?: { passkeys?: { enabled?: boolean } } }).SiteConfiguration?.passkeys?.enabled ??
+        true;
 
     const {
         verify,
@@ -188,7 +191,7 @@ function LoginContainer() {
                             {t('auth.login.forgot_password')}
                         </SecondaryLink>
                     </div>
-                    {isSupported && (
+                    {isSupported && passkeysEnabled && (
                         <Button
                             className='w-full rounded-lg bg-transparent p-2 px-4 text-white ring-1 ring-overlay/20 hover:bg-overlay/10'
                             type='button'

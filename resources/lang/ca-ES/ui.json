@@ -1221,7 +1221,14 @@
             "brand_color_updated": "Color de marca actualitzat.",
             "brand_color_update_failed": "No s'ha pogut desar el color de marca.",
             "brand_color_reset": "Color de marca restablert al valor per defecte.",
-            "brand_color_reset_failed": "No s'ha pogut restablir el color de marca."
+            "brand_color_reset_failed": "No s'ha pogut restablir el color de marca.",
+            "tab_passkeys": "Passkeys",
+            "passkeys_enabled": "Activa les passkeys",
+            "passkeys_enabled_hint": "Permet als usuaris registrar passkeys i iniciar sessió sense introduir la contrasenya. El TOTP continua sent obligatori quan està actiu.",
+            "passkeys_relying_party_id": "Relying Party ID",
+            "passkeys_relying_party_id_hint": "El domini del panell al qual s'enllacen les passkeys, sense https://. Canviar-lo invalida les passkeys existents.",
+            "passkeys_allowed_origins": "Orígens permesos",
+            "passkeys_allowed_origins_hint": "Orígens HTTPS separats per comes on es pot obrir el diàleg de passkey, per exemple https://panel.example.com."
         },
         "system_info": {
             "cpu_cores": "Nuclis de CPU",

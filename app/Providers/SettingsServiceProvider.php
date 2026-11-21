@@ -48,6 +48,9 @@ class SettingsServiceProvider extends ServiceProvider
     'pterodactyl:captcha:cap:site_key',
     'pterodactyl:captcha:cap:secret_key',
     'pterodactyl:captcha:cap:server_url',
+    'passkeys:enabled',
+    'passkeys:relying_party_id',
+    'passkeys:allowed_origins',
   ];
 
 
@@ -107,6 +110,15 @@ class SettingsServiceProvider extends ServiceProvider
           $value = $encrypter->decrypt($value);
         } catch (DecryptException $exception) {
         }
+      }
+
+      if ($key === 'passkeys:allowed_origins' && is_string($value)) {
+        $value = array_values(array_filter(array_map('trim', explode(',', $value))));
+      }
+
+      if (is_array($value)) {
+        $config->set(str_replace(':', '.', $key), $value);
+        continue;
       }
 
       switch (strtolower($value)) {

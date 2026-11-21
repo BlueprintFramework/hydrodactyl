@@ -1221,7 +1221,14 @@
             "brand_color_updated": "Cor da marca atualizada.",
             "brand_color_update_failed": "Não foi possível salvar a cor da marca.",
             "brand_color_reset": "Cor da marca restaurada para o padrão.",
-            "brand_color_reset_failed": "Não foi possível restaurar a cor da marca."
+            "brand_color_reset_failed": "Não foi possível restaurar a cor da marca.",
+            "tab_passkeys": "Passkeys",
+            "passkeys_enabled": "Ativar passkeys",
+            "passkeys_enabled_hint": "Permite que os usuários registrem passkeys e entrem sem digitar a senha. O TOTP continua obrigatório quando ativado.",
+            "passkeys_relying_party_id": "Relying Party ID",
+            "passkeys_relying_party_id_hint": "O domínio do painel ao qual as passkeys estão vinculadas, sem https://. Alterar isso invalida as passkeys existentes.",
+            "passkeys_allowed_origins": "Origens permitidas",
+            "passkeys_allowed_origins_hint": "Origens HTTPS separadas por vírgulas onde o diálogo de passkey pode aparecer, por exemplo https://panel.example.com."
         },
         "system_info": {
             "cpu_cores": "Núcleos de CPU",

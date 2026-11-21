@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Middleware\PasskeyErrorResponse;
+use Pterodactyl\Http\Middleware\EnsurePasskeysEnabled;
 use Pterodactyl\Http\Controllers\Auth\PasskeyLoginController;
 
 /*
@@ -16,7 +17,7 @@ use Pterodactyl\Http\Controllers\Auth\PasskeyLoginController;
 |
 */
 
-Route::middleware(['guest', 'throttle:authentication', PasskeyErrorResponse::class])->group(function () {
+Route::middleware(['guest', 'throttle:authentication', EnsurePasskeysEnabled::class, PasskeyErrorResponse::class])->group(function () {
     Route::get('/auth/passkeys/login/options', [PasskeyLoginController::class, 'options'])
         ->name('auth.passkeys.options');
 

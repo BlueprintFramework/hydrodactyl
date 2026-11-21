@@ -1221,7 +1221,14 @@
             "brand_color_updated": "Color nominis instauratus.",
             "brand_color_update_failed": "Colorem nominis servare non potuit.",
             "brand_color_reset": "Color nominis in pristinum restitutus.",
-            "brand_color_reset_failed": "Colorem nominis restituere non potuit."
+            "brand_color_reset_failed": "Colorem nominis restituere non potuit.",
+            "tab_passkeys": "Passkeys",
+            "passkeys_enabled": "Enable passkeys",
+            "passkeys_enabled_hint": "Allow users to register passkeys and sign in without entering their password. TOTP is still required when enabled.",
+            "passkeys_relying_party_id": "Relying Party ID",
+            "passkeys_relying_party_id_hint": "The panel domain passkeys are bound to, without https://. Changing this invalidates existing passkeys.",
+            "passkeys_allowed_origins": "Allowed origins",
+            "passkeys_allowed_origins_hint": "Comma-separated HTTPS origins where passkey prompts may open, for example https://panel.example.com."
         },
         "system_info": {
             "cpu_cores": "Nuclei CPU",

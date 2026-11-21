@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'enabled' => env('PASSKEYS_ENABLED', true),
+
     /*
     |--------------------------------------------------------------------------
     | Relying Party
@@ -30,7 +32,7 @@ return [
     */
 
     'allowed_origins' => array_values(array_filter(array_map(
-        'trim',
+        fn (string $origin) => rtrim(trim($origin), '/'),
         explode(',', (string) env('PASSKEYS_ALLOWED_ORIGINS', (string) config('app.url'))),
     ))),
 

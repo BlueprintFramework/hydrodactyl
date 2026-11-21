@@ -14,6 +14,9 @@ export interface SiteSettings {
         url: string;
         icon: string;
     }[];
+    passkeys?: {
+        enabled: boolean;
+    };
 }
 
 export interface SettingsStore {

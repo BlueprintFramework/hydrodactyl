@@ -3,19 +3,20 @@
 namespace Pterodactyl\Http\Controllers\Admin\Api;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Contracts\Encryption\Encrypter;
 use Pterodactyl\Enums\Captcha\Captchas;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Pterodactyl\Http\Controllers\Controller;
+use Illuminate\Contracts\Console\Kernel;
 use Pterodactyl\Exceptions\DisplayException;
+use Pterodactyl\Http\Controllers\Controller;
+use Illuminate\Contracts\Encryption\Encrypter;
 use Pterodactyl\Providers\SettingsServiceProvider;
 use Pterodactyl\Traits\Helpers\AvailableLanguages;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 use Pterodactyl\Http\Requests\Admin\Settings\BaseSettingsFormRequest;
 use Pterodactyl\Http\Requests\Admin\Settings\MailSettingsFormRequest;
-use Pterodactyl\Http\Requests\Admin\Settings\AdvancedSettingsFormRequest;
 use Pterodactyl\Http\Requests\Admin\Settings\CaptchaSettingsFormRequest;
+use Pterodactyl\Http\Requests\Admin\Settings\PasskeySettingsFormRequest;
+use Pterodactyl\Http\Requests\Admin\Settings\AdvancedSettingsFormRequest;
 use Pterodactyl\Http\Requests\Admin\Settings\CustomNavigationSettingsFormRequest;
 
 class SettingsController extends Controller
@@ -94,6 +95,11 @@ class SettingsController extends Controller
             'custom_navigation' => [
                 'items' => $items,
             ],
+            'passkeys' => [
+                'passkeys:enabled' => (bool) $this->config->get('passkeys.enabled', true),
+                'passkeys:relying_party_id' => (string) $this->config->get('passkeys.relying_party_id', ''),
+                'passkeys:allowed_origins' => implode(', ', (array) $this->config->get('passkeys.allowed_origins', [])),
+            ],
             'languages' => $this->getAvailableLanguages(true),
         ]);
     }
@@ -132,6 +138,14 @@ class SettingsController extends Controller
      * Update the captcha settings.
      */
     public function updateCaptcha(CaptchaSettingsFormRequest $request): JsonResponse
+    {
+        return $this->store($request->normalize());
+    }
+
+    /**
+     * Update the passkey settings.
+     */
+    public function updatePasskeys(PasskeySettingsFormRequest $request): JsonResponse
     {
         return $this->store($request->normalize());
     }

@@ -3,11 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Controllers\Base;
 use Pterodactyl\Http\Middleware\PasskeyErrorResponse;
+use Pterodactyl\Http\Middleware\EnsurePasskeysEnabled;
 use Pterodactyl\Http\Controllers\Auth\PasskeyController;
 use Pterodactyl\Http\Middleware\RequireTwoFactorAuthentication;
 use Laravel\Passkeys\Http\Controllers\PasskeyRegistrationController;
 
-Route::middleware(['auth', PasskeyErrorResponse::class])->group(function () {
+Route::middleware(['auth', EnsurePasskeysEnabled::class, PasskeyErrorResponse::class])->group(function () {
     Route::get('/user/passkeys', [PasskeyController::class, 'index'])->name('account.passkeys.index');
     Route::get('/user/passkeys/options', [PasskeyRegistrationController::class, 'index'])->name('account.passkeys.options');
     Route::post('/user/passkeys', [PasskeyRegistrationController::class, 'store'])->name('account.passkeys.store');
