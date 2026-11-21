@@ -16,6 +16,9 @@ interface Passkey {
     last_used_at: string | null;
 }
 
+// Million compiles this into a block, which binds the input's onChange as the
+// native `change` event (fires on blur/Enter) instead of React's synthetic one.
+// million-ignore
 const PasskeySettings = () => {
     const { t, locale } = useTranslation();
     const { clearAndAddHttpError } = useFlashKey('account:passkeys');
