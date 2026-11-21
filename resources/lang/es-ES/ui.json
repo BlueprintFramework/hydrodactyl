@@ -1225,7 +1225,7 @@
             "tab_passkeys": "Claves de acceso",
             "passkeys_enabled": "Activar claves de acceso",
             "passkeys_enabled_hint": "Permite a los usuarios registrar claves de acceso e iniciar sesión sin introducir la contraseña. El TOTP sigue siendo obligatorio cuando está activo.",
-            "passkeys_relying_party_id": "Relying Party ID",
+            "passkeys_relying_party_id": "ID de la parte de confianza",
             "passkeys_relying_party_id_hint": "El dominio del panel al que se vinculan las claves de acceso, sin https://. Cambiarlo invalida las claves de acceso existentes.",
             "passkeys_allowed_origins": "Orígenes permitidos",
             "passkeys_allowed_origins_hint": "Orígenes HTTPS separados por comas donde puede abrirse el diálogo de clave de acceso, por ejemplo https://panel.example.com."

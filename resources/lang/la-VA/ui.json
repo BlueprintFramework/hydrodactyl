@@ -1225,7 +1225,7 @@
             "tab_passkeys": "Claves accessus",
             "passkeys_enabled": "Claves accessus activare",
             "passkeys_enabled_hint": "Permittit ut usores claves accessus registrent et sine tessera intrent. TOTP tamen necessarium est cum activum est.",
-            "passkeys_relying_party_id": "Relying Party ID",
+            "passkeys_relying_party_id": "ID partis fidentis",
             "passkeys_relying_party_id_hint": "Dominium panel cui claves accessus alligantur, sine https://. Id mutare claves accessus existentes irritas facit.",
             "passkeys_allowed_origins": "Origines permissae",
             "passkeys_allowed_origins_hint": "Origines HTTPS virgulis separatae ubi dialogus clavis accessus aperiri potest, exempli gratia https://panel.example.com."

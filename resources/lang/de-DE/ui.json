@@ -1182,7 +1182,7 @@
             "tab_passkeys": "Passkeys",
             "passkeys_enabled": "Passkeys aktivieren",
             "passkeys_enabled_hint": "Erlaubt Benutzern, Passkeys zu registrieren und sich ohne Passwort anzumelden. TOTP bleibt weiterhin erforderlich.",
-            "passkeys_relying_party_id": "Relying Party ID",
+            "passkeys_relying_party_id": "ID der vertrauenden Partei",
             "passkeys_relying_party_id_hint": "Die Panel-Domain, an die Passkeys gebunden sind, ohne https://. Eine Änderung macht bestehende Passkeys ungültig.",
             "passkeys_allowed_origins": "Erlaubte Origins",
             "passkeys_allowed_origins_hint": "Kommagetrennte HTTPS-Origins, unter denen die Passkey-Abfrage erscheinen darf, zum Beispiel https://panel.example.com."

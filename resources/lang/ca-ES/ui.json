@@ -1225,7 +1225,7 @@
             "tab_passkeys": "Claus d'accés",
             "passkeys_enabled": "Activa les claus d'accés",
             "passkeys_enabled_hint": "Permet als usuaris registrar claus d'accés i iniciar sessió sense introduir la contrasenya. El TOTP continua sent obligatori quan està actiu.",
-            "passkeys_relying_party_id": "Relying Party ID",
+            "passkeys_relying_party_id": "ID de la part de confiança",
             "passkeys_relying_party_id_hint": "El domini del panell al qual s'enllacen les claus d'accés, sense https://. Canviar-lo invalida les claus d'accés existents.",
             "passkeys_allowed_origins": "Orígens permesos",
             "passkeys_allowed_origins_hint": "Orígens HTTPS separats per comes on es pot obrir el diàleg de clau d'accés, per exemple https://panel.example.com."
