@@ -288,6 +288,18 @@
             "remove": "Treure l'aplicació d'autenticació",
             "remove_description": "Treure l'aplicació d'autenticació farà que el teu compte sigui menys segur.",
             "scan_description": "Escaneja el codi QR de dalt amb una aplicació d'autenticació o introdueix el codi secret de dalt. Després, introdueix a baix el codi de 6 dígits que generi."
+        },
+        "passkeys": {
+            "title": "Passkeys",
+            "description": "Utilitza una passkey del teu dispositiu per iniciar sessió sense introduir la contrasenya.",
+            "create": "Afegeix passkey",
+            "name_placeholder": "Nom de la passkey, per exemple MacBook",
+            "empty": "Encara no tens cap passkey.",
+            "unsupported": "Aquest navegador no admet passkeys.",
+            "last_used": "Darrer ús",
+            "never_used": "Mai utilitzada",
+            "help": "La contrasenya continua disponible com a alternativa.",
+            "delete_confirm": "Vols eliminar aquesta passkey?"
         }
     },
     "admin": {
@@ -1246,7 +1258,9 @@
             "sign_in": "Inicia la sessió",
             "title": "Inici de sessió",
             "username_label": "Nom d'usuari o correu electrònic",
-            "username_required": "Cal proporcionar un nom d'usuari o un correu electrònic."
+            "username_required": "Cal proporcionar un nom d'usuari o un correu electrònic.",
+            "passkey": "Inicia sessió amb passkey",
+            "passkey_failed": "No s'ha pogut iniciar sessió amb passkey. Torna-ho a provar."
         },
         "reset_password": {
             "confirm_password_label": "Confirma la contrasenya nova",

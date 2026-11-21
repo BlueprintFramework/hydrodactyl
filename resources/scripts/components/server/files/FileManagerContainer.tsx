@@ -74,6 +74,7 @@ const FileManagerContainer = () => {
         [files, normalizedSearchTerm],
     );
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: reset the search when the URL hash changes
     useEffect(() => {
         setSearchTerm('');
 

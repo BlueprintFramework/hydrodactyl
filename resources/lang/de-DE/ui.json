@@ -245,6 +245,18 @@
             "remove": "Authenticator-App entfernen",
             "remove_description": "Das Entfernen Ihrer Authenticator-App macht Ihr Konto weniger sicher.",
             "scan_description": "Scannen Sie den obigen QR-Code mit einer Authenticator-App oder geben Sie den obigen Geheimcode ein. Geben Sie dann den daraus erzeugten 6-stelligen Code unten ein."
+        },
+        "passkeys": {
+            "title": "Passkeys",
+            "description": "Melde dich mit einem auf deinem Gerät gespeicherten Passkey an, ohne dein Passwort einzugeben.",
+            "create": "Passkey hinzufügen",
+            "name_placeholder": "Passkey-Name, zum Beispiel MacBook",
+            "empty": "Du hast noch keine Passkeys.",
+            "unsupported": "Dieser Browser unterstützt keine Passkeys.",
+            "last_used": "Zuletzt verwendet",
+            "never_used": "Nie verwendet",
+            "help": "Dein Passwort bleibt als Alternative verfügbar.",
+            "delete_confirm": "Diesen Passkey entfernen?"
         }
     },
     "admin": {
@@ -1203,7 +1215,9 @@
             "sign_in": "Anmelden",
             "title": "Anmeldung",
             "username_label": "Benutzername oder E-Mail",
-            "username_required": "Ein Benutzername oder eine E-Mail-Adresse muss angegeben werden."
+            "username_required": "Ein Benutzername oder eine E-Mail-Adresse muss angegeben werden.",
+            "passkey": "Mit Passkey anmelden",
+            "passkey_failed": "Passkey-Anmeldung fehlgeschlagen. Bitte versuche es erneut."
         },
         "reset_password": {
             "confirm_password_label": "Neues Passwort bestätigen",

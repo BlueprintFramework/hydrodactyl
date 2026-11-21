@@ -288,6 +288,18 @@
             "remove": "Remover aplicativo autenticador",
             "remove_description": "Remover o aplicativo autenticador deixará sua conta menos segura.",
             "scan_description": "Escaneie o QR code acima com um aplicativo autenticador ou informe o código secreto acima. Depois, digite abaixo o código de 6 dígitos gerado pelo aplicativo."
+        },
+        "passkeys": {
+            "title": "Passkeys",
+            "description": "Use uma passkey armazenada no seu dispositivo para entrar sem digitar a senha.",
+            "create": "Adicionar passkey",
+            "name_placeholder": "Nome da passkey, por exemplo MacBook",
+            "empty": "Você ainda não tem nenhuma passkey.",
+            "unsupported": "Este navegador não oferece suporte a passkeys.",
+            "last_used": "Último uso",
+            "never_used": "Nunca usada",
+            "help": "Sua senha continua disponível como alternativa.",
+            "delete_confirm": "Remover esta passkey?"
         }
     },
     "admin": {
@@ -1246,7 +1258,9 @@
             "sign_in": "Entrar",
             "title": "Login",
             "username_label": "Usuário ou e-mail",
-            "username_required": "Informe um usuário ou e-mail."
+            "username_required": "Informe um usuário ou e-mail.",
+            "passkey": "Entrar com passkey",
+            "passkey_failed": "Não foi possível entrar com a passkey. Tente novamente."
         },
         "reset_password": {
             "confirm_password_label": "Confirmar nova senha",

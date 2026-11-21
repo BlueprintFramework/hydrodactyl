@@ -288,6 +288,18 @@
             "remove": "Tolle applicationem authentificandi",
             "remove_description": "Remotio applicationis authentificandi rationem tuam minus tutam faciet.",
             "scan_description": "Scopito codicem QR supra applicatione authentificandi, vel inscribe codicem secretum supra. Deinde inscribe codicem 6 numerorum quem generat infra."
+        },
+        "passkeys": {
+            "title": "Passkeys",
+            "description": "Use a passkey stored on your device to sign in without entering your password.",
+            "create": "Add passkey",
+            "name_placeholder": "Passkey name, for example MacBook",
+            "empty": "You don't have any passkeys yet.",
+            "unsupported": "This browser does not support passkeys.",
+            "last_used": "Last used",
+            "never_used": "Never used",
+            "help": "Your password remains available as a fallback.",
+            "delete_confirm": "Remove this passkey?"
         }
     },
     "admin": {
@@ -1246,7 +1258,9 @@
             "sign_in": "Ingredere",
             "title": "Ingressus",
             "username_label": "Nomen usoris vel epistula",
-            "username_required": "Nomen usoris vel epistula electronica praebenda est."
+            "username_required": "Nomen usoris vel epistula electronica praebenda est.",
+            "passkey": "Sign in with a passkey",
+            "passkey_failed": "Passkey sign-in failed. Please try again."
         },
         "reset_password": {
             "confirm_password_label": "Confirma tesseram novam",

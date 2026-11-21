@@ -288,6 +288,18 @@
             "remove": "Remove Authenticator App",
             "remove_description": "Removing your authenticator app will make your account less secure.",
             "scan_description": "Scan the QR code above using an authenticator app, or enter the secret code above. Then, enter the 6-digit code it generates below."
+        },
+        "passkeys": {
+            "title": "Passkeys",
+            "description": "Use a passkey stored on your device to sign in without entering your password.",
+            "create": "Add passkey",
+            "name_placeholder": "Passkey name, for example MacBook",
+            "empty": "You don't have any passkeys yet.",
+            "unsupported": "This browser does not support passkeys.",
+            "last_used": "Last used",
+            "never_used": "Never used",
+            "help": "Your password remains available as a fallback.",
+            "delete_confirm": "Remove this passkey?"
         }
     },
     "admin": {
@@ -1246,7 +1258,9 @@
             "sign_in": "Sign in",
             "title": "Login",
             "username_label": "Username or Email",
-            "username_required": "A username or email must be provided."
+            "username_required": "A username or email must be provided.",
+            "passkey": "Sign in with a passkey",
+            "passkey_failed": "Passkey sign-in failed. Please try again."
         },
         "reset_password": {
             "confirm_password_label": "Confirm New Password",
