@@ -27,6 +27,7 @@ function lookup(dictionary: DeepPartial<Translations>, key: string): string | un
             return undefined;
         }
 
+        // biome-ignore lint: walking a dynamically-keyed translation tree; the result is narrowed to a string below.
         node = (node as Record<string, unknown>)[segment];
     }
 

@@ -1,0 +1,58 @@
+language js
+
+// anti-slop/no-reflect-get
+// Reflect.get bypasses ordinary property access and discards type evidence.
+// Ported from oxlint-plugin-anti-slop `no-reflect-get`.
+//
+// The original matches any CallExpression whose callee is a member access on the global
+// `Reflect` naming `get` (identifier property, or string-literal property when computed).
+// Matching by node kind says exactly that: `JsCallExpression` covers optional-call `?.()` and
+// explicit type arguments for free because both live in fields this pattern leaves unconstrained,
+// and `JsStaticMemberExpression` covers `.` and `?.` alike.
+//
+// Biome's CST keeps parentheses as nodes and the original's AST does not, so the three positions
+// where a parenthesis can hide the shape -- around the callee, around the global, around the
+// computed key -- each get a guarded-recursive peel below. Guarded recursion is depth-unbounded
+// and does not overflow; verified to 200 levels.
+//
+// Known gaps, both shared with any scope-free implementation:
+//   - a local binding named `Reflect` that shadows the global still reports; GritQL has no scope
+//     analysis;
+//   - a computed key that spells the method through escape sequences (`Reflect["\x67et"]`) is
+//     missed; GritQL compares the literal's source text and cannot unescape it.
+// See PARITY.md.
+
+// A computed key naming the method: either quote style, through any depth of parentheses.
+pattern anti_slop_reflect_get_key() {
+	or {
+		`"get"`,
+		`'get'`,
+		JsParenthesizedExpression(expression = anti_slop_reflect_get_key())
+	}
+}
+
+// The global itself, through any depth of parentheses around it. The original works on an AST
+// with no parenthesis node, so `(Reflect).get(o, k)` is the same call to it as `Reflect.get(o, k)`.
+pattern anti_slop_reflect_get_object() {
+	or {
+		`Reflect`,
+		JsParenthesizedExpression(expression = anti_slop_reflect_get_object())
+	}
+}
+
+// The call target, through any depth of parentheses around it.
+pattern anti_slop_reflect_get_callee() {
+	or {
+		JsStaticMemberExpression(object = anti_slop_reflect_get_object(), member = `get`),
+		JsComputedMemberExpression(object = anti_slop_reflect_get_object(), member = anti_slop_reflect_get_key()),
+		JsParenthesizedExpression(expression = anti_slop_reflect_get_callee())
+	}
+}
+
+JsCallExpression(callee = anti_slop_reflect_get_callee()) as $node where {
+	register_diagnostic(
+		span = $node,
+		message = "anti-slop/no-reflect-get: Replace `Reflect.get` with typed property access. Parse dynamic input into a named domain type before reading it.",
+		severity = "error"
+	)
+}

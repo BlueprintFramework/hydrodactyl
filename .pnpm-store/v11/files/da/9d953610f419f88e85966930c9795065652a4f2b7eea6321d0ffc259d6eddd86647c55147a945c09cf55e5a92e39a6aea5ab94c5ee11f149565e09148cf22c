@@ -1,0 +1,9 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const React = tslib_1.__importStar(require("react"));
+const ArrowDownLeft = (props) => (React.createElement("svg", Object.assign({ xmlns: "http://www.w3.org/2000/svg", width: 16, height: 16, fill: "none", viewBox: "0 0 16 16" }, props),
+    React.createElement("g", { fill: "currentColor" },
+        React.createElement("path", { d: "M12.197 2.741a.75.75 0 0 1 1.06 1.061l-8.175 8.176h3.847a.75.75 0 0 1-.001 1.5H3.27a.75.75 0 0 1-.75-.75V7.073a.75.75 0 0 1 1.5 0v3.845z" }),
+        React.createElement("path", { d: "M12.198 2.741a.75.75 0 0 1 1.06 1.061l-8.175 8.176h3.846a.75.75 0 0 1 0 1.5H3.27a.75.75 0 0 1-.75-.75V7.072a.751.751 0 0 1 1.501 0v3.846z" }))));
+exports.default = ArrowDownLeft;

@@ -1,0 +1,149 @@
+language js
+
+// anti-slop/no-unsafe-dictionary-type
+// A dictionary contract whose value type is `unknown`, `any`, `object`, `{}` — or a union
+// containing one of those, or one of them behind a transparent wrapper — hands callers a
+// container with no value contract at all. Reject `Record<K, escape-hatch>`, index-signature
+// members and mapped types with the same value, so the owner names a real value type and
+// parses external payloads before insertion.
+// Ported from oxlint-plugin-anti-slop `no-unsafe-dictionary-type`.
+//
+// GritQL has no scope or type resolution, so this port is syntactic: it cannot follow a value
+// type through a type alias, a generic parameter, or an empty `interface`. It matches the
+// escape hatch where it is written.
+//
+// Everything below the shadowing guards is matched on node kinds. That matters twice over:
+// index signatures are reached in class and interface bodies as well as type literals, and the
+// value classifier recurses. Guarded recursion only survives if every step binds through a node
+// field — a metavariable bound by a *snippet* inside a recursive definition stops matching node
+// kinds after the first re-entry, which silently drops the whole branch.
+//
+// The pattern is also deliberately flat. A named-pattern call is expensive in Biome's GritQL —
+// wrapping the same body in one extra `pattern` measured 4.4x slower over 1200 matches — so the
+// two dictionary shapes are spelled inline in the top-level `or` and only the recursive
+// classifier and the cold `{}` test are named.
+
+// `Record`'s built-in meaning only holds while nothing in the file declares or imports that
+// name; likewise for the transparent wrappers. Only declarations that introduce a *type* count,
+// mirroring the original's environment: `const Record = …` leaves the built-in `Record<K, V>`
+// type untouched. `Record` and the wrapper group are tracked separately, so a file that declares
+// its own `Record` still gets its index signatures checked, and a file that imports `Partial`
+// still gets its `Record`s checked. Both guards run only against an already-matched dictionary.
+//
+// Each guard is anchored on the file node. `within` walks every ancestor and tests the pattern
+// against each one, so an unanchored regex is re-run over every enclosing node's text; anchoring
+// turns all but one of those into a node-kind check. It is also the more faithful reading — the
+// original builds its environment from the program's own top-level statements.
+pattern udt_shadowed_record() {
+	or {
+		JsModule(),
+		JsScript()
+	} as $file where {
+		$file <: r"[\s\S]*(?:(?:type|interface|class|enum|function)\s+Record\b|import\s+(?:type\s+)?(?:\*\s+as\s+)?Record\b|import[^;\n]*\{[^}]*\bRecord\b)[\s\S]*"
+	}
+}
+
+pattern udt_shadowed_wrapper() {
+	or {
+		JsModule(),
+		JsScript()
+	} as $file where {
+		$file <: r"[\s\S]*(?:(?:type|interface|class|enum|function)\s+(?:Readonly|Partial|Required|NonNullable)\b|import\s+(?:type\s+)?(?:\*\s+as\s+)?(?:Readonly|Partial|Required|NonNullable)\b|import[^;\n]*\{[^}]*\b(?:Readonly|Partial|Required|NonNullable)\b)[\s\S]*"
+	}
+}
+
+// `{}` and `{ readonly __brand?: never }`: a member list that is empty, or made only of optional
+// `never`s, is "effectively empty", exactly as the original rule classifies it. Only the `?` is
+// spelled as a regex — Biome's GritQL exposes a node's child *nodes* but not its tokens, so
+// there is no optional-token field to test. The regex has to describe the whole member, not just
+// look for a `?` somewhere in it: a `?` inside a quoted property name (`{ "a?b": never }`) is
+// not an optional marker, and reading it as one reports a type that has a required member.
+pattern udt_effectively_empty_member() {
+	TsPropertySignatureTypeMember(
+		type_annotation = TsTypeAnnotation(ty = TsNeverType())
+	) as $member where {
+		$member <: r"\s*(?:readonly\s+)?(?:[A-Za-z_$][A-Za-z0-9_$]*|\x22[^\x22\n]*\x22|'[^'\n]*'|[0-9]+)\s*\?[\s\S]*"
+	}
+}
+
+pattern udt_empty_object_type() {
+	TsObjectType(members = $members) where {
+		$members <: every udt_effectively_empty_member()
+	}
+}
+
+// `any` on its own poisons an intersection, so it needs its own transparent-wrapper walk.
+pattern udt_any_value() {
+	or {
+		TsAnyType(),
+		TsParenthesizedType(ty = $parenthesized) where {
+			$parenthesized <: udt_any_value()
+		},
+		TsReferenceType(
+			name = $any_wrapper_name,
+			type_arguments = TsTypeArguments(ts_type_argument_list = $any_wrapper_arguments)
+		) where {
+			$any_wrapper_name <: r"(?:Readonly|Partial|Required|NonNullable)",
+			$any_wrapper_name <: not within udt_shadowed_wrapper(),
+			$any_wrapper_arguments <: some udt_any_value()
+		}
+	}
+}
+
+// Guarded recursion: every branch descends into a strictly smaller type node, so parentheses,
+// `Readonly`/`Partial`/`Required`/`NonNullable`, unions and intersections nest to any depth.
+// `TsUnionType` and `TsIntersectionType` carry their whole member list, so there is no arity cap.
+// An intersection is unsafe when `any` poisons it, or when every member is itself a hatch.
+pattern udt_unsafe_value() {
+	or {
+		TsUnknownType(),
+		TsAnyType(),
+		TsNonPrimitiveType(),
+		TsParenthesizedType(ty = $parenthesized) where {
+			$parenthesized <: udt_unsafe_value()
+		},
+		TsReferenceType(
+			name = $wrapper_name,
+			type_arguments = TsTypeArguments(ts_type_argument_list = $wrapper_arguments)
+		) where {
+			$wrapper_name <: r"(?:Readonly|Partial|Required|NonNullable)",
+			$wrapper_name <: not within udt_shadowed_wrapper(),
+			$wrapper_arguments <: some udt_unsafe_value()
+		},
+		TsUnionType(types = $union_members) where {
+			$union_members <: some udt_unsafe_value()
+		},
+		TsIntersectionType(types = $intersection_members) where {
+			or {
+				$intersection_members <: every udt_unsafe_value(),
+				$intersection_members <: some udt_any_value()
+			}
+		},
+		udt_empty_object_type()
+	}
+}
+
+// The two ways to spell a key-to-value contract: `Record<K, V>`, and an index signature —
+// reached in a type literal, an interface body and a class body alike — or a mapped type. The
+// diagnostic lands on the offending member itself rather than on its container.
+or {
+	`Record<$key, $value>` where {
+		$value <: udt_unsafe_value(),
+		$key <: not within udt_shadowed_record()
+	},
+	TsIndexSignatureTypeMember(type_annotation = TsTypeAnnotation(ty = $value)) where {
+		$value <: udt_unsafe_value()
+	},
+	TsIndexSignatureClassMember(type_annotation = TsTypeAnnotation(ty = $value)) where {
+		$value <: udt_unsafe_value()
+	},
+	TsMappedType(mapped_type = TsTypeAnnotation(ty = $value)) where {
+		$value <: udt_unsafe_value()
+	}
+} as $node where {
+	register_diagnostic(
+		span = $node,
+		message = "anti-slop/no-unsafe-dictionary-type: This dictionary's unknown/any/object/{} value type gives callers no concrete value contract. Use an owner/schema-derived value type; parse external payloads before insertion.",
+		severity = "error"
+	)
+}

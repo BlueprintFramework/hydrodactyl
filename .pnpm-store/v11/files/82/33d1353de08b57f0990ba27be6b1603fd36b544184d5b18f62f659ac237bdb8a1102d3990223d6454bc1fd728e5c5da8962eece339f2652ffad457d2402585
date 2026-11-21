@@ -1,0 +1,52 @@
+{
+	"name": "biome-anti-slop",
+	"version": "0.1.0",
+	"description": "Opinionated Biome (GritQL) lint rules that reject low-evidence and low-signal TypeScript and JavaScript patterns. A port of oxlint-plugin-anti-slop.",
+	"type": "module",
+	"license": "MIT",
+	"exports": {
+		".": "./presets/all.json",
+		"./all": "./presets/all.json",
+		"./recommended": "./presets/recommended.json",
+		"./plugins/*": "./plugins/*"
+	},
+	"bin": {
+		"biome-anti-slop": "./bin/cli.mjs"
+	},
+	"files": [
+		"presets",
+		"plugins",
+		"bin",
+		"docs",
+		"skills",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"test": "node test/harness.mjs && node test/robustness.mjs && node test/cli.mjs && node test/integration.mjs && node scripts/check-manifest.mjs",
+		"test:rules": "node test/harness.mjs",
+		"test:robustness": "node test/robustness.mjs",
+		"test:cli": "node test/cli.mjs",
+		"test:install": "node test/integration.mjs",
+		"check": "node scripts/check-manifest.mjs"
+	},
+	"keywords": [
+		"biome",
+		"biomejs",
+		"gritql",
+		"lint",
+		"linter",
+		"typescript",
+		"anti-slop",
+		"code-quality"
+	],
+	"engines": {
+		"node": ">=18"
+	},
+	"peerDependencies": {
+		"@biomejs/biome": ">=2.5.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.8"
+	}
+}

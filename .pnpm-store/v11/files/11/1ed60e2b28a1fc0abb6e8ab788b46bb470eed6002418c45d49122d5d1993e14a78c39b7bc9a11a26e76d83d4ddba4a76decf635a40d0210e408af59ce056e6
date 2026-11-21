@@ -1,0 +1,8 @@
+import * as React from 'react';
+const ChartLineArrowUp = (props) => (React.createElement("svg", Object.assign({ xmlns: "http://www.w3.org/2000/svg", width: 16, height: 16, fill: "none", viewBox: "0 0 16 16" }, props),
+    React.createElement("g", { clipPath: "url(#a)" },
+        React.createElement("path", { fill: "currentColor", d: "M14.75 12.5a.75.75 0 0 1 0 1.5H1.25a.75.75 0 0 1 0-1.5zm-.5-10a.75.75 0 0 1 .75.75V6.5a.75.75 0 0 1-1.5 0V5.06l-3.241 3.242a2.25 2.25 0 0 1-2.505.465L5.335 7.69a.75.75 0 0 0-.923.261l-2.044 2.973a.75.75 0 0 1-1.236-.85l2.044-2.972a2.25 2.25 0 0 1 2.767-.782l2.42 1.075a.75.75 0 0 0 .835-.155L12.44 4H11a.75.75 0 0 1 0-1.5z" })),
+    React.createElement("defs", null,
+        React.createElement("clipPath", { id: "a" },
+            React.createElement("path", { fill: "currentColor", d: "M0 0h16v16H0z" })))));
+export default ChartLineArrowUp;

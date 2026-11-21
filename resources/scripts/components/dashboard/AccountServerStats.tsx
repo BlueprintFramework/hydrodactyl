@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import getServerCount, { type ServerAccessType } from '@/api/getServerCount';
+import getServerCount from '@/api/getServerCount';
 import AccountSection from '@/components/dashboard/AccountSection';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from '@/i18n/I18nProvider';
@@ -9,12 +9,16 @@ const STROKE = 12;
 const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-function useServerCount(type: ServerAccessType) {
-    const { data } = useSWR(['server:count', type], () => getServerCount(type), {
-        revalidateOnFocus: false,
-    });
+function useServerCounts() {
+    return useSWR(
+        'server:counts',
+        async () => {
+            const [owned, shared] = await Promise.all([getServerCount('owner'), getServerCount('shared')]);
 
-    return data;
+            return { owned, shared };
+        },
+        { revalidateOnFocus: false },
+    );
 }
 
 /**
@@ -23,12 +27,10 @@ function useServerCount(type: ServerAccessType) {
  */
 const AccountServerStats = () => {
     const { t } = useTranslation();
-    const owned = useServerCount('owner');
-    const shared = useServerCount('shared');
-    const loading = owned === undefined || shared === undefined;
+    const { data, isLoading: loading } = useServerCounts();
 
-    const ownedCount = owned ?? 0;
-    const sharedCount = shared ?? 0;
+    const ownedCount = data?.owned ?? 0;
+    const sharedCount = data?.shared ?? 0;
     const total = ownedCount + sharedCount;
     const ownedArc = total > 0 ? (ownedCount / total) * CIRCUMFERENCE : 0;
     const sharedArc = total > 0 ? CIRCUMFERENCE - ownedArc : 0;

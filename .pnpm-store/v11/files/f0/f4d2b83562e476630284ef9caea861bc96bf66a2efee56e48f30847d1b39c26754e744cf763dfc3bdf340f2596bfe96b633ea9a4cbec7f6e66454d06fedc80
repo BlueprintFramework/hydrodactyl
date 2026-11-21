@@ -1,0 +1,167 @@
+language js
+
+// anti-slop/no-unknown-type-aliases
+// A named alias whose resolved type is `unknown` hides the top type behind a
+// domain-sounding name, so readers believe a value was parsed when it was not.
+// `unknown` must stay visible at the parsing boundary (or on an allowed `cause`
+// field); everywhere else, name the parsed owner type instead.
+// Ported from oxlint-plugin-anti-slop `no-unknown-type-aliases`.
+//
+// The original walks `Program.body` only, so an alias declared inside any nested
+// body is invisible to it -- both as a violation and as a chain hop. This port
+// reproduces that by resolving chain hops against the root's *item list*
+// (`module_items()`) instead of searching the whole file: a nested alias is not a
+// root item, so it can never be reached, and the search touches one node per
+// top-level statement rather than every node in the file.
+//
+// Chains are bounded at the alias plus four hops. The original resolves any depth
+// with a visited set; GritQL has no state to hold one, and a parameterised
+// recursive pattern definition overflows the Biome worker's stack even when every
+// branch descends, so the bound is what keeps a cyclic alias (`type A = B;
+// type B = A;`) from looping forever. Parenthesis depth is *not* bounded: the
+// `contains ... until not TsParenthesizedType()` walks peel any number of layers.
+//
+// Cost: every right-hand side that is not a bare alias reference leaves in O(1),
+// which is what a generated types file is made of (300 object aliases: 0.05s).
+// A file built entirely of bare re-export aliases *and* containing at least one
+// `= unknown` alias still costs one item-list scan per alias per hop, i.e. it is
+// quadratic in the number of such aliases -- 300 of them chained end to end take
+// ~7s. GritQL has no map to memoise the lookup, so that shape stays slow.
+
+// `unknown` under any number of parentheses. `until not TsParenthesizedType()`
+// descends through parenthesis wrappers and nothing else, so `(unknown)` resolves
+// while `(unknown | string)` and `({ a: unknown })` correctly do not.
+// `TsUnknownType` is the keyword itself, so the string type `"unknown"` and the
+// template type `` `unknown` `` are not mistaken for it.
+pattern unknown_top() {
+	contains TsUnknownType() until not TsParenthesizedType()
+}
+
+// A declaration that no nested body encloses, i.e. a `Program.body` statement.
+// The list enumerates every node that can hold a statement: function and class
+// static bodies, blocks, module/namespace bodies, switch clauses, and the
+// single-statement bodies of labels, `if` and the loops. `export` and `declare`
+// wrappers are deliberately absent -- an alias under those is still top level.
+pattern top_level() {
+	not within or {
+		JsFunctionBody(),
+		JsBlockStatement(),
+		TsModuleBlock(),
+		JsStaticInitializationBlockClassMember(),
+		JsCaseClause(),
+		JsDefaultClause(),
+		JsLabeledStatement(),
+		JsIfStatement(),
+		JsForStatement(),
+		JsForInStatement(),
+		JsForOfStatement(),
+		JsWhileStatement(),
+		JsDoWhileStatement(),
+		JsWithStatement()
+	}
+}
+
+// A module-level statement declaring alias `$name` with right-hand side `$rhs`,
+// stripped of the `export` / `declare` / `export declare` wrappers that each get
+// their own node in Biome's tree. `type_parameters = .` is the original's refusal
+// to resolve *through* a generic alias: `type G<T> = unknown; type U = G;` leaves
+// `U` alone.
+pattern module_alias($name, $rhs) {
+	or {
+		TsTypeAliasDeclaration(binding_identifier = $name, type_parameters = ., ty = $rhs),
+		JsExport(
+			export_clause = TsTypeAliasDeclaration(
+				binding_identifier = $name,
+				type_parameters = .,
+				ty = $rhs
+			)
+		),
+		TsDeclareStatement(
+			declaration = TsTypeAliasDeclaration(
+				binding_identifier = $name,
+				type_parameters = .,
+				ty = $rhs
+			)
+		),
+		JsExport(
+			export_clause = TsExportDeclareClause(
+				declaration = TsTypeAliasDeclaration(
+					binding_identifier = $name,
+					type_parameters = .,
+					ty = $rhs
+				)
+			)
+		)
+	}
+}
+
+// Binds `$items` to the file's top-level statement list, i.e. the original's
+// `Program.body`. Two root nodes carry one: `JsModule` for `.ts` / `.tsx` /
+// `.mts` / `.cts`, and `TsDeclarationModule` for `.d.ts`. Naming only `JsModule`
+// silently disabled every chain hop in declaration files, which is exactly where
+// generated alias chains live.
+pattern module_items($items) {
+	or {
+		JsModule(items = $items),
+		TsDeclarationModule(items = $items)
+	}
+}
+
+// A bare reference to some alias name, under any number of parentheses.
+// `JsReferenceIdentifier` rejects a qualified name (`Legacy.Inner`) and
+// `type_arguments = .` rejects an instantiation (`G<string>`), exactly as the
+// original's `referencedAliasName` does. Nothing else can start a chain, so this
+// is also the O(1) gate that keeps every other right-hand side out of the lookup.
+pattern bare_alias_ref() {
+	contains TsReferenceType(name = JsReferenceIdentifier(), type_arguments = .)
+		until not TsParenthesizedType()
+}
+
+// One chain hop: `bare_alias_ref()` plus the module-level declaration it names,
+// whose right-hand side has to match `$next`.
+pattern alias_hop($next) {
+	contains (
+		TsReferenceType(name = JsReferenceIdentifier() as $name, type_arguments = .) as $ref where {
+			$ref <: within module_items($items),
+			$items <: some module_alias($name, $rhs),
+			$rhs <: $next
+		}
+	) until not TsParenthesizedType()
+}
+
+pattern resolves_unknown_0() { unknown_top() }
+pattern resolves_unknown_1() { or { unknown_top(), alias_hop(resolves_unknown_0()) } }
+pattern resolves_unknown_2() { or { unknown_top(), alias_hop(resolves_unknown_1()) } }
+pattern resolves_unknown_3() { or { unknown_top(), alias_hop(resolves_unknown_2()) } }
+pattern resolves_unknown_4() { or { unknown_top(), alias_hop(resolves_unknown_3()) } }
+
+TsTypeAliasDeclaration(ty = $type) as $node where {
+	$node <: top_level(),
+	or {
+		$type <: unknown_top(),
+		and {
+			// Two gates, cheapest first, because the hop chain is the only part of
+			// this rule that costs more than O(1) per alias.
+			//
+			// Only a bare alias reference can start a chain, so every union, object,
+			// generic, indexed-access and keyword right-hand side -- which is what a
+			// generated types file is made of -- leaves here without touching the
+			// module.
+			//
+			// A chain can then only *end* at a module-level alias whose right-hand
+			// side is literally `unknown`, so a file with no such alias cannot
+			// produce a hit through any number of hops. One list scan buys skipping
+			// four nested ones, which is what keeps a file of alias re-exports from
+			// going quadratic with a large constant.
+			$type <: bare_alias_ref(),
+			$node <: within module_items($gate_items),
+			$gate_items <: some module_alias($gate_name, unknown_top()),
+			$type <: resolves_unknown_4()
+		}
+	},
+	register_diagnostic(
+		span = $node,
+		message = "anti-slop/no-unknown-type-aliases: This type alias hides `unknown`. Keep `unknown` explicit at the parsing boundary or on an allowed `cause` field; otherwise use the parsed owner type.",
+		severity = "error"
+	)
+}

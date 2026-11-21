@@ -1,0 +1,14 @@
+import Keyframes from '../models/Keyframes';
+import { Interpolation, Styles } from '../types';
+/**
+ * Define a CSS `@keyframes` animation with an automatically scoped name.
+ *
+ * ```tsx
+ * const rotate = keyframes`
+ *   from { transform: rotate(0deg); }
+ *   to { transform: rotate(360deg); }
+ * `;
+ * const Spinner = styled.div`animation: ${rotate} 1s linear infinite;`;
+ * ```
+ */
+export default function keyframes<Props extends object = {}>(strings: Styles<Props>, ...interpolations: Array<Interpolation<Props>>): Keyframes;

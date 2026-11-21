@@ -1,0 +1,46 @@
+{
+  "name": "@hcaptcha/loader",
+  "description": "This is a JavaScript library to easily configure the loading of the hCaptcha JS client SDK with built-in error handling.",
+  "version": "2.3.0",
+  "author": "hCaptcha team and contributors",
+  "license": "MIT",
+  "keywords": [
+    "hcaptcha",
+    "captcha"
+  ],
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/types/src/index.d.ts",
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.cjs"
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hCaptcha/hcaptcha-loader.git"
+  },
+  "devDependencies": {
+    "@playwright/experimental-ct-react": "^1.33.0",
+    "@playwright/test": "^1.33.0",
+    "@types/node": "^18.11.18",
+    "http-server": "^14.1.1",
+    "@loader/demo": "^1.0.0",
+    "@loader/lib": "^1.0.0"
+  },
+  "scripts": {
+    "build:lib": "pnpm -r --stream run compile:build",
+    "dev:lib": "pnpm -r --stream run compile:watch",
+    "display:demo": "http-server ./ --cors -d -o ./demo/src",
+    "serve:demo": "http-server ./",
+    "fix:lint": "pnpm -r --stream run fix:lint",
+    "test:lint": "pnpm -r --stream run test:lint",
+    "test:types": "pnpm -r --stream run test:types",
+    "test:unit": "pnpm -r --stream run test:unit",
+    "test:integration": "playwright test -c playwright.config.ts"
+  }
+}

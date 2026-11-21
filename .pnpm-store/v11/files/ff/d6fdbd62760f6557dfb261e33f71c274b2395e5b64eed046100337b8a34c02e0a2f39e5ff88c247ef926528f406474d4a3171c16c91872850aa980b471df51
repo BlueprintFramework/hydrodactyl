@@ -1,0 +1,345 @@
+language js
+
+// anti-slop/no-known-value-widening
+// A value whose shape is established right here — an object/array literal, a function, a class,
+// a literal — that is handed to an explicitly broad or anonymous target type throws away the
+// evidence the compiler already had. Keep inference, or check the shape with `satisfies`.
+// Ported from oxlint-plugin-anti-slop `no-known-value-widening`. GritQL has no scope analysis and
+// no type resolution, so this port only fires when the evidence and the broad target are visible
+// at the same site: a value reached through a binding, and a target reached through a type alias
+// or an interface, are out of reach and deliberately stay unreported. Everything else the
+// original sees is reachable by node kind. See test/fixtures/<rule>/valid.ts for the parked cases.
+//
+// Two Biome-GritQL constraints shape the code below and are worth knowing before editing it:
+//
+//   * A pattern definition that takes an **unbound** parameter (an "out" parameter) costs about
+//     1.4ms per call, and the plugin runtime is already quadratic in file size, so a handful of
+//     them per matched node is the difference between 0.06s and 2.4s on the same file. Anything
+//     that has to hand a node back to its caller is therefore written inline, however repetitive
+//     that is. Definitions whose parameters are all bound on entry are free and are used freely.
+//   * Self-recursion is not usable here, for two different reasons depending on how it is spelled.
+//     A recursive `predicate` taking parameters compiles and then silently matches only its base
+//     case: `predicate p($t) { or { $t <: TsUnknownType(), and { $t <: TsParenthesizedType(ty =
+//     $i), p($i) } } }` matches `unknown` and never `(unknown)`. A recursive parameterless
+//     `pattern` does work correctly (contrary to an earlier note in docs/GRITQL-NOTES.md claiming
+//     node-kind branches are lost), but it overflows the Biome worker's stack at roughly 300
+//     levels of type nesting, where the unrolled chain below still answers at 1000 and Biome's
+//     own parser is the first thing to give out. A stack overflow aborts the whole run, so the
+//     transparent-wrapper peel is an explicit chain and accepts a cap instead.
+
+// ---------------------------------------------------------------------------
+// Values
+// ---------------------------------------------------------------------------
+
+// A value whose shape the reader can see without leaving the expression. Mirrors the original's
+// `isKnownEvidenceExpression`: object/array literals, functions, classes, `new`, every unary
+// expression and every literal. Node kinds rather than source-text regexes, so an identifier that
+// merely reads like a literal (`trueValue`, `maybenull`, `version1`) is not evidence.
+pattern anti_slop_value_core() {
+	or {
+		JsObjectExpression(),
+		JsArrayExpression(),
+		JsArrowFunctionExpression(),
+		JsFunctionExpression(),
+		JsClassExpression(),
+		JsNewExpression(),
+		JsUnaryExpression(),
+		JsStringLiteralExpression(),
+		JsNumberLiteralExpression(),
+		JsBigintLiteralExpression(),
+		JsBooleanLiteralExpression(),
+		JsNullLiteralExpression(),
+		JsRegexLiteralExpression(),
+		// A tagged template is a call, not a literal, but the CST keeps both spellings in
+		// `JsTemplateExpression` and its `tag` field does not bind to anything a pattern can
+		// test. The two are told apart by the one thing that always differs: an untagged
+		// template's text starts with a backtick. Regexes here are full-match anchored.
+		and { JsTemplateExpression(), r"(?s)\x60.*" }
+	}
+}
+
+pattern anti_slop_empty_object_core() {
+	JsObjectExpression(members = $anti_slop_object_members) where {
+		$anti_slop_object_members <: not some $_
+	}
+}
+
+// Parentheses, both assertion spellings, `satisfies` and `!` do not remove the evidence
+// underneath them. Mirrors the original's `unwrapExpression`.
+pattern anti_slop_value_wrapper() {
+	or {
+		JsParenthesizedExpression(),
+		TsAsExpression(),
+		TsSatisfiesExpression(),
+		TsNonNullAssertionExpression(),
+		TsTypeAssertionExpression()
+	}
+}
+
+// The evidence under any depth of those wrappers. `until` walks the wrapper spine and stops at
+// the first node that is not one, so a literal buried in a call argument, an array element or a
+// ternary branch is never mistaken for the value itself.
+pattern anti_slop_known_value() {
+	contains anti_slop_value_core() until not anti_slop_value_wrapper()
+}
+
+pattern anti_slop_empty_object() {
+	contains anti_slop_empty_object_core() until not anti_slop_value_wrapper()
+}
+
+// ---------------------------------------------------------------------------
+// Targets
+// ---------------------------------------------------------------------------
+
+// A `Record<K, V>`. Matching the reference's own name means `MyRecord` and `Recorder` are not it,
+// where a whole-node regex would have taken any text containing the word. Like the original this
+// port does not track shadowing of the built-in.
+pattern anti_slop_record_type() {
+	TsReferenceType(name = r"Record", type_arguments = TsTypeArguments())
+}
+
+// A type literal carrying an index signature. `some` looks at the literal's own member list, so a
+// nested type literal's index signature does not promote its parent.
+pattern anti_slop_index_signature_literal() {
+	TsObjectType(members = $anti_slop_dictionary_members) where {
+		$anti_slop_dictionary_members <: some TsIndexSignatureTypeMember()
+	}
+}
+
+// Anonymous object contracts: a type literal with at least one member and no index signature —
+// `{ start: Command }`, `{ host: string; port: number }`, `{ (): void }`, and the nested-brace
+// shapes a regex could never accept. `{}` is excluded: the original classifies it as no target.
+pattern anti_slop_anonymous_literal() {
+	TsObjectType(members = $anti_slop_anonymous_members) where {
+		$anti_slop_anonymous_members <: not some TsIndexSignatureTypeMember(),
+		$anti_slop_anonymous_members <: some $_
+	}
+}
+
+// Is this already-unwrapped type a widening target for this value? `{}` flowing into a dictionary
+// is the legitimate accumulator seed and is never reported there, but it is still evidence
+// against `unknown`, `object` and a named-shape type literal.
+predicate anti_slop_broad_target($core, $value) {
+	or {
+		$core <: TsUnknownType(),
+		$core <: TsNonPrimitiveType(),
+		$core <: anti_slop_anonymous_literal(),
+		and {
+			or {
+				$core <: anti_slop_record_type(),
+				$core <: TsMappedType(),
+				$core <: anti_slop_index_signature_literal()
+			},
+			$value <: not anti_slop_empty_object()
+		}
+	}
+}
+
+// The transparent built-in wrappers keep the shape they wrap, so the target underneath is the one
+// that counts. Peeled by an explicit four-deep chain: recursion is spelled out in the header note
+// above and trades a cap this file will never reach for a stack overflow that aborts the run, and
+// hoisting the one-wrapper step into a definition would need an out parameter, which is the single
+// most expensive thing this file can do per node. Each level is entered only once the level above
+// it matched, so an ordinary target costs one failed test. Four is far past anything real —
+// `Readonly<Partial<Record<…>>>` is two — and a fifth only ever costs a report.
+predicate anti_slop_widens($target, $value) {
+	and {
+		$value <: anti_slop_known_value(),
+		or {
+			anti_slop_broad_target($target, $value),
+			and {
+				$target <: or {
+					TsParenthesizedType(ty = $anti_slop_peel_1),
+					TsReferenceType(
+						// Grouped: an ungrouped alternation anchors only at the outer ends and
+						// would take any identifier merely starting with `Readonly`.
+						name = r"(?:Readonly|Partial|Required|NonNullable)",
+						type_arguments = TsTypeArguments(ts_type_argument_list = $anti_slop_args_1)
+					) where {
+						$anti_slop_args_1 <: some $anti_slop_peel_1
+					}
+				},
+				or {
+					anti_slop_broad_target($anti_slop_peel_1, $value),
+					and {
+						$anti_slop_peel_1 <: or {
+							TsParenthesizedType(ty = $anti_slop_peel_2),
+							TsReferenceType(
+								name = r"(?:Readonly|Partial|Required|NonNullable)",
+								type_arguments = TsTypeArguments(ts_type_argument_list = $anti_slop_args_2)
+							) where {
+								$anti_slop_args_2 <: some $anti_slop_peel_2
+							}
+						},
+						or {
+							anti_slop_broad_target($anti_slop_peel_2, $value),
+							and {
+								$anti_slop_peel_2 <: or {
+									TsParenthesizedType(ty = $anti_slop_peel_3),
+									TsReferenceType(
+										name = r"(?:Readonly|Partial|Required|NonNullable)",
+										type_arguments = TsTypeArguments(ts_type_argument_list = $anti_slop_args_3)
+									) where {
+										$anti_slop_args_3 <: some $anti_slop_peel_3
+									}
+								},
+								or {
+									anti_slop_broad_target($anti_slop_peel_3, $value),
+									and {
+										$anti_slop_peel_3 <: or {
+											TsParenthesizedType(ty = $anti_slop_peel_4),
+											TsReferenceType(
+												name = r"(?:Readonly|Partial|Required|NonNullable)",
+												type_arguments = TsTypeArguments(ts_type_argument_list = $anti_slop_args_4)
+											) where {
+												$anti_slop_args_4 <: some $anti_slop_peel_4
+											}
+										},
+										anti_slop_broad_target($anti_slop_peel_4, $value)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// Anything that owns its own `return`. Used as a walk boundary so a nested function's returns are
+// never attributed to the enclosing signature. Every parameter-free definition like this one is
+// free to call, unlike one taking an unbound parameter.
+// A constructor belongs here even though it can never declare a return type: `return obj` inside
+// one overrides the constructed instance, and the original resolves it to the constructor's own
+// (untyped) function, never to the enclosing signature. Leaving it out reported every such return
+// against whatever broad return type the surrounding function happened to declare.
+// A class `static {}` block is deliberately absent: `return` is illegal there, and the original
+// walks straight past it to the enclosing function, so this port does too.
+pattern anti_slop_function_boundary() {
+	or {
+		JsFunctionDeclaration(),
+		JsFunctionExportDefaultDeclaration(),
+		JsFunctionExpression(),
+		JsArrowFunctionExpression(),
+		JsMethodClassMember(),
+		JsMethodObjectMember(),
+		JsConstructorClassMember(),
+		JsGetterClassMember(),
+		JsSetterClassMember(),
+		JsGetterObjectMember(),
+		JsSetterObjectMember()
+	}
+}
+
+predicate anti_slop_report($n) {
+	register_diagnostic(
+		span = $n,
+		message = "anti-slop/no-known-value-widening: The explicit broad type on this known value discards type evidence. Keep inference, validate with `satisfies`, or use a named owner contract.",
+		severity = "error"
+	)
+}
+
+or {
+	// Every annotated binding whose initializer is visible at the same site: `const`, `let` and
+	// `var` declarators — including several in one statement — plus class properties and
+	// `accessor` properties. Requiring an identifier binding leaves destructuring declarations
+	// alone, which the original also skips.
+	or {
+		JsVariableDeclarator(
+			id = JsIdentifierBinding(),
+			variable_annotation = TsTypeAnnotation(ty = $anti_slop_owner_type),
+			initializer = JsInitializerClause(expression = $anti_slop_owner_value)
+		),
+		JsPropertyClassMember(
+			property_annotation = TsTypeAnnotation(ty = $anti_slop_owner_type),
+			value = JsInitializerClause(expression = $anti_slop_owner_value)
+		)
+	} as $anti_slop_owner_node where {
+		anti_slop_widens($anti_slop_owner_type, $anti_slop_owner_value),
+		anti_slop_report($anti_slop_owner_node)
+	},
+	// Both spellings of a type assertion; `<T>x` has no snippet form at all. Only the outermost
+	// assertion of a chain reports: an inner `x as unknown as Named` is the sanctioned escape
+	// hatch, and the original skips an assertion whose direct parent is another assertion.
+	// `until` walks off any number of redundant parentheses between the two, so the chain is
+	// recognised at every depth rather than the two the hand-unrolled version reached.
+	or {
+		TsAsExpression(ty = $anti_slop_assert_type, expression = $anti_slop_assert_operand),
+		TsTypeAssertionExpression(ty = $anti_slop_assert_type, expression = $anti_slop_assert_operand)
+	} as $anti_slop_assert_node where {
+		$anti_slop_assert_node <: not within or {
+			TsAsExpression(expression = $anti_slop_outer_as) where {
+				$anti_slop_outer_as <: contains $anti_slop_assert_node until not JsParenthesizedExpression()
+			},
+			TsTypeAssertionExpression(expression = $anti_slop_outer_angle) where {
+				$anti_slop_outer_angle <: contains $anti_slop_assert_node until not JsParenthesizedExpression()
+			}
+		},
+		anti_slop_widens($anti_slop_assert_type, $anti_slop_assert_operand),
+		anti_slop_report($anti_slop_assert_node)
+	},
+	// Every signature that declares a return type, method and generic forms included. A getter's
+	// annotation sits in `return_type` as a plain `TsTypeAnnotation`, not the
+	// `TsReturnTypeAnnotation` the other signatures use.
+	or {
+		JsFunctionDeclaration(
+			return_type_annotation = TsReturnTypeAnnotation(ty = $anti_slop_return_type),
+			body = $anti_slop_body
+		),
+		JsFunctionExportDefaultDeclaration(
+			return_type_annotation = TsReturnTypeAnnotation(ty = $anti_slop_return_type),
+			body = $anti_slop_body
+		),
+		JsFunctionExpression(
+			return_type_annotation = TsReturnTypeAnnotation(ty = $anti_slop_return_type),
+			body = $anti_slop_body
+		),
+		JsArrowFunctionExpression(
+			return_type_annotation = TsReturnTypeAnnotation(ty = $anti_slop_return_type),
+			body = $anti_slop_body
+		),
+		JsMethodClassMember(
+			return_type_annotation = TsReturnTypeAnnotation(ty = $anti_slop_return_type),
+			body = $anti_slop_body
+		),
+		JsMethodObjectMember(
+			return_type_annotation = TsReturnTypeAnnotation(ty = $anti_slop_return_type),
+			body = $anti_slop_body
+		),
+		JsGetterClassMember(
+			return_type = TsTypeAnnotation(ty = $anti_slop_return_type),
+			body = $anti_slop_body
+		),
+		JsGetterObjectMember(
+			return_type = TsTypeAnnotation(ty = $anti_slop_return_type),
+			body = $anti_slop_body
+		)
+	} as $anti_slop_fn_node where {
+		or {
+			// A block body: every `return` in it, at any nesting depth, down to the first nested
+			// function. The old `some` looked only at direct statement children, so a widening
+			// return inside an `if`, `try`, loop or `switch` was invisible.
+			and {
+				$anti_slop_body <: JsFunctionBody(),
+				$anti_slop_body <: contains JsReturnStatement(
+					argument = $anti_slop_returned
+				) as $anti_slop_return_node where {
+					anti_slop_widens($anti_slop_return_type, $anti_slop_returned),
+					anti_slop_report($anti_slop_return_node),
+					// `contains` stops at its first match, so the predicate is forced to fail
+					// after the diagnostic is registered. The walk then continues and every
+					// widening return in the body is reported, not just the first. A return
+					// statement is never a binding, so this test can only fail.
+					$anti_slop_return_node <: JsIdentifierBinding()
+				} until anti_slop_function_boundary()
+			},
+			// A concise arrow body is the returned value.
+			and {
+				$anti_slop_body <: not JsFunctionBody(),
+				anti_slop_widens($anti_slop_return_type, $anti_slop_body),
+				anti_slop_report($anti_slop_fn_node)
+			}
+		}
+	}
+}

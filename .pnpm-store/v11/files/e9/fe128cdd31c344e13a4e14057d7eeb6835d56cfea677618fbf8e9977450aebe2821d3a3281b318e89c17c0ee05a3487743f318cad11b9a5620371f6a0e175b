@@ -1,0 +1,99 @@
+{
+  "name": "@ibm/telemetry-js",
+  "description": "JavaScript telemetry tooling for open/inner source projects",
+  "version": "1.11.0",
+  "license": "Apache-2.0",
+  "author": "IBM",
+  "keywords": [
+    "ibm",
+    "telemetry",
+    "metrics",
+    "opentelemetry",
+    "javascript",
+    "typescript"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/ibm-telemetry/telemetry-js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ibm-telemetry/telemetry-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ibm-telemetry/telemetry-js/issues"
+  },
+  "type": "module",
+  "bin": {
+    "ibmtelemetry": "dist/collect.js"
+  },
+  "files": [
+    "dist/background-process.js",
+    "dist/collect.js",
+    "dist/spawn-background-process.js",
+    "dist/notify.js"
+  ],
+  "scripts": {
+    "build": "npm run clean && npm run compile && npm run compile:collect && npm run bundle",
+    "bundle": "node esbuild.js",
+    "clean": "rimraf dist .test-coverage",
+    "compile": "tsc",
+    "compile:collect": "tsc --project ./tsconfig.collect.json",
+    "compile:watch": "tsc --watch",
+    "lint": "scripts/lint",
+    "lint:fix": "scripts/lint_and_fix",
+    "prepare": "husky",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest --coverage"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.4.1",
+    "@commitlint/config-conventional": "^19.4.1",
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.4.0",
+    "@ibm/telemetry-attributes-js": "^4.4.0",
+    "@ibm/telemetry-config-schema": "^1.4.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-metrics-otlp-http": "^0.53.0",
+    "@opentelemetry/otlp-exporter-base": "^0.53.0",
+    "@opentelemetry/resources": "^1.26.0",
+    "@opentelemetry/sdk-metrics": "^1.26.0",
+    "@opentelemetry/semantic-conventions": "^1.27.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/lodash": "^4.17.7",
+    "@types/mock-fs": "^4.13.4",
+    "@types/node": "^20.16.5",
+    "@types/semver": "^7.5.8",
+    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/eslint-plugin": "^1.0.1",
+    "ajv": "^8.17.1",
+    "ci-info": "^4.0.0",
+    "commander": "^12.1.0",
+    "domhandler": "^5.0.3",
+    "domutils": "^3.2.2",
+    "esbuild": "^0.25.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-jsdoc": "^48.11.0",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-notice": "^0.9.10",
+    "eslint-plugin-promise": "^6.6.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globals": "^15.9.0",
+    "htmlparser2": "^10.0.0",
+    "husky": "^9.1.5",
+    "js-yaml": "^4.1.0",
+    "lint-staged": "^15.2.10",
+    "lodash": "^4.17.21",
+    "mock-fs": "^5.4.0",
+    "object-scan": "^19.0.5",
+    "prettier": "^3.3.3",
+    "reflect-metadata": "^0.2.1",
+    "rimraf": "^5.0.10",
+    "semver": "^7.6.3",
+    "ts-json-schema-generator": "^1.5.1",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^7.18.0",
+    "vite": "^5.4.3",
+    "vitest": "^1.6.0"
+  }
+}

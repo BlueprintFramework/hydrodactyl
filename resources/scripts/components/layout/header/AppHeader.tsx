@@ -35,12 +35,14 @@ const HeaderActions = memo(() => {
 
 HeaderActions.displayName = 'HeaderActions';
 
-const getSiteName = () => {
-    const siteConfiguration = (window as Record<string, unknown>).SiteConfiguration as { name?: unknown } | undefined;
+interface SiteConfigurationWindow extends Window {
+    SiteConfiguration?: { name?: string };
+}
 
-    return typeof siteConfiguration?.name === 'string' && siteConfiguration.name.trim().length > 0
-        ? siteConfiguration.name
-        : 'Hydrodactyl';
+const getSiteName = () => {
+    const siteName = (window as SiteConfigurationWindow).SiteConfiguration?.name?.trim();
+
+    return siteName && siteName.length > 0 ? siteName : 'Hydrodactyl';
 };
 
 const LogoSection = memo(({ admin }: { admin?: boolean }) => {

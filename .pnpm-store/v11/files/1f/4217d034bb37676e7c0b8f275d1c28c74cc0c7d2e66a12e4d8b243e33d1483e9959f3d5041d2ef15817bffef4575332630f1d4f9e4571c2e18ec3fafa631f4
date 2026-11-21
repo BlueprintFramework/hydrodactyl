@@ -1,0 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const React = tslib_1.__importStar(require("react"));
+const CheckDouble = (props) => (React.createElement("svg", Object.assign({ xmlns: "http://www.w3.org/2000/svg", width: 16, height: 16, fill: "none", viewBox: "0 0 16 16" }, props),
+    React.createElement("path", { fill: "currentColor", d: "M13.97 5.223a.75.75 0 0 1 1.06 1.06l-5.5 5.5a.75.75 0 0 1-1.088-.028l-.5-.555a.75.75 0 0 1 1.084-1.034zm-4-1.008a.75.75 0 0 1 1.06 1.061l-5.5 5.5a.75.75 0 0 1-1.095-.036l-3.5-4a.75.75 0 0 1 1.13-.988l2.97 3.396z" })));
+exports.default = CheckDouble;

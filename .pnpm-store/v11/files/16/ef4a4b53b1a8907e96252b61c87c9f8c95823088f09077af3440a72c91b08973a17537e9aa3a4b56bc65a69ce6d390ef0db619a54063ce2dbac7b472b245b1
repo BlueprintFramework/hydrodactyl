@@ -1,0 +1,125 @@
+{
+  "name": "@gravity-ui/icons",
+  "version": "2.20.0",
+  "description": "Pack of Gravity UI icons",
+  "keywords": [
+    "icons",
+    "svg",
+    "react"
+  ],
+  "license": "MIT",
+  "files": [
+    "svgs",
+    "esm",
+    "*.d.ts",
+    "*.js",
+    "!.*.js",
+    "!*.config.js",
+    "metadata.json"
+  ],
+  "module": "esm/index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./esm/index.js",
+      "require": "./index.js"
+    },
+    "./*": {
+      "types": "./*.d.ts",
+      "import": "./esm/*.js",
+      "require": "./*.js"
+    },
+    "./svgs/*": "./svgs/*",
+    "./metadata.json": "./metadata.json",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gravity-ui/icons.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gravity-ui/icons/issues"
+  },
+  "homepage": "https://gravity-ui.com",
+  "scripts": {
+    "prepare": "husky",
+    "lint:js": "eslint",
+    "lint:styles": "stylelint '**/*.scss' '.storybook/**/*.scss'",
+    "lint": "run-p lint:*",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p .storybook",
+    "test": "exit 0",
+    "start": "storybook dev -p 7009",
+    "build-storybook": "storybook build -c .storybook -o storybook-static",
+    "src:download": "node scripts/download.mjs",
+    "src:icons": "node scripts/icons.mjs",
+    "build:cjs": "tsc --declaration --outDir .",
+    "build:esm": "tsc --module esnext --outDir esm",
+    "build": "run-p build:*",
+    "clean": "node scripts/clean.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-react": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
+    "@bem-react/classname": "^1.8.0",
+    "@commitlint/cli": "^21.1.0",
+    "@commitlint/config-conventional": "^21.1.0",
+    "@figma-export/core": "^6.4.0",
+    "@gravity-ui/eslint-config": "^4.3.1",
+    "@gravity-ui/prettier-config": "^1.1.1",
+    "@gravity-ui/stylelint-config": "^5.0.0",
+    "@gravity-ui/tsconfig": "^1.0.0",
+    "@gravity-ui/uikit": "^7.43.0",
+    "@storybook/addon-a11y": "^10.4.6",
+    "@storybook/addon-webpack5-compiler-swc": "^4.0.3",
+    "@storybook/react-webpack5": "^10.4.6",
+    "@storybook/cli": "^10.4.6",
+    "@svgr/core": "^8.1.0",
+    "@svgr/plugin-jsx": "^8.1.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "css-loader": "^7.1.4",
+    "eslint": "^9.39.4",
+    "eslint-plugin-storybook": "^10.4.6",
+    "fast-glob": "^3.3.3",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "nano-staged": "^1.0.2",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.8.4",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "rimraf": "^6.1.3",
+    "sass": "^1.101.0",
+    "sass-loader": "^17.0.0",
+    "storybook": "^10.4.6",
+    "style-loader": "^4.0.0",
+    "stylelint": "^16.26.1",
+    "svgo": "^4.0.1",
+    "typescript": "~5.8.3"
+  },
+  "peerDependencies": {
+    "react": "*"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "nano-staged": {
+    "*.{scss}": [
+      "stylelint --fix --quiet"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix --quiet"
+    ],
+    "*.{md,yml}": [
+      "prettier --write"
+    ]
+  }
+}

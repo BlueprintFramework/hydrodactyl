@@ -1,0 +1,20 @@
+language js
+
+// anti-slop/no-runtime-typeof
+// A runtime `typeof` check narrows a representation without establishing a contract:
+// it proves the shape of a value at one point but carries no evidence forward.
+// Decode external input into a domain type at the I/O boundary, then branch on that.
+// Ported from oxlint-plugin-anti-slop `no-runtime-typeof`.
+// A TS type query (`type T = typeof x`, `keyof typeof x`, `x as typeof y`) is a
+// different node and is not matched, exactly as in the original.
+// Gap: the original's opt-in `allowInTypeGuards: true` exempts a `typeof` whose
+// nearest enclosing function returns a type predicate. GritQL plugins take no
+// options and cannot walk the parent chain, so this port always behaves as the
+// rule's default (`allowInTypeGuards: false`) and flags type guards too.
+`typeof $operand` as $node where {
+	register_diagnostic(
+		span = $node,
+		message = "anti-slop/no-runtime-typeof: A `typeof` check narrows a representation without establishing its contract. Parse input at its I/O boundary, then branch on the domain value.",
+		severity = "error"
+	)
+}

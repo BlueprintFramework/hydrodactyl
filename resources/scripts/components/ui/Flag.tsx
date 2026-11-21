@@ -32,10 +32,13 @@ function countryCode(identifier: string): string | undefined {
  * without a resolvable country or when the image fails to load.
  */
 export default function Flag({ identifier, label, className }: FlagProps) {
-    const [failed, setFailed] = useState(false);
+    // Track the identifier that failed rather than a plain boolean: the pickers
+    // reuse one Flag instance across locales, so a boolean would stay stuck on
+    // the next identifier and hide a flag that loads fine.
+    const [failedIdentifier, setFailedIdentifier] = useState<string | null>(null);
     const country = countryCode(identifier);
 
-    if (!country || failed) {
+    if (!country || failedIdentifier === identifier) {
         return null;
     }
 
@@ -49,7 +52,7 @@ export default function Flag({ identifier, label, className }: FlagProps) {
             aria-hidden={label ? undefined : true}
             decoding='async'
             referrerPolicy='no-referrer'
-            onError={() => setFailed(true)}
+            onError={() => setFailedIdentifier(identifier)}
             className={cn(
                 'inline-block h-[15px] w-5 shrink-0 rounded-[2px] object-cover ring-1 ring-black/10',
                 className,

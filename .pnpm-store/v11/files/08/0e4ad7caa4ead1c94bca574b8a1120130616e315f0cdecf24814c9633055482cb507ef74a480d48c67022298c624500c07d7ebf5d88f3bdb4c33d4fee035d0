@@ -1,0 +1,1 @@
+export { hCaptchaLoader } from './loader';

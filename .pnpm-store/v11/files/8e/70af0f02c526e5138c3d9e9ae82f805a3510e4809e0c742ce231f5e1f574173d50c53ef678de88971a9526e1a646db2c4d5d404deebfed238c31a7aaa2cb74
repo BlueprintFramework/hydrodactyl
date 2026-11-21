@@ -1,0 +1,38 @@
+language js
+
+// anti-slop/no-unknown-parameters
+// A parameter annotated `unknown` pushes the parsing burden onto every caller and onto
+// every branch of the body: the signature records nothing about what was accepted, so each
+// consumer re-narrows the value and no narrowing is ever checked against the producer.
+// Decode the value into a named domain type at the I/O boundary instead. `cause` is exempt:
+// error-cause enrichment genuinely carries an unparsed value.
+// Ported from oxlint-plugin-anti-slop `no-unknown-parameters`.
+or {
+	JsFormalParameter(
+		binding = $binding,
+		type_annotation = TsTypeAnnotation(ty = $ty)
+	) where { $binding <: not r"cause" },
+	JsRestParameter(
+		binding = $binding,
+		type_annotation = TsTypeAnnotation(ty = $ty)
+	) where { $binding <: not r"cause" },
+	TsThisParameter(type_annotation = TsTypeAnnotation(ty = $ty))
+} where {
+	$ty <: bare_unknown(),
+	$ty <: contains TsUnknownType() as $node,
+	register_diagnostic(
+		span = $node,
+		message = "anti-slop/no-unknown-parameters: This parameter leaves input unparsed. Accept a named domain type; run the expected schema or parser at the I/O boundary before calling this function.",
+		severity = "error"
+	)
+}
+
+// Only a bare `unknown`, optionally wrapped in parentheses, is the unparsed contract the
+// original rule rejects. `unknown[]`, `Record<string, unknown>`, `Promise<unknown>` and
+// unions containing `unknown` are different contracts and are deliberately left alone.
+pattern bare_unknown() {
+	or {
+		`unknown`,
+		TsParenthesizedType(ty = bare_unknown())
+	}
+}

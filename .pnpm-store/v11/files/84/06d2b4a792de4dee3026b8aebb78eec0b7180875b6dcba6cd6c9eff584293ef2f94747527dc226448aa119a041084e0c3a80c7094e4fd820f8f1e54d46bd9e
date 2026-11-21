@@ -1,0 +1,8 @@
+import * as React from 'react';
+const LayoutSplitColumns = (props) => (React.createElement("svg", Object.assign({ xmlns: "http://www.w3.org/2000/svg", width: 16, height: 16, fill: "none", viewBox: "0 0 16 16" }, props),
+    React.createElement("g", { clipPath: "url(#a)" },
+        React.createElement("path", { fill: "currentColor", fillRule: "evenodd", d: "M5 12.5H3a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1M3 14h2a2.5 2.5 0 0 0 2.5-2.5v-7A2.5 2.5 0 0 0 5 2H3A2.5 2.5 0 0 0 .5 4.5v7A2.5 2.5 0 0 0 3 14m10-1.5h-2a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1M11 14h2a2.5 2.5 0 0 0 2.5-2.5v-7A2.5 2.5 0 0 0 13 2h-2a2.5 2.5 0 0 0-2.5 2.5v7A2.5 2.5 0 0 0 11 14", clipRule: "evenodd" })),
+    React.createElement("defs", null,
+        React.createElement("clipPath", { id: "a" },
+            React.createElement("path", { fill: "currentColor", d: "M0 0h16v16H0z" })))));
+export default LayoutSplitColumns;

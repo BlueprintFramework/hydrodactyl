@@ -1,0 +1,40 @@
+language js
+
+// anti-slop/no-object-parameters
+// `object` on a function input accepts any non-primitive and names no contract, so the
+// callee learns nothing about what it was handed. Accept an owner-provided type and parse
+// external input at its boundary instead.
+// Ported from oxlint-plugin-anti-slop `no-object-parameters`.
+//
+// Every parameter of every owner form in the original's visitor set is one of these three
+// node kinds, so matching them directly reaches function declarations and expressions,
+// arrows, methods, getters and setters, constructors and parameter properties, overload and
+// abstract signatures, `declare function`, TS function and constructor types, call and
+// construct signatures, and interface method signatures — without enumerating any of them.
+// Each parameter is matched on its own, so a list with several `object` parameters reports
+// each one, and the diagnostic lands on the annotation, as the original does.
+or {
+	JsFormalParameter(type_annotation = TsTypeAnnotation(ty = $ty)),
+	JsRestParameter(type_annotation = TsTypeAnnotation(ty = $ty)),
+	TsThisParameter(type_annotation = TsTypeAnnotation(ty = $ty))
+} where {
+	$ty <: object_type(),
+	register_diagnostic(
+		span = $ty,
+		message = "anti-slop/no-object-parameters: This parameter uses the broad `object` type. Accept a named owner type; parse external input at its boundary before calling this function.",
+		severity = "error"
+	)
+}
+
+// The original's `resolvesToObject`: the `object` keyword, any parenthesization of it, or a
+// union with such a member — and nothing else. `some` tests the union's own variants rather
+// than walking their subtrees, which is what keeps composite types that merely mention
+// `object` silent: `Array<object>`, `object[]`, `{ meta: object }`, `A & object`,
+// `Map<string | object, number>` and `(object) => void` all fail every branch.
+pattern object_type() {
+	or {
+		TsNonPrimitiveType(),
+		TsParenthesizedType(ty = object_type()),
+		TsUnionType(types = some object_type())
+	}
+}

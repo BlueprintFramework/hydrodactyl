@@ -1,0 +1,34 @@
+{
+  "name": "sockette",
+  "version": "2.0.6",
+  "repository": "lukeed/sockette",
+  "description": "🧦 The cutest little WebSocket wrapper!",
+  "module": "dist/sockette.mjs",
+  "unpkg": "dist/sockette.min.js",
+  "main": "dist/sockette.js",
+  "types": "sockette.d.ts",
+  "license": "MIT",
+  "author": {
+    "name": "Luke Edwards",
+    "email": "luke.edwards05@gmail.com",
+    "url": "lukeed.com"
+  },
+  "scripts": {
+    "build": "bundt",
+    "pretest": "npm run build",
+    "test": "tape test/*.js"
+  },
+  "files": [
+    "dist",
+    "sockette.d.ts"
+  ],
+  "keywords": [
+    "socket",
+    "reconnect",
+    "websocket"
+  ],
+  "devDependencies": {
+    "bundt": "^0.4.0",
+    "tape": "^4.10.1"
+  }
+}
