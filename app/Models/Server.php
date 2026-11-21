@@ -294,6 +294,14 @@ class Server extends Model
     }
 
     /**
+     * Gets per-path file blocks for subusers on this server.
+     */
+    public function fileBlocks(): HasMany
+    {
+        return $this->hasMany(ServerFileBlock::class, 'server_id', 'id');
+    }
+
+    /**
      * Gets the default allocation for a server.
      */
     public function allocation(): HasOne

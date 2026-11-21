@@ -317,6 +317,10 @@ return [
             'no_allocation_limit' => 'Sie können Belegungen für diesen Server nicht löschen: Es ist kein Belegungs-Limit festgelegt.',
             'primary_allocation' => 'Sie können die primäre Belegung für diesen Server nicht löschen.',
         ],
+        'files' => [
+            'blocked' => 'Sie haben keine Berechtigung, auf diese Datei zuzugreifen.',
+            'block_not_subuser' => 'Einer oder mehrere ausgewählte Benutzer sind keine Unterbenutzer dieses Servers.',
+        ],
         'websocket' => [
             'connect_forbidden' => 'Sie haben keine Berechtigung, sich mit dem WebSocket dieses Servers zu verbinden.',
             'transfer_logs_forbidden' => 'Sie haben keine Berechtigung, die Serverübertragungsprotokolle anzuzeigen.',

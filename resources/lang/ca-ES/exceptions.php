@@ -317,6 +317,10 @@ return [
             'no_allocation_limit' => 'No pots eliminar assignacions d\'aquest servidor: no s\'ha establert cap límit d\'assignacions.',
             'primary_allocation' => 'No pots eliminar l\'assignació principal d\'aquest servidor.',
         ],
+        'files' => [
+            'blocked' => 'No tens permís per accedir a aquest fitxer.',
+            'block_not_subuser' => 'Un o més usuaris seleccionats no són subusuaris d\'aquest servidor.',
+        ],
         'websocket' => [
             'connect_forbidden' => 'No tens permís per connectar-te al websocket d\'aquest servidor.',
             'transfer_logs_forbidden' => 'No tens permís per veure els registres de transferència del servidor.',

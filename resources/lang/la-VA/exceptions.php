@@ -317,6 +317,10 @@ return [
             'no_allocation_limit' => 'Attributiones pro hoc servero delere non potes: nullum limen attributionum positum est.',
             'primary_allocation' => 'Attributionem primariam pro hoc servero delere non potes.',
         ],
+        'files' => [
+            'blocked' => 'Permissum non habes hunc fasciculum adire.',
+            'block_not_subuser' => 'Unus vel plures usores electi non sunt subusores huius serveri.',
+        ],
         'websocket' => [
             'connect_forbidden' => 'Permissum non habes WebSocket huius serveri iungendi.',
             'transfer_logs_forbidden' => 'Permissum non habes diaria transmissionis serveri videndi.',

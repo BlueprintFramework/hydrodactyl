@@ -317,6 +317,10 @@ return [
             'no_allocation_limit' => 'No puedes eliminar asignaciones de este servidor: no se ha establecido ningún límite de asignaciones.',
             'primary_allocation' => 'No puedes eliminar la asignación primaria de este servidor.',
         ],
+        'files' => [
+            'blocked' => 'No tienes permiso para acceder a este archivo.',
+            'block_not_subuser' => 'Uno o más usuarios seleccionados no son subusuarios de este servidor.',
+        ],
         'websocket' => [
             'connect_forbidden' => 'No tienes permiso para conectarte al websocket de este servidor.',
             'transfer_logs_forbidden' => 'No tienes permiso para ver los registros de transferencia del servidor.',
