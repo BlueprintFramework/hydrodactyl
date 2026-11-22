@@ -70,6 +70,14 @@ class PasskeySettingsFormRequest extends AdminFormRequest
                         }
 
                         $host = strtolower($parts['host']);
+                        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+
+                        if ($scheme === 'http' && !in_array($host, ['localhost', '127.0.0.1', '::1', '[::1]'], true)) {
+                            $fail(__('validation.json_api.passkey_origin_https_required'));
+
+                            return;
+                        }
+
                         if ($host !== $relyingPartyId && !str_ends_with($host, '.' . $relyingPartyId)) {
                             $fail(__('validation.json_api.passkey_origin_not_in_relying_party'));
                         }

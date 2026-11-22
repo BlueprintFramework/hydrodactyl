@@ -309,7 +309,8 @@
             "count": "{{count}} de {{max}}",
             "limit_reached": "Has arribat al límit de claus d'accés ({{max}}). Elimina'n una per afegir-ne una altra.",
             "name_taken": "Ja tens una clau d'accés amb aquest nom.",
-            "recommendation": "Guarda claus d'accés en almenys dues ubicacions diferents per no quedar-te sense accés."
+            "recommendation": "Guarda claus d'accés en almenys dues ubicacions diferents per no quedar-te sense accés.",
+            "created": "Creada el {{date}}"
         }
     },
     "passkeys": {

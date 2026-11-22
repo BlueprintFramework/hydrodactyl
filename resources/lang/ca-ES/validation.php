@@ -116,6 +116,7 @@ return [
         'password_confirmation_required' => 'Cal confirmar la contrasenya.',
         'passkey_limit_reached' => 'Has arribat al límit de claus d\'accés (:max). Elimina\'n una abans d\'afegir-ne una altra.',
         'passkey_name_taken' => 'Ja tens una clau d\'accés amb aquest nom.',
+        'passkey_origin_https_required' => 'Només es permeten orígens HTTPS. HTTP només es permet per a localhost.',
         'power_action_invalid' => 'L\'acció d\'alimentació ha de ser una de les següents: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'Has de confirmar que entens que aquesta acció no es pot desfer sense l\'ajuda d\'un administrador.',
         'subdomain_invalid_characters' => 'El subdomini conté caràcters no vàlids.',

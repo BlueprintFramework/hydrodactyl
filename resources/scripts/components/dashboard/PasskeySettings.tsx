@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import http, { httpErrorToHuman } from '@/api/http';
 import { Dialog } from '@/components/elements/dialog';
 import { Button } from '@/components/ui/button';
+import { useAppearance } from '@/contexts/AppearanceContext';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { formatDateTime } from '@/lib/formatters';
 import { isPasswordConfirmationError, passkeyErrorMessage } from '@/lib/passkeys';
@@ -14,6 +15,8 @@ interface Passkey {
     id: number;
     name: string;
     authenticator: string | null;
+    authenticator_icon_light: string | null;
+    authenticator_icon_dark: string | null;
     created_at: string | null;
     last_used_at: string | null;
 }
@@ -25,6 +28,7 @@ type PendingAction = { type: 'add'; name: string } | { type: 'delete'; passkey: 
 // million-ignore
 const PasskeySettings = () => {
     const { t, locale } = useTranslation();
+    const { theme } = useAppearance();
     const { clearAndAddHttpError } = useFlashKey('account:passkeys');
     const [passkeys, setPasskeys] = useState<Passkey[]>([]);
     const [maxPasskeys, setMaxPasskeys] = useState(10);
@@ -270,34 +274,52 @@ const PasskeySettings = () => {
                 <p className='text-sm text-zinc-400'>{t('account.passkeys.empty')}</p>
             ) : (
                 <div className='space-y-3'>
-                    {passkeys.map((passkey) => (
-                        <div
-                            key={passkey.id}
-                            className='flex items-center justify-between gap-4 rounded-lg border border-mocha-400 px-4 py-3'
-                        >
-                            <div className='min-w-0'>
-                                <p className='truncate text-sm font-medium text-zinc-100'>{passkey.name}</p>
-                                <p className='text-xs text-zinc-400'>
-                                    {passkey.authenticator ? `${passkey.authenticator} · ` : ''}
-                                    {t('account.passkeys.last_used')}:{' '}
-                                    {passkey.last_used_at
-                                        ? formatDateTime(new Date(passkey.last_used_at), locale, 'medium')
-                                        : t('account.passkeys.never_used')}
-                                </p>
-                            </div>
-                            <Button
-                                type='button'
-                                variant='attention'
-                                size='sm'
-                                disabled={deleting !== null}
-                                onClick={() => requestDelete(passkey)}
-                                title={t('account.passkeys.delete')}
-                                aria-label={t('account.passkeys.delete')}
+                    {passkeys.map((passkey) => {
+                        const icon =
+                            theme === 'dark' ? passkey.authenticator_icon_dark : passkey.authenticator_icon_light;
+                        const created = passkey.created_at
+                            ? t('account.passkeys.created', {
+                                  date: formatDateTime(new Date(passkey.created_at), locale, 'medium'),
+                              })
+                            : null;
+
+                        return (
+                            <div
+                                key={passkey.id}
+                                className='flex items-center justify-between gap-4 rounded-lg border border-mocha-400 px-4 py-3'
                             >
-                                <TrashBin width={18} height={18} fill='currentColor' />
-                            </Button>
-                        </div>
-                    ))}
+                                <div className='flex min-w-0 items-center gap-3'>
+                                    {icon && (
+                                        <img src={icon} alt='' className='h-6 w-6 shrink-0 rounded-md object-contain' />
+                                    )}
+                                    <div className='min-w-0'>
+                                        <p className='truncate text-sm font-medium text-zinc-100'>{passkey.name}</p>
+                                        {passkey.authenticator && (
+                                            <p className='truncate text-xs text-zinc-400'>{passkey.authenticator}</p>
+                                        )}
+                                        <p className='text-xs text-zinc-400'>
+                                            {created ? `${created} · ` : ''}
+                                            {t('account.passkeys.last_used')}:{' '}
+                                            {passkey.last_used_at
+                                                ? formatDateTime(new Date(passkey.last_used_at), locale, 'medium')
+                                                : t('account.passkeys.never_used')}
+                                        </p>
+                                    </div>
+                                </div>
+                                <Button
+                                    type='button'
+                                    variant='attention'
+                                    size='sm'
+                                    disabled={deleting !== null}
+                                    onClick={() => requestDelete(passkey)}
+                                    title={t('account.passkeys.delete')}
+                                    aria-label={t('account.passkeys.delete')}
+                                >
+                                    <TrashBin width={18} height={18} fill='currentColor' />
+                                </Button>
+                            </div>
+                        );
+                    })}
                 </div>
             )}
 

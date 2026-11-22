@@ -115,6 +115,7 @@ return [
         'password_confirmation_required' => 'É necessário confirmar a senha.',
         'passkey_limit_reached' => 'Você atingiu o limite de chaves de acesso (:max). Remova uma antes de adicionar outra.',
         'passkey_name_taken' => 'Você já tem uma chave de acesso com este nome.',
+        'passkey_origin_https_required' => 'Apenas origens HTTPS são permitidas. HTTP é permitido apenas para localhost.',
         'power_action_invalid' => 'A ação de energia deve ser uma das seguintes: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'Você deve confirmar que entende que esta ação não pode ser desfeita sem a ajuda de um administrador.',
         'subdomain_invalid_characters' => 'O subdomínio contém caracteres inválidos.',

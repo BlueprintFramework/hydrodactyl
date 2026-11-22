@@ -17,13 +17,19 @@ class PasskeyController extends Controller
             ->passkeys()
             ->orderByDesc('created_at')
             ->get()
-            ->map(fn ($passkey) => [
-                'id' => $passkey->id,
-                'name' => $passkey->name,
-                'created_at' => $passkey->created_at?->toIso8601String(),
-                'last_used_at' => $passkey->last_used_at?->toIso8601String(),
-                'authenticator' => $passkey->authenticator,
-            ])
+            ->map(function ($passkey) {
+                $passkey->append(['authenticator_icon_light', 'authenticator_icon_dark']);
+
+                return [
+                    'id' => $passkey->id,
+                    'name' => $passkey->name,
+                    'created_at' => $passkey->created_at?->toIso8601String(),
+                    'last_used_at' => $passkey->last_used_at?->toIso8601String(),
+                    'authenticator' => $passkey->authenticator,
+                    'authenticator_icon_light' => $passkey->authenticator_icon_light,
+                    'authenticator_icon_dark' => $passkey->authenticator_icon_dark,
+                ];
+            })
             ->values();
 
         return response()->json([

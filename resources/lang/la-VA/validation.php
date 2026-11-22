@@ -116,6 +116,7 @@ return [
         'password_confirmation_required' => 'Confirmatio tesserae necessaria est.',
         'passkey_limit_reached' => 'Limit clavium accessus (:max) attigisti. Unam remove antequam aliam addas.',
         'passkey_name_taken' => 'Iam clavem accessus hoc nomine habes.',
+        'passkey_origin_https_required' => 'Tantum origines HTTPS permittuntur. HTTP solum pro localhost permittitur.',
         'power_action_invalid' => 'Actio potestatis esse debet una ex: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'Confirmare debes intellegere hanc actionem sine adiutorio administratoris irritam fieri non posse.',
         'subdomain_invalid_characters' => 'Subdominium signa mendosa continet.',

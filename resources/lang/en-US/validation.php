@@ -116,6 +116,7 @@ return [
         'password_confirmation_required' => 'Password confirmation required.',
         'passkey_limit_reached' => 'You have reached the passkey limit (:max). Remove one before adding another.',
         'passkey_name_taken' => 'You already have a passkey with this name.',
+        'passkey_origin_https_required' => 'Only HTTPS origins are allowed. HTTP is allowed only for localhost.',
         'power_action_invalid' => 'The power action must be one of: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'You must confirm that you understand this action cannot be undone without administrator assistance.',
         'subdomain_invalid_characters' => 'Subdomain contains invalid characters.',

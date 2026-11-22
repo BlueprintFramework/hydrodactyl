@@ -150,6 +150,25 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
         }
     }
 
+    public function testPasskeySettingsRejectHttpOrigins(): void
+    {
+        $user = User::factory()->create(['root_admin' => true]);
+
+        $this->actingAs($user)
+            ->patchJson('/admin/api/settings/passkeys', [
+                'passkeys:enabled' => true,
+                'passkeys:max_per_user' => 10,
+                'passkeys:relying_party_id' => 'panel.example.com',
+                'passkeys:allowed_origins' => 'http://panel.example.com',
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('errors.0.meta.source_field', 'passkeys:allowed_origins')
+            ->assertJsonPath(
+                'errors.0.detail',
+                'Only HTTPS origins are allowed. HTTP is allowed only for localhost.',
+            );
+    }
+
     public function testPasskeySettingsRejectInvalidMaximums(): void
     {
         $user = User::factory()->create(['root_admin' => true]);

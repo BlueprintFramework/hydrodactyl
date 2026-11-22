@@ -309,7 +309,8 @@
             "count": "{{count}} de {{max}}",
             "limit_reached": "Você atingiu o limite de chaves de acesso ({{max}}). Remova uma para adicionar outra.",
             "name_taken": "Você já tem uma chave de acesso com este nome.",
-            "recommendation": "Guarde chaves de acesso em pelo menos dois locais diferentes para não perder o acesso."
+            "recommendation": "Guarde chaves de acesso em pelo menos dois locais diferentes para não perder o acesso.",
+            "created": "Criada em {{date}}"
         }
     },
     "passkeys": {
