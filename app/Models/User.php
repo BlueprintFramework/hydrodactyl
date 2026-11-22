@@ -9,6 +9,8 @@ use Illuminate\Validation\Rules\In;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
+use Laravel\Passkeys\Contracts\PasskeyUser;
+use Laravel\Passkeys\PasskeyAuthenticatable;
 use Pterodactyl\Models\Traits\HasAccessTokens;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Pterodactyl\Traits\Helpers\AvailableLanguages;
@@ -42,18 +44,18 @@ use Pterodactyl\Notifications\SendPasswordReset as ResetPasswordNotification;
  * @property bool $gravatar
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\ApiKey[] $apiKeys
+ * @property \Illuminate\Database\Eloquent\Collection|ApiKey[] $apiKeys
  * @property int|null $api_keys_count
  * @property string $name
  * @property \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property int|null $notifications_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\RecoveryToken[] $recoveryTokens
+ * @property \Illuminate\Database\Eloquent\Collection|RecoveryToken[] $recoveryTokens
  * @property int|null $recovery_tokens_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\Server[] $servers
+ * @property \Illuminate\Database\Eloquent\Collection|Server[] $servers
  * @property int|null $servers_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\UserSSHKey[] $sshKeys
+ * @property \Illuminate\Database\Eloquent\Collection|UserSSHKey[] $sshKeys
  * @property int|null $ssh_keys_count
- * @property \Illuminate\Database\Eloquent\Collection|\Pterodactyl\Models\ApiKey[] $tokens
+ * @property \Illuminate\Database\Eloquent\Collection|ApiKey[] $tokens
  * @property int|null $tokens_count
  *
  * @method static \Database\Factories\UserFactory factory(...$parameters)
@@ -84,7 +86,8 @@ class User extends Model implements
     AuthenticatableContract,
     AuthorizableContract,
     CanResetPasswordContract,
-    HasLocalePreference
+    HasLocalePreference,
+    PasskeyUser
 {
     use Authenticatable;
     use Authorizable;
@@ -92,6 +95,7 @@ class User extends Model implements
     use CanResetPassword;
     use HasAccessTokens;
     use Notifiable;
+    use PasskeyAuthenticatable;
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 

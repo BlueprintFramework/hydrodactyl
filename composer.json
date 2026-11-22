@@ -24,6 +24,7 @@
         "knuckleswtf/scribe": "^5.11",
         "laravel/framework": "^13.0",
         "laravel/helpers": "^1.8",
+        "laravel/passkeys": "^0.3",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.6",

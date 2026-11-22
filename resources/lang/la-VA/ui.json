@@ -288,6 +288,60 @@
             "remove": "Tolle applicationem authentificandi",
             "remove_description": "Remotio applicationis authentificandi rationem tuam minus tutam faciet.",
             "scan_description": "Scopito codicem QR supra applicatione authentificandi, vel inscribe codicem secretum supra. Deinde inscribe codicem 6 numerorum quem generat infra."
+        },
+        "passkeys": {
+            "title": "Claves accessus",
+            "description": "Utere clave accessus in instrumento tuo servata ut sine tessera intres.",
+            "create": "Adde clavem accessus",
+            "name_placeholder": "Nomen clavis accessus, exempli gratia MacBook",
+            "empty": "Nondum ullam clavem accessus habes.",
+            "unsupported": "Hic navigator claves accessus non sustinet.",
+            "last_used": "Ultimus usus",
+            "never_used": "Numquam adhibita",
+            "help": "Tessera tua ut alternativa manet.",
+            "delete_confirm": "Certusne es clavem accessus «{{name}}» removere velle? Haec actio reverti non potest.",
+            "delete_title": "Clavem accessus removere",
+            "delete": "Clavem accessus removere",
+            "password_title": "Confirma tesseram tuam",
+            "password_description": "Pro securitate, tesseram tuam confirma antequam claves accessus administres.",
+            "password_label": "Tessera",
+            "password_placeholder": "Tesseram tuam currentem inscribe",
+            "count": "{{count}} ex {{max}}",
+            "limit_reached": "Limit clavium accessus ({{max}}) attigisti. Unam remove ut aliam addas.",
+            "name_taken": "Iam clavem accessus hoc nomine habes.",
+            "recommendation": "Claves accessus in duobus locis diversis serva ut accessum non amittas.",
+            "created": "Creata {{date}}"
+        }
+    },
+    "passkeys": {
+        "errors": {
+            "cancelled": "Operatio clavis accessus abolita est.",
+            "not_supported": "Hic navigator claves accessus non sustinet.",
+            "exists": "Hoc instrumentum iam ut clavis accessus registratum est.",
+            "invalid_domain": "Claves accessus in hoc dominio adhiberi non possunt. Pro evolutione locali, localhost utere.",
+            "unexpected_response": "Petitio clavis accessus responsum validum non reddidit.",
+            "security": "Origo panel cum dominio clavis accessus constituto non congruit.",
+            "timeout": "Operatio clavis accessus exspiravit. Conare iterum quaeso.",
+            "constraint": "Authenticator condiciones necessarias non implet.",
+            "unavailable": "Authenticator praesto non est.",
+            "unknown": "Operatio clavis accessus perfici non potuit. Conare iterum quaeso.",
+            "not_recognized": "Haec clavis accessus non agnoscitur. Fortasse ex ratione tua remota est.",
+            "verify_failed": "Clavem accessus verificare non potuit. Conare iterum quaeso.",
+            "register_failed": "Clavem accessus registrare non potuit. Conare iterum quaeso.",
+            "invalid_credential": "Data clavis accessus mendosa sunt. Conare iterum quaeso.",
+            "verification_expired": "Sessio verificationis clavis accessus exspiravit. Conare iterum quaeso.",
+            "registration_expired": "Sessio registrationis clavis accessus exspiravit. Conare iterum quaeso.",
+            "sign_in_failed": "Hac ratione ingredi non potuit."
+        },
+        "authenticators": {
+            "google_password_manager": "Administrator clavium Google",
+            "microsoft_password_manager": "Administrator clavium Microsoft",
+            "chrome_on_mac": "Chrome in Mac",
+            "icloud_keychain_managed": "Claviger iCloud (administratus)",
+            "apple_passwords": "Tesserae Apple",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Administrator clavium: {{brand}}",
+            "unknown": "Authenticator ignotus"
         }
     },
     "admin": {
@@ -1209,7 +1263,16 @@
             "brand_color_updated": "Color nominis instauratus.",
             "brand_color_update_failed": "Colorem nominis servare non potuit.",
             "brand_color_reset": "Color nominis in pristinum restitutus.",
-            "brand_color_reset_failed": "Colorem nominis restituere non potuit."
+            "brand_color_reset_failed": "Colorem nominis restituere non potuit.",
+            "tab_passkeys": "Claves accessus",
+            "passkeys_enabled": "Claves accessus activare",
+            "passkeys_enabled_hint": "Permittit ut usores claves accessus registrent et sine tessera intrent. TOTP tamen necessarium est cum activum est.",
+            "passkeys_relying_party_id": "ID partis fidentis",
+            "passkeys_relying_party_id_hint": "Dominium panel cui claves accessus alligantur, sine https://. Id mutare claves accessus existentes irritas facit.",
+            "passkeys_allowed_origins": "Origines permissae",
+            "passkeys_allowed_origins_hint": "Origines HTTPS virgulis separatae ubi dialogus clavis accessus aperiri potest, exempli gratia https://panel.example.com.",
+            "passkeys_max_per_user": "Maximum clavium accessus per usorem",
+            "passkeys_max_per_user_hint": "0 significat sine limite. Decem suadentur."
         },
         "system_info": {
             "cpu_cores": "Nuclei CPU",
@@ -1246,7 +1309,9 @@
             "sign_in": "Ingredere",
             "title": "Ingressus",
             "username_label": "Nomen usoris vel epistula",
-            "username_required": "Nomen usoris vel epistula electronica praebenda est."
+            "username_required": "Nomen usoris vel epistula electronica praebenda est.",
+            "passkey": "Per clavem accessus ingredere",
+            "passkey_failed": "Ingressus per clavem accessus defecit. Conare iterum quaeso."
         },
         "reset_password": {
             "confirm_password_label": "Confirma tesseram novam",

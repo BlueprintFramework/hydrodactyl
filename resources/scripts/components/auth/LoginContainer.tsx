@@ -1,8 +1,10 @@
+import { usePasskeyVerify } from '@laravel/passkeys/react';
 import type { FormikHelpers } from 'formik';
 import { Formik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import { object, string } from 'yup';
 import login from '@/api/auth/login';
+import http from '@/api/http';
 import LoginFormContainer, { TitleSection } from '@/components/auth/LoginFormContainer';
 import Button from '@/components/elements/Button';
 import Captcha, { getCaptchaResponse } from '@/components/elements/Captcha';
@@ -10,6 +12,7 @@ import Field from '@/components/elements/Field';
 import { useTranslation } from '@/i18n/I18nProvider';
 
 import CaptchaManager from '@/lib/captcha';
+import { passkeyErrorMessage } from '@/lib/passkeys';
 
 import useFlash from '@/plugins/useFlash';
 
@@ -31,6 +34,55 @@ function LoginContainer() {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const passkeysEnabled =
+        (window as { SiteConfiguration?: { passkeys?: { enabled?: boolean } } }).SiteConfiguration?.passkeys?.enabled ??
+        true;
+
+    const {
+        verify,
+        isLoading: isPasskeyLoading,
+        isSupported,
+    } = usePasskeyVerify({
+        routes: {
+            options: '/auth/passkeys/login/options',
+            submit: '/auth/passkeys/login',
+        },
+        onSuccess: (response) => {
+            const data = (response as { data?: { complete?: boolean; intended?: string; confirmation_token?: string } })
+                .data;
+
+            if (data?.complete) {
+                clearFlashes();
+                window.location.href = data.intended || '/';
+                return;
+            }
+
+            if (data?.confirmation_token) {
+                navigate('/auth/login/checkpoint', {
+                    state: { token: data.confirmation_token },
+                });
+                return;
+            }
+
+            clearAndAddHttpError({
+                error: new Error(t('auth.login.passkey_failed')),
+            });
+        },
+        onError: (error) => {
+            clearAndAddHttpError({
+                error: new Error(passkeyErrorMessage(error, t)),
+            });
+        },
+    });
+
+    const onPasskeyLogin = async () => {
+        try {
+            await http.get('/sanctum/csrf-cookie');
+            await verify();
+        } catch (error) {
+            clearAndAddHttpError({ error });
+        }
+    };
 
     const onSubmit = (values: Values, { setSubmitting }: FormikHelpers<Values>) => {
         // clearFlashes();
@@ -140,6 +192,18 @@ function LoginContainer() {
                             {t('auth.login.forgot_password')}
                         </SecondaryLink>
                     </div>
+                    {isSupported && passkeysEnabled && (
+                        <Button
+                            className='w-full rounded-lg bg-transparent p-2 px-4 text-white ring-1 ring-overlay/20 hover:bg-overlay/10'
+                            type='button'
+                            size='xlarge'
+                            isLoading={isPasskeyLoading}
+                            disabled={isPasskeyLoading || isSubmitting}
+                            onClick={onPasskeyLogin}
+                        >
+                            {t('auth.login.passkey')}
+                        </Button>
+                    )}
                 </LoginFormContainer>
             )}
         </Formik>

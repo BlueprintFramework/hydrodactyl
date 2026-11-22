@@ -288,6 +288,60 @@
             "remove": "Quitar aplicación de autenticación",
             "remove_description": "Quitar tu aplicación de autenticación hará que tu cuenta sea menos segura.",
             "scan_description": "Escanea el código QR de arriba con una aplicación de autenticación, o introduce el código secreto de arriba. Después, introduce abajo el código de 6 dígitos que genere."
+        },
+        "passkeys": {
+            "title": "Llaves de acceso",
+            "description": "Usa una llave de acceso guardada en tu dispositivo para iniciar sesión sin introducir la contraseña.",
+            "create": "Añadir llave de acceso",
+            "name_placeholder": "Nombre de la llave de acceso, por ejemplo MacBook",
+            "empty": "Todavía no tienes ninguna llave de acceso.",
+            "unsupported": "Este navegador no admite llaves de acceso.",
+            "last_used": "Último uso",
+            "never_used": "Nunca usada",
+            "help": "La contraseña sigue disponible como método alternativo.",
+            "delete_confirm": "¿Seguro que quieres eliminar la llave de acceso «{{name}}»? Esta acción no se puede deshacer.",
+            "delete_title": "Eliminar llave de acceso",
+            "delete": "Eliminar llave de acceso",
+            "password_title": "Confirma tu contraseña",
+            "password_description": "Por seguridad, confirma tu contraseña antes de gestionar las llaves de acceso.",
+            "password_label": "Contraseña",
+            "password_placeholder": "Introduce tu contraseña actual",
+            "count": "{{count}} de {{max}}",
+            "limit_reached": "Has alcanzado el límite de llaves de acceso ({{max}}). Elimina una para añadir otra.",
+            "name_taken": "Ya tienes una llave de acceso con este nombre.",
+            "recommendation": "Guarda llaves de acceso en al menos dos ubicaciones distintas para no quedarte sin acceso.",
+            "created": "Creada el {{date}}"
+        }
+    },
+    "passkeys": {
+        "errors": {
+            "cancelled": "La operación con la llave de acceso se ha cancelado.",
+            "not_supported": "Este navegador no admite llaves de acceso.",
+            "exists": "Este dispositivo ya está registrado como llave de acceso.",
+            "invalid_domain": "Las llaves de acceso no se pueden usar en este dominio. Para desarrollo local, usa localhost.",
+            "unexpected_response": "La solicitud de la llave de acceso no devolvió una respuesta válida.",
+            "security": "El origen del panel no coincide con el dominio configurado para las llaves de acceso.",
+            "timeout": "La operación con la llave de acceso ha caducado. Inténtalo de nuevo.",
+            "constraint": "El autenticador no cumple los requisitos necesarios.",
+            "unavailable": "El autenticador no está disponible.",
+            "unknown": "No se pudo completar la operación con la llave de acceso. Inténtalo de nuevo.",
+            "not_recognized": "Esta llave de acceso no se reconoce. Es posible que se haya eliminado de tu cuenta.",
+            "verify_failed": "No se pudo verificar la llave de acceso. Inténtalo de nuevo.",
+            "register_failed": "No se pudo registrar la llave de acceso. Inténtalo de nuevo.",
+            "invalid_credential": "Los datos de la llave de acceso no son válidos. Inténtalo de nuevo.",
+            "verification_expired": "La sesión de verificación de la llave de acceso ha caducado. Inténtalo de nuevo.",
+            "registration_expired": "La sesión de registro de la llave de acceso ha caducado. Inténtalo de nuevo.",
+            "sign_in_failed": "No se pudo iniciar sesión con esta cuenta."
+        },
+        "authenticators": {
+            "google_password_manager": "Administrador de contraseñas de Google",
+            "microsoft_password_manager": "Administrador de contraseñas de Microsoft",
+            "chrome_on_mac": "Chrome en Mac",
+            "icloud_keychain_managed": "Llavero de iCloud (gestionado)",
+            "apple_passwords": "Contraseñas de Apple",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Administrador de contraseñas de {{brand}}",
+            "unknown": "Autenticador desconocido"
         }
     },
     "admin": {
@@ -1209,7 +1263,16 @@
             "brand_color_updated": "Color de marca actualizado.",
             "brand_color_update_failed": "No se pudo guardar el color de marca.",
             "brand_color_reset": "Color de marca restablecido al valor predeterminado.",
-            "brand_color_reset_failed": "No se pudo restablecer el color de marca."
+            "brand_color_reset_failed": "No se pudo restablecer el color de marca.",
+            "tab_passkeys": "Llaves de acceso",
+            "passkeys_enabled": "Activar llaves de acceso",
+            "passkeys_enabled_hint": "Permite a los usuarios registrar llaves de acceso e iniciar sesión sin introducir la contraseña. El TOTP sigue siendo obligatorio cuando está activo.",
+            "passkeys_relying_party_id": "ID de la parte de confianza",
+            "passkeys_relying_party_id_hint": "El dominio del panel al que se vinculan las llaves de acceso, sin https://. Cambiarlo invalida las llaves de acceso existentes.",
+            "passkeys_allowed_origins": "Orígenes permitidos",
+            "passkeys_allowed_origins_hint": "Orígenes HTTPS separados por comas donde puede abrirse el diálogo de llave de acceso, por ejemplo https://panel.example.com.",
+            "passkeys_max_per_user": "Máximo de llaves de acceso por usuario",
+            "passkeys_max_per_user_hint": "Usa 0 para no limitar. Se recomiendan 10."
         },
         "system_info": {
             "cpu_cores": "Núcleos de CPU",
@@ -1246,7 +1309,9 @@
             "sign_in": "Iniciar sesión",
             "title": "Iniciar sesión",
             "username_label": "Nombre de usuario o correo electrónico",
-            "username_required": "Debes indicar un nombre de usuario o un correo electrónico."
+            "username_required": "Debes indicar un nombre de usuario o un correo electrónico.",
+            "passkey": "Iniciar sesión con llave de acceso",
+            "passkey_failed": "No se pudo iniciar sesión con la llave de acceso. Inténtalo de nuevo."
         },
         "reset_password": {
             "confirm_password_label": "Confirmar nueva contraseña",

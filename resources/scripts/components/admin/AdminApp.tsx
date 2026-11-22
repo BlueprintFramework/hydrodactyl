@@ -93,6 +93,7 @@ const GeneralSettings = lazy(() => import('./settings/GeneralSettings'));
 const AdvancedSettings = lazy(() => import('./settings/AdvancedSettings'));
 const MailSettings = lazy(() => import('./settings/MailSettings'));
 const CaptchaSettings = lazy(() => import('./settings/CaptchaSettings'));
+const PasskeySettings = lazy(() => import('./settings/PasskeySettings'));
 const CustomNavigationSettings = lazy(() => import('./settings/CustomNavigationSettings'));
 const DomainsContainer = lazy(() => import('./settings/domains/DomainsContainer'));
 const DomainFormContainer = lazy(() => import('./settings/domains/DomainFormContainer'));
@@ -300,6 +301,7 @@ const AdminShell = () => {
                                         <Route path='advanced' element={<AdvancedSettings />} />
                                         <Route path='mail' element={<MailSettings />} />
                                         <Route path='captcha' element={<CaptchaSettings />} />
+                                        <Route path='passkeys' element={<PasskeySettings />} />
                                         <Route path='custom-navigation' element={<CustomNavigationSettings />} />
                                         <Route path='domains' element={<DomainsContainer />} />
                                         <Route path='domains/new' element={<DomainFormContainer />} />

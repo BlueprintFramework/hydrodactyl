@@ -288,6 +288,60 @@
             "remove": "Remove Authenticator App",
             "remove_description": "Removing your authenticator app will make your account less secure.",
             "scan_description": "Scan the QR code above using an authenticator app, or enter the secret code above. Then, enter the 6-digit code it generates below."
+        },
+        "passkeys": {
+            "title": "Passkeys",
+            "description": "Use a passkey stored on your device to sign in without entering your password.",
+            "create": "Add passkey",
+            "name_placeholder": "Passkey name, for example MacBook",
+            "empty": "You don't have any passkeys yet.",
+            "unsupported": "This browser does not support passkeys.",
+            "last_used": "Last used",
+            "never_used": "Never used",
+            "help": "Your password remains available as a fallback.",
+            "delete_confirm": "Are you sure you want to remove the passkey “{{name}}”? This action cannot be undone.",
+            "delete_title": "Remove passkey",
+            "delete": "Remove passkey",
+            "password_title": "Confirm your password",
+            "password_description": "For your security, confirm your password before managing passkeys.",
+            "password_label": "Password",
+            "password_placeholder": "Enter your current password",
+            "count": "{{count}} of {{max}}",
+            "limit_reached": "You have reached the passkey limit ({{max}}). Remove one to add another.",
+            "name_taken": "You already have a passkey with this name.",
+            "recommendation": "Keep passkeys in at least two different storage locations so you don't lose access.",
+            "created": "Created {{date}}"
+        }
+    },
+    "passkeys": {
+        "errors": {
+            "cancelled": "The passkey operation was cancelled.",
+            "not_supported": "This browser does not support passkeys.",
+            "exists": "This device is already registered as a passkey.",
+            "invalid_domain": "Passkeys can't be used on this domain. For local development, use localhost.",
+            "unexpected_response": "The passkey request did not return a valid response.",
+            "security": "The panel origin does not match the configured passkey domain.",
+            "timeout": "The passkey operation timed out. Please try again.",
+            "constraint": "The authenticator does not meet the required conditions.",
+            "unavailable": "The authenticator is not available.",
+            "unknown": "The passkey operation could not be completed. Please try again.",
+            "not_recognized": "This passkey isn't recognized. It may have been removed from your account.",
+            "verify_failed": "Unable to verify the passkey. Please try again.",
+            "register_failed": "Unable to register the passkey. Please try again.",
+            "invalid_credential": "The passkey data is invalid. Please try again.",
+            "verification_expired": "The passkey verification session expired. Please try again.",
+            "registration_expired": "The passkey registration session expired. Please try again.",
+            "sign_in_failed": "Unable to sign in with this account."
+        },
+        "authenticators": {
+            "google_password_manager": "Google Password Manager",
+            "microsoft_password_manager": "Microsoft Password Manager",
+            "chrome_on_mac": "Chrome on Mac",
+            "icloud_keychain_managed": "iCloud Keychain (Managed)",
+            "apple_passwords": "Apple Passwords",
+            "windows_hello": "Windows Hello",
+            "password_manager": "{{brand}} Password Manager",
+            "unknown": "Unknown authenticator"
         }
     },
     "admin": {
@@ -1209,7 +1263,16 @@
             "brand_color_updated": "Brand color updated.",
             "brand_color_update_failed": "Failed to save brand color.",
             "brand_color_reset": "Brand color reset to default.",
-            "brand_color_reset_failed": "Failed to reset brand color."
+            "brand_color_reset_failed": "Failed to reset brand color.",
+            "tab_passkeys": "Passkeys",
+            "passkeys_enabled": "Enable passkeys",
+            "passkeys_enabled_hint": "Allow users to register passkeys and sign in without entering their password. TOTP is still required when enabled.",
+            "passkeys_relying_party_id": "Relying Party ID",
+            "passkeys_relying_party_id_hint": "The panel domain passkeys are bound to, without https://. Changing this invalidates existing passkeys.",
+            "passkeys_allowed_origins": "Allowed origins",
+            "passkeys_allowed_origins_hint": "Comma-separated HTTPS origins where passkey prompts may open, for example https://panel.example.com.",
+            "passkeys_max_per_user": "Maximum passkeys per user",
+            "passkeys_max_per_user_hint": "Set to 0 for no limit. 10 is recommended."
         },
         "system_info": {
             "cpu_cores": "CPU Cores",
@@ -1246,7 +1309,9 @@
             "sign_in": "Sign in",
             "title": "Login",
             "username_label": "Username or Email",
-            "username_required": "A username or email must be provided."
+            "username_required": "A username or email must be provided.",
+            "passkey": "Sign in with a passkey",
+            "passkey_failed": "Passkey sign-in failed. Please try again."
         },
         "reset_password": {
             "confirm_password_label": "Confirm New Password",

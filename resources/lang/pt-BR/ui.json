@@ -288,6 +288,60 @@
             "remove": "Remover aplicativo autenticador",
             "remove_description": "Remover o aplicativo autenticador deixará sua conta menos segura.",
             "scan_description": "Escaneie o QR code acima com um aplicativo autenticador ou informe o código secreto acima. Depois, digite abaixo o código de 6 dígitos gerado pelo aplicativo."
+        },
+        "passkeys": {
+            "title": "Chaves de acesso",
+            "description": "Use uma chave de acesso armazenada no seu dispositivo para entrar sem digitar a senha.",
+            "create": "Adicionar chave de acesso",
+            "name_placeholder": "Nome da chave de acesso, por exemplo MacBook",
+            "empty": "Você ainda não tem nenhuma chave de acesso.",
+            "unsupported": "Este navegador não oferece suporte a chaves de acesso.",
+            "last_used": "Último uso",
+            "never_used": "Nunca usada",
+            "help": "Sua senha continua disponível como alternativa.",
+            "delete_confirm": "Tem certeza de que deseja remover a chave de acesso “{{name}}”? Esta ação não pode ser desfeita.",
+            "delete_title": "Remover chave de acesso",
+            "delete": "Remover chave de acesso",
+            "password_title": "Confirme sua senha",
+            "password_description": "Por segurança, confirme sua senha antes de gerenciar as chaves de acesso.",
+            "password_label": "Senha",
+            "password_placeholder": "Digite sua senha atual",
+            "count": "{{count}} de {{max}}",
+            "limit_reached": "Você atingiu o limite de chaves de acesso ({{max}}). Remova uma para adicionar outra.",
+            "name_taken": "Você já tem uma chave de acesso com este nome.",
+            "recommendation": "Guarde chaves de acesso em pelo menos dois locais diferentes para não perder o acesso.",
+            "created": "Criada em {{date}}"
+        }
+    },
+    "passkeys": {
+        "errors": {
+            "cancelled": "A operação com a chave de acesso foi cancelada.",
+            "not_supported": "Este navegador não oferece suporte a chaves de acesso.",
+            "exists": "Este dispositivo já está registrado como chave de acesso.",
+            "invalid_domain": "As chaves de acesso não podem ser usadas neste domínio. Para desenvolvimento local, use localhost.",
+            "unexpected_response": "A solicitação da chave de acesso não retornou uma resposta válida.",
+            "security": "A origem do painel não corresponde ao domínio configurado para as chaves de acesso.",
+            "timeout": "A operação com a chave de acesso expirou. Tente novamente.",
+            "constraint": "O autenticador não atende aos requisitos necessários.",
+            "unavailable": "O autenticador não está disponível.",
+            "unknown": "Não foi possível concluir a operação com a chave de acesso. Tente novamente.",
+            "not_recognized": "Esta chave de acesso não é reconhecida. Ela pode ter sido removida da sua conta.",
+            "verify_failed": "Não foi possível verificar a chave de acesso. Tente novamente.",
+            "register_failed": "Não foi possível registrar a chave de acesso. Tente novamente.",
+            "invalid_credential": "Os dados da chave de acesso são inválidos. Tente novamente.",
+            "verification_expired": "A sessão de verificação da chave de acesso expirou. Tente novamente.",
+            "registration_expired": "A sessão de registro da chave de acesso expirou. Tente novamente.",
+            "sign_in_failed": "Não foi possível entrar com esta conta."
+        },
+        "authenticators": {
+            "google_password_manager": "Gerenciador de senhas do Google",
+            "microsoft_password_manager": "Gerenciador de senhas da Microsoft",
+            "chrome_on_mac": "Chrome no Mac",
+            "icloud_keychain_managed": "Chaveiro do iCloud (gerenciado)",
+            "apple_passwords": "Senhas da Apple",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Gerenciador de senhas: {{brand}}",
+            "unknown": "Autenticador desconhecido"
         }
     },
     "admin": {
@@ -1209,7 +1263,16 @@
             "brand_color_updated": "Cor da marca atualizada.",
             "brand_color_update_failed": "Não foi possível salvar a cor da marca.",
             "brand_color_reset": "Cor da marca restaurada para o padrão.",
-            "brand_color_reset_failed": "Não foi possível restaurar a cor da marca."
+            "brand_color_reset_failed": "Não foi possível restaurar a cor da marca.",
+            "tab_passkeys": "Chaves de acesso",
+            "passkeys_enabled": "Ativar chaves de acesso",
+            "passkeys_enabled_hint": "Permite que os usuários registrem chaves de acesso e entrem sem digitar a senha. O TOTP continua obrigatório quando ativado.",
+            "passkeys_relying_party_id": "ID da parte confiável",
+            "passkeys_relying_party_id_hint": "O domínio do painel ao qual as chaves de acesso estão vinculadas, sem https://. Alterar isso invalida as chaves de acesso existentes.",
+            "passkeys_allowed_origins": "Origens permitidas",
+            "passkeys_allowed_origins_hint": "Origens HTTPS separadas por vírgulas onde o diálogo de chave de acesso pode aparecer, por exemplo https://panel.example.com.",
+            "passkeys_max_per_user": "Máximo de chaves de acesso por usuário",
+            "passkeys_max_per_user_hint": "Use 0 para sem limite. Recomendam-se 10."
         },
         "system_info": {
             "cpu_cores": "Núcleos de CPU",
@@ -1246,7 +1309,9 @@
             "sign_in": "Entrar",
             "title": "Login",
             "username_label": "Usuário ou e-mail",
-            "username_required": "Informe um usuário ou e-mail."
+            "username_required": "Informe um usuário ou e-mail.",
+            "passkey": "Entrar com chave de acesso",
+            "passkey_failed": "Não foi possível entrar com a chave de acesso. Tente novamente."
         },
         "reset_password": {
             "confirm_password_label": "Confirmar nova senha",

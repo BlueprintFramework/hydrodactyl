@@ -38,6 +38,10 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->routes(function () {
             Route::middleware('web')->group(function () {
+                // Public passkey sign-in endpoints. They must be registered
+                // before the authenticated SPA routes.
+                Route::group([], base_path('routes/passkeys.php'));
+
                 // AT Protocol OAuth metadata + callback are intentionally public,
                 // so they must be registered before the authenticated routes
                 // (and before the SPA catch-all in routes/base.php).

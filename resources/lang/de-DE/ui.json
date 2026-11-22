@@ -245,6 +245,60 @@
             "remove": "Authenticator-App entfernen",
             "remove_description": "Das Entfernen Ihrer Authenticator-App macht Ihr Konto weniger sicher.",
             "scan_description": "Scannen Sie den obigen QR-Code mit einer Authenticator-App oder geben Sie den obigen Geheimcode ein. Geben Sie dann den daraus erzeugten 6-stelligen Code unten ein."
+        },
+        "passkeys": {
+            "title": "Passkeys",
+            "description": "Melde dich mit einem auf deinem Gerät gespeicherten Passkey an, ohne dein Passwort einzugeben.",
+            "create": "Passkey hinzufügen",
+            "name_placeholder": "Passkey-Name, zum Beispiel MacBook",
+            "empty": "Du hast noch keine Passkeys.",
+            "unsupported": "Dieser Browser unterstützt keine Passkeys.",
+            "last_used": "Zuletzt verwendet",
+            "never_used": "Nie verwendet",
+            "help": "Dein Passwort bleibt als Alternative verfügbar.",
+            "delete_confirm": "Bist du sicher, dass du den Passkey „{{name}}“ entfernen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+            "delete_title": "Passkey entfernen",
+            "delete": "Passkey entfernen",
+            "password_title": "Passwort bestätigen",
+            "password_description": "Bestätige aus Sicherheitsgründen dein Passwort, bevor du Passkeys verwaltest.",
+            "password_label": "Passwort",
+            "password_placeholder": "Aktuelles Passwort eingeben",
+            "count": "{{count}} von {{max}}",
+            "limit_reached": "Du hast das Passkey-Limit ({{max}}) erreicht. Entferne einen, um einen weiteren hinzuzufügen.",
+            "name_taken": "Du hast bereits einen Passkey mit diesem Namen.",
+            "recommendation": "Speichere Passkeys an mindestens zwei verschiedenen Orten, damit du den Zugang nicht verlierst.",
+            "created": "Erstellt am {{date}}"
+        }
+    },
+    "passkeys": {
+        "errors": {
+            "cancelled": "Der Passkey-Vorgang wurde abgebrochen.",
+            "not_supported": "Dieser Browser unterstützt keine Passkeys.",
+            "exists": "Dieses Gerät ist bereits als Passkey registriert.",
+            "invalid_domain": "Passkeys können in dieser Domain nicht verwendet werden. Verwende für die lokale Entwicklung localhost.",
+            "unexpected_response": "Die Passkey-Anfrage hat keine gültige Antwort zurückgegeben.",
+            "security": "Der Ursprung des Panels stimmt nicht mit der konfigurierten Passkey-Domain überein.",
+            "timeout": "Der Passkey-Vorgang ist abgelaufen. Bitte versuche es erneut.",
+            "constraint": "Der Authenticator erfüllt nicht die erforderlichen Bedingungen.",
+            "unavailable": "Der Authenticator ist nicht verfügbar.",
+            "unknown": "Der Passkey-Vorgang konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
+            "not_recognized": "Dieser Passkey wird nicht erkannt. Möglicherweise wurde er von deinem Konto entfernt.",
+            "verify_failed": "Der Passkey konnte nicht verifiziert werden. Bitte versuche es erneut.",
+            "register_failed": "Der Passkey konnte nicht registriert werden. Bitte versuche es erneut.",
+            "invalid_credential": "Die Passkey-Daten sind ungültig. Bitte versuche es erneut.",
+            "verification_expired": "Die Passkey-Verifizierungssitzung ist abgelaufen. Bitte versuche es erneut.",
+            "registration_expired": "Die Passkey-Registrierungssitzung ist abgelaufen. Bitte versuche es erneut.",
+            "sign_in_failed": "Mit diesem Konto konnte nicht angemeldet werden."
+        },
+        "authenticators": {
+            "google_password_manager": "Google Passwortmanager",
+            "microsoft_password_manager": "Microsoft Passwortmanager",
+            "chrome_on_mac": "Chrome auf dem Mac",
+            "icloud_keychain_managed": "iCloud-Schlüsselbund (verwaltet)",
+            "apple_passwords": "Apple Passwörter",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Passwortmanager von {{brand}}",
+            "unknown": "Unbekannter Authenticator"
         }
     },
     "admin": {
@@ -1166,7 +1220,16 @@
             "brand_color_updated": "Markenfarbe aktualisiert.",
             "brand_color_update_failed": "Markenfarbe konnte nicht gespeichert werden.",
             "brand_color_reset": "Markenfarbe auf Standard zurückgesetzt.",
-            "brand_color_reset_failed": "Markenfarbe konnte nicht zurückgesetzt werden."
+            "brand_color_reset_failed": "Markenfarbe konnte nicht zurückgesetzt werden.",
+            "tab_passkeys": "Passkeys",
+            "passkeys_enabled": "Passkeys aktivieren",
+            "passkeys_enabled_hint": "Erlaubt Benutzern, Passkeys zu registrieren und sich ohne Passwort anzumelden. TOTP bleibt weiterhin erforderlich.",
+            "passkeys_relying_party_id": "ID der vertrauenden Partei",
+            "passkeys_relying_party_id_hint": "Die Panel-Domain, an die Passkeys gebunden sind, ohne https://. Eine Änderung macht bestehende Passkeys ungültig.",
+            "passkeys_allowed_origins": "Erlaubte Origins",
+            "passkeys_allowed_origins_hint": "Kommagetrennte HTTPS-Origins, unter denen die Passkey-Abfrage erscheinen darf, zum Beispiel https://panel.example.com.",
+            "passkeys_max_per_user": "Maximale Passkeys pro Benutzer",
+            "passkeys_max_per_user_hint": "0 bedeutet kein Limit. Empfohlen sind 10."
         },
         "system_info": {
             "cpu_cores": "CPU-Kerne",
@@ -1203,7 +1266,9 @@
             "sign_in": "Anmelden",
             "title": "Anmeldung",
             "username_label": "Benutzername oder E-Mail",
-            "username_required": "Ein Benutzername oder eine E-Mail-Adresse muss angegeben werden."
+            "username_required": "Ein Benutzername oder eine E-Mail-Adresse muss angegeben werden.",
+            "passkey": "Mit Passkey anmelden",
+            "passkey_failed": "Passkey-Anmeldung fehlgeschlagen. Bitte versuche es erneut."
         },
         "reset_password": {
             "confirm_password_label": "Neues Passwort bestätigen",

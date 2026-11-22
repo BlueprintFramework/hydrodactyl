@@ -288,6 +288,60 @@
             "remove": "Treure l'aplicació d'autenticació",
             "remove_description": "Treure l'aplicació d'autenticació farà que el teu compte sigui menys segur.",
             "scan_description": "Escaneja el codi QR de dalt amb una aplicació d'autenticació o introdueix el codi secret de dalt. Després, introdueix a baix el codi de 6 dígits que generi."
+        },
+        "passkeys": {
+            "title": "Claus d'accés",
+            "description": "Utilitza una clau d'accés del teu dispositiu per iniciar sessió sense introduir la contrasenya.",
+            "create": "Afegeix una clau d'accés",
+            "name_placeholder": "Nom de la clau d'accés, per exemple MacBook",
+            "empty": "Encara no tens cap clau d'accés.",
+            "unsupported": "Aquest navegador no admet claus d'accés.",
+            "last_used": "Darrer ús",
+            "never_used": "Mai utilitzada",
+            "help": "La contrasenya continua disponible com a alternativa.",
+            "delete_confirm": "Segur que vols eliminar la clau d'accés «{{name}}»? Aquesta acció no es pot desfer.",
+            "delete_title": "Eliminar clau d'accés",
+            "delete": "Eliminar clau d'accés",
+            "password_title": "Confirma la contrasenya",
+            "password_description": "Per seguretat, confirma la contrasenya abans de gestionar les claus d'accés.",
+            "password_label": "Contrasenya",
+            "password_placeholder": "Introdueix la contrasenya actual",
+            "count": "{{count}} de {{max}}",
+            "limit_reached": "Has arribat al límit de claus d'accés ({{max}}). Elimina'n una per afegir-ne una altra.",
+            "name_taken": "Ja tens una clau d'accés amb aquest nom.",
+            "recommendation": "Guarda claus d'accés en almenys dues ubicacions diferents per no quedar-te sense accés.",
+            "created": "Creada el {{date}}"
+        }
+    },
+    "passkeys": {
+        "errors": {
+            "cancelled": "L'operació amb la clau d'accés s'ha cancel·lat.",
+            "not_supported": "Aquest navegador no admet claus d'accés.",
+            "exists": "Aquest dispositiu ja està registrat com a clau d'accés.",
+            "invalid_domain": "Les claus d'accés no es poden usar en aquest domini. Per a desenvolupament local, usa localhost.",
+            "unexpected_response": "La sol·licitud de la clau d'accés no va retornar una resposta vàlida.",
+            "security": "L'origen del panell no coincideix amb el domini configurat per a les claus d'accés.",
+            "timeout": "L'operació amb la clau d'accés ha caducat. Torna-ho a provar.",
+            "constraint": "L'autenticador no compleix els requisits necessaris.",
+            "unavailable": "L'autenticador no està disponible.",
+            "unknown": "No s'ha pogut completar l'operació amb la clau d'accés. Torna-ho a provar.",
+            "not_recognized": "Aquesta clau d'accés no es reconeix. Potser s'ha eliminat del teu compte.",
+            "verify_failed": "No s'ha pogut verificar la clau d'accés. Torna-ho a provar.",
+            "register_failed": "No s'ha pogut registrar la clau d'accés. Torna-ho a provar.",
+            "invalid_credential": "Les dades de la clau d'accés no són vàlides. Torna-ho a provar.",
+            "verification_expired": "La sessió de verificació de la clau d'accés ha caducat. Torna-ho a provar.",
+            "registration_expired": "La sessió de registre de la clau d'accés ha caducat. Torna-ho a provar.",
+            "sign_in_failed": "No s'ha pogut iniciar sessió amb aquest compte."
+        },
+        "authenticators": {
+            "google_password_manager": "Gestor de contrasenyes de Google",
+            "microsoft_password_manager": "Gestor de contrasenyes de Microsoft",
+            "chrome_on_mac": "Chrome al Mac",
+            "icloud_keychain_managed": "Clauer de l'iCloud (gestionat)",
+            "apple_passwords": "Contrasenyes d'Apple",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Gestor de contrasenyes de {{brand}}",
+            "unknown": "Autenticador desconegut"
         }
     },
     "admin": {
@@ -1209,7 +1263,16 @@
             "brand_color_updated": "Color de marca actualitzat.",
             "brand_color_update_failed": "No s'ha pogut desar el color de marca.",
             "brand_color_reset": "Color de marca restablert al valor per defecte.",
-            "brand_color_reset_failed": "No s'ha pogut restablir el color de marca."
+            "brand_color_reset_failed": "No s'ha pogut restablir el color de marca.",
+            "tab_passkeys": "Claus d'accés",
+            "passkeys_enabled": "Activa les claus d'accés",
+            "passkeys_enabled_hint": "Permet als usuaris registrar claus d'accés i iniciar sessió sense introduir la contrasenya. El TOTP continua sent obligatori quan està actiu.",
+            "passkeys_relying_party_id": "ID de la part de confiança",
+            "passkeys_relying_party_id_hint": "El domini del panell al qual s'enllacen les claus d'accés, sense https://. Canviar-lo invalida les claus d'accés existents.",
+            "passkeys_allowed_origins": "Orígens permesos",
+            "passkeys_allowed_origins_hint": "Orígens HTTPS separats per comes on es pot obrir el diàleg de clau d'accés, per exemple https://panel.example.com.",
+            "passkeys_max_per_user": "Màxim de claus d'accés per usuari",
+            "passkeys_max_per_user_hint": "Usa 0 per no limitar. Es recomanen 10."
         },
         "system_info": {
             "cpu_cores": "Nuclis de CPU",
@@ -1246,7 +1309,9 @@
             "sign_in": "Inicia la sessió",
             "title": "Inici de sessió",
             "username_label": "Nom d'usuari o correu electrònic",
-            "username_required": "Cal proporcionar un nom d'usuari o un correu electrònic."
+            "username_required": "Cal proporcionar un nom d'usuari o un correu electrònic.",
+            "passkey": "Inicia sessió amb una clau d'accés",
+            "passkey_failed": "No s'ha pogut iniciar sessió amb la clau d'accés. Torna-ho a provar."
         },
         "reset_password": {
             "confirm_password_label": "Confirma la contrasenya nova",

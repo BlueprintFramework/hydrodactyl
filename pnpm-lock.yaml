@@ -53,6 +53,9 @@ importers:
       '@hugeicons/react':
         specifier: ^1.1.1
         version: 1.1.9(react@19.2.7)
+      '@laravel/passkeys':
+        specifier: ^0.4.1
+        version: 0.4.1(react@19.2.7)
       '@lezer/highlight':
         specifier: ^1.2.1
         version: 1.2.3
@@ -611,6 +614,21 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@laravel/passkeys@0.4.1':
+    resolution: {integrity: sha512-og3qrXHy0Q8naRkSg2Yo8BMwvr5P7fEoxqYSN8NGZ0hg44vSGeY8hFUyjnQxZmZcJk2IMWmTFS+O5G3FnCLqlQ==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      svelte: ^5.0.0
+      vue: ^3.3.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
 
   '@lezer/common@1.5.2':
     resolution: {integrity: sha512-sxQE460fPZyU3sdc8lafxiPwJHBzZRy/udNFynGQky1SePYBdhkBl1kOagA9uT3pxR8K09bOrmTUqA9wb/PjSQ==}
@@ -1172,6 +1190,9 @@ packages:
     peerDependenciesMeta:
       rollup:
         optional: true
+
+  '@simplewebauthn/browser@13.3.0':
+    resolution: {integrity: sha512-BE/UWv6FOToAdVk0EokzkqQQDOWtNydYlY6+OrmiZ5SCNmb41VehttboTetUM3T/fr6EAFYVXjz4My2wg230rQ==}
 
   '@sinclair/typebox@0.34.52':
     resolution: {integrity: sha512-XiMQh7qqVlxZzcVD+kkGMNGMzcTrDMLWI7S4x7z1MkCkbDPrekpZXEUK0eZqZFMuHQg2a2DZOcDIh9o5v3Gonw==}
@@ -3136,6 +3157,12 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@laravel/passkeys@0.4.1(react@19.2.7)':
+    dependencies:
+      '@simplewebauthn/browser': 13.3.0
+    optionalDependencies:
+      react: 19.2.7
+
   '@lezer/common@1.5.2': {}
 
   '@lezer/cpp@1.1.6':
@@ -3677,6 +3704,8 @@ snapshots:
       '@types/estree': 1.0.9
       estree-walker: 2.0.2
       picomatch: 4.0.4
+
+  '@simplewebauthn/browser@13.3.0': {}
 
   '@sinclair/typebox@0.34.52': {}
 

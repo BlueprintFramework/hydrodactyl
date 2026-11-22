@@ -47,12 +47,20 @@ export interface CustomNavigationSettings {
     items: { label: string; url: string; icon: string }[];
 }
 
+export interface PasskeySettings {
+    'passkeys:enabled': boolean;
+    'passkeys:max_per_user': number;
+    'passkeys:relying_party_id': string;
+    'passkeys:allowed_origins': string;
+}
+
 export interface SettingsResponse {
     general: GeneralSettings;
     advanced: AdvancedSettings;
     mail: MailSettings;
     captcha: CaptchaSettings;
     custom_navigation: CustomNavigationSettings;
+    passkeys: PasskeySettings;
     languages: Record<string, string>;
 }
 
