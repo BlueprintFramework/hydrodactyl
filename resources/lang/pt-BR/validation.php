@@ -111,6 +111,8 @@ return [
         'operation_id_uuid' => 'O ID da operação deve ser um UUID válido.',
         'passkey_origin_invalid' => 'As origens das chaves de acesso devem ser origens HTTP(S) absolutas e sem caminho.',
         'passkey_origin_not_in_relying_party' => 'As origens das chaves de acesso devem pertencer ao domínio da parte confiável.',
+        'passkey_relying_party_id_invalid' => 'O ID da parte confiável deve ser um nome de domínio válido, sem esquema, caminho, porta ou endereço IP.',
+        'password_confirmation_required' => 'É necessário confirmar a senha.',
         'power_action_invalid' => 'A ação de energia deve ser uma das seguintes: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'Você deve confirmar que entende que esta ação não pode ser desfeita sem a ajuda de um administrador.',
         'subdomain_invalid_characters' => 'O subdomínio contém caracteres inválidos.',

@@ -91,4 +91,69 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
                 'Los orígenes de las claves de acceso deben pertenecer al dominio de la parte de confianza.',
             );
     }
+
+    public function testPasskeySettingsRejectInvalidRelyingPartyIds(): void
+    {
+        $user = User::factory()->create(['root_admin' => true]);
+
+        $invalidIds = [
+            '-panel.example.com',
+            'panel-.example.com',
+            'panel..example.com',
+            '.panel.example.com',
+            'panel.example.com.',
+            'panel_example.com',
+            '127.0.0.1',
+            'https://panel.example.com',
+            'panel.example.com/path',
+            str_repeat('a', 64) . '.example.com',
+        ];
+
+        foreach ($invalidIds as $relyingPartyId) {
+            $this->actingAs($user)
+                ->patchJson('/admin/api/settings/passkeys', [
+                    'passkeys:enabled' => true,
+                    'passkeys:relying_party_id' => $relyingPartyId,
+                    'passkeys:allowed_origins' => 'https://panel.example.com',
+                ])
+                ->assertStatus(422);
+        }
+    }
+
+    public function testPasskeySettingsAcceptValidRelyingPartyIds(): void
+    {
+        $user = User::factory()->create(['root_admin' => true]);
+
+        foreach ([
+            ['localhost', 'http://localhost'],
+            ['panel.example.com', 'https://panel.example.com'],
+            ['sub.panel.example.com', 'https://sub.panel.example.com'],
+        ] as [$relyingPartyId, $origin]) {
+            $this->actingAs($user)
+                ->patchJson('/admin/api/settings/passkeys', [
+                    'passkeys:enabled' => true,
+                    'passkeys:relying_party_id' => $relyingPartyId,
+                    'passkeys:allowed_origins' => $origin,
+                ])
+                ->assertOk();
+        }
+    }
+
+    public function testPasskeyRelyingPartyValidationMessageIsLocalized(): void
+    {
+        $user = User::factory()->create(['root_admin' => true, 'language' => 'es-ES']);
+
+        $this->actingAs($user)
+            ->patchJson('/admin/api/settings/passkeys', [
+                'passkeys:enabled' => true,
+                'passkeys:relying_party_id' => 'panel..example.com',
+                'passkeys:allowed_origins' => 'https://panel.example.com',
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('errors.0.meta.source_field', 'passkeys:relying_party_id')
+            ->assertJsonPath(
+                'errors.0.detail',
+                'El ID de la parte de confianza debe ser un nombre de dominio válido, sin esquema, ruta, puerto ni dirección IP.',
+            );
+    }
 }

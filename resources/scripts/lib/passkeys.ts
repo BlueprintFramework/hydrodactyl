@@ -22,6 +22,17 @@ const MESSAGE_KEYS: Record<string, TranslationKey> = {
     'An unknown error occurred.': 'passkeys.errors.unknown',
 };
 
+export const isPasswordConfirmationError = (error: unknown): boolean => {
+    if (typeof error !== 'object' || error === null) {
+        return false;
+    }
+
+    const status =
+        (error as { status?: unknown }).status ?? (error as { response?: { status?: unknown } }).response?.status;
+
+    return status === 423;
+};
+
 export const passkeyErrorMessage = (error: unknown, t: Translate): string => {
     if (!(error instanceof Error)) {
         return t('passkeys.errors.unknown');

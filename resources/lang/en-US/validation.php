@@ -112,6 +112,8 @@ return [
         'operation_id_uuid' => 'The operation ID must be a valid UUID.',
         'passkey_origin_invalid' => 'Passkey origins must be absolute HTTP(S) origins without a path.',
         'passkey_origin_not_in_relying_party' => 'Passkey origins must belong to the relying party domain.',
+        'passkey_relying_party_id_invalid' => 'The relying party ID must be a valid domain name without a scheme, path, port, or IP address.',
+        'password_confirmation_required' => 'Password confirmation required.',
         'power_action_invalid' => 'The power action must be one of: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'You must confirm that you understand this action cannot be undone without administrator assistance.',
         'subdomain_invalid_characters' => 'Subdomain contains invalid characters.',

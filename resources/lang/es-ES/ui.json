@@ -301,7 +301,11 @@
             "help": "La contraseña sigue disponible como método alternativo.",
             "delete_confirm": "¿Seguro que quieres eliminar la clave de acceso «{{name}}»? Esta acción no se puede deshacer.",
             "delete_title": "Eliminar clave de acceso",
-            "delete": "Eliminar clave de acceso"
+            "delete": "Eliminar clave de acceso",
+            "password_title": "Confirma tu contraseña",
+            "password_description": "Por seguridad, confirma tu contraseña antes de gestionar las claves de acceso.",
+            "password_label": "Contraseña",
+            "password_placeholder": "Introduce tu contraseña actual"
         }
     },
     "passkeys": {

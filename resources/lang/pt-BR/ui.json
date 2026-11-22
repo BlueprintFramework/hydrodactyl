@@ -301,7 +301,11 @@
             "help": "Sua senha continua disponível como alternativa.",
             "delete_confirm": "Tem certeza de que deseja remover a chave de acesso “{{name}}”? Esta ação não pode ser desfeita.",
             "delete_title": "Remover chave de acesso",
-            "delete": "Remover chave de acesso"
+            "delete": "Remover chave de acesso",
+            "password_title": "Confirme sua senha",
+            "password_description": "Por segurança, confirme sua senha antes de gerenciar as chaves de acesso.",
+            "password_label": "Senha",
+            "password_placeholder": "Digite sua senha atual"
         }
     },
     "passkeys": {

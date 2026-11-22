@@ -301,7 +301,11 @@
             "help": "La contrasenya continua disponible com a alternativa.",
             "delete_confirm": "Segur que vols eliminar la clau d'accés «{{name}}»? Aquesta acció no es pot desfer.",
             "delete_title": "Eliminar clau d'accés",
-            "delete": "Eliminar clau d'accés"
+            "delete": "Eliminar clau d'accés",
+            "password_title": "Confirma la contrasenya",
+            "password_description": "Per seguretat, confirma la contrasenya abans de gestionar les claus d'accés.",
+            "password_label": "Contrasenya",
+            "password_placeholder": "Introdueix la contrasenya actual"
         }
     },
     "passkeys": {

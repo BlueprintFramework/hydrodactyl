@@ -301,7 +301,11 @@
             "help": "Tessera tua ut alternativa manet.",
             "delete_confirm": "Certusne es clavem accessus «{{name}}» removere velle? Haec actio reverti non potest.",
             "delete_title": "Clavem accessus removere",
-            "delete": "Clavem accessus removere"
+            "delete": "Clavem accessus removere",
+            "password_title": "Confirma tesseram tuam",
+            "password_description": "Pro securitate, tesseram tuam confirma antequam claves accessus administres.",
+            "password_label": "Tessera",
+            "password_placeholder": "Tesseram tuam currentem inscribe"
         }
     },
     "passkeys": {

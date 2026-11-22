@@ -301,7 +301,11 @@
             "help": "Your password remains available as a fallback.",
             "delete_confirm": "Are you sure you want to remove the passkey “{{name}}”? This action cannot be undone.",
             "delete_title": "Remove passkey",
-            "delete": "Remove passkey"
+            "delete": "Remove passkey",
+            "password_title": "Confirm your password",
+            "password_description": "For your security, confirm your password before managing passkeys.",
+            "password_label": "Password",
+            "password_placeholder": "Enter your current password"
         }
     },
     "passkeys": {

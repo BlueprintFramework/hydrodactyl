@@ -58,7 +58,9 @@ return [
     // routes as a second line of defence if discovery order ever changes.
     'middleware' => ['web', Pterodactyl\Http\Middleware\BlockPackagePasskeyLogin::class],
 
-    'management_middleware' => ['auth'],
+    // The panel's routes apply this explicitly as well, mirroring Laravel's
+    // password.confirm behaviour before passkeys can be added or removed.
+    'management_middleware' => ['auth', Pterodactyl\Http\Middleware\RequirePasskeyPasswordConfirmation::class],
 
     'throttle' => null,
 

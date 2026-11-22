@@ -14,7 +14,21 @@ class PasskeySettingsFormRequest extends AdminFormRequest
                 'required',
                 'string',
                 'max:253',
-                'regex:/^[A-Za-z0-9.-]+$/',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $relyingPartyId = strtolower(trim((string) $value));
+
+                    if (
+                        $relyingPartyId === ''
+                        || strlen($relyingPartyId) > 253
+                        || filter_var($relyingPartyId, FILTER_VALIDATE_IP) !== false
+                        || !preg_match(
+                            '/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i',
+                            $relyingPartyId,
+                        )
+                    ) {
+                        $fail(__('validation.json_api.passkey_relying_party_id_invalid'));
+                    }
+                },
             ],
             'passkeys:allowed_origins' => [
                 'required',

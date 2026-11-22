@@ -1,13 +1,14 @@
 import { TrashBin } from '@gravity-ui/icons';
 import { usePasskeyRegister } from '@laravel/passkeys/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import http, { httpErrorToHuman } from '@/api/http';
 import { Dialog } from '@/components/elements/dialog';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { formatDateTime } from '@/lib/formatters';
-import { passkeyErrorMessage } from '@/lib/passkeys';
+import { isPasswordConfirmationError, passkeyErrorMessage } from '@/lib/passkeys';
 import { useFlashKey } from '@/plugins/useFlash';
+import PasskeyPasswordModal from './PasskeyPasswordModal';
 
 interface Passkey {
     id: number;
@@ -16,6 +17,8 @@ interface Passkey {
     created_at: string | null;
     last_used_at: string | null;
 }
+
+type PendingAction = { type: 'add'; name: string } | { type: 'delete'; passkey: Passkey };
 
 // Million compiles this into a block, which binds the input's onChange as the
 // native `change` event (fires on blur/Enter) instead of React's synthetic one.
@@ -28,6 +31,12 @@ const PasskeySettings = () => {
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState<number | null>(null);
     const [passkeyToDelete, setPasskeyToDelete] = useState<Passkey | null>(null);
+    const [passwordConfirmed, setPasswordConfirmed] = useState(false);
+    const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+    const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [confirmingPassword, setConfirmingPassword] = useState(false);
+    const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+    const pendingName = useRef('');
 
     const loadPasskeys = useCallback(() => {
         setLoading(true);
@@ -41,38 +50,128 @@ const PasskeySettings = () => {
         loadPasskeys();
     }, [loadPasskeys]);
 
+    useEffect(() => {
+        http.get('/user/passkeys/confirmation')
+            .then(({ data }) => setPasswordConfirmed(data.confirmed === true))
+            .catch(() => setPasswordConfirmed(false));
+    }, []);
+
+    const requestPassword = (action: PendingAction) => {
+        setPendingAction(action);
+        setPasswordError(null);
+        setPasswordModalOpen(true);
+    };
+
     const { register, isLoading, isSupported } = usePasskeyRegister({
         onSuccess: () => {
+            pendingName.current = '';
             setName('');
             loadPasskeys();
         },
         onError: (error) => {
+            if (isPasswordConfirmationError(error)) {
+                setPasswordConfirmed(false);
+                requestPassword({ type: 'add', name: pendingName.current });
+                return;
+            }
+
             clearAndAddHttpError(new Error(passkeyErrorMessage(error, t)));
         },
     });
 
-    const addPasskey = async () => {
-        if (!name.trim()) {
-            return;
-        }
+    const performAdd = async (passkeyName: string) => {
+        pendingName.current = passkeyName;
 
         try {
             await http.get('/sanctum/csrf-cookie');
-            await register(name.trim());
+            await register(passkeyName);
         } catch (error) {
-            clearAndAddHttpError(new Error(httpErrorToHuman(error)));
+            if (isPasswordConfirmationError(error)) {
+                setPasswordConfirmed(false);
+                requestPassword({ type: 'add', name: passkeyName });
+                return;
+            }
+
+            clearAndAddHttpError(new Error(passkeyErrorMessage(error, t)));
         }
+    };
+
+    const addPasskey = async () => {
+        const trimmed = name.trim();
+
+        if (!trimmed) {
+            return;
+        }
+
+        if (!passwordConfirmed) {
+            requestPassword({ type: 'add', name: trimmed });
+            return;
+        }
+
+        await performAdd(trimmed);
     };
 
     const deletePasskey = (passkey: Passkey) => {
         setDeleting(passkey.id);
         http.delete(`/user/passkeys/${passkey.id}`)
             .then(() => setPasskeys((current) => current.filter((entry) => entry.id !== passkey.id)))
-            .catch((error) => clearAndAddHttpError(new Error(httpErrorToHuman(error))))
+            .catch((error) => {
+                if (isPasswordConfirmationError(error)) {
+                    setPasswordConfirmed(false);
+                    setPasskeyToDelete(null);
+                    requestPassword({ type: 'delete', passkey });
+                    return;
+                }
+
+                clearAndAddHttpError(new Error(httpErrorToHuman(error)));
+            })
             .finally(() => {
                 setDeleting(null);
                 setPasskeyToDelete(null);
             });
+    };
+
+    const requestDelete = (passkey: Passkey) => {
+        if (!passwordConfirmed) {
+            requestPassword({ type: 'delete', passkey });
+            return;
+        }
+
+        setPasskeyToDelete(passkey);
+    };
+
+    const confirmPassword = async (password: string) => {
+        setConfirmingPassword(true);
+        setPasswordError(null);
+
+        try {
+            await http.post('/user/passkeys/confirm-password', { password });
+            setPasswordConfirmed(true);
+            setPasswordModalOpen(false);
+
+            const action = pendingAction;
+            setPendingAction(null);
+
+            if (action?.type === 'add') {
+                await performAdd(action.name);
+            } else if (action?.type === 'delete') {
+                setPasskeyToDelete(action.passkey);
+            }
+        } catch (error) {
+            setPasswordError(httpErrorToHuman(error));
+        } finally {
+            setConfirmingPassword(false);
+        }
+    };
+
+    const closePasswordModal = () => {
+        if (confirmingPassword) {
+            return;
+        }
+
+        setPasswordModalOpen(false);
+        setPendingAction(null);
+        setPasswordError(null);
     };
 
     if (!isSupported) {
@@ -81,6 +180,14 @@ const PasskeySettings = () => {
 
     return (
         <div className='space-y-5'>
+            <PasskeyPasswordModal
+                open={passwordModalOpen}
+                loading={confirmingPassword}
+                error={passwordError}
+                onClose={closePasswordModal}
+                onConfirmed={(password) => void confirmPassword(password)}
+            />
+
             <Dialog.Confirm
                 open={passkeyToDelete !== null}
                 onClose={() => {
@@ -143,7 +250,7 @@ const PasskeySettings = () => {
                                 variant='attention'
                                 size='sm'
                                 disabled={deleting !== null}
-                                onClick={() => setPasskeyToDelete(passkey)}
+                                onClick={() => requestDelete(passkey)}
                                 title={t('account.passkeys.delete')}
                                 aria-label={t('account.passkeys.delete')}
                             >
