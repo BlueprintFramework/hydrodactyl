@@ -210,19 +210,30 @@ const PasskeySettings = () => {
 
             <p className='text-sm text-zinc-300'>{t('account.passkeys.description')}</p>
 
-            <div className='flex flex-col gap-3 sm:flex-row'>
+            <form
+                autoComplete='off'
+                className='flex flex-col gap-3 sm:flex-row'
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    void addPasskey();
+                }}
+            >
                 <input
                     type='text'
+                    name='passkey-name'
+                    autoComplete='off'
+                    data-1p-ignore
+                    data-lpignore='true'
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     placeholder={t('account.passkeys.name_placeholder')}
                     maxLength={100}
                     className='min-w-0 flex-1 rounded-lg border border-mocha-400 bg-mocha-400 px-3 py-2 text-sm text-zinc-100 outline-hidden focus:border-hydro-400'
                 />
-                <Button type='button' variant='secondary' disabled={isLoading || !name.trim()} onClick={addPasskey}>
+                <Button type='submit' variant='secondary' disabled={isLoading || !name.trim()}>
                     {t('account.passkeys.create')}
                 </Button>
-            </div>
+            </form>
 
             {loading ? (
                 <p className='text-sm text-zinc-400'>{t('common.loading')}</p>
