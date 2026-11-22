@@ -332,6 +332,15 @@
             "verification_expired": "A sessão de verificação da chave de acesso expirou. Tente novamente.",
             "registration_expired": "A sessão de registro da chave de acesso expirou. Tente novamente.",
             "sign_in_failed": "Não foi possível entrar com esta conta."
+        },
+        "authenticators": {
+            "google_password_manager": "Gerenciador de senhas do Google",
+            "microsoft_password_manager": "Gerenciador de senhas da Microsoft",
+            "chrome_on_mac": "Chrome no Mac",
+            "icloud_keychain_managed": "Chaveiro do iCloud (gerenciado)",
+            "apple_passwords": "Senhas da Apple",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Gerenciador de senhas: {{brand}}"
         }
     },
     "admin": {

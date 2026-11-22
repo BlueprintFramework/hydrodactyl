@@ -15,6 +15,17 @@ const ERROR_KEYS: Record<string, TranslationKey> = {
     NotReadableError: 'passkeys.errors.unavailable',
 };
 
+const AUTHENTICATOR_KEYS: Record<string, TranslationKey> = {
+    'Google Password Manager': 'passkeys.authenticators.google_password_manager',
+    'Microsoft Password Manager': 'passkeys.authenticators.microsoft_password_manager',
+    'Chrome on Mac': 'passkeys.authenticators.chrome_on_mac',
+    'iCloud Keychain (Managed)': 'passkeys.authenticators.icloud_keychain_managed',
+    'Apple Passwords': 'passkeys.authenticators.apple_passwords',
+    'Windows Hello': 'passkeys.authenticators.windows_hello',
+};
+
+const PASSWORD_MANAGER_SUFFIX = ' Password Manager';
+
 const MESSAGE_KEYS: Record<string, TranslationKey> = {
     'The passkey operation was cancelled.': 'passkeys.errors.cancelled',
     'Passkeys are not supported in this browser.': 'passkeys.errors.not_supported',
@@ -28,6 +39,28 @@ const MESSAGE_KEYS: Record<string, TranslationKey> = {
     'Passkey verification session expired. Please try again.': 'passkeys.errors.verification_expired',
     'Passkey registration session expired. Please try again.': 'passkeys.errors.registration_expired',
     'Unable to sign in with this account.': 'passkeys.errors.sign_in_failed',
+};
+
+export const passkeyAuthenticatorLabel = (label: string | null, t: Translate): string | null => {
+    if (!label) {
+        return null;
+    }
+
+    const key = AUTHENTICATOR_KEYS[label];
+
+    if (key) {
+        return t(key);
+    }
+
+    if (label.endsWith(PASSWORD_MANAGER_SUFFIX)) {
+        const brand = label.slice(0, -PASSWORD_MANAGER_SUFFIX.length).trim();
+
+        if (brand) {
+            return t('passkeys.authenticators.password_manager', { brand });
+        }
+    }
+
+    return label;
 };
 
 export const isPasswordConfirmationError = (error: unknown): boolean => {

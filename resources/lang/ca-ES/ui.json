@@ -332,6 +332,15 @@
             "verification_expired": "La sessió de verificació de la clau d'accés ha caducat. Torna-ho a provar.",
             "registration_expired": "La sessió de registre de la clau d'accés ha caducat. Torna-ho a provar.",
             "sign_in_failed": "No s'ha pogut iniciar sessió amb aquest compte."
+        },
+        "authenticators": {
+            "google_password_manager": "Gestor de contrasenyes de Google",
+            "microsoft_password_manager": "Gestor de contrasenyes de Microsoft",
+            "chrome_on_mac": "Chrome al Mac",
+            "icloud_keychain_managed": "Clauer de l'iCloud (gestionat)",
+            "apple_passwords": "Contrasenyes d'Apple",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Gestor de contrasenyes de {{brand}}"
         }
     },
     "admin": {

@@ -332,6 +332,15 @@
             "verification_expired": "Sessio verificationis clavis accessus exspiravit. Conare iterum quaeso.",
             "registration_expired": "Sessio registrationis clavis accessus exspiravit. Conare iterum quaeso.",
             "sign_in_failed": "Hac ratione ingredi non potuit."
+        },
+        "authenticators": {
+            "google_password_manager": "Administrator clavium Google",
+            "microsoft_password_manager": "Administrator clavium Microsoft",
+            "chrome_on_mac": "Chrome in Mac",
+            "icloud_keychain_managed": "Claviger iCloud (administratus)",
+            "apple_passwords": "Tesserae Apple",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Administrator clavium: {{brand}}"
         }
     },
     "admin": {

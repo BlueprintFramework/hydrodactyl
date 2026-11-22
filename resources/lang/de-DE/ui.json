@@ -289,6 +289,15 @@
             "verification_expired": "Die Passkey-Verifizierungssitzung ist abgelaufen. Bitte versuche es erneut.",
             "registration_expired": "Die Passkey-Registrierungssitzung ist abgelaufen. Bitte versuche es erneut.",
             "sign_in_failed": "Mit diesem Konto konnte nicht angemeldet werden."
+        },
+        "authenticators": {
+            "google_password_manager": "Google Passwortmanager",
+            "microsoft_password_manager": "Microsoft Passwortmanager",
+            "chrome_on_mac": "Chrome auf dem Mac",
+            "icloud_keychain_managed": "iCloud-Schlüsselbund (verwaltet)",
+            "apple_passwords": "Apple Passwörter",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Passwortmanager von {{brand}}"
         }
     },
     "admin": {

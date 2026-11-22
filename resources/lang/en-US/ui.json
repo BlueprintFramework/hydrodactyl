@@ -332,6 +332,15 @@
             "verification_expired": "The passkey verification session expired. Please try again.",
             "registration_expired": "The passkey registration session expired. Please try again.",
             "sign_in_failed": "Unable to sign in with this account."
+        },
+        "authenticators": {
+            "google_password_manager": "Google Password Manager",
+            "microsoft_password_manager": "Microsoft Password Manager",
+            "chrome_on_mac": "Chrome on Mac",
+            "icloud_keychain_managed": "iCloud Keychain (Managed)",
+            "apple_passwords": "Apple Passwords",
+            "windows_hello": "Windows Hello",
+            "password_manager": "{{brand}} Password Manager"
         }
     },
     "admin": {

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useAppearance } from '@/contexts/AppearanceContext';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { formatDateTime } from '@/lib/formatters';
-import { isPasswordConfirmationError, passkeyErrorMessage } from '@/lib/passkeys';
+import { isPasswordConfirmationError, passkeyAuthenticatorLabel, passkeyErrorMessage } from '@/lib/passkeys';
 import { useFlashKey } from '@/plugins/useFlash';
 import PasskeyPasswordModal from './PasskeyPasswordModal';
 
@@ -282,6 +282,7 @@ const PasskeySettings = () => {
                                   date: formatDateTime(new Date(passkey.created_at), locale, 'medium'),
                               })
                             : null;
+                        const authenticator = passkeyAuthenticatorLabel(passkey.authenticator, t);
 
                         return (
                             <div
@@ -294,8 +295,8 @@ const PasskeySettings = () => {
                                     )}
                                     <div className='min-w-0'>
                                         <p className='truncate text-sm font-medium text-zinc-100'>{passkey.name}</p>
-                                        {passkey.authenticator && (
-                                            <p className='truncate text-xs text-zinc-400'>{passkey.authenticator}</p>
+                                        {authenticator && (
+                                            <p className='truncate text-xs text-zinc-400'>{authenticator}</p>
                                         )}
                                         <p className='text-xs text-zinc-400'>
                                             {created ? `${created} · ` : ''}

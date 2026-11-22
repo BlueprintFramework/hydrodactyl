@@ -332,6 +332,15 @@
             "verification_expired": "La sesión de verificación de la llave de acceso ha caducado. Inténtalo de nuevo.",
             "registration_expired": "La sesión de registro de la llave de acceso ha caducado. Inténtalo de nuevo.",
             "sign_in_failed": "No se pudo iniciar sesión con esta cuenta."
+        },
+        "authenticators": {
+            "google_password_manager": "Administrador de contraseñas de Google",
+            "microsoft_password_manager": "Administrador de contraseñas de Microsoft",
+            "chrome_on_mac": "Chrome en Mac",
+            "icloud_keychain_managed": "Llavero de iCloud (gestionado)",
+            "apple_passwords": "Contraseñas de Apple",
+            "windows_hello": "Windows Hello",
+            "password_manager": "Administrador de contraseñas de {{brand}}"
         }
     },
     "admin": {
