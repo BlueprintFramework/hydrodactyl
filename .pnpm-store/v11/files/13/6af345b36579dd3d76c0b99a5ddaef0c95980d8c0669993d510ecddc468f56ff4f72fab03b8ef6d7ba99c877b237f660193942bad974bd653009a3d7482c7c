@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/table/TableCollection.cjs",
-  "module": "../../../dist/exports/private/table/TableCollection.js",
-  "types": "../../../dist/types/exports/private/table/TableCollection.d.ts"
-}

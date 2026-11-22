@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useTreeState.cjs",
-  "module": "../dist/exports/useTreeState.js",
-  "types": "../dist/types/exports/useTreeState.d.ts"
-}

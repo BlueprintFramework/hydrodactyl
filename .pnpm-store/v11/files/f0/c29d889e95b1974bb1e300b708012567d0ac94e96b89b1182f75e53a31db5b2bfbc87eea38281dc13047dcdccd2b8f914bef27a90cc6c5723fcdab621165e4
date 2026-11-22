@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useId.cjs",
-  "module": "../dist/exports/useId.js",
-  "types": "../dist/types/exports/useId.d.ts"
-}

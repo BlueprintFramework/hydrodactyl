@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/autocomplete/useAutocompleteState.cjs",
-  "module": "../../../dist/exports/private/autocomplete/useAutocompleteState.js",
-  "types": "../../../dist/types/exports/private/autocomplete/useAutocompleteState.d.ts"
-}

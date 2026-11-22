@@ -1,8 +1,0 @@
-import * as React from 'react';
-const Frames = (props) => (React.createElement("svg", Object.assign({ xmlns: "http://www.w3.org/2000/svg", width: 16, height: 16, fill: "none", viewBox: "0 0 16 16" }, props),
-    React.createElement("g", { clipPath: "url(#a)" },
-        React.createElement("path", { fill: "currentColor", fillRule: "evenodd", d: "M13.25.75a.75.75 0 0 1 .75.75V2h.5a.75.75 0 0 1 0 1.5H14v5h.5a.75.75 0 0 1 0 1.5H14v.5a.75.75 0 0 1-1.5 0V10H10v2.5h.5a.75.75 0 0 1 0 1.5H10v.5a.75.75 0 0 1-1.5 0V14h-5v.5a.75.75 0 0 1-1.5 0V14h-.5a.75.75 0 0 1 0-1.5H2v-5h-.5a.75.75 0 0 1 0-1.5H2v-.5a.75.75 0 0 1 1.5 0V6H6V3.5h-.5a.75.75 0 0 1 0-1.5H6v-.5a.75.75 0 0 1 1.5 0V2h5v-.5a.75.75 0 0 1 .75-.75M7.5 6h1v-.5a.75.75 0 0 1 1.5 0V6h.5a.75.75 0 0 1 0 1.5H10v1h2.5v-5h-5zm-4 6.5v-5h5v5z", clipRule: "evenodd" })),
-    React.createElement("defs", null,
-        React.createElement("clipPath", { id: "a" },
-            React.createElement("path", { fill: "currentColor", d: "M0 0h16v16H0z" })))));
-export default Frames;

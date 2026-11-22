@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useControlledState.cjs",
-  "module": "../dist/exports/useControlledState.js",
-  "types": "../dist/types/exports/useControlledState.d.ts"
-}

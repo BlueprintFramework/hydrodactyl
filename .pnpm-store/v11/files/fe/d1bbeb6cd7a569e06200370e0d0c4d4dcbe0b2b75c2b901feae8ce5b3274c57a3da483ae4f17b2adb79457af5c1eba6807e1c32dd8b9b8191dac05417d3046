@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useAsyncList.cjs",
-  "module": "../dist/exports/useAsyncList.js",
-  "types": "../dist/types/exports/useAsyncList.d.ts"
-}

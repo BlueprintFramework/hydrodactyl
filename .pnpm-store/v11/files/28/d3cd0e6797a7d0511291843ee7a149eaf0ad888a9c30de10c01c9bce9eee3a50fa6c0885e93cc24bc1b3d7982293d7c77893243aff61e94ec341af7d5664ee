@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useLocalizedStringFormatter.cjs",
-  "module": "../dist/exports/useLocalizedStringFormatter.js",
-  "types": "../dist/types/exports/useLocalizedStringFormatter.d.ts"
-}

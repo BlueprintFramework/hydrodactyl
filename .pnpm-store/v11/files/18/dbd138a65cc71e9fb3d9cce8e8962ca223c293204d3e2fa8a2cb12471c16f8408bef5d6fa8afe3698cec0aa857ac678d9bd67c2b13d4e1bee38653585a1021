@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useColorFieldState.cjs",
-  "module": "../dist/exports/useColorFieldState.js",
-  "types": "../dist/types/exports/useColorFieldState.d.ts"
-}

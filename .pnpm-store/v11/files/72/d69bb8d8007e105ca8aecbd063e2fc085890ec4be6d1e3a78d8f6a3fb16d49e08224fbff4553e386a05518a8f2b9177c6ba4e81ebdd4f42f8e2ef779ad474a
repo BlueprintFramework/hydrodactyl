@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useDateField.cjs",
-  "module": "../dist/exports/useDateField.js",
-  "types": "../dist/types/exports/useDateField.d.ts"
-}

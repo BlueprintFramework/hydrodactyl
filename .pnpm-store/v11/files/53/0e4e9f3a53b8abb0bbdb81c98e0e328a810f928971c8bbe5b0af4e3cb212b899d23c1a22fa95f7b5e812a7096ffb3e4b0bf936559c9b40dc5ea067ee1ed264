@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useTagGroup.cjs",
-  "module": "../dist/exports/useTagGroup.js",
-  "types": "../dist/types/exports/useTagGroup.d.ts"
-}

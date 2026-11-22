@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/actiongroup/useActionGroup.cjs",
-  "module": "../../../dist/exports/private/actiongroup/useActionGroup.js",
-  "types": "../../../dist/types/exports/private/actiongroup/useActionGroup.d.ts"
-}

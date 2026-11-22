@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/virtualizer/utils.cjs",
-  "module": "../../../dist/exports/private/virtualizer/utils.js",
-  "types": "../../../dist/types/exports/private/virtualizer/utils.d.ts"
-}

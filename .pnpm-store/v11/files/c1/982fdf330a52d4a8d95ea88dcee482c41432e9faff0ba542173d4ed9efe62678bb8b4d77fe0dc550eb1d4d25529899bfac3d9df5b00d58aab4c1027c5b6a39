@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/i18n/server.cjs",
-  "module": "../../../dist/exports/private/i18n/server.js",
-  "types": "../../../dist/types/exports/private/i18n/server.d.ts"
-}

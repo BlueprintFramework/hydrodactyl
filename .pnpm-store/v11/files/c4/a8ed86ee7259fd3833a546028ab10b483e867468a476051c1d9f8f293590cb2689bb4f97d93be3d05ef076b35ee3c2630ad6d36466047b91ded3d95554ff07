@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useSeparator.cjs",
-  "module": "../dist/exports/useSeparator.js",
-  "types": "../dist/types/exports/useSeparator.d.ts"
-}

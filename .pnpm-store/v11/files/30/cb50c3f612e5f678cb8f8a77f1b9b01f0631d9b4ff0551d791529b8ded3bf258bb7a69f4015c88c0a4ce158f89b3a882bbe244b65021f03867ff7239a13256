@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useTabListState.cjs",
-  "module": "../dist/exports/useTabListState.js",
-  "types": "../dist/types/exports/useTabListState.d.ts"
-}

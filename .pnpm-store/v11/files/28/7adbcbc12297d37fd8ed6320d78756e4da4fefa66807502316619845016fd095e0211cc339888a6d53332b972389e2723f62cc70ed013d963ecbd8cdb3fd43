@@ -1,1 +1,0 @@
-export declare function useDocumentEvent<TType extends keyof DocumentEventMap>(enabled: boolean, type: TType, listener: (ev: DocumentEventMap[TType]) => any, options?: boolean | AddEventListenerOptions): void;

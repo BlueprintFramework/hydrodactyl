@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/Pressable.cjs",
-  "module": "../dist/exports/Pressable.js",
-  "types": "../dist/types/exports/Pressable.d.ts"
-}

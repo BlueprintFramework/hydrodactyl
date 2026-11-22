@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useDisclosure.cjs",
-  "module": "../dist/exports/useDisclosure.js",
-  "types": "../dist/types/exports/useDisclosure.d.ts"
-}

@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useToggleGroupState.cjs",
-  "module": "../dist/exports/useToggleGroupState.js",
-  "types": "../dist/types/exports/useToggleGroupState.d.ts"
-}

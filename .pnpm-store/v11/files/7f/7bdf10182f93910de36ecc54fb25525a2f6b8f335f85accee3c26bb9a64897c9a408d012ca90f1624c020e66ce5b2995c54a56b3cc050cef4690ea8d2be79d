@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useCalendarState.cjs",
-  "module": "../dist/exports/useCalendarState.js",
-  "types": "../dist/types/exports/useCalendarState.d.ts"
-}

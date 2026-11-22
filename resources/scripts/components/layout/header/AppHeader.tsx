@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useHeader } from '@/contexts/HeaderContext';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useTranslation } from '@/i18n/I18nProvider';
+import type { ExtendedWindow } from '@/state/bootstrap';
 
 import { MobileSidebarToggle } from '../sidebar/MobileSidebar';
 import '../sidebar/sidebar-modern.css';
@@ -35,12 +36,8 @@ const HeaderActions = memo(() => {
 
 HeaderActions.displayName = 'HeaderActions';
 
-interface SiteConfigurationWindow extends Window {
-    SiteConfiguration?: { name?: string };
-}
-
 const getSiteName = () => {
-    const siteName = (window as SiteConfigurationWindow).SiteConfiguration?.name?.trim();
+    const siteName = (window as ExtendedWindow).SiteConfiguration?.name?.trim();
 
     return siteName && siteName.length > 0 ? siteName : 'Hydrodactyl';
 };

@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/utils/useGlobalListeners.cjs",
-  "module": "../../../dist/exports/private/utils/useGlobalListeners.js",
-  "types": "../../../dist/types/exports/private/utils/useGlobalListeners.d.ts"
-}

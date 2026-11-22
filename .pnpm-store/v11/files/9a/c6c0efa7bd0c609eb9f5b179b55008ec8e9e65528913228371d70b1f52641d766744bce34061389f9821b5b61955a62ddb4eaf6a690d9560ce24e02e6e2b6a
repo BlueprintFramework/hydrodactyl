@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/collections/useCollection.cjs",
-  "module": "../../../dist/exports/private/collections/useCollection.js",
-  "types": "../../../dist/types/exports/private/collections/useCollection.d.ts"
-}

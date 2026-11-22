@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useDateFormatter.cjs",
-  "module": "../dist/exports/useDateFormatter.js",
-  "types": "../dist/types/exports/useDateFormatter.d.ts"
-}

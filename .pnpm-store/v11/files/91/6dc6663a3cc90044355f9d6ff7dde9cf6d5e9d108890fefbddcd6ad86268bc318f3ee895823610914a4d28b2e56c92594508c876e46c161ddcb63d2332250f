@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useSelectState.cjs",
-  "module": "../dist/exports/useSelectState.js",
-  "types": "../dist/types/exports/useSelectState.d.ts"
-}

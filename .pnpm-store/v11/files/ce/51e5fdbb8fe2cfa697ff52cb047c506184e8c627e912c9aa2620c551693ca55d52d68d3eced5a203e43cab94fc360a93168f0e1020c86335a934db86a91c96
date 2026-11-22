@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useTextField.cjs",
-  "module": "../dist/exports/useTextField.js",
-  "types": "../dist/types/exports/useTextField.d.ts"
-}

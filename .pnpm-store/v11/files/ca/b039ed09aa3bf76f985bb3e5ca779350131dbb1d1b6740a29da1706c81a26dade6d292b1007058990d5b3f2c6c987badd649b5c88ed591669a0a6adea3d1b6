@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/utils/getOffset.cjs",
-  "module": "../../../dist/exports/private/utils/getOffset.js",
-  "types": "../../../dist/types/exports/private/utils/getOffset.d.ts"
-}

@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useColorWheelState.cjs",
-  "module": "../dist/exports/useColorWheelState.js",
-  "types": "../dist/types/exports/useColorWheelState.d.ts"
-}

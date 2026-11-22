@@ -23,6 +23,7 @@ storage/framework/*
 /.direnv
 
 node_modules
+.pnpm-store/
 *.log
 _ide_helper.php
 _ide_helper_models.php

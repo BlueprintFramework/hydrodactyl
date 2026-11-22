@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/utils/useLoadMoreSentinel.cjs",
-  "module": "../../../dist/exports/private/utils/useLoadMoreSentinel.js",
-  "types": "../../../dist/types/exports/private/utils/useLoadMoreSentinel.d.ts"
-}

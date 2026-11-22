@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useModalOverlay.cjs",
-  "module": "../dist/exports/useModalOverlay.js",
-  "types": "../dist/types/exports/useModalOverlay.d.ts"
-}

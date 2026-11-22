@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/form/useFormValidationState.cjs",
-  "module": "../../../dist/exports/private/form/useFormValidationState.js",
-  "types": "../../../dist/types/exports/private/form/useFormValidationState.d.ts"
-}

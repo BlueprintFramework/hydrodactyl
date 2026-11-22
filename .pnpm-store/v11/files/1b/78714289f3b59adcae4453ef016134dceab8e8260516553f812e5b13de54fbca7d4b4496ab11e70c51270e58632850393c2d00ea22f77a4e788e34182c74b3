@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/utils/useFormReset.cjs",
-  "module": "../../../dist/exports/private/utils/useFormReset.js",
-  "types": "../../../dist/types/exports/private/utils/useFormReset.d.ts"
-}

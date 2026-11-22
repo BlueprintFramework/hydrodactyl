@@ -1,3 +1,0 @@
-'use client';
-'use strict';
-

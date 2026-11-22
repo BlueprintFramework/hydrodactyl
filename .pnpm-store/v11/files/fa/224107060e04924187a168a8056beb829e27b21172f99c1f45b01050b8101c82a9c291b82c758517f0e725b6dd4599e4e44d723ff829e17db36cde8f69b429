@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useTimeField.cjs",
-  "module": "../dist/exports/useTimeField.js",
-  "types": "../dist/types/exports/useTimeField.d.ts"
-}

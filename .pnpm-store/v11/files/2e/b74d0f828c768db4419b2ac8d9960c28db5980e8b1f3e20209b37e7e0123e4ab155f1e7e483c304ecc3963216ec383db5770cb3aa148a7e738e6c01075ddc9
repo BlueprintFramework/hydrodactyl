@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/utils/isFocusable.cjs",
-  "module": "../../../dist/exports/private/utils/isFocusable.js",
-  "types": "../../../dist/types/exports/private/utils/isFocusable.d.ts"
-}

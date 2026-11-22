@@ -1,1 +1,0 @@
-export { hCaptchaLoader } from './loader';

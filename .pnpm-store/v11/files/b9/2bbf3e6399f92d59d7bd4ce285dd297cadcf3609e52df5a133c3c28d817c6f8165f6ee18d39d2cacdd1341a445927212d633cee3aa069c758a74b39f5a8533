@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/focus/useHasTabbableChild.cjs",
-  "module": "../../../dist/exports/private/focus/useHasTabbableChild.js",
-  "types": "../../../dist/types/exports/private/focus/useHasTabbableChild.d.ts"
-}

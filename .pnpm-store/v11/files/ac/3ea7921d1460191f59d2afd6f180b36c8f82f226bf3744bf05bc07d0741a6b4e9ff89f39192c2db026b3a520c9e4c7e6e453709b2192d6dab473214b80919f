@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useNumberFormatter.cjs",
-  "module": "../dist/exports/useNumberFormatter.js",
-  "types": "../dist/types/exports/useNumberFormatter.d.ts"
-}

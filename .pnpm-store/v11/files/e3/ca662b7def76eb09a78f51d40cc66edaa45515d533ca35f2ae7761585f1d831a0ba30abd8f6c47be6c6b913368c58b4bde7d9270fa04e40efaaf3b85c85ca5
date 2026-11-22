@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useGridList.cjs",
-  "module": "../dist/exports/useGridList.js",
-  "types": "../dist/types/exports/useGridList.d.ts"
-}

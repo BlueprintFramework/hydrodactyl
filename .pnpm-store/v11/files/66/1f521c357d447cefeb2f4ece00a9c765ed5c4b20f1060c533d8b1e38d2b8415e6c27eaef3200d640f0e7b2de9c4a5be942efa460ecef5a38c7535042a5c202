@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useColorField.cjs",
-  "module": "../dist/exports/useColorField.js",
-  "types": "../dist/types/exports/useColorField.d.ts"
-}

@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/utils/getNonce.cjs",
-  "module": "../../../dist/exports/private/utils/getNonce.js",
-  "types": "../../../dist/types/exports/private/utils/getNonce.d.ts"
-}

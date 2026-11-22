@@ -1,6 +1,0 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.isExact = void 0;
-const isExact = () => (x) => x;
-exports.isExact = isExact;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9saWIvZnVuY3Rpb25zL2lzLWV4YWN0L2luZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7OztBQUVPLE1BQU0sT0FBTyxHQUNsQixHQUFrQixFQUFFLENBQ3BCLENBQWMsQ0FBc0MsRUFBRSxFQUFFLENBQ3RELENBQWtCLENBQUM7QUFIVixRQUFBLE9BQU8sV0FHRyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IElzRXhhY3QgfSBmcm9tIFwiLi4vLi4vaXMtZXhhY3RcIjtcblxuZXhwb3J0IGNvbnN0IGlzRXhhY3QgPVxuICA8RXhwZWN0ZWRTaGFwZT4oKSA9PlxuICA8QWN0dWFsU2hhcGU+KHg6IElzRXhhY3Q8QWN0dWFsU2hhcGUsIEV4cGVjdGVkU2hhcGU+KSA9PlxuICAgIHggYXMgRXhwZWN0ZWRTaGFwZTtcbiJdfQ==

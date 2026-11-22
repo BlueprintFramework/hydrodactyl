@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useListData.cjs",
-  "module": "../dist/exports/useListData.js",
-  "types": "../dist/types/exports/useListData.d.ts"
-}

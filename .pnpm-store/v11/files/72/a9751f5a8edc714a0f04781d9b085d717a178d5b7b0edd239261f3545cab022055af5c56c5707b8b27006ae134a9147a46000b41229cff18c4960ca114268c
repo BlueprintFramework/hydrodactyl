@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useColorAreaState.cjs",
-  "module": "../dist/exports/useColorAreaState.js",
-  "types": "../dist/types/exports/useColorAreaState.d.ts"
-}

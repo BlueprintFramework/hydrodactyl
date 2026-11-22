@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useToggleButton.cjs",
-  "module": "../dist/exports/useToggleButton.js",
-  "types": "../dist/types/exports/useToggleButton.d.ts"
-}

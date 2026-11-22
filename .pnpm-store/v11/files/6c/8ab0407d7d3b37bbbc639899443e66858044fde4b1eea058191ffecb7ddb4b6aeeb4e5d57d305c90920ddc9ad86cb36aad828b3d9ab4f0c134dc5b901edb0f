@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/Color.cjs",
-  "module": "../dist/exports/Color.js",
-  "types": "../dist/types/exports/Color.d.ts"
-}

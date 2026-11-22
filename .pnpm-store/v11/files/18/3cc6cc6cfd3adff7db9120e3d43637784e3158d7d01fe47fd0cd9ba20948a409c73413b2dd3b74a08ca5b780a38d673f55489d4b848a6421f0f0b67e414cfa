@@ -1,5 +1,0 @@
-{
-  "main": "../dist/exports/useFocus.cjs",
-  "module": "../dist/exports/useFocus.js",
-  "types": "../dist/types/exports/useFocus.d.ts"
-}

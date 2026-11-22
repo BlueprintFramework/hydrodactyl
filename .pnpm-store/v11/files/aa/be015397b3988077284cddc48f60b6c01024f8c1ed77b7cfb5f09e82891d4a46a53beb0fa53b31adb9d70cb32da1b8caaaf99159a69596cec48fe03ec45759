@@ -1,5 +1,0 @@
-{
-  "main": "../../../dist/exports/private/utils/useValueEffect.cjs",
-  "module": "../../../dist/exports/private/utils/useValueEffect.js",
-  "types": "../../../dist/types/exports/private/utils/useValueEffect.d.ts"
-}
