@@ -324,7 +324,14 @@
             "timeout": "Operatio clavis accessus exspiravit. Conare iterum quaeso.",
             "constraint": "Authenticator condiciones necessarias non implet.",
             "unavailable": "Authenticator praesto non est.",
-            "unknown": "Operatio clavis accessus perfici non potuit. Conare iterum quaeso."
+            "unknown": "Operatio clavis accessus perfici non potuit. Conare iterum quaeso.",
+            "not_recognized": "Haec clavis accessus non agnoscitur. Fortasse ex ratione tua remota est.",
+            "verify_failed": "Clavem accessus verificare non potuit. Conare iterum quaeso.",
+            "register_failed": "Clavem accessus registrare non potuit. Conare iterum quaeso.",
+            "invalid_credential": "Data clavis accessus mendosa sunt. Conare iterum quaeso.",
+            "verification_expired": "Sessio verificationis clavis accessus exspiravit. Conare iterum quaeso.",
+            "registration_expired": "Sessio registrationis clavis accessus exspiravit. Conare iterum quaeso.",
+            "sign_in_failed": "Hac ratione ingredi non potuit."
         }
     },
     "admin": {

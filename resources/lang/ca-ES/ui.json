@@ -324,7 +324,14 @@
             "timeout": "L'operació amb la clau d'accés ha caducat. Torna-ho a provar.",
             "constraint": "L'autenticador no compleix els requisits necessaris.",
             "unavailable": "L'autenticador no està disponible.",
-            "unknown": "No s'ha pogut completar l'operació amb la clau d'accés. Torna-ho a provar."
+            "unknown": "No s'ha pogut completar l'operació amb la clau d'accés. Torna-ho a provar.",
+            "not_recognized": "Aquesta clau d'accés no es reconeix. Potser s'ha eliminat del teu compte.",
+            "verify_failed": "No s'ha pogut verificar la clau d'accés. Torna-ho a provar.",
+            "register_failed": "No s'ha pogut registrar la clau d'accés. Torna-ho a provar.",
+            "invalid_credential": "Les dades de la clau d'accés no són vàlides. Torna-ho a provar.",
+            "verification_expired": "La sessió de verificació de la clau d'accés ha caducat. Torna-ho a provar.",
+            "registration_expired": "La sessió de registre de la clau d'accés ha caducat. Torna-ho a provar.",
+            "sign_in_failed": "No s'ha pogut iniciar sessió amb aquest compte."
         }
     },
     "admin": {

@@ -324,7 +324,14 @@
             "timeout": "The passkey operation timed out. Please try again.",
             "constraint": "The authenticator does not meet the required conditions.",
             "unavailable": "The authenticator is not available.",
-            "unknown": "The passkey operation could not be completed. Please try again."
+            "unknown": "The passkey operation could not be completed. Please try again.",
+            "not_recognized": "This passkey isn't recognized. It may have been removed from your account.",
+            "verify_failed": "Unable to verify the passkey. Please try again.",
+            "register_failed": "Unable to register the passkey. Please try again.",
+            "invalid_credential": "The passkey data is invalid. Please try again.",
+            "verification_expired": "The passkey verification session expired. Please try again.",
+            "registration_expired": "The passkey registration session expired. Please try again.",
+            "sign_in_failed": "Unable to sign in with this account."
         }
     },
     "admin": {

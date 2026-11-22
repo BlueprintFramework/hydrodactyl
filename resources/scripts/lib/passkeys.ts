@@ -20,6 +20,14 @@ const MESSAGE_KEYS: Record<string, TranslationKey> = {
     'Passkeys are not supported in this browser.': 'passkeys.errors.not_supported',
     'This device is already registered as a passkey.': 'passkeys.errors.exists',
     'An unknown error occurred.': 'passkeys.errors.unknown',
+    'Passkey not recognized. It may have been removed from your account.': 'passkeys.errors.not_recognized',
+    'Unable to verify passkey. Please try again.': 'passkeys.errors.verify_failed',
+    'Unable to register passkey. Please try again.': 'passkeys.errors.register_failed',
+    'Unable to register this passkey.': 'passkeys.errors.register_failed',
+    'Invalid credential format.': 'passkeys.errors.invalid_credential',
+    'Passkey verification session expired. Please try again.': 'passkeys.errors.verification_expired',
+    'Passkey registration session expired. Please try again.': 'passkeys.errors.registration_expired',
+    'Unable to sign in with this account.': 'passkeys.errors.sign_in_failed',
 };
 
 export const isPasswordConfirmationError = (error: unknown): boolean => {

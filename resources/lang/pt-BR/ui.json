@@ -324,7 +324,14 @@
             "timeout": "A operação com a chave de acesso expirou. Tente novamente.",
             "constraint": "O autenticador não atende aos requisitos necessários.",
             "unavailable": "O autenticador não está disponível.",
-            "unknown": "Não foi possível concluir a operação com a chave de acesso. Tente novamente."
+            "unknown": "Não foi possível concluir a operação com a chave de acesso. Tente novamente.",
+            "not_recognized": "Esta chave de acesso não é reconhecida. Ela pode ter sido removida da sua conta.",
+            "verify_failed": "Não foi possível verificar a chave de acesso. Tente novamente.",
+            "register_failed": "Não foi possível registrar a chave de acesso. Tente novamente.",
+            "invalid_credential": "Os dados da chave de acesso são inválidos. Tente novamente.",
+            "verification_expired": "A sessão de verificação da chave de acesso expirou. Tente novamente.",
+            "registration_expired": "A sessão de registro da chave de acesso expirou. Tente novamente.",
+            "sign_in_failed": "Não foi possível entrar com esta conta."
         }
     },
     "admin": {

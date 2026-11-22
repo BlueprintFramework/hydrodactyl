@@ -281,7 +281,14 @@
             "timeout": "Der Passkey-Vorgang ist abgelaufen. Bitte versuche es erneut.",
             "constraint": "Der Authenticator erfüllt nicht die erforderlichen Bedingungen.",
             "unavailable": "Der Authenticator ist nicht verfügbar.",
-            "unknown": "Der Passkey-Vorgang konnte nicht abgeschlossen werden. Bitte versuche es erneut."
+            "unknown": "Der Passkey-Vorgang konnte nicht abgeschlossen werden. Bitte versuche es erneut.",
+            "not_recognized": "Dieser Passkey wird nicht erkannt. Möglicherweise wurde er von deinem Konto entfernt.",
+            "verify_failed": "Der Passkey konnte nicht verifiziert werden. Bitte versuche es erneut.",
+            "register_failed": "Der Passkey konnte nicht registriert werden. Bitte versuche es erneut.",
+            "invalid_credential": "Die Passkey-Daten sind ungültig. Bitte versuche es erneut.",
+            "verification_expired": "Die Passkey-Verifizierungssitzung ist abgelaufen. Bitte versuche es erneut.",
+            "registration_expired": "Die Passkey-Registrierungssitzung ist abgelaufen. Bitte versuche es erneut.",
+            "sign_in_failed": "Mit diesem Konto konnte nicht angemeldet werden."
         }
     },
     "admin": {

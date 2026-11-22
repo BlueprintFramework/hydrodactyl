@@ -324,7 +324,14 @@
             "timeout": "La operación con la llave de acceso ha caducado. Inténtalo de nuevo.",
             "constraint": "El autenticador no cumple los requisitos necesarios.",
             "unavailable": "El autenticador no está disponible.",
-            "unknown": "No se pudo completar la operación con la llave de acceso. Inténtalo de nuevo."
+            "unknown": "No se pudo completar la operación con la llave de acceso. Inténtalo de nuevo.",
+            "not_recognized": "Esta llave de acceso no se reconoce. Es posible que se haya eliminado de tu cuenta.",
+            "verify_failed": "No se pudo verificar la llave de acceso. Inténtalo de nuevo.",
+            "register_failed": "No se pudo registrar la llave de acceso. Inténtalo de nuevo.",
+            "invalid_credential": "Los datos de la llave de acceso no son válidos. Inténtalo de nuevo.",
+            "verification_expired": "La sesión de verificación de la llave de acceso ha caducado. Inténtalo de nuevo.",
+            "registration_expired": "La sesión de registro de la llave de acceso ha caducado. Inténtalo de nuevo.",
+            "sign_in_failed": "No se pudo iniciar sesión con esta cuenta."
         }
     },
     "admin": {
