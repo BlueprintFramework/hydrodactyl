@@ -1252,7 +1252,9 @@
             "passkeys_relying_party_id": "ID de la parte de confianza",
             "passkeys_relying_party_id_hint": "El dominio del panel al que se vinculan las llaves de acceso, sin https://. Cambiarlo invalida las llaves de acceso existentes.",
             "passkeys_allowed_origins": "Orígenes permitidos",
-            "passkeys_allowed_origins_hint": "Orígenes HTTPS separados por comas donde puede abrirse el diálogo de llave de acceso, por ejemplo https://panel.example.com."
+            "passkeys_allowed_origins_hint": "Orígenes HTTPS separados por comas donde puede abrirse el diálogo de llave de acceso, por ejemplo https://panel.example.com.",
+            "passkeys_max_per_user": "Máximo de llaves de acceso por usuario",
+            "passkeys_max_per_user_hint": "Usa 0 para no limitar. Se recomiendan 10."
         },
         "system_info": {
             "cpu_cores": "Núcleos de CPU",

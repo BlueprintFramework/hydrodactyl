@@ -1252,7 +1252,9 @@
             "passkeys_relying_party_id": "Relying Party ID",
             "passkeys_relying_party_id_hint": "The panel domain passkeys are bound to, without https://. Changing this invalidates existing passkeys.",
             "passkeys_allowed_origins": "Allowed origins",
-            "passkeys_allowed_origins_hint": "Comma-separated HTTPS origins where passkey prompts may open, for example https://panel.example.com."
+            "passkeys_allowed_origins_hint": "Comma-separated HTTPS origins where passkey prompts may open, for example https://panel.example.com.",
+            "passkeys_max_per_user": "Maximum passkeys per user",
+            "passkeys_max_per_user_hint": "Set to 0 for no limit. 10 is recommended."
         },
         "system_info": {
             "cpu_cores": "CPU Cores",

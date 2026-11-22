@@ -97,6 +97,7 @@ class SettingsController extends Controller
             ],
             'passkeys' => [
                 'passkeys:enabled' => (bool) $this->config->get('passkeys.enabled', true),
+                'passkeys:max_per_user' => max(0, (int) $this->config->get('passkeys.max_per_user', 10)),
                 'passkeys:relying_party_id' => (string) $this->config->get('passkeys.relying_party_id', ''),
                 'passkeys:allowed_origins' => implode(', ', (array) $this->config->get('passkeys.allowed_origins', [])),
             ],

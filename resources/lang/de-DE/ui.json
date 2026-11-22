@@ -1209,7 +1209,9 @@
             "passkeys_relying_party_id": "ID der vertrauenden Partei",
             "passkeys_relying_party_id_hint": "Die Panel-Domain, an die Passkeys gebunden sind, ohne https://. Eine Änderung macht bestehende Passkeys ungültig.",
             "passkeys_allowed_origins": "Erlaubte Origins",
-            "passkeys_allowed_origins_hint": "Kommagetrennte HTTPS-Origins, unter denen die Passkey-Abfrage erscheinen darf, zum Beispiel https://panel.example.com."
+            "passkeys_allowed_origins_hint": "Kommagetrennte HTTPS-Origins, unter denen die Passkey-Abfrage erscheinen darf, zum Beispiel https://panel.example.com.",
+            "passkeys_max_per_user": "Maximale Passkeys pro Benutzer",
+            "passkeys_max_per_user_hint": "0 bedeutet kein Limit. Empfohlen sind 10."
         },
         "system_info": {
             "cpu_cores": "CPU-Kerne",

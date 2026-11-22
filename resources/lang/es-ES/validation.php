@@ -289,6 +289,7 @@ return [
         'owner_id' => 'propietario',
         'passkeys:allowed_origins' => 'orígenes permitidos',
         'passkeys:enabled' => 'llaves de acceso activadas',
+        'passkeys:max_per_user' => 'máximo de llaves de acceso por usuario',
         'passkeys:relying_party_id' => 'ID de la parte de confianza',
         'password' => 'contraseña',
         'payload' => 'carga útil',

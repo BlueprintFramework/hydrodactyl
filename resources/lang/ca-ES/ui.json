@@ -1252,7 +1252,9 @@
             "passkeys_relying_party_id": "ID de la part de confiança",
             "passkeys_relying_party_id_hint": "El domini del panell al qual s'enllacen les claus d'accés, sense https://. Canviar-lo invalida les claus d'accés existents.",
             "passkeys_allowed_origins": "Orígens permesos",
-            "passkeys_allowed_origins_hint": "Orígens HTTPS separats per comes on es pot obrir el diàleg de clau d'accés, per exemple https://panel.example.com."
+            "passkeys_allowed_origins_hint": "Orígens HTTPS separats per comes on es pot obrir el diàleg de clau d'accés, per exemple https://panel.example.com.",
+            "passkeys_max_per_user": "Màxim de claus d'accés per usuari",
+            "passkeys_max_per_user_hint": "Usa 0 per no limitar. Es recomanen 10."
         },
         "system_info": {
             "cpu_cores": "Nuclis de CPU",

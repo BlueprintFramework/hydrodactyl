@@ -11,6 +11,7 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
 {
     private const KEYS = [
         'settings::passkeys:enabled',
+        'settings::passkeys:max_per_user',
         'settings::passkeys:relying_party_id',
         'settings::passkeys:allowed_origins',
     ];
@@ -31,6 +32,7 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
             ->getJson('/admin/api/settings')
             ->assertOk()
             ->assertJsonPath('passkeys.passkeys:enabled', true)
+            ->assertJsonPath('passkeys.passkeys:max_per_user', 10)
             ->assertJsonPath('passkeys.passkeys:relying_party_id', 'localhost')
             ->assertJsonPath('passkeys.passkeys:allowed_origins', 'http://localhost');
     }
@@ -42,6 +44,7 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
         $this->actingAs($user)
             ->patchJson('/admin/api/settings/passkeys', [
                 'passkeys:enabled' => false,
+                'passkeys:max_per_user' => 5,
                 'passkeys:relying_party_id' => 'panel.example.com',
                 'passkeys:allowed_origins' => 'HTTPS://Panel.Example.com/',
             ])
@@ -50,6 +53,10 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
         $this->assertDatabaseHas('settings', [
             'key' => 'settings::passkeys:enabled',
             'value' => 'false',
+        ]);
+        $this->assertDatabaseHas('settings', [
+            'key' => 'settings::passkeys:max_per_user',
+            'value' => '5',
         ]);
         $this->assertDatabaseHas('settings', [
             'key' => 'settings::passkeys:relying_party_id',
@@ -68,6 +75,7 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
         $this->actingAs($user)
             ->patchJson('/admin/api/settings/passkeys', [
                 'passkeys:enabled' => true,
+                'passkeys:max_per_user' => 10,
                 'passkeys:relying_party_id' => 'panel.example.com',
                 'passkeys:allowed_origins' => 'https://attacker.example.net',
             ])
@@ -81,6 +89,7 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
         $this->actingAs($user)
             ->patchJson('/admin/api/settings/passkeys', [
                 'passkeys:enabled' => true,
+                'passkeys:max_per_user' => 10,
                 'passkeys:relying_party_id' => 'panel.example.com',
                 'passkeys:allowed_origins' => 'https://attacker.example.net',
             ])
@@ -113,6 +122,7 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
             $this->actingAs($user)
                 ->patchJson('/admin/api/settings/passkeys', [
                     'passkeys:enabled' => true,
+                    'passkeys:max_per_user' => 10,
                     'passkeys:relying_party_id' => $relyingPartyId,
                     'passkeys:allowed_origins' => 'https://panel.example.com',
                 ])
@@ -132,10 +142,27 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
             $this->actingAs($user)
                 ->patchJson('/admin/api/settings/passkeys', [
                     'passkeys:enabled' => true,
+                    'passkeys:max_per_user' => 10,
                     'passkeys:relying_party_id' => $relyingPartyId,
                     'passkeys:allowed_origins' => $origin,
                 ])
                 ->assertOk();
+        }
+    }
+
+    public function testPasskeySettingsRejectInvalidMaximums(): void
+    {
+        $user = User::factory()->create(['root_admin' => true]);
+
+        foreach ([-1, 101, 'ten'] as $maxPerUser) {
+            $this->actingAs($user)
+                ->patchJson('/admin/api/settings/passkeys', [
+                    'passkeys:enabled' => true,
+                    'passkeys:max_per_user' => $maxPerUser,
+                    'passkeys:relying_party_id' => 'panel.example.com',
+                    'passkeys:allowed_origins' => 'https://panel.example.com',
+                ])
+                ->assertStatus(422);
         }
     }
 
@@ -146,6 +173,7 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
         $this->actingAs($user)
             ->patchJson('/admin/api/settings/passkeys', [
                 'passkeys:enabled' => true,
+                'passkeys:max_per_user' => 10,
                 'passkeys:relying_party_id' => 'panel..example.com',
                 'passkeys:allowed_origins' => 'https://panel.example.com',
             ])

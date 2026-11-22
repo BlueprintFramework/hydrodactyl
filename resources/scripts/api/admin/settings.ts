@@ -49,6 +49,7 @@ export interface CustomNavigationSettings {
 
 export interface PasskeySettings {
     'passkeys:enabled': boolean;
+    'passkeys:max_per_user': number;
     'passkeys:relying_party_id': string;
     'passkeys:allowed_origins': string;
 }

@@ -3,8 +3,8 @@
 namespace Pterodactyl\Providers;
 
 use Psr\Log\LoggerInterface as Log;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -13,138 +13,139 @@ use Pterodactyl\Contracts\Repository\SettingsRepositoryInterface;
 
 class SettingsServiceProvider extends ServiceProvider
 {
-  /**
-   * An array of configuration keys to override with database values
-   * if they exist.
-   */
-  protected array $keys = [
-    'app:name',
-    'app:locale',
-    // existing mail keys, etc...
-    'pterodactyl:guzzle:timeout',
-    'pterodactyl:guzzle:connect_timeout',
-    'pterodactyl:console:count',
-    'pterodactyl:console:frequency',
-    'pterodactyl:auth:2fa_required',
-    'app:logo:type',
-    'app:logo:value',
-    'app:brand_color',
-    'app:custom_nav_items',
-    'pterodactyl:client_features:allocations:enabled',
-    'pterodactyl:client_features:allocations:range_start',
-    'pterodactyl:client_features:allocations:range_end',
-    'pterodactyl:client_features:groups:enabled',
-    'pterodactyl:client_features:schedules:per_schedule_task_limit',
-    'pterodactyl:client_features:schedules:stuck_timeout',
-    'pterodactyl:client_features:resource_history:enabled',
-    'pterodactyl:client_features:resource_history:samples',
-    'pterodactyl:captcha:provider',
-    'pterodactyl:captcha:turnstile:site_key',
-    'pterodactyl:captcha:turnstile:secret_key',
-    'pterodactyl:captcha:hcaptcha:site_key',
-    'pterodactyl:captcha:hcaptcha:secret_key',
-    'pterodactyl:captcha:recaptcha:site_key',
-    'pterodactyl:captcha:recaptcha:secret_key',
-    'pterodactyl:captcha:cap:site_key',
-    'pterodactyl:captcha:cap:secret_key',
-    'pterodactyl:captcha:cap:server_url',
-    'passkeys:enabled',
-    'passkeys:relying_party_id',
-    'passkeys:allowed_origins',
-  ];
+    /**
+     * An array of configuration keys to override with database values
+     * if they exist.
+     */
+    protected array $keys = [
+        'app:name',
+        'app:locale',
+        // existing mail keys, etc...
+        'pterodactyl:guzzle:timeout',
+        'pterodactyl:guzzle:connect_timeout',
+        'pterodactyl:console:count',
+        'pterodactyl:console:frequency',
+        'pterodactyl:auth:2fa_required',
+        'app:logo:type',
+        'app:logo:value',
+        'app:brand_color',
+        'app:custom_nav_items',
+        'pterodactyl:client_features:allocations:enabled',
+        'pterodactyl:client_features:allocations:range_start',
+        'pterodactyl:client_features:allocations:range_end',
+        'pterodactyl:client_features:groups:enabled',
+        'pterodactyl:client_features:schedules:per_schedule_task_limit',
+        'pterodactyl:client_features:schedules:stuck_timeout',
+        'pterodactyl:client_features:resource_history:enabled',
+        'pterodactyl:client_features:resource_history:samples',
+        'pterodactyl:captcha:provider',
+        'pterodactyl:captcha:turnstile:site_key',
+        'pterodactyl:captcha:turnstile:secret_key',
+        'pterodactyl:captcha:hcaptcha:site_key',
+        'pterodactyl:captcha:hcaptcha:secret_key',
+        'pterodactyl:captcha:recaptcha:site_key',
+        'pterodactyl:captcha:recaptcha:secret_key',
+        'pterodactyl:captcha:cap:site_key',
+        'pterodactyl:captcha:cap:secret_key',
+        'pterodactyl:captcha:cap:server_url',
+        'passkeys:enabled',
+        'passkeys:max_per_user',
+        'passkeys:relying_party_id',
+        'passkeys:allowed_origins',
+    ];
 
 
-  /**
-   * Keys specific to the mail driver that are only grabbed from the database
-   * when using the SMTP driver.
-   */
-  protected array $emailKeys = [
-    'mail:mailers:smtp:host',
-    'mail:mailers:smtp:port',
-    'mail:mailers:smtp:encryption',
-    'mail:mailers:smtp:username',
-    'mail:mailers:smtp:password',
-    'mail:from:address',
-    'mail:from:name',
-  ];
+    /**
+     * Keys specific to the mail driver that are only grabbed from the database
+     * when using the SMTP driver.
+     */
+    protected array $emailKeys = [
+        'mail:mailers:smtp:host',
+        'mail:mailers:smtp:port',
+        'mail:mailers:smtp:encryption',
+        'mail:mailers:smtp:username',
+        'mail:mailers:smtp:password',
+        'mail:from:address',
+        'mail:from:name',
+    ];
 
-  /**
-   * Keys that are encrypted and should be decrypted when set in the
-   * configuration array.
-   */
-  protected static array $encrypted = [
-    'mail:mailers:smtp:password',
-    'pterodactyl:captcha:turnstile:secret_key',
-    'pterodactyl:captcha:hcaptcha:secret_key',
-    'pterodactyl:captcha:recaptcha:secret_key',
-    'pterodactyl:captcha:cap:secret_key',
-  ];
+    /**
+     * Keys that are encrypted and should be decrypted when set in the
+     * configuration array.
+     */
+    protected static array $encrypted = [
+        'mail:mailers:smtp:password',
+        'pterodactyl:captcha:turnstile:secret_key',
+        'pterodactyl:captcha:hcaptcha:secret_key',
+        'pterodactyl:captcha:recaptcha:secret_key',
+        'pterodactyl:captcha:cap:secret_key',
+    ];
 
-  /**
-   * Boot the service provider.
-   */
-  public function boot(ConfigRepository $config, Encrypter $encrypter, Log $log, SettingsRepositoryInterface $settings): void
-  {
-    // Only set the email driver settings from the database if we
-    // are configured using SMTP as the driver.
-    if ($config->get('mail.default') === 'smtp') {
-      $this->keys = array_merge($this->keys, $this->emailKeys);
-    }
-
-    try {
-      $values = Cache::remember(
-        'pterodactyl:settings:all',
-        now()->addHour(),
-        fn () => $settings->all()->mapWithKeys(fn ($setting) => [$setting->key => $setting->value])->toArray()
-      );
-    } catch (QueryException $exception) {
-      $log->notice('A query exception was encountered while trying to load settings from the database: ' . $exception->getMessage());
-
-      return;
-    }
-
-    foreach ($this->keys as $key) {
-      $value = array_get($values, 'settings::' . $key, $config->get(str_replace(':', '.', $key)));
-      if (in_array($key, self::$encrypted)) {
-        try {
-          $value = $encrypter->decrypt($value);
-        } catch (DecryptException $exception) {
+    /**
+     * Boot the service provider.
+     */
+    public function boot(ConfigRepository $config, Encrypter $encrypter, Log $log, SettingsRepositoryInterface $settings): void
+    {
+        // Only set the email driver settings from the database if we
+        // are configured using SMTP as the driver.
+        if ($config->get('mail.default') === 'smtp') {
+            $this->keys = array_merge($this->keys, $this->emailKeys);
         }
-      }
 
-      if ($key === 'passkeys:allowed_origins' && is_string($value)) {
-        $value = array_values(array_filter(array_map('trim', explode(',', $value))));
-      }
+        try {
+            $values = Cache::remember(
+                'pterodactyl:settings:all',
+                now()->addHour(),
+                fn () => $settings->all()->mapWithKeys(fn ($setting) => [$setting->key => $setting->value])->toArray()
+            );
+        } catch (QueryException $exception) {
+            $log->notice('A query exception was encountered while trying to load settings from the database: ' . $exception->getMessage());
 
-      if (is_array($value)) {
-        $config->set(str_replace(':', '.', $key), $value);
-        continue;
-      }
+            return;
+        }
 
-      switch (strtolower($value)) {
-        case 'true':
-        case '(true)':
-          $value = true;
-          break;
-        case 'false':
-        case '(false)':
-          $value = false;
-          break;
-        case 'empty':
-        case '(empty)':
-          $value = '';
-          break;
-        case 'null':
-        case '(null)':
-          $value = null;
-      }
+        foreach ($this->keys as $key) {
+            $value = array_get($values, 'settings::' . $key, $config->get(str_replace(':', '.', $key)));
+            if (in_array($key, self::$encrypted)) {
+                try {
+                    $value = $encrypter->decrypt($value);
+                } catch (DecryptException $exception) {
+                }
+            }
 
-      $config->set(str_replace(':', '.', $key), $value);
+            if ($key === 'passkeys:allowed_origins' && is_string($value)) {
+                $value = array_values(array_filter(array_map('trim', explode(',', $value))));
+            }
+
+            if (is_array($value)) {
+                $config->set(str_replace(':', '.', $key), $value);
+                continue;
+            }
+
+            switch (strtolower($value)) {
+                case 'true':
+                case '(true)':
+                    $value = true;
+                    break;
+                case 'false':
+                case '(false)':
+                    $value = false;
+                    break;
+                case 'empty':
+                case '(empty)':
+                    $value = '';
+                    break;
+                case 'null':
+                case '(null)':
+                    $value = null;
+            }
+
+            $config->set(str_replace(':', '.', $key), $value);
+        }
     }
-  }
 
-  public static function getEncryptedKeys(): array
-  {
-    return self::$encrypted;
-  }
+    public static function getEncryptedKeys(): array
+    {
+        return self::$encrypted;
+    }
 }

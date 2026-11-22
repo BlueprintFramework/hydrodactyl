@@ -1252,7 +1252,9 @@
             "passkeys_relying_party_id": "ID da parte confiável",
             "passkeys_relying_party_id_hint": "O domínio do painel ao qual as chaves de acesso estão vinculadas, sem https://. Alterar isso invalida as chaves de acesso existentes.",
             "passkeys_allowed_origins": "Origens permitidas",
-            "passkeys_allowed_origins_hint": "Origens HTTPS separadas por vírgulas onde o diálogo de chave de acesso pode aparecer, por exemplo https://panel.example.com."
+            "passkeys_allowed_origins_hint": "Origens HTTPS separadas por vírgulas onde o diálogo de chave de acesso pode aparecer, por exemplo https://panel.example.com.",
+            "passkeys_max_per_user": "Máximo de chaves de acesso por usuário",
+            "passkeys_max_per_user_hint": "Use 0 para sem limite. Recomendam-se 10."
         },
         "system_info": {
             "cpu_cores": "Núcleos de CPU",

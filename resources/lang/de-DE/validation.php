@@ -289,6 +289,7 @@ return [
         'owner_id' => 'Besitzer-ID',
         'passkeys:allowed_origins' => 'erlaubte Origins',
         'passkeys:enabled' => 'Passkeys aktiviert',
+        'passkeys:max_per_user' => 'maximale Passkeys pro Benutzer',
         'passkeys:relying_party_id' => 'ID der vertrauenden Partei',
         'password' => 'Passwort',
         'payload' => 'Nutzdaten',

@@ -28,6 +28,7 @@ const Toggle = ({ value, onChange }: { value: boolean; onChange: (value: boolean
 const PasskeyForm = ({ settings, onSaved }: { settings: PasskeyValues; onSaved: () => void }) => {
     const { t } = useTranslation();
     const [enabled, setEnabled] = useState(settings['passkeys:enabled']);
+    const [maxPasskeys, setMaxPasskeys] = useState(String(settings['passkeys:max_per_user']));
     const [relyingPartyId, setRelyingPartyId] = useState(settings['passkeys:relying_party_id']);
     const [allowedOrigins, setAllowedOrigins] = useState(settings['passkeys:allowed_origins']);
     const [submitting, setSubmitting] = useState(false);
@@ -40,6 +41,7 @@ const PasskeyForm = ({ settings, onSaved }: { settings: PasskeyValues; onSaved: 
         try {
             await updateSettings('passkeys', {
                 'passkeys:enabled': enabled,
+                'passkeys:max_per_user': maxPasskeys,
                 'passkeys:relying_party_id': relyingPartyId,
                 'passkeys:allowed_origins': allowedOrigins,
             });
@@ -67,6 +69,20 @@ const PasskeyForm = ({ settings, onSaved }: { settings: PasskeyValues; onSaved: 
                 hint={t('admin.settings.passkeys_enabled_hint')}
             >
                 <Toggle value={enabled} onChange={setEnabled} />
+            </Field>
+
+            <Field
+                label={t('admin.settings.passkeys_max_per_user')}
+                error={errors['passkeys:max_per_user']}
+                hint={t('admin.settings.passkeys_max_per_user_hint')}
+            >
+                <Input.Text
+                    type='number'
+                    min={0}
+                    max={100}
+                    value={maxPasskeys}
+                    onChange={(event) => setMaxPasskeys(event.target.value)}
+                />
             </Field>
 
             <Field

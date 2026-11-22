@@ -1252,7 +1252,9 @@
             "passkeys_relying_party_id": "ID partis fidentis",
             "passkeys_relying_party_id_hint": "Dominium panel cui claves accessus alligantur, sine https://. Id mutare claves accessus existentes irritas facit.",
             "passkeys_allowed_origins": "Origines permissae",
-            "passkeys_allowed_origins_hint": "Origines HTTPS virgulis separatae ubi dialogus clavis accessus aperiri potest, exempli gratia https://panel.example.com."
+            "passkeys_allowed_origins_hint": "Origines HTTPS virgulis separatae ubi dialogus clavis accessus aperiri potest, exempli gratia https://panel.example.com.",
+            "passkeys_max_per_user": "Maximum clavium accessus per usorem",
+            "passkeys_max_per_user_hint": "0 significat sine limite. Decem suadentur."
         },
         "system_info": {
             "cpu_cores": "Nuclei CPU",

@@ -289,6 +289,7 @@ return [
         'owner_id' => 'id possessoris',
         'passkeys:allowed_origins' => 'origines permissae',
         'passkeys:enabled' => 'claves accessus activae',
+        'passkeys:max_per_user' => 'maximum clavium accessus per usorem',
         'passkeys:relying_party_id' => 'ID partis fidentis',
         'password' => 'tessera',
         'payload' => 'onus',

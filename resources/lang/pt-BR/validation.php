@@ -288,6 +288,7 @@ return [
         'owner_id' => 'ID do proprietário',
         'passkeys:allowed_origins' => 'origens permitidas',
         'passkeys:enabled' => 'chaves de acesso ativadas',
+        'passkeys:max_per_user' => 'máximo de chaves de acesso por usuário',
         'passkeys:relying_party_id' => 'ID da parte confiável',
         'password' => 'senha',
         'payload' => 'dados da tarefa',

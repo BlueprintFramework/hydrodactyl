@@ -10,6 +10,7 @@ class PasskeySettingsFormRequest extends AdminFormRequest
     {
         return [
             'passkeys:enabled' => 'required|boolean',
+            'passkeys:max_per_user' => 'required|integer|min:0|max:100',
             'passkeys:relying_party_id' => [
                 'required',
                 'string',
@@ -101,6 +102,7 @@ class PasskeySettingsFormRequest extends AdminFormRequest
 
         return [
             'passkeys:enabled' => $this->boolean('passkeys:enabled') ? 'true' : 'false',
+            'passkeys:max_per_user' => (string) max(0, (int) $this->input('passkeys:max_per_user')),
             'passkeys:relying_party_id' => strtolower(trim((string) $this->input('passkeys:relying_party_id'))),
             'passkeys:allowed_origins' => implode(', ', $origins),
         ];
@@ -110,6 +112,7 @@ class PasskeySettingsFormRequest extends AdminFormRequest
     {
         return [
             'passkeys:enabled' => __('validation.attributes.passkeys:enabled'),
+            'passkeys:max_per_user' => __('validation.attributes.passkeys:max_per_user'),
             'passkeys:relying_party_id' => __('validation.attributes.passkeys:relying_party_id'),
             'passkeys:allowed_origins' => __('validation.attributes.passkeys:allowed_origins'),
         ];
