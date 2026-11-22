@@ -88,7 +88,7 @@ class PasskeySettingsControllerTest extends IntegrationTestCase
             ->assertJsonPath('errors.0.meta.source_field', 'passkeys:allowed_origins')
             ->assertJsonPath(
                 'errors.0.detail',
-                'Los orígenes de las claves de acceso deben pertenecer al dominio de la parte de confianza.',
+                'Los orígenes de las llaves de acceso deben pertenecer al dominio de la parte de confianza.',
             );
     }
 
