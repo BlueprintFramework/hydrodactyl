@@ -305,7 +305,11 @@
             "password_title": "Confirma tu contraseña",
             "password_description": "Por seguridad, confirma tu contraseña antes de gestionar las llaves de acceso.",
             "password_label": "Contraseña",
-            "password_placeholder": "Introduce tu contraseña actual"
+            "password_placeholder": "Introduce tu contraseña actual",
+            "count": "{{count}} de {{max}}",
+            "limit_reached": "Has alcanzado el límite de llaves de acceso ({{max}}). Elimina una para añadir otra.",
+            "name_taken": "Ya tienes una llave de acceso con este nombre.",
+            "recommendation": "Guarda llaves de acceso en al menos dos ubicaciones distintas para no quedarte sin acceso."
         }
     },
     "passkeys": {

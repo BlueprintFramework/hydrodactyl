@@ -114,6 +114,8 @@ return [
         'passkey_origin_not_in_relying_party' => 'Passkey-Origins müssen zur Domain der vertrauenden Partei gehören.',
         'passkey_relying_party_id_invalid' => 'Die ID der vertrauenden Partei muss ein gültiger Domainname ohne Schema, Pfad, Port oder IP-Adresse sein.',
         'password_confirmation_required' => 'Passwortbestätigung erforderlich.',
+        'passkey_limit_reached' => 'Du hast das Passkey-Limit (:max) erreicht. Entferne einen, bevor du einen weiteren hinzufügst.',
+        'passkey_name_taken' => 'Du hast bereits einen Passkey mit diesem Namen.',
         'power_action_invalid' => 'Die Power-Aktion muss eine der folgenden sein: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'Sie müssen bestätigen, dass Ihnen bekannt ist, dass diese Aktion ohne Hilfe eines Administrators nicht rückgängig gemacht werden kann.',
         'subdomain_invalid_characters' => 'Die Subdomain enthält ungültige Zeichen.',

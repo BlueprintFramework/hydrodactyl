@@ -114,6 +114,8 @@ return [
         'passkey_origin_not_in_relying_party' => 'Els orígens de les claus d\'accés han de pertànyer al domini de la part de confiança.',
         'passkey_relying_party_id_invalid' => 'L\'ID de la part de confiança ha de ser un nom de domini vàlid, sense esquema, ruta, port ni adreça IP.',
         'password_confirmation_required' => 'Cal confirmar la contrasenya.',
+        'passkey_limit_reached' => 'Has arribat al límit de claus d\'accés (:max). Elimina\'n una abans d\'afegir-ne una altra.',
+        'passkey_name_taken' => 'Ja tens una clau d\'accés amb aquest nom.',
         'power_action_invalid' => 'L\'acció d\'alimentació ha de ser una de les següents: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'Has de confirmar que entens que aquesta acció no es pot desfer sense l\'ajuda d\'un administrador.',
         'subdomain_invalid_characters' => 'El subdomini conté caràcters no vàlids.',

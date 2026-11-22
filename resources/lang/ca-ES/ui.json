@@ -305,7 +305,11 @@
             "password_title": "Confirma la contrasenya",
             "password_description": "Per seguretat, confirma la contrasenya abans de gestionar les claus d'accés.",
             "password_label": "Contrasenya",
-            "password_placeholder": "Introdueix la contrasenya actual"
+            "password_placeholder": "Introdueix la contrasenya actual",
+            "count": "{{count}} de {{max}}",
+            "limit_reached": "Has arribat al límit de claus d'accés ({{max}}). Elimina'n una per afegir-ne una altra.",
+            "name_taken": "Ja tens una clau d'accés amb aquest nom.",
+            "recommendation": "Guarda claus d'accés en almenys dues ubicacions diferents per no quedar-te sense accés."
         }
     },
     "passkeys": {

@@ -27,6 +27,7 @@ const PasskeySettings = () => {
     const { t, locale } = useTranslation();
     const { clearAndAddHttpError } = useFlashKey('account:passkeys');
     const [passkeys, setPasskeys] = useState<Passkey[]>([]);
+    const [maxPasskeys, setMaxPasskeys] = useState(10);
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState<number | null>(null);
@@ -37,11 +38,18 @@ const PasskeySettings = () => {
     const [confirmingPassword, setConfirmingPassword] = useState(false);
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const pendingName = useRef('');
+    const atLimit = maxPasskeys > 0 && passkeys.length >= maxPasskeys;
 
     const loadPasskeys = useCallback(() => {
         setLoading(true);
         http.get('/user/passkeys')
-            .then(({ data }) => setPasskeys(data.passkeys ?? []))
+            .then(({ data }) => {
+                setPasskeys(data.passkeys ?? []);
+
+                if (typeof data.max === 'number') {
+                    setMaxPasskeys(data.max);
+                }
+            })
             .catch((error) => clearAndAddHttpError(new Error(httpErrorToHuman(error))))
             .finally(() => setLoading(false));
     }, [clearAndAddHttpError]);
@@ -100,6 +108,16 @@ const PasskeySettings = () => {
         const trimmed = name.trim();
 
         if (!trimmed) {
+            return;
+        }
+
+        if (atLimit) {
+            clearAndAddHttpError(new Error(t('account.passkeys.limit_reached', { max: maxPasskeys })));
+            return;
+        }
+
+        if (passkeys.some((passkey) => passkey.name.trim().toLocaleLowerCase() === trimmed.toLocaleLowerCase())) {
+            clearAndAddHttpError(new Error(t('account.passkeys.name_taken')));
             return;
         }
 
@@ -208,7 +226,14 @@ const PasskeySettings = () => {
                 {t('account.passkeys.delete_confirm', { name: passkeyToDelete?.name ?? '' })}
             </Dialog.Confirm>
 
-            <p className='text-sm text-zinc-300'>{t('account.passkeys.description')}</p>
+            <div className='flex flex-wrap items-center justify-between gap-2'>
+                <p className='text-sm text-zinc-300'>{t('account.passkeys.description')}</p>
+                {maxPasskeys > 0 && (
+                    <span className='text-xs text-zinc-400'>
+                        {t('account.passkeys.count', { count: passkeys.length, max: maxPasskeys })}
+                    </span>
+                )}
+            </div>
 
             <form
                 autoComplete='off'
@@ -230,10 +255,14 @@ const PasskeySettings = () => {
                     maxLength={100}
                     className='min-w-0 flex-1 rounded-lg border border-mocha-400 bg-mocha-400 px-3 py-2 text-sm text-zinc-100 outline-hidden focus:border-hydro-400'
                 />
-                <Button type='submit' variant='secondary' disabled={isLoading || !name.trim()}>
+                <Button type='submit' variant='secondary' disabled={isLoading || !name.trim() || atLimit}>
                     {t('account.passkeys.create')}
                 </Button>
             </form>
+
+            {atLimit && (
+                <p className='text-sm text-amber-400'>{t('account.passkeys.limit_reached', { max: maxPasskeys })}</p>
+            )}
 
             {loading ? (
                 <p className='text-sm text-zinc-400'>{t('common.loading')}</p>
@@ -273,6 +302,7 @@ const PasskeySettings = () => {
             )}
 
             <p className='text-xs text-zinc-500'>{t('account.passkeys.help')}</p>
+            <p className='text-xs text-zinc-500'>{t('account.passkeys.recommendation')}</p>
         </div>
     );
 };

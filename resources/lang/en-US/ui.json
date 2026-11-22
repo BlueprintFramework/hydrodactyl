@@ -305,7 +305,11 @@
             "password_title": "Confirm your password",
             "password_description": "For your security, confirm your password before managing passkeys.",
             "password_label": "Password",
-            "password_placeholder": "Enter your current password"
+            "password_placeholder": "Enter your current password",
+            "count": "{{count}} of {{max}}",
+            "limit_reached": "You have reached the passkey limit ({{max}}). Remove one to add another.",
+            "name_taken": "You already have a passkey with this name.",
+            "recommendation": "Keep passkeys in at least two different storage locations so you don't lose access."
         }
     },
     "passkeys": {

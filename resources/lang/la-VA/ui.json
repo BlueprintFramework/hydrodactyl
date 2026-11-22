@@ -305,7 +305,11 @@
             "password_title": "Confirma tesseram tuam",
             "password_description": "Pro securitate, tesseram tuam confirma antequam claves accessus administres.",
             "password_label": "Tessera",
-            "password_placeholder": "Tesseram tuam currentem inscribe"
+            "password_placeholder": "Tesseram tuam currentem inscribe",
+            "count": "{{count}} ex {{max}}",
+            "limit_reached": "Limit clavium accessus ({{max}}) attigisti. Unam remove ut aliam addas.",
+            "name_taken": "Iam clavem accessus hoc nomine habes.",
+            "recommendation": "Claves accessus in duobus locis diversis serva ut accessum non amittas."
         }
     },
     "passkeys": {

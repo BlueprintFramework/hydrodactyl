@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Pterodactyl\Http\Controllers\Base;
+use Pterodactyl\Http\Middleware\EnforcePasskeyLimit;
 use Pterodactyl\Http\Middleware\PasskeyErrorResponse;
 use Pterodactyl\Http\Middleware\EnsurePasskeysEnabled;
 use Pterodactyl\Http\Controllers\Auth\PasskeyController;
@@ -19,8 +20,11 @@ Route::middleware(['auth', EnsurePasskeysEnabled::class, PasskeyErrorResponse::c
         ->name('account.passkeys.confirm-password');
 
     Route::middleware(RequirePasskeyPasswordConfirmation::class)->group(function () {
-        Route::get('/user/passkeys/options', [PasskeyRegistrationController::class, 'index'])->name('account.passkeys.options');
-        Route::post('/user/passkeys', [PasskeyRegistrationController::class, 'store'])->name('account.passkeys.store');
+        Route::middleware(EnforcePasskeyLimit::class)->group(function () {
+            Route::get('/user/passkeys/options', [PasskeyRegistrationController::class, 'index'])->name('account.passkeys.options');
+            Route::post('/user/passkeys', [PasskeyRegistrationController::class, 'store'])->name('account.passkeys.store');
+        });
+
         Route::delete('/user/passkeys/{passkey}', [PasskeyRegistrationController::class, 'destroy'])->name('account.passkeys.destroy');
     });
 });

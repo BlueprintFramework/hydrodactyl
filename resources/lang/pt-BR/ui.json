@@ -305,7 +305,11 @@
             "password_title": "Confirme sua senha",
             "password_description": "Por segurança, confirme sua senha antes de gerenciar as chaves de acesso.",
             "password_label": "Senha",
-            "password_placeholder": "Digite sua senha atual"
+            "password_placeholder": "Digite sua senha atual",
+            "count": "{{count}} de {{max}}",
+            "limit_reached": "Você atingiu o limite de chaves de acesso ({{max}}). Remova uma para adicionar outra.",
+            "name_taken": "Você já tem uma chave de acesso com este nome.",
+            "recommendation": "Guarde chaves de acesso em pelo menos dois locais diferentes para não perder o acesso."
         }
     },
     "passkeys": {

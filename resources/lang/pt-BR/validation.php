@@ -113,6 +113,8 @@ return [
         'passkey_origin_not_in_relying_party' => 'As origens das chaves de acesso devem pertencer ao domínio da parte confiável.',
         'passkey_relying_party_id_invalid' => 'O ID da parte confiável deve ser um nome de domínio válido, sem esquema, caminho, porta ou endereço IP.',
         'password_confirmation_required' => 'É necessário confirmar a senha.',
+        'passkey_limit_reached' => 'Você atingiu o limite de chaves de acesso (:max). Remova uma antes de adicionar outra.',
+        'passkey_name_taken' => 'Você já tem uma chave de acesso com este nome.',
         'power_action_invalid' => 'A ação de energia deve ser uma das seguintes: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'Você deve confirmar que entende que esta ação não pode ser desfeita sem a ajuda de um administrador.',
         'subdomain_invalid_characters' => 'O subdomínio contém caracteres inválidos.',

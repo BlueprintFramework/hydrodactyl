@@ -262,7 +262,11 @@
             "password_title": "Passwort bestätigen",
             "password_description": "Bestätige aus Sicherheitsgründen dein Passwort, bevor du Passkeys verwaltest.",
             "password_label": "Passwort",
-            "password_placeholder": "Aktuelles Passwort eingeben"
+            "password_placeholder": "Aktuelles Passwort eingeben",
+            "count": "{{count}} von {{max}}",
+            "limit_reached": "Du hast das Passkey-Limit ({{max}}) erreicht. Entferne einen, um einen weiteren hinzuzufügen.",
+            "name_taken": "Du hast bereits einen Passkey mit diesem Namen.",
+            "recommendation": "Speichere Passkeys an mindestens zwei verschiedenen Orten, damit du den Zugang nicht verlierst."
         }
     },
     "passkeys": {

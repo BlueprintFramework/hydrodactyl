@@ -26,6 +26,9 @@ class PasskeyController extends Controller
             ])
             ->values();
 
-        return response()->json(['passkeys' => $passkeys]);
+        return response()->json([
+            'passkeys' => $passkeys,
+            'max' => max(0, (int) config('passkeys.max_per_user', 10)),
+        ]);
     }
 }

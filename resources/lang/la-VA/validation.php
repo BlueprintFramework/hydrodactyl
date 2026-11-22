@@ -114,6 +114,8 @@ return [
         'passkey_origin_not_in_relying_party' => 'Origines clavis accessus ad dominium partis fidentis pertinere debent.',
         'passkey_relying_party_id_invalid' => 'ID partis fidentis nomen dominii validum esse debet, sine schemate, semita, portu aut inscriptione IP.',
         'password_confirmation_required' => 'Confirmatio tesserae necessaria est.',
+        'passkey_limit_reached' => 'Limit clavium accessus (:max) attigisti. Unam remove antequam aliam addas.',
+        'passkey_name_taken' => 'Iam clavem accessus hoc nomine habes.',
         'power_action_invalid' => 'Actio potestatis esse debet una ex: start, stop, restart, kill.',
         'revert_docker_image_confirm' => 'Confirmare debes intellegere hanc actionem sine adiutorio administratoris irritam fieri non posse.',
         'subdomain_invalid_characters' => 'Subdominium signa mendosa continet.',

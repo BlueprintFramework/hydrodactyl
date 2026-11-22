@@ -34,7 +34,8 @@ class PasskeyLoginControllerTest extends IntegrationTestCase
         $this->actingAs($user)
             ->getJson('/user/passkeys')
             ->assertOk()
-            ->assertExactJson(['passkeys' => []]);
+            ->assertJsonPath('max', 10)
+            ->assertJsonCount(0, 'passkeys');
     }
 
     public function testLoginOptionsAreUnavailableWhenPasskeysAreDisabled(): void
