@@ -29,8 +29,8 @@ const SetupRouter = () => {
                 className='pointer-events-none fixed inset-0 z-1 opacity-[0.4]'
             />
             <div className='flex size-full'>
-                <div className='relative w-full max-w-4xl z-2 flex items-start sm:items-center bg-bg-lowered px-5 py-8 sm:px-[calc(var(--page-padding)*3)] sm:py-[calc(var(--page-padding)*2)] overflow-y-auto'>
-                    <LocaleDropdown className='absolute top-5 right-5 z-10' />
+                <div className='relative w-full max-w-4xl z-2 flex items-start sm:items-center bg-bg-lowered px-5 pt-20 pb-8 sm:px-[calc(var(--page-padding)*3)] sm:py-[calc(var(--page-padding)*2)] overflow-y-auto'>
+                    <LocaleDropdown className='absolute top-5 right-6 z-10' />
                     <SetupContainer />
                 </div>
 
