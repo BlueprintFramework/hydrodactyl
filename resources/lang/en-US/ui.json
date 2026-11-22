@@ -299,7 +299,9 @@
             "last_used": "Last used",
             "never_used": "Never used",
             "help": "Your password remains available as a fallback.",
-            "delete_confirm": "Remove this passkey?"
+            "delete_confirm": "Are you sure you want to remove the passkey “{{name}}”? This action cannot be undone.",
+            "delete_title": "Remove passkey",
+            "delete": "Remove passkey"
         }
     },
     "passkeys": {

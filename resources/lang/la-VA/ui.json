@@ -299,7 +299,9 @@
             "last_used": "Ultimus usus",
             "never_used": "Numquam adhibita",
             "help": "Tessera tua ut alternativa manet.",
-            "delete_confirm": "Hanc clavem accessus removere vis?"
+            "delete_confirm": "Certusne es clavem accessus «{{name}}» removere velle? Haec actio reverti non potest.",
+            "delete_title": "Clavem accessus removere",
+            "delete": "Clavem accessus removere"
         }
     },
     "passkeys": {

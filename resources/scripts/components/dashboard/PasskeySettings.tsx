@@ -2,6 +2,7 @@ import { TrashBin } from '@gravity-ui/icons';
 import { usePasskeyRegister } from '@laravel/passkeys/react';
 import { useCallback, useEffect, useState } from 'react';
 import http, { httpErrorToHuman } from '@/api/http';
+import { Dialog } from '@/components/elements/dialog';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/i18n/I18nProvider';
 import { formatDateTime } from '@/lib/formatters';
@@ -26,6 +27,7 @@ const PasskeySettings = () => {
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(true);
     const [deleting, setDeleting] = useState<number | null>(null);
+    const [passkeyToDelete, setPasskeyToDelete] = useState<Passkey | null>(null);
 
     const loadPasskeys = useCallback(() => {
         setLoading(true);
@@ -62,16 +64,15 @@ const PasskeySettings = () => {
         }
     };
 
-    const deletePasskey = (id: number) => {
-        if (!window.confirm(t('account.passkeys.delete_confirm'))) {
-            return;
-        }
-
-        setDeleting(id);
-        http.delete(`/user/passkeys/${id}`)
-            .then(() => setPasskeys((current) => current.filter((passkey) => passkey.id !== id)))
+    const deletePasskey = (passkey: Passkey) => {
+        setDeleting(passkey.id);
+        http.delete(`/user/passkeys/${passkey.id}`)
+            .then(() => setPasskeys((current) => current.filter((entry) => entry.id !== passkey.id)))
             .catch((error) => clearAndAddHttpError(new Error(httpErrorToHuman(error))))
-            .finally(() => setDeleting(null));
+            .finally(() => {
+                setDeleting(null);
+                setPasskeyToDelete(null);
+            });
     };
 
     if (!isSupported) {
@@ -80,6 +81,26 @@ const PasskeySettings = () => {
 
     return (
         <div className='space-y-5'>
+            <Dialog.Confirm
+                open={passkeyToDelete !== null}
+                onClose={() => {
+                    if (deleting === null) {
+                        setPasskeyToDelete(null);
+                    }
+                }}
+                title={t('account.passkeys.delete_title')}
+                confirm={t('account.passkeys.delete')}
+                loading={deleting !== null}
+                preventExternalClose={deleting !== null}
+                onConfirmed={() => {
+                    if (passkeyToDelete) {
+                        void deletePasskey(passkeyToDelete);
+                    }
+                }}
+            >
+                {t('account.passkeys.delete_confirm', { name: passkeyToDelete?.name ?? '' })}
+            </Dialog.Confirm>
+
             <p className='text-sm text-zinc-300'>{t('account.passkeys.description')}</p>
 
             <div className='flex flex-col gap-3 sm:flex-row'>
@@ -122,7 +143,9 @@ const PasskeySettings = () => {
                                 variant='attention'
                                 size='sm'
                                 disabled={deleting !== null}
-                                onClick={() => deletePasskey(passkey.id)}
+                                onClick={() => setPasskeyToDelete(passkey)}
+                                title={t('account.passkeys.delete')}
+                                aria-label={t('account.passkeys.delete')}
                             >
                                 <TrashBin width={18} height={18} fill='currentColor' />
                             </Button>

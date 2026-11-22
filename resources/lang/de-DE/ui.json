@@ -256,7 +256,9 @@
             "last_used": "Zuletzt verwendet",
             "never_used": "Nie verwendet",
             "help": "Dein Passwort bleibt als Alternative verfügbar.",
-            "delete_confirm": "Diesen Passkey entfernen?"
+            "delete_confirm": "Bist du sicher, dass du den Passkey „{{name}}“ entfernen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+            "delete_title": "Passkey entfernen",
+            "delete": "Passkey entfernen"
         }
     },
     "passkeys": {

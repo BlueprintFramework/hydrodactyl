@@ -299,7 +299,9 @@
             "last_used": "Darrer ús",
             "never_used": "Mai utilitzada",
             "help": "La contrasenya continua disponible com a alternativa.",
-            "delete_confirm": "Vols eliminar aquesta clau d'accés?"
+            "delete_confirm": "Segur que vols eliminar la clau d'accés «{{name}}»? Aquesta acció no es pot desfer.",
+            "delete_title": "Eliminar clau d'accés",
+            "delete": "Eliminar clau d'accés"
         }
     },
     "passkeys": {

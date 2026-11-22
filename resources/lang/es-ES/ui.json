@@ -299,7 +299,9 @@
             "last_used": "Último uso",
             "never_used": "Nunca usada",
             "help": "La contraseña sigue disponible como método alternativo.",
-            "delete_confirm": "¿Eliminar esta clave de acceso?"
+            "delete_confirm": "¿Seguro que quieres eliminar la clave de acceso «{{name}}»? Esta acción no se puede deshacer.",
+            "delete_title": "Eliminar clave de acceso",
+            "delete": "Eliminar clave de acceso"
         }
     },
     "passkeys": {
