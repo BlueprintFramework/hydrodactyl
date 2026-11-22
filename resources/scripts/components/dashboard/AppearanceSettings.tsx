@@ -2,7 +2,10 @@ import { Checkmark } from '@carbon/icons-react';
 import AccountSection from '@/components/dashboard/AccountSection';
 import { useAppearance } from '@/contexts/AppearanceContext';
 import { useTranslation } from '@/i18n/I18nProvider';
-import { type Appearance, type AppearanceMode, appearanceAccents, appearancePalettes } from '@/lib/appearance';
+import { type Appearance, appearanceAccents, appearancePalettes } from '@/lib/appearance';
+
+const paletteKeys = Object.keys(appearancePalettes) as Appearance['palette'][];
+const accentKeys = Object.keys(appearanceAccents) as Appearance['accent'][];
 
 const radioClass = 'sr-only';
 const choiceClass =
@@ -25,11 +28,7 @@ export default function AppearanceSettings() {
     const { preferences, theme, persistent, updateAppearance } = useAppearance();
 
     return (
-        <AccountSection
-            title={t('appearance.title')}
-            description={t('appearance.description')}
-            descriptionId='appearance-description'
-        >
+        <AccountSection title={t('appearance.title')} description={t('appearance.description')}>
             <div className='space-y-6'>
                 <fieldset aria-describedby='appearance-mode-description'>
                     <legend className='text-sm font-medium'>{t('appearance.theme')}</legend>
@@ -51,7 +50,7 @@ export default function AppearanceSettings() {
                                     name='appearance-mode'
                                     value={value}
                                     checked={preferences.mode === value}
-                                    onChange={() => updateAppearance({ mode: value as AppearanceMode })}
+                                    onChange={() => updateAppearance({ mode: value })}
                                 />
                                 <span>{label}</span>
                                 <SelectionCheck visible={preferences.mode === value} />
@@ -65,7 +64,7 @@ export default function AppearanceSettings() {
                         {t('appearance.palette_description')}
                     </p>
                     <div className='grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4'>
-                        {Object.keys(appearancePalettes).map((value) => (
+                        {paletteKeys.map((value) => (
                             <label key={value} className={paletteChoiceClass}>
                                 <input
                                     className={radioClass}
@@ -73,11 +72,11 @@ export default function AppearanceSettings() {
                                     name='appearance-palette'
                                     value={value}
                                     checked={preferences.palette === value}
-                                    onChange={() => updateAppearance({ palette: value as Appearance['palette'] })}
+                                    onChange={() => updateAppearance({ palette: value })}
                                 />
                                 <span className='flex min-h-5 w-full min-w-0 items-center justify-between gap-2'>
                                     <span className='min-w-0 truncate font-medium'>
-                                        {t(`appearance.palettes.${value as Appearance['palette']}`)}
+                                        {t(`appearance.palettes.${value}`)}
                                     </span>
                                     {preferences.palette === value && (
                                         <span
@@ -109,7 +108,7 @@ export default function AppearanceSettings() {
                         {t('appearance.accent_description')}
                     </p>
                     <div className='flex flex-wrap gap-2'>
-                        {Object.keys(appearanceAccents).map((value) => (
+                        {accentKeys.map((value) => (
                             <label key={value} className={choiceClass}>
                                 <input
                                     className={radioClass}
@@ -117,11 +116,9 @@ export default function AppearanceSettings() {
                                     name='appearance-accent'
                                     value={value}
                                     checked={preferences.accent === value}
-                                    onChange={() => updateAppearance({ accent: value as Appearance['accent'] })}
+                                    onChange={() => updateAppearance({ accent: value })}
                                 />
-                                <span className='min-w-0 truncate'>
-                                    {t(`appearance.accents.${value as Appearance['accent']}`)}
-                                </span>
+                                <span className='min-w-0 truncate'>{t(`appearance.accents.${value}`)}</span>
                                 <span
                                     aria-hidden='true'
                                     className='appearance-preview ml-auto h-5 w-5 shrink-0 rounded-full border border-current bg-[var(--panel-accent)]'

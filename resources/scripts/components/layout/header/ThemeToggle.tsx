@@ -28,7 +28,6 @@ export default function ThemeToggle(): React.JSX.Element {
                         type='button'
                         className='group relative h-11 w-13 shrink-0 cursor-pointer rounded-full select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mocha-50'
                         aria-label={label}
-                        data-icon={isDark ? 'sun' : 'moon'}
                         onClick={() => updateAppearance({ mode: isDark ? 'light' : 'dark' })}
                     >
                         <span

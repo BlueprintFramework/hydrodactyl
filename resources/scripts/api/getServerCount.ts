@@ -1,4 +1,4 @@
-import http from '@/api/http';
+import http, { type FractalPaginatedResponse } from '@/api/http';
 
 export type ServerAccessType = 'owner' | 'shared';
 
@@ -8,9 +8,9 @@ export type ServerAccessType = 'owner' | 'shared';
  * without shipping a page of servers the account page will not render.
  */
 export default async (type: ServerAccessType): Promise<number> => {
-    const { data } = await http.get('/api/client', {
+    const { data } = await http.get<FractalPaginatedResponse>('/api/client', {
         params: { type, per_page: 1 },
     });
 
-    return data?.meta?.pagination?.total ?? 0;
+    return data.meta.pagination.total;
 };

@@ -5,14 +5,14 @@ import { cn } from '@/lib/utils';
 interface Props {
     title: string;
     description?: string;
-    descriptionId?: string;
     showFlashes?: string;
     className?: string;
     children: React.ReactNode;
 }
 
-const AccountSection = ({ title, description, descriptionId, showFlashes, className, children }: Props) => {
+const AccountSection = ({ title, description, showFlashes, className, children }: Props) => {
     const headingId = useId();
+    const descriptionId = useId();
 
     return (
         <section

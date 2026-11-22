@@ -31,7 +31,7 @@ const LocaleDropdown = ({ className }: LocaleDropdownProps) => {
                     aria-label={t('panel.language')}
                     className={cn('h-8 gap-2 rounded-full px-3', className)}
                 >
-                    <Flag identifier={current?.shortIdentifier ?? current?.code ?? locale} />
+                    <Flag identifier={current?.shortIdentifier ?? locale} />
                     <span>{current?.label ?? locale}</span>
                 </Button>
             </DropdownMenuTrigger>
@@ -42,7 +42,7 @@ const LocaleDropdown = ({ className }: LocaleDropdownProps) => {
                         onSelect={() => setLocale(definition.code)}
                         className={cn('gap-2', definition.code === locale && 'bg-accent/20')}
                     >
-                        <Flag identifier={definition.shortIdentifier ?? definition.code} />
+                        <Flag identifier={definition.shortIdentifier} />
                         <span>{definition.label}</span>
                     </DropdownMenuItem>
                 ))}

@@ -33,7 +33,7 @@ const AccountOverviewContainer = () => {
                  * row to its tallest card, which left a large void under the short
                  * cards (Profile above Account Email). Stacking each column on its
                  * own keeps the cards tight while the mobile order stays Name,
-                 * Email, Language, Password, 2FA, Version.
+                 * Email, Language, Server stats, Password, 2FA, Version.
                  */}
                 <div className='flex flex-col gap-4 lg:flex-row lg:items-start'>
                     <div className='flex min-w-0 flex-1 flex-col gap-4'>

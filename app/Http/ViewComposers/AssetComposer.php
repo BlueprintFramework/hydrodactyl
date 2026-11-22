@@ -48,11 +48,16 @@ class AssetComposer
             'logo' => $logoUrl,
             'customNavItems' => $this->getCustomNavItems(),
             'locales' => collect($this->getAvailableLanguages(true))
-                ->map(fn ($name, $code) => array_filter([
-                    'code' => $code,
-                    'name' => $name,
-                    'shortIdentifier' => $this->getLanguageMeta($code)['short_identifier'] ?? null,
-                ], fn ($value) => !is_null($value)))
+                ->map(function ($name, $code) {
+                    $locale = ['code' => $code, 'name' => $name];
+                    $shortIdentifier = $this->getLanguageMeta($code)['short_identifier'] ?? null;
+
+                    if (is_string($shortIdentifier) && $shortIdentifier !== '') {
+                        $locale['shortIdentifier'] = $shortIdentifier;
+                    }
+
+                    return $locale;
+                })
                 ->values()
                 ->all(),
             'captcha' => [

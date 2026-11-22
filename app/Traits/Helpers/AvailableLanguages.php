@@ -68,6 +68,8 @@ trait AvailableLanguages
      * Optional per-language metadata from `resources/lang/<code>/meta.json`.
      * A language may define a `short_identifier` (e.g. "de-de") that the panel
      * uses to resolve its flag instead of the locale code itself.
+     *
+     * @return array<string, mixed>
      */
     public function getLanguageMeta(string $code): array
     {
@@ -77,7 +79,13 @@ trait AvailableLanguages
             return [];
         }
 
-        $meta = json_decode((string) file_get_contents($path), true);
+        $contents = @file_get_contents($path);
+
+        if ($contents === false) {
+            return [];
+        }
+
+        $meta = json_decode($contents, true);
 
         return is_array($meta) ? $meta : [];
     }

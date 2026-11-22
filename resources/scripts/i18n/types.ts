@@ -37,11 +37,8 @@ export type Translate = (key: TranslationKey, params?: TranslationParams) => str
 export interface LocaleDefinition {
     code: LocaleCode;
     label: string;
-    /**
-     * Optional short identifier ("de-de", "en-us") used to resolve the
-     * language's flag. Defaults to the lowercased locale code.
-     */
-    shortIdentifier?: string;
+    /** Short identifier ("de-de", "en-us") used to resolve the language's flag. */
+    shortIdentifier: string;
 }
 
 export interface I18nContextValue {

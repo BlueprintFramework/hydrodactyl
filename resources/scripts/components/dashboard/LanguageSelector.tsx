@@ -46,7 +46,7 @@ const LanguageSelector = () => {
                     aria-label={t('panel.language')}
                     className='h-11 sm:h-8 gap-2 rounded-full px-3'
                 >
-                    <Flag identifier={current?.shortIdentifier ?? current?.code ?? locale} />
+                    <Flag identifier={current?.shortIdentifier ?? locale} />
                     <span className='text-right'>{current?.label ?? locale}</span>
                 </Button>
             </DropdownMenuTrigger>
@@ -57,7 +57,7 @@ const LanguageSelector = () => {
                         onSelect={() => onSelect(definition.code)}
                         className={cn('gap-2', definition.code === locale && 'bg-accent/20')}
                     >
-                        <Flag identifier={definition.shortIdentifier ?? definition.code} />
+                        <Flag identifier={definition.shortIdentifier} />
                         <span>{definition.label}</span>
                     </DropdownMenuItem>
                 ))}
