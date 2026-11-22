@@ -179,7 +179,7 @@ const PasskeySettings = () => {
     }
 
     return (
-        <div className='space-y-5'>
+        <div className='flex flex-col gap-5'>
             <PasskeyPasswordModal
                 open={passwordModalOpen}
                 loading={confirmingPassword}
