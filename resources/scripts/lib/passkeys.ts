@@ -41,9 +41,9 @@ const MESSAGE_KEYS: Record<string, TranslationKey> = {
     'Unable to sign in with this account.': 'passkeys.errors.sign_in_failed',
 };
 
-export const passkeyAuthenticatorLabel = (label: string | null, t: Translate): string | null => {
+export const passkeyAuthenticatorLabel = (label: string | null, t: Translate): string => {
     if (!label) {
-        return null;
+        return t('passkeys.authenticators.unknown');
     }
 
     const key = AUTHENTICATOR_KEYS[label];

@@ -1,4 +1,4 @@
-import { TrashBin } from '@gravity-ui/icons';
+import { Key, TrashBin } from '@gravity-ui/icons';
 import { usePasskeyRegister } from '@laravel/passkeys/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import http, { httpErrorToHuman } from '@/api/http';
@@ -290,14 +290,19 @@ const PasskeySettings = () => {
                                 className='flex items-center justify-between gap-4 rounded-lg border border-mocha-400 px-4 py-3'
                             >
                                 <div className='flex min-w-0 items-center gap-3'>
-                                    {icon && (
+                                    {icon ? (
                                         <img src={icon} alt='' className='h-6 w-6 shrink-0 rounded-md object-contain' />
+                                    ) : (
+                                        <Key
+                                            width={24}
+                                            height={24}
+                                            fill='currentColor'
+                                            className='h-6 w-6 shrink-0 text-zinc-400'
+                                        />
                                     )}
                                     <div className='min-w-0'>
                                         <p className='truncate text-sm font-medium text-zinc-100'>{passkey.name}</p>
-                                        {authenticator && (
-                                            <p className='truncate text-xs text-zinc-400'>{authenticator}</p>
-                                        )}
+                                        <p className='truncate text-xs text-zinc-400'>{authenticator}</p>
                                         <p className='text-xs text-zinc-400'>
                                             {created ? `${created} · ` : ''}
                                             {t('account.passkeys.last_used')}:{' '}

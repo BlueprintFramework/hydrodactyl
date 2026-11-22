@@ -340,7 +340,8 @@
             "icloud_keychain_managed": "Clauer de l'iCloud (gestionat)",
             "apple_passwords": "Contrasenyes d'Apple",
             "windows_hello": "Windows Hello",
-            "password_manager": "Gestor de contrasenyes de {{brand}}"
+            "password_manager": "Gestor de contrasenyes de {{brand}}",
+            "unknown": "Autenticador desconegut"
         }
     },
     "admin": {

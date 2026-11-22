@@ -340,7 +340,8 @@
             "icloud_keychain_managed": "Claviger iCloud (administratus)",
             "apple_passwords": "Tesserae Apple",
             "windows_hello": "Windows Hello",
-            "password_manager": "Administrator clavium: {{brand}}"
+            "password_manager": "Administrator clavium: {{brand}}",
+            "unknown": "Authenticator ignotus"
         }
     },
     "admin": {

@@ -340,7 +340,8 @@
             "icloud_keychain_managed": "Llavero de iCloud (gestionado)",
             "apple_passwords": "Contraseñas de Apple",
             "windows_hello": "Windows Hello",
-            "password_manager": "Administrador de contraseñas de {{brand}}"
+            "password_manager": "Administrador de contraseñas de {{brand}}",
+            "unknown": "Autenticador desconocido"
         }
     },
     "admin": {

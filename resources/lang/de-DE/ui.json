@@ -297,7 +297,8 @@
             "icloud_keychain_managed": "iCloud-Schlüsselbund (verwaltet)",
             "apple_passwords": "Apple Passwörter",
             "windows_hello": "Windows Hello",
-            "password_manager": "Passwortmanager von {{brand}}"
+            "password_manager": "Passwortmanager von {{brand}}",
+            "unknown": "Unbekannter Authenticator"
         }
     },
     "admin": {
