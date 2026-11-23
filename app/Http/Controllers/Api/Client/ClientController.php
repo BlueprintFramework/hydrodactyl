@@ -182,6 +182,32 @@ class ClientController extends ClientApiController
     }
 
     /**
+     * Get the number of servers the signed-in user owns and is a subuser on.
+     */
+    public function serverCounts(GetServersRequest $request): array
+    {
+        $user = $request->user();
+
+        $owned = Server::query()
+            ->where('servers.owner_id', $user->id)
+            ->count();
+
+        $shared = Server::query()
+            ->whereIn('servers.id', function ($query) use ($user) {
+                $query->select('server_id')->from('subusers')->where('user_id', $user->id);
+            })
+            ->count();
+
+        return [
+            'object' => 'server_counts',
+            'attributes' => [
+                'owned' => $owned,
+                'shared' => $shared,
+            ],
+        ];
+    }
+
+    /**
      * Return the panel version.
      */
     public function version(): JsonResponse

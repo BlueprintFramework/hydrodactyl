@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import getServerCount from '@/api/getServerCount';
+import getServerCounts from '@/api/getServerCounts';
 import AccountSection from '@/components/dashboard/AccountSection';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from '@/i18n/I18nProvider';
@@ -10,15 +10,7 @@ const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 function useServerCounts() {
-    return useSWR(
-        'server:counts',
-        async () => {
-            const [owned, shared] = await Promise.all([getServerCount('owner'), getServerCount('shared')]);
-
-            return { owned, shared };
-        },
-        { revalidateOnFocus: false },
-    );
+    return useSWR('server:counts', getServerCounts, { revalidateOnFocus: false });
 }
 
 /**

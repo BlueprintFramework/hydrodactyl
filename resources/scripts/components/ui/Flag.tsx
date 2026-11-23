@@ -30,6 +30,12 @@ function countryCode(identifier: string): string | undefined {
 /**
  * Language flag loaded from the FlagCDN API. Renders nothing for identifiers
  * without a resolvable country or when the image fails to load.
+ *
+ * Flags are loaded from FlagCDN (flagcdn.com). This provides consistent,
+ * high-quality flag icons for all locales without bundling SVGs, but each request
+ * leaks the user's IP to an external service and flags may not render offline or
+ * behind restrictive networks. Consider bundling local SVGs or making this opt-in
+ * for privacy-sensitive deployments.
  */
 export default function Flag({ identifier, label, className }: FlagProps) {
     // Track the identifier that failed rather than a plain boolean: the pickers

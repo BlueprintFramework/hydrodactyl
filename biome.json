@@ -592,7 +592,7 @@
         { "includes": ["**/*.{ts,tsx}"], "javascript": { "globals": [] } },
         {
             "includes": [
-                "resources/scripts/api/getServerCount.ts",
+                "resources/scripts/api/getServerCounts.ts",
                 "resources/scripts/components/dashboard/AccountOverviewContainer.tsx",
                 "resources/scripts/components/dashboard/AccountSection.tsx",
                 "resources/scripts/components/dashboard/AccountServerStats.tsx",

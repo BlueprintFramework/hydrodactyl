@@ -20,6 +20,7 @@ use Pterodactyl\Http\Middleware\Api\Client\Server\AuthenticateServerAccess;
 */
 
 Route::get('/', [Client\ClientController::class, 'index'])->name('api:client.index');
+Route::get('/server-counts', [Client\ClientController::class, 'serverCounts'])->name('api:client.server-counts');
 Route::get('/filter-options', [Client\ClientController::class, 'filterOptions'])->name('api:client.filter-options');
 Route::get('/permissions', [Client\ClientController::class, 'permissions']);
 Route::get('/version', [Client\ClientController::class, 'version']);
