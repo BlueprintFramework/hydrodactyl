@@ -494,6 +494,37 @@ class ClientControllerTest extends ClientApiIntegrationTestCase
         $response->assertJsonPath('object', 'server_filter_options');
     }
 
+    public function testServerCountsEndpointReturnsOwnedAndSharedTotals(): void
+    {
+        /** @var \Pterodactyl\Models\User[] $users */
+        $users = User::factory()->times(3)->create();
+
+        $servers = [
+            $this->createServerModel(['user_id' => $users[0]->id]),
+            $this->createServerModel(['user_id' => $users[0]->id]),
+            $this->createServerModel(['user_id' => $users[1]->id]),
+            $this->createServerModel(['user_id' => $users[2]->id]),
+        ];
+
+        // User 0 owns the first two servers and is a subuser on the last one.
+        Subuser::query()->create([
+            'user_id' => $users[0]->id,
+            'server_id' => $servers[3]->id,
+            'permissions' => [Permission::ACTION_WEBSOCKET_CONNECT],
+        ]);
+
+        $response = $this->actingAs($users[0])->getJson('/api/client/server-counts');
+
+        $response->assertOk();
+        $response->assertJson([
+            'object' => 'server_counts',
+            'attributes' => [
+                'owned' => 2,
+                'shared' => 1,
+            ],
+        ]);
+    }
+
     public function testCustomNameSortCombinedWithAllocationSearchFilter(): void
     {
         // Regression for a Postgres-only bug: the custom name sorts used to ORDER BY

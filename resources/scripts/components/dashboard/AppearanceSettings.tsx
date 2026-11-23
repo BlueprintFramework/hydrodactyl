@@ -1,24 +1,34 @@
 import { Checkmark } from '@carbon/icons-react';
-import ContentBox from '@/components/elements/ContentBox';
+import AccountSection from '@/components/dashboard/AccountSection';
 import { useAppearance } from '@/contexts/AppearanceContext';
 import { useTranslation } from '@/i18n/I18nProvider';
-import { type Appearance, type AppearanceMode, appearanceAccents, appearancePalettes } from '@/lib/appearance';
+import { type Appearance, appearanceAccents, appearancePalettes } from '@/lib/appearance';
+
+const paletteKeys = Object.keys(appearancePalettes) as Appearance['palette'][];
+const accentKeys = Object.keys(appearanceAccents) as Appearance['accent'][];
 
 const radioClass = 'sr-only';
 const choiceClass =
-    'flex min-h-11 min-w-0 cursor-pointer items-center rounded-lg border border-mocha-50 bg-mocha-600 p-3 text-sm has-[:checked]:border-hydro-400 has-[:checked]:ring-2 has-[:checked]:ring-hydro-400 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-hydro-400';
+    'flex min-h-11 min-w-0 cursor-pointer items-center gap-2 rounded-lg border border-mocha-50 bg-mocha-600 p-3 text-sm transition-colors hover:border-mocha-100 has-[:checked]:border-hydro-400/70 has-[:checked]:bg-hydro-500/15 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-hydro-400';
 const paletteChoiceClass =
-    'flex min-h-24 min-w-0 cursor-pointer flex-col gap-3 rounded-xl border border-mocha-50 bg-mocha-600 p-3 text-sm transition-colors hover:border-mocha-100 has-[:checked]:border-hydro-400 has-[:checked]:bg-mocha-500 has-[:checked]:ring-2 has-[:checked]:ring-hydro-400 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-hydro-400';
+    'flex min-h-24 min-w-0 cursor-pointer flex-col gap-3 rounded-xl border border-mocha-50 bg-mocha-600 p-3 text-sm transition-colors hover:border-mocha-100 has-[:checked]:border-hydro-400/70 has-[:checked]:bg-hydro-500/10 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-hydro-400';
+
+const SelectionCheck = ({ visible }: { visible: boolean }) => (
+    <span aria-hidden='true' className='ml-auto flex size-4 shrink-0 items-center justify-center'>
+        {visible && (
+            <span className='flex size-4 items-center justify-center rounded-full bg-hydro-400 text-mocha-700'>
+                <Checkmark className='size-2.5' />
+            </span>
+        )}
+    </span>
+);
 
 export default function AppearanceSettings() {
     const { t } = useTranslation();
     const { preferences, theme, persistent, updateAppearance } = useAppearance();
 
     return (
-        <ContentBox title={t('appearance.title')}>
-            <p id='appearance-description' className='mb-4 text-sm text-secondary'>
-                {t('appearance.description')}
-            </p>
+        <AccountSection title={t('appearance.title')} description={t('appearance.description')}>
             <div className='space-y-6'>
                 <fieldset aria-describedby='appearance-mode-description'>
                     <legend className='text-sm font-medium'>{t('appearance.theme')}</legend>
@@ -40,9 +50,10 @@ export default function AppearanceSettings() {
                                     name='appearance-mode'
                                     value={value}
                                     checked={preferences.mode === value}
-                                    onChange={() => updateAppearance({ mode: value as AppearanceMode })}
+                                    onChange={() => updateAppearance({ mode: value })}
                                 />
-                                {label}
+                                <span>{label}</span>
+                                <SelectionCheck visible={preferences.mode === value} />
                             </label>
                         ))}
                     </div>
@@ -53,7 +64,7 @@ export default function AppearanceSettings() {
                         {t('appearance.palette_description')}
                     </p>
                     <div className='grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4'>
-                        {Object.keys(appearancePalettes).map((value) => (
+                        {paletteKeys.map((value) => (
                             <label key={value} className={paletteChoiceClass}>
                                 <input
                                     className={radioClass}
@@ -61,11 +72,11 @@ export default function AppearanceSettings() {
                                     name='appearance-palette'
                                     value={value}
                                     checked={preferences.palette === value}
-                                    onChange={() => updateAppearance({ palette: value as Appearance['palette'] })}
+                                    onChange={() => updateAppearance({ palette: value })}
                                 />
                                 <span className='flex min-h-5 w-full min-w-0 items-center justify-between gap-2'>
                                     <span className='min-w-0 truncate font-medium'>
-                                        {t(`appearance.palettes.${value as Appearance['palette']}`)}
+                                        {t(`appearance.palettes.${value}`)}
                                     </span>
                                     {preferences.palette === value && (
                                         <span
@@ -97,7 +108,7 @@ export default function AppearanceSettings() {
                         {t('appearance.accent_description')}
                     </p>
                     <div className='flex flex-wrap gap-2'>
-                        {Object.keys(appearanceAccents).map((value) => (
+                        {accentKeys.map((value) => (
                             <label key={value} className={choiceClass}>
                                 <input
                                     className={radioClass}
@@ -105,26 +116,27 @@ export default function AppearanceSettings() {
                                     name='appearance-accent'
                                     value={value}
                                     checked={preferences.accent === value}
-                                    onChange={() => updateAppearance({ accent: value as Appearance['accent'] })}
+                                    onChange={() => updateAppearance({ accent: value })}
                                 />
-                                <span>{t(`appearance.accents.${value as Appearance['accent']}`)}</span>
+                                <span className='min-w-0 truncate'>{t(`appearance.accents.${value}`)}</span>
                                 <span
                                     aria-hidden='true'
-                                    className='appearance-preview ml-2 h-5 w-5 shrink-0 rounded-full border border-current bg-[var(--panel-accent)]'
+                                    className='appearance-preview ml-auto h-5 w-5 shrink-0 rounded-full border border-current bg-[var(--panel-accent)]'
                                     data-theme={theme}
                                     data-palette={preferences.palette}
                                     data-accent={value}
                                 />
+                                <SelectionCheck visible={preferences.accent === value} />
                             </label>
                         ))}
                     </div>
                 </fieldset>
             </div>
             {!persistent && (
-                <p role='status' className='mt-4 text-sm text-secondary'>
+                <p role='status' className='text-sm text-secondary'>
                     {t('appearance.storage_unavailable')}
                 </p>
             )}
-        </ContentBox>
+        </AccountSection>
     );
 }

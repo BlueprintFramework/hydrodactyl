@@ -589,7 +589,36 @@
                 }
             }
         },
-        { "includes": ["**/*.{ts,tsx}"], "javascript": { "globals": [] } }
+        { "includes": ["**/*.{ts,tsx}"], "javascript": { "globals": [] } },
+        {
+            "includes": [
+                "resources/scripts/api/getServerCounts.ts",
+                "resources/scripts/components/dashboard/AccountOverviewContainer.tsx",
+                "resources/scripts/components/dashboard/AccountSection.tsx",
+                "resources/scripts/components/dashboard/AccountServerStats.tsx",
+                "resources/scripts/components/dashboard/AppearanceSettings.tsx",
+                "resources/scripts/components/dashboard/LanguageSelector.tsx",
+                "resources/scripts/components/elements/LocaleDropdown.tsx",
+                "resources/scripts/components/layout/header/AppHeader.tsx",
+                "resources/scripts/components/layout/header/ThemeToggle.tsx",
+                "resources/scripts/components/ui/Flag.tsx",
+                "resources/scripts/i18n/I18nProvider.tsx",
+                "resources/scripts/i18n/types.ts",
+                "resources/scripts/state/settings.ts"
+            ],
+            "plugins": [
+                "./node_modules/biome-anti-slop/plugins/no-chained-type-assertions.grit",
+                "./node_modules/biome-anti-slop/plugins/no-conditional-empty-object-spread.grit",
+                "./node_modules/biome-anti-slop/plugins/no-module-mocking.grit",
+                "./node_modules/biome-anti-slop/plugins/no-object-parameters.grit",
+                "./node_modules/biome-anti-slop/plugins/no-reflect-apply.grit",
+                "./node_modules/biome-anti-slop/plugins/no-reflect-get.grit",
+                "./node_modules/biome-anti-slop/plugins/no-unknown-parameters.grit",
+                "./node_modules/biome-anti-slop/plugins/no-unknown-returns.grit",
+                "./node_modules/biome-anti-slop/plugins/no-unknown-type-aliases.grit",
+                "./node_modules/biome-anti-slop/plugins/no-unsafe-dictionary-type.grit"
+            ]
+        }
     ],
     "assist": {
         "enabled": true,

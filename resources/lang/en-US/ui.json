@@ -253,6 +253,15 @@
             "submit": "Update Password",
             "updating": "Updating..."
         },
+        "servers": {
+            "chart_label": "{{owned}} servers owned and {{shared}} as a subuser.",
+            "description": "Servers you own and servers other people share with you.",
+            "empty": "You do not have access to any servers yet.",
+            "owned": "Owned",
+            "shared": "Subuser",
+            "title": "Your Servers",
+            "total": "Total"
+        },
         "ssh": {
             "add": "Add SSH Key",
             "add_confirm": "Add Key",

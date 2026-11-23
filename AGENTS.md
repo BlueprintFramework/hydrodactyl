@@ -263,4 +263,10 @@ Actions: `list`, `create`, `rename`, `delete`, `assign`, `move`.
 - **Host tools (CLI-only)**: `diag` `status` reports Composer and mkcert against the versions lerd pins, and flags any that differ. Applying an update is `lerd tools:update`, and the optional tray applet is `lerd tray off|on`; neither has a tool here, so tell the user to run it
 - **Sharing a site is CLI-only and deliberate**: `lerd share` (ngrok, cloudflared, Expose, serveo, localhost.run, Pinggy) and the dashboard's share menu put a site on the public internet, the same menu's public share serves it through the user's own reverse proxy on a base domain they control instead of a tunnel service, and `lerd lan:expose` puts it on the local network. None is exposed here, so never claim you can share a site; hand the user the command and let them decide
 
+## 5. Anti-slop integration
+
+The `biome-anti-slop` plugin (`^0.1.0`) is configured in `biome.json` with 10 recommended rules scoped to the 13 frontend files changed on the `style/account` branch. This avoids the 490+ legacy violations that exist in the codebase and would cause CI failures. The scoped `includes` in the override limits diagnostics to only the new/account UI code. The subset of rules addresses the most common quality concerns for the new code while keeping the lint pipeline fast and the violation count manageable.
+
+Adding new rules or widening the scope should only be done incrementally, with the full `pnpm check` suite verified after each change.
+
 <!-- lerd:end -->

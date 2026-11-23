@@ -27,6 +27,7 @@ function lookup(dictionary: DeepPartial<Translations>, key: string): string | un
             return undefined;
         }
 
+        // biome-ignore lint: walking a dynamically-keyed translation tree; the result is narrowed to a string below.
         node = (node as Record<string, unknown>)[segment];
     }
 
@@ -76,10 +77,15 @@ const I18nProvider = ({ children }: I18nProviderProps) => {
         const definitions = (configuredLocales ?? []).map((entry) => ({
             code: entry.code,
             label: entry.name || localeLabel(entry.code),
+            shortIdentifier: entry.shortIdentifier || entry.code.toLowerCase(),
         }));
 
         if (!definitions.some((entry) => entry.code === DEFAULT_LOCALE)) {
-            definitions.unshift({ code: DEFAULT_LOCALE, label: localeLabel(DEFAULT_LOCALE) });
+            definitions.unshift({
+                code: DEFAULT_LOCALE,
+                label: localeLabel(DEFAULT_LOCALE),
+                shortIdentifier: DEFAULT_LOCALE.toLowerCase(),
+            });
         }
 
         return definitions;
