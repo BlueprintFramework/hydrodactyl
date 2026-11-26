@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'breadcrumb' => [
+        'admin' => 'Админ',
+        'settings' => 'Настройки',
+    ],
+    'copyright' => 'Copyright &copy; 2015 - :year <a href="https://blueprint.zip/">BlueprintFramework</a> и <a href="https://hydrodactyl.dev">Hydrodactyl</a>.',
+    'exit_admin_control' => 'Выйти из администрирования',
+    'logout' => 'Выйти',
+    'logout_confirm_button' => 'Выйти',
+    'logout_confirm_title' => 'Вы хотите выйти?',
+    'settings_nav' => [
+        'advanced' => 'Расширенные',
+        'branding' => 'Брендинг',
+        'captcha' => 'Captcha',
+        'custom_navigation' => 'Пользовательская навигация',
+        'domains' => 'Домены',
+        'general' => 'Общие',
+        'mail' => 'Почта',
+    ],
+    'sidebar' => [
+        'application_api' => 'API приложения',
+        'basic_administration' => 'ОСНОВНОЕ АДМИНИСТРИРОВАНИЕ',
+        'databases' => 'Базы данных',
+        'locations' => 'Локации',
+        'management' => 'УПРАВЛЕНИЕ',
+        'mounts' => 'Монтирования',
+        'nests' => 'Гнёзда',
+        'nodes' => 'Узлы',
+        'overview' => 'Обзор',
+        's3_buckets' => 'S3-корзины',
+        'servers' => 'Серверы',
+        'service_management' => 'УПРАВЛЕНИЕ СЛУЖБАМИ',
+        'settings' => 'Настройки',
+        'toggle_navigation' => 'Переключить навигацию',
+        'users' => 'Пользователи',
+    ],
+    'validation_error' => 'Произошла ошибка при проверке предоставленных данных.',
+];
