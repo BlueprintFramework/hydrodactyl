@@ -2,18 +2,39 @@
 
 namespace Pterodactyl\Http\Requests\Api\Client\Servers\Schedules;
 
+use Pterodactyl\Models\Task;
+use Pterodactyl\Models\Server;
 use Pterodactyl\Models\Permission;
 
 class StoreTaskRequest extends ViewScheduleRequest
 {
     /**
-     * Determine if the user is allowed to create a new task for this schedule. We simply
-     * check if they can modify a schedule to determine if they're able to do this. There
-     * are no task specific permissions.
+     * Creating or editing a task requires schedule.update.
      */
     public function permission(): string
     {
         return Permission::ACTION_SCHEDULE_UPDATE;
+    }
+
+    /**
+     * On top of schedule.update, the user must hold the permission for the action the task
+     * performs (e.g. control.console for a command task). Otherwise a schedule would let
+     * them do something they cannot do directly.
+     */
+    public function authorize(): bool
+    {
+        if (!parent::authorize()) {
+            return false;
+        }
+
+        $permission = Task::permissionForAction((string) $this->input('action'), $this->input('payload'));
+        if (is_null($permission)) {
+            return true;
+        }
+
+        $server = $this->route()->parameter('server');
+
+        return $server instanceof Server && $this->user()->can($permission, $server);
     }
 
     public function rules(): array

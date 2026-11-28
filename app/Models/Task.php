@@ -44,6 +44,28 @@ class Task extends Model
     public const ACTION_BACKUP = 'backup';
 
     /**
+     * Returns the permission a user must hold to create or edit a task that performs the
+     * given action. Tasks run with the panel's own daemon credentials, so this mapping is
+     * the only place the equivalent direct-endpoint permission is enforced.
+     *
+     * Returns null when the action requires no permission beyond schedule.update, or when
+     * the action/payload is invalid (request validation rejects those).
+     */
+    public static function permissionForAction(string $action, ?string $payload = null): ?string
+    {
+        return match ($action) {
+            self::ACTION_COMMAND => Permission::ACTION_CONTROL_CONSOLE,
+            self::ACTION_POWER => match (trim((string) $payload)) {
+                'start' => Permission::ACTION_CONTROL_START,
+                'stop', 'kill' => Permission::ACTION_CONTROL_STOP,
+                'restart' => Permission::ACTION_CONTROL_RESTART,
+                default => null,
+            },
+            default => null,
+        };
+    }
+
+    /**
      * The table associated with the model.
      */
     protected $table = 'tasks';

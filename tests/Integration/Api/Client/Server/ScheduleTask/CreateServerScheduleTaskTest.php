@@ -170,8 +170,85 @@ class CreateServerScheduleTaskTest extends ClientApiIntegrationTestCase
             ->assertForbidden();
     }
 
+    /**
+     * F-4: schedule.update alone must not allow a task that sends console commands or
+     * power actions, since the task runs them without the matching control.* permission.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('actionPermissionDataProvider')]
+    public function testTaskCannotBeCreatedWithoutActionPermission(string $action, string $payload, string $permission)
+    {
+        [$user, $server] = $this->generateTestAccount([Permission::ACTION_SCHEDULE_UPDATE]);
+
+        /** @var Schedule $schedule */
+        $schedule = Schedule::factory()->create(['server_id' => $server->id]);
+
+        $this->actingAs($user)->postJson($this->link($schedule, '/tasks'), [
+            'action' => $action,
+            'payload' => $payload,
+            'time_offset' => 0,
+        ])->assertForbidden();
+
+        $this->assertEmpty($schedule->tasks()->get());
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('actionPermissionDataProvider')]
+    public function testTaskCanBeCreatedWithActionPermission(string $action, string $payload, string $permission)
+    {
+        [$user, $server] = $this->generateTestAccount([Permission::ACTION_SCHEDULE_UPDATE, $permission]);
+
+        /** @var Schedule $schedule */
+        $schedule = Schedule::factory()->create(['server_id' => $server->id]);
+
+        $this->actingAs($user)->postJson($this->link($schedule, '/tasks'), [
+            'action' => $action,
+            'payload' => $payload,
+            'time_offset' => 0,
+        ])->assertOk();
+
+        $this->assertSame($payload, $schedule->tasks()->sole()->payload);
+    }
+
+    /**
+     * F-4: an existing harmless task must not be editable into a command task without
+     * control.console.
+     */
+    public function testTaskCannotBeUpdatedToCommandWithoutConsolePermission()
+    {
+        [$user, $server] = $this->generateTestAccount([Permission::ACTION_SCHEDULE_UPDATE, Permission::ACTION_CONTROL_START]);
+
+        /** @var Schedule $schedule */
+        $schedule = Schedule::factory()->create(['server_id' => $server->id]);
+        /** @var Task $task */
+        $task = Task::factory()->create([
+            'schedule_id' => $schedule->id,
+            'action' => 'power',
+            'payload' => 'start',
+        ]);
+
+        $this->actingAs($user)->postJson($this->link($task), [
+            'action' => 'command',
+            'payload' => 'say pwned',
+            'time_offset' => 0,
+        ])->assertForbidden();
+
+        $task->refresh();
+        $this->assertSame('power', $task->action);
+        $this->assertSame('start', $task->payload);
+    }
+
     public static function permissionsDataProvider(): array
     {
-        return [[[]], [[Permission::ACTION_SCHEDULE_UPDATE]]];
+        return [[[]], [[Permission::ACTION_SCHEDULE_UPDATE, Permission::ACTION_CONTROL_CONSOLE]]];
+    }
+
+    public static function actionPermissionDataProvider(): array
+    {
+        return [
+            'command' => ['command', 'say hi', Permission::ACTION_CONTROL_CONSOLE],
+            'power start' => ['power', 'start', Permission::ACTION_CONTROL_START],
+            'power stop' => ['power', 'stop', Permission::ACTION_CONTROL_STOP],
+            'power kill' => ['power', 'kill', Permission::ACTION_CONTROL_STOP],
+            'power restart' => ['power', 'restart', Permission::ACTION_CONTROL_RESTART],
+        ];
     }
 }
