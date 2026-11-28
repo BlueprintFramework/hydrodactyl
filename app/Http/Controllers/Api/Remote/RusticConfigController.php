@@ -7,6 +7,7 @@ use Pterodactyl\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Crypt;
+use Pterodactyl\Exceptions\Http\HttpForbiddenException;
 
 class RusticConfigController extends Controller
 {
@@ -16,6 +17,13 @@ class RusticConfigController extends Controller
     public function show(Request $request, string $uuid): JsonResponse
     {
         $server = Server::where('uuid', $uuid)->firstOrFail();
+
+        // Repository passwords and S3 keys are only handed to the node hosting the server.
+        /** @var \Pterodactyl\Models\Node $node */
+        $node = $request->attributes->get('node');
+        if ($server->node_id !== $node->id) {
+            throw new HttpForbiddenException(__('exceptions.remote.backups.forbidden'));
+        }
 
         $type = $request->query('type', 'local');
 
