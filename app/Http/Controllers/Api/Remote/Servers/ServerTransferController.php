@@ -2,6 +2,7 @@
 
 namespace Pterodactyl\Http\Controllers\Api\Remote\Servers;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Models\Allocation;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Pterodactyl\Models\ServerTransfer;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Http\Controllers\Controller;
+use Pterodactyl\Exceptions\Http\HttpForbiddenException;
 use Pterodactyl\Repositories\Eloquent\ServerRepository;
 use Pterodactyl\Repositories\Wings\DaemonServerRepository;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -31,12 +33,19 @@ class ServerTransferController extends Controller
      *
      * @throws \Throwable
      */
-    public function failure(string $uuid): JsonResponse
+    public function failure(Request $request, string $uuid): JsonResponse
     {
+        /** @var \Pterodactyl\Models\Node $node */
+        $node = $request->attributes->get('node');
         $server = $this->repository->getByUuid($uuid);
         $transfer = $server->transfer;
         if (is_null($transfer)) {
             throw new ConflictHttpException(__('exceptions.remote.transfer.not_in_progress'));
+        }
+
+        // Either node participating in the transfer may report that it failed.
+        if ($node->id !== $transfer->old_node && $node->id !== $transfer->new_node) {
+            throw new HttpForbiddenException(__('exceptions.remote.backups.forbidden'));
         }
 
         return $this->processFailedTransfer($transfer);
@@ -47,12 +56,19 @@ class ServerTransferController extends Controller
      *
      * @throws \Throwable
      */
-    public function success(string $uuid): JsonResponse
+    public function success(Request $request, string $uuid): JsonResponse
     {
+        /** @var \Pterodactyl\Models\Node $node */
+        $node = $request->attributes->get('node');
         $server = $this->repository->getByUuid($uuid);
         $transfer = $server->transfer;
         if (is_null($transfer)) {
             throw new ConflictHttpException(__('exceptions.remote.transfer.not_in_progress'));
+        }
+
+        // Only the destination node can confirm that it received the server.
+        if ($node->id !== $transfer->new_node) {
+            throw new HttpForbiddenException(__('exceptions.remote.backups.forbidden'));
         }
 
         /** @var \Pterodactyl\Models\Server $server */

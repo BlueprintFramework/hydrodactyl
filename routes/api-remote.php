@@ -28,8 +28,6 @@ Route::group(['prefix' => '/servers/{uuid}'], function () {
     Route::get('/rustic-config', [RusticConfigController::class, 'show']);
     Route::post('/backup-sizes', [BackupSizeController::class, 'update']);
 
-    Route::get('/transfer/failure', [ServerTransferController::class, 'failure']);
-    Route::get('/transfer/success', [ServerTransferController::class, 'success']);
     Route::post('/transfer/failure', [ServerTransferController::class, 'failure']);
     Route::post('/transfer/success', [ServerTransferController::class, 'success']);
 });
