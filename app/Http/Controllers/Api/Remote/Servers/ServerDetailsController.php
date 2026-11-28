@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
 use Illuminate\Database\ConnectionInterface;
 use Pterodactyl\Http\Controllers\Controller;
+use Pterodactyl\Exceptions\Http\HttpForbiddenException;
 use Pterodactyl\Services\Eggs\EggConfigurationService;
 use Pterodactyl\Repositories\Eloquent\ServerRepository;
 use Pterodactyl\Http\Resources\Wings\ServerConfigurationCollection;
@@ -33,7 +34,20 @@ class ServerDetailsController extends Controller
      */
     public function __invoke(Request $request, string $uuid): JsonResponse
     {
+        /** @var \Pterodactyl\Models\Node $node */
+        $node = $request->attributes->get('node');
         $server = $this->repository->getByUuid($uuid);
+
+        // Only the node hosting the server, or either node in an active transfer, may
+        // read its configuration.
+        $transfer = $server->transfer;
+        $valid = $transfer
+            ? $node->id === $transfer->old_node || $node->id === $transfer->new_node
+            : $node->id === $server->node_id;
+
+        if (!$valid) {
+            throw new HttpForbiddenException(__('exceptions.remote.backups.forbidden'));
+        }
 
         return new JsonResponse([
             'settings' => $this->configurationStructureService->handle($server),
