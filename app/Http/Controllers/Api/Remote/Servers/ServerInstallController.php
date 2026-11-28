@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Http\Controllers\Controller;
+use Pterodactyl\Exceptions\Http\HttpForbiddenException;
 use Pterodactyl\Repositories\Eloquent\ServerRepository;
 use Pterodactyl\Events\Server\Installed as ServerInstalled;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
@@ -28,6 +29,8 @@ class ServerInstallController extends Controller
     public function index(Request $request, string $uuid): JsonResponse
     {
         $server = $this->repository->getByUuid($uuid);
+        $this->assertNodeOwnsServer($request, $server);
+
         $egg = $server->egg;
 
         return new JsonResponse([
@@ -46,6 +49,8 @@ class ServerInstallController extends Controller
     public function store(InstallationDataRequest $request, string $uuid): JsonResponse
     {
         $server = $this->repository->getByUuid($uuid);
+        $this->assertNodeOwnsServer($request, $server);
+
         $status = null;
 
         // Make sure the type of failure is accurate
@@ -74,5 +79,18 @@ class ServerInstallController extends Controller
         }
 
         return new JsonResponse([], Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Only the node hosting the server may read or report its installation.
+     */
+    private function assertNodeOwnsServer(Request $request, Server $server): void
+    {
+        /** @var \Pterodactyl\Models\Node $node */
+        $node = $request->attributes->get('node');
+
+        if ($server->node_id !== $node->id) {
+            throw new HttpForbiddenException(__('exceptions.remote.backups.forbidden'));
+        }
     }
 }

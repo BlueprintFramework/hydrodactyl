@@ -95,6 +95,13 @@ class BackupStatusController extends Controller
         /** @var Backup $model */
         $model = Backup::query()->where('uuid', $backup)->firstOrFail();
 
+        // Only the node hosting the server may report that a restore finished.
+        /** @var \Pterodactyl\Models\Node $node */
+        $node = $request->attributes->get('node');
+        if ($model->server->node_id !== $node->id) {
+            throw new HttpForbiddenException(__('exceptions.remote.backups.forbidden_backup'));
+        }
+
         $model->server->update(['status' => null]);
 
         Activity::event($request->boolean('successful') ? 'server:backup.restore-complete' : 'server.backup.restore-failed')
