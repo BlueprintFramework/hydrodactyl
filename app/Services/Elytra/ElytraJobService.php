@@ -202,8 +202,20 @@ class ElytraJobService
             return;
         }
 
-        $server = $job->server;
         $currentStatus = $job->status;
+
+        // A finished job's completion side effects (e.g. deleting backup rows) must run
+        // once only; ignore replayed or late reports.
+        if (in_array($currentStatus, [ElytraJob::STATUS_COMPLETED, ElytraJob::STATUS_FAILED], true)) {
+            Log::warning('Ignoring status update for job already in a terminal state', [
+                'elytra_job_id' => $elytraJobId,
+                'status' => $currentStatus,
+            ]);
+
+            return;
+        }
+
+        $server = $job->server;
         $newStatus = $statusData['status'] ?? 'unknown';
 
         $errorMessage = $statusData['error_message'] ?? null;
