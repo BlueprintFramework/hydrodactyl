@@ -48,7 +48,7 @@ class ElytraJobService
     public function submitJob(Server $server, string $jobType, array $jobData, User $user): array
     {
         $handler = $this->getJobHandler($jobType);
-        $validatedData = $handler->validateJobData($jobData);
+        $validatedData = $handler->validateJobData($jobType, $jobData);
         $job = ElytraJob::create([
             'server_id' => $server->id,
             'user_id' => $user->id,

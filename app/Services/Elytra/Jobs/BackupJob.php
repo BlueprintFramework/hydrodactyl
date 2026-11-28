@@ -10,6 +10,7 @@ use Pterodactyl\Models\ElytraJob;
 use Pterodactyl\Models\Permission;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Pterodactyl\Contracts\Elytra\Job;
 use Pterodactyl\Repositories\Elytra\ElytraRepository;
 use Pterodactyl\Services\Backups\ServerStateService;
@@ -31,20 +32,33 @@ class BackupJob implements Job
         return ['backup_create', 'backup_delete', 'backup_restore', 'backup_download', 'backup_delete_all'];
     }
 
-    public function getRequiredPermissions(string $operation): array
+    public function getRequiredPermissions(string $operation, string $jobType): ?array
     {
         return match ($operation) {
-            'index' => [Permission::ACTION_BACKUP_READ],
-            'create' => [Permission::ACTION_BACKUP_CREATE],
-            'show' => [Permission::ACTION_BACKUP_READ],
+            'index', 'show' => [Permission::ACTION_BACKUP_READ],
+            // Only backup creation may be submitted through the generic jobs API. Delete,
+            // restore, download and delete-all must use the dedicated backup endpoints,
+            // which enforce their own permission, backup ownership and password/2FA
+            // confirmation for destructive actions.
+            'create' => $jobType === 'backup_create' ? [Permission::ACTION_BACKUP_CREATE] : null,
             'cancel' => [Permission::ACTION_BACKUP_DELETE],
-            default => [],
+            default => null,
         };
     }
 
-    public function validateJobData(array $jobData): array
+    public function validateJobData(string $jobType, array $jobData): array
     {
-        $rules = match ($jobData['operation'] ?? '') {
+        // The rules (and later the submission path) are chosen by the job type, and the
+        // payload's operation must agree with it, so data cannot smuggle in a different
+        // operation than the one that was authorized.
+        $operation = $this->getOperationFromJobType($jobType);
+        if (($jobData['operation'] ?? null) !== $operation) {
+            throw ValidationException::withMessages([
+                'job_data.operation' => __('exceptions.elytra.invalid_operation'),
+            ]);
+        }
+
+        $rules = match ($operation) {
             'create' => [
                 'operation' => 'required|string|in:create',
                 'adapter' => 'nullable|string',
@@ -84,8 +98,7 @@ class BackupJob implements Job
 
     public function submitToElytra(Server $server, ElytraJob $job, ElytraRepository $elytraRepository): string
     {
-        $jobData = $job->job_data;
-        $operation = $jobData['operation'];
+        $operation = $this->getOperationFromJobType($job->job_type);
 
         return match ($operation) {
             'create' => $this->submitCreateJob($server, $job, $elytraRepository),
@@ -195,7 +208,7 @@ class BackupJob implements Job
     private function submitDeleteJob(Server $server, ElytraJob $job, ElytraRepository $elytraRepository): string
     {
         $jobData = $job->job_data;
-        $backup = Backup::where('uuid', $jobData['backup_uuid'])->firstOrFail();
+        $backup = $server->backups()->where('uuid', $jobData['backup_uuid'])->firstOrFail();
 
         $elytraJobData = [
             'server_id' => $server->uuid,
@@ -212,7 +225,7 @@ class BackupJob implements Job
     private function submitRestoreJob(Server $server, ElytraJob $job, ElytraRepository $elytraRepository): string
     {
         $jobData = $job->job_data;
-        $backup = Backup::where('uuid', $jobData['backup_uuid'])->firstOrFail();
+        $backup = $server->backups()->where('uuid', $jobData['backup_uuid'])->firstOrFail();
 
         $downloadUrl = $jobData['download_url'] ?? null;
 

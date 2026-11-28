@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
+use Pterodactyl\Contracts\Elytra\Job;
 use Illuminate\Auth\Access\AuthorizationException;
 use Pterodactyl\Services\Elytra\ElytraJobService;
 use Pterodactyl\Http\Controllers\Api\Client\ClientApiController;
@@ -27,13 +28,7 @@ class ElytraJobsController extends ClientApiController
 
         if ($jobType) {
             $handler = $this->elytraJobService->getJobHandler($jobType);
-            $requiredPermissions = $handler->getRequiredPermissions('index');
-
-            foreach ($requiredPermissions as $permission) {
-                if (!$request->user()->can($permission, $server)) {
-                    throw new AuthorizationException();
-                }
-            }
+            $this->authorizeJobOperation($request, $server, $handler, 'index', $jobType);
         }
 
         $jobs = $this->elytraJobService->listJobs(
@@ -57,13 +52,7 @@ class ElytraJobsController extends ClientApiController
         $jobData = $request->input('job_data', []);
 
         $handler = $this->elytraJobService->getJobHandler($jobType);
-        $requiredPermissions = $handler->getRequiredPermissions('create');
-
-        foreach ($requiredPermissions as $permission) {
-            if (!$request->user()->can($permission, $server)) {
-                throw new AuthorizationException();
-            }
-        }
+        $this->authorizeJobOperation($request, $server, $handler, 'create', $jobType);
 
         $result = $this->elytraJobService->submitJob(
             $server,
@@ -92,13 +81,7 @@ class ElytraJobsController extends ClientApiController
         }
 
         $handler = $this->elytraJobService->getJobHandler($job['type']);
-        $requiredPermissions = $handler->getRequiredPermissions('show');
-
-        foreach ($requiredPermissions as $permission) {
-            if (!$request->user()->can($permission, $server)) {
-                throw new AuthorizationException();
-            }
-        }
+        $this->authorizeJobOperation($request, $server, $handler, 'show', $job['type']);
 
         return new JsonResponse([
             'object' => 'job',
@@ -118,13 +101,7 @@ class ElytraJobsController extends ClientApiController
         }
 
         $handler = $this->elytraJobService->getJobHandler($job['type']);
-        $requiredPermissions = $handler->getRequiredPermissions('cancel');
-
-        foreach ($requiredPermissions as $permission) {
-            if (!$request->user()->can($permission, $server)) {
-                throw new AuthorizationException();
-            }
-        }
+        $this->authorizeJobOperation($request, $server, $handler, 'cancel', $job['type']);
 
         $result = $this->elytraJobService->cancelJob($server, $jobId);
 
@@ -135,5 +112,25 @@ class ElytraJobsController extends ClientApiController
 
         return new JsonResponse($result);
     }
-}
 
+    /**
+     * Throws unless the user holds every permission the job type requires for the
+     * operation. A null permission list means the operation is not offered for that
+     * job type through this API.
+     *
+     * @throws AuthorizationException
+     */
+    private function authorizeJobOperation(Request $request, Server $server, Job $handler, string $operation, string $jobType): void
+    {
+        $requiredPermissions = $handler->getRequiredPermissions($operation, $jobType);
+        if (is_null($requiredPermissions)) {
+            throw new AuthorizationException();
+        }
+
+        foreach ($requiredPermissions as $permission) {
+            if (!$request->user()->can($permission, $server)) {
+                throw new AuthorizationException();
+            }
+        }
+    }
+}
