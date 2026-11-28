@@ -249,6 +249,7 @@ class CreateServerScheduleTaskTest extends ClientApiIntegrationTestCase
             'power stop' => ['power', 'stop', Permission::ACTION_CONTROL_STOP],
             'power kill' => ['power', 'kill', Permission::ACTION_CONTROL_STOP],
             'power restart' => ['power', 'restart', Permission::ACTION_CONTROL_RESTART],
+            'backup' => ['backup', '', Permission::ACTION_BACKUP_CREATE],
         ];
     }
 }

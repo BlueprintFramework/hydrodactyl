@@ -55,6 +55,7 @@ class Task extends Model
     {
         return match ($action) {
             self::ACTION_COMMAND => Permission::ACTION_CONTROL_CONSOLE,
+            self::ACTION_BACKUP => Permission::ACTION_BACKUP_CREATE,
             self::ACTION_POWER => match (trim((string) $payload)) {
                 'start' => Permission::ACTION_CONTROL_START,
                 'stop', 'kill' => Permission::ACTION_CONTROL_STOP,
